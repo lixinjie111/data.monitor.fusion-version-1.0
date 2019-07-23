@@ -1,0 +1,38 @@
+@charset "UTF-8";
+@import './theme.scss';
+.c-table{
+    border:1px solid #5e5970;
+    /*background-color: #5e5970;*/
+    width:96%;
+    text-align: center;
+    color: #ffffff;
+    font-family: MicrosoftYaHei;
+    letter-spacing: 1px;
+	tr{
+		height: 50px;
+		th{
+			background: #5e5970;
+		}
+		td{
+			background: #2c2b2e;
+		}
+		th,td{
+			border:1px solid #5e5970;
+			opacity: 0.6;
+			color: #ffffff;
+			line-height: 40px;
+		}
+	}
+    .alert-level{
+		display: inline-block;
+		width: 26px;
+		height: 26px;
+		border-radius: 50%;
+		vertical-align: middle;
+		position: relative;
+		.alert-level-value{
+			position: relative;
+			top: -7px;
+		}
+    }
+}

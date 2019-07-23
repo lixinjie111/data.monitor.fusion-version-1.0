@@ -1,0 +1,45 @@
+@charset "UTF-8";
+@mixin lineClampOne() {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin lineClamp($line) {
+  display: -webkit-box;
+  -webkit-line-clamp: $line;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@mixin inlineBg($url, $width:100%, $height:100%, $x:center, $y:center) {
+  background: {
+    image:url($url);
+    position: $x $y;
+    size: $width $height;
+    repeat: no-repeat;
+  }
+}
+//垂直水平居中
+@mixin layoutMode($Mode:both) {
+  display: flex;
+  @if $Mode==align {
+    align-items: center;
+  }
+  @if $Mode==pack {
+    justify-content: center;
+  }
+  @if $Mode==both {
+    align-items: center;
+    justify-content: center;
+  }
+  @if $Mode==between {
+    justify-content: space-between;
+  }
+  @if $Mode==all {
+    align-items: center;
+    justify-content: center;
+    justify-content: space-between;
+  }
+}
