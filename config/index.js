@@ -45,10 +45,10 @@ module.exports = {
 
   build: {
     // Template for index.html
-    index: path.resolve(__dirname, '../dataMonitor/index.html'),
+    index: path.resolve(__dirname, '../fusionMonitor/index.html'),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../dataMonitor'),
+    assetsRoot: path.resolve(__dirname, '../fusionMonitor'),
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
     // // Template for index.html
