@@ -4,10 +4,10 @@
 //-----------------------------------------------------
 @import '@/assets/scss/theme.scss';
 
-@font-face {
+/*@font-face {
   font-family: carFont;
   src: url("../font/NeogreyRegular.otf");
-}
+}*/
 
 [v-cloak] {
   display: none;
@@ -99,140 +99,6 @@ img {
   position: absolute;
 }
 
-.c-pos-wrap {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  height: 0;
-  padding-bottom: 100%;
-  background-color: #e1e1e1;
-}
-.c-pos-inner {
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-}
-
-.c-view-btn {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.c-view-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-.c-view-side {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: 1;
-  width: 398px;
-  padding-top: 100px;
-  background-size: 100% auto;
-  background-repeat: repeat-y;
-  &.c-view-left {
-    left: 0;
-    padding-left: 50px;
-    padding-right: 68px;
-    // background-image: url("../images/public/mask-left.png");
-    background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0)); /* 标准的语法 */
-    .c-scroll-wrap {
-      width: 398px;
-      left: 50px;
-    }
-  }
-  &.c-view-right {
-    right: 0;
-    padding-right: 22px;
-    padding-left: 96px;
-    // background-image: url("../images/public/mask-right.png");
-    // background-size: 150% auto;
-    // background-position: right top;
-    background: linear-gradient(90deg, rgba(0, 0 ,0 , 0), rgba(0, 0 ,0 , .5) 70%); /* 标准的语法 */
-    .c-scroll-wrap {
-      width: 388px;
-      right: 22px;
-    }
-  }
-  .c-scroll-wrap {
-    position: absolute;
-    top: 100px;
-    bottom: 20px;
-    height: auto;
-    .c-scroll-inner {
-      padding-right: 8px;
-    }
-  }
-}
-.c-view-main {
-  height: 100%;
-}
-
-.c-info-wrap {
-  margin-top: 14px;
-  .c-info-list {
-    float: left;
-    width: 50%;
-    padding: 10px 0;
-    line-height: 34px;
-    .c-info-title {
-      font-size: 16px;
-    }
-    .c-info-text {
-      font-family: carFont;
-      font-size: 24px;
-      color: #37ba7b;
-    }
-  }
-}
-.c-title {
-  position: relative;
-  // margin-top: 28px;
-  margin-top: 40px;
-  font-size: 20px;
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(211, 134, 0 , 0.4);
-  font-weight: normal;
-  &:after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -1px;
-    width: 22px;
-    height: 2px;
-    background-color: #d38600;
-  }
-  .c-sub-title {
-    float: right;
-    font-size: 14px;
-    letter-spacing: 1px;
-    line-height: 30px;
-    margin-top: 10px;
-    color: #ccc;
-  }
-}
-
-.c-car-list {
-  // height: 180px;
-  border: solid 1px #5e5970;
-  box-sizing: border-box;
-  background-color: rgba(94, 89, 112, .1);
-  // padding: 14px 12px;
-  margin-bottom: 20px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-  .c-title {
-    margin-top: 0;
-  }
-}
-
 .c-dialog-wrapper {
   position: fixed;
   left: 0;
@@ -313,46 +179,6 @@ img {
   }
 }
 
-
-.c-button-style{
-  font-size:14px;
-  position: absolute;
-  top: 100px;
-  right:400px;
-  color: #ccc;
-  z-index: 2;
-  li{
-    float: left;
-    border:1px solid #5e5970;
-    width: 100px;
-    height: 30px;
-    @include layoutMode();
-    margin-left: -1px;
-    cursor: pointer;
-  }
-  .active{
-    color: #dc8c00;
-    border:1px solid #dc8c00!important;
-    position: relative;
-  }
-}
-.c-map-style{
-  height:100%;
-}
-.c-size-style{
-  width: 330px;
-  height: 210px;
-  margin-bottom: 30px;
-  position: relative;
-  padding: 5px;
-  border:1px solid #5e5970;
-  box-sizing: border-box;
-}
-.c-info-style {
-  position: absolute;
-  right: 20px;
-}
-
 .c-mask-style{
   position: absolute;
   width: 310px;
@@ -364,5 +190,23 @@ img {
     margin-left: 10px;
     font-size: 12px;
     color: #fff;
+  }
+}
+.c-title {
+  position: relative;
+  // margin-top: 28px;
+  margin-top: 40px;
+  font-size: 20px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(211, 134, 0 , 0.4);
+  font-weight: normal;
+  &:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 22px;
+    height: 2px;
+    background-color: #d38600;
   }
 }

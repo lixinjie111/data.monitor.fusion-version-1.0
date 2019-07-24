@@ -2,6 +2,11 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store';
+
+// 全局静态资源
+import './assets/css/reset.css';
+import './assets/scss/public.scss';
+import './assets/scss/element-ui-reset.scss';
 // Element-ui
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'

@@ -9,6 +9,7 @@ const Err404 = resolve => require(['@/views/error/404'], resolve)
 //重新加载当前路由
 const Refresh = resolve => require(['@/views/refresh'], resolve)
 
+const Single = resolve => require(['@/views/single'], resolve)
 Vue.use(Router)
 
 export default new Router({
@@ -31,6 +32,11 @@ export default new Router({
     name: 'Refresh', 
     component: Refresh,
     meta: {}
+  },{
+      path: '/single',
+      name: 'Single',
+      component: Single,
+      meta: {}
   }],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }
