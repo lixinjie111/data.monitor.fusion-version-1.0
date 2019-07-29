@@ -10,6 +10,7 @@ const Err404 = resolve => require(['@/views/error/404'], resolve)
 const Refresh = resolve => require(['@/views/refresh'], resolve)
 
 const Single = resolve => require(['@/views/single'], resolve)
+const Perception = resolve => require(['@/views/perception'], resolve)
 Vue.use(Router)
 
 export default new Router({
@@ -36,6 +37,11 @@ export default new Router({
       path: '/single',
       name: 'Single',
       component: Single,
+      meta: {}
+  },{
+      path: '/perception',
+      name: 'Perception',
+      component: Perception,
       meta: {}
   }],
   scrollBehavior (to, from, savedPosition) {

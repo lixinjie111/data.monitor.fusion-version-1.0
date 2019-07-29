@@ -2,6 +2,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store';
+// 时间戳转时间
+import TDate from '@/utils/date.js'
+Vue.prototype.$dateUtil = TDate;
 
 // 全局静态资源
 import './assets/css/reset.css';

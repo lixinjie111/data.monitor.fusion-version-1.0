@@ -80,7 +80,7 @@
                 <span class="detail2">km/h</span>
             </div>
             <div class="detail1">
-                <span>航向角5°</span>
+                <span>航向角{{realData.headingAngle?realData.headingAngle.toFixed(1):'--'}}°</span>
             </div>
             <div class="detail1">
                 <span>{{nowYear}}</span>
@@ -91,12 +91,13 @@
 </template>
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
+    import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
     export default {
         data() {
             return {
                 option1:{
                     overNative: true,
-                    autoplay: true,
+                    autoplay: false,
                     controls: true,
                     fluid: true,
                     techOrder: ['flash', 'html5'],
@@ -169,20 +170,43 @@
                      'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},
                      'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},
                      'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},
-                    /*'key_3':{},
-                    'key_2':{},
-                    'key_1':{},
-                    'key_4':{}*/
                 },
                 realData:{
                     'longitude':116.40741300,
                     'latitude':39.904214,
                     'speed':56.6
                 },
-                nowYear:'2019-09-03',
-                nowTime:'06:53:00'
+                timer1:0,
+                timer2:0,
+                vehicleId:'B21E-00-017'
             }
 
+        },
+        computed:{
+            nowYear(){
+                if(this.realData.gpsTime==''){
+                    return '--';
+                }else{
+                    return this.$dateUtil.formatTime(this.realData.gpsTime).split(" ")[0];
+                }
+            },
+            nowTime(){
+                if(this.realData.gpsTime==''){
+                    return '--';
+                }else{
+                    return this.$dateUtil.formatTime(this.realData.gpsTime).split(" ")[1];
+                }
+            }
+        },
+        props:{
+            realData:{
+                type:Object,
+                default() {
+                    return {
+
+                    };
+                }
+            }
         },
         methods: {
             //视频报错的方法
@@ -206,8 +230,86 @@
                     }, 2000);
                 }
             },
+            getDeviceInfo(){
+                getLiveDeviceInfo({
+                    'vehicleId': this.vehicleId,
+                }).then(res => {
+                    let result = res.data;
+                    result.forEach(item=>{
+                        //前向摄像头
+                        if(item.toward==0){
+                            if(item.serialNum==''){
+                                this.option1.sources[0].src='';
+                            }else{
+                                this.getStream(this.option1,item);
+                            }
+                        }
+                        //车内摄像头
+                        if(item.toward==4){
+                            if(item.serialNum==''){
+                                this.option2.sources[0].src='';
+                            }else{
+                                this.getStream(this.option2,item);
+                            }
+                        }
+                    })
+                });
+            },
+            getStream(option,item){
+                startStream({
+                    'vehicleId': this.vehicleId,
+                    'camId':item.serialNum,
+                    'protocal':item.protocol
+                }).then(res => {
+                    let streamInfo = res.streamInfoRes;
+                    //获取视频地址并赋值
+                    let rtmp = streamInfo.rtmp;
+                    if(rtmp&&rtmp!=''){
+                        option.sources[0].src = rtmp;
+                        option.bigPlayButton=true;
+                        //直播报活调用
+                        this.repeatFn(item);//拉取流后，保活
+                    }else {
+                        option.notSupportedMessage='视频流不存在，请稍候再试！';
+                        option.bigPlayButton=false;
+                    }
+                });
+            },
+            keepStream(item){
+                sendStreamHeart({
+                    'vehicleId': this.vehicleId,
+                    'camId':item.serialNum,
+                    'protocal':item.protocol
+                }).then(res => {
+                });
+            },
+            repeatFn(item){//每5秒直播报活一次
+                let _this = this;
+                _this.keepStream(item);
+                if(item.toward==0){
+                    clearTimeout(_this.timer1);
+                    _this.timer1 = null;//清除直播报活
+                    _this.timer1 = setTimeout(function(){
+                        _this.repeatFn(item);
+                    },5000)
+                }
+                if(item.toward==4){
+                    clearTimeout(_this.timer2);
+                    _this.timer2 = null;//清除直播报活
+                    _this.timer2 = setTimeout(function(){
+                        _this.repeatFn(item);
+                    },5000)
+                }
+            },
         },
         mounted() {
+            this.getDeviceInfo();
+        },
+        beforeDestroy(){
+            clearTimeout(this.timer1);
+            this.timer1 = null;//清除直播报活
+            clearTimeout(this.timer2);
+            this.timer2 = null;//清除直播报活
 
         }
     }
@@ -222,107 +324,99 @@
     .fusion-video .vjs-modal-dialog-content{
         padding-top:50px!important;
     }
+    .fusion-video .vjs-custom-skin > .video-js .vjs-big-play-button{
+        font-size: 0.5em!important;
+    }
 </style>
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
-    .fusion-right-style{
-        .map-right{
-            .fusion-video{
-                border:1px solid rgba(211, 134, 0, 0.5);
-                margin: 20px 0px;
-                height: 172px;
-            }
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 270px;
-            padding: 0px 30px;
-            background-image: linear-gradient(90deg,
-                    #000000 0%,
-                    #000000 100%);
+    .fusion-video{
+        border:1px solid rgba(211, 134, 0, 0.5);
+        margin: 20px 0px;
+        height: 172px;
+        box-sizing: border-box;
+        padding-top: 10px;
+    }
+    .spat-detail{
+        position: absolute;
+        top: 30px;
+        /*left: 0;
+        text-align: center;*/
+        z-index: 1;
+        left:-300px;
+        margin-left:40%;
+        .spat-layout{
+            float: left;
+            margin-left: 20px;
         }
-        .spat-detail{
-            position: absolute;
-            top: 30px;
-            /*left: 0;
-            text-align: center;*/
-            z-index: 1;
-            left:-300px;
-            margin-left:40%;
-            .spat-layout{
-                float: left;
-                margin-left: 20px;
-            }
-            .spat-detail-style{
-                width: 130px;
-                height: 60px;
-                border-radius: 30px;
-                background-color: #313131;
-                box-sizing: border-box;
-                padding:6px 2px;
-                /*float: left;
-                margin-left: 20px;*/
-                @include layoutMode(align);
-                .spat-detail-img{
-                    width: 48px;
-                    height: 48px;
-                    background-color: #454545;
-                    border-radius: 50%;
-                    display: inline-block;
-                    position: relative;
-                    img{
-                        position: absolute;
-                        top: 50%;
-                        margin-top:-15px;
-                        left: 50%;
-                        margin-left: -14px;
-                    }
-                }
-                .spat-detail-font{
-                    letter-spacing: 4px;
-                    color: #c8360f;
-                    font-size: 36px;
-                    display: inline-block;
-                    margin-left: 12px;
-                }
-                .spat-detail-color{
-                    color: #23b318;
-                }
-                .spat-straight{
-                    transform: rotate(90deg);
-                }
-                .spat-right{
-                    transform: rotate(180deg);
-                }
-                .light-yellow{
-                    color: #d99f04;
-                }
-                .light-red{
-                    color: #c93710;
-                }
-                .light-green{
-                    color: #28b51d;
-                }
-            }
-        }
-        .travel-detail{
-            position: absolute;
-            left: -400px;
-            margin-left:40%;
-            bottom: 20px;
-            font-size: 20px;
-            letter-spacing: 0px;
-           /* background: #24212c;*/
-            z-index:1;
-            .detail1{
+        .spat-detail-style{
+            width: 130px;
+            height: 60px;
+            border-radius: 30px;
+            background-color: #313131;
+            box-sizing: border-box;
+            padding:6px 2px;
+            /*float: left;
+            margin-left: 20px;*/
+            @include layoutMode(align);
+            .spat-detail-img{
+                width: 48px;
+                height: 48px;
+                background-color: #454545;
+                border-radius: 50%;
                 display: inline-block;
-                padding:5px 10px;
-                .detail2{
-                    color: #37ba7b;
-                    display: inline-block;
-                    padding: 0px 2px;
+                position: relative;
+                img{
+                    position: absolute;
+                    top: 50%;
+                    margin-top:-15px;
+                    left: 50%;
+                    margin-left: -14px;
                 }
+            }
+            .spat-detail-font{
+                letter-spacing: 4px;
+                color: #c8360f;
+                font-size: 36px;
+                display: inline-block;
+                margin-left: 12px;
+            }
+            .spat-detail-color{
+                color: #23b318;
+            }
+            .spat-straight{
+                transform: rotate(90deg);
+            }
+            .spat-right{
+                transform: rotate(180deg);
+            }
+            .light-yellow{
+                color: #d99f04;
+            }
+            .light-red{
+                color: #c93710;
+            }
+            .light-green{
+                color: #28b51d;
+            }
+        }
+    }
+    .travel-detail{
+        position: absolute;
+        left: -400px;
+        margin-left:40%;
+        bottom: 20px;
+        font-size: 20px;
+        letter-spacing: 0px;
+       /* background: #24212c;*/
+        z-index:1;
+        .detail1{
+            display: inline-block;
+            padding:5px 10px;
+            .detail2{
+                color: #37ba7b;
+                display: inline-block;
+                padding: 0px 2px;
             }
         }
     }
