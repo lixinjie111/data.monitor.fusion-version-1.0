@@ -1,35 +1,50 @@
 <template>
-    <div class="fusion-right-style">
+    <div class="fusion-right-style" id="fusionRight">
         <div class="map-right">
             <div class="base-info">
                 <span>2019-09-23 08:00:00</span>
                 <img src="@/assets/images/weather/default.png" class="weather-icon"/>
                 <span>15.6°</span>
             </div>
-            <div class="perception-road" id="mapRoad"></div>
+            <div class="perception-road" id="mapRoad">
+                <tusvn-map
+                        ref="map1"
+                        targetId="map1"
+                        overlayContainerId="overlay1"
+                        :isMasker='false'
+                        :isCircle='false'
+
+                        @ViewLevelChange="levelChange"
+                        @MapInitComplete='map1InitComplete'>
+                </tusvn-map>
+            </div>
         </div>
         <div id="map" class="c-map">
-            <div class="style" id="message">
+            <div class="style" id="message" :style="{left:left+'px',top:top+'px'}">
                 <video-player class="vjs-custom-skin" :options="option" @error="playerError1"></video-player>
             </div>
+            <tusvn-map
+                    ref="map"
+                    targetId="ddd"
+                    overlayContainerId="ccc"
+                    :isMasker='false'
+                    :isCircle='false'
+
+                    @ViewLevelChange="viewLevelChange"
+                    @MapInitComplete='mapInitComplete'
+                    @ExtentChange="dragEnd"
+                    >
+
+            </tusvn-map>
         </div>
     </div>
 </template>
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
-    import Animation from '@/assets/js/animation.js'
+    import TusvnMap from './TusvnMap.vue';
     export default {
         data() {
             return {
-                mapOption:{
-                    resizeEnable: true,
-                    center: [121.17265957261286,31.284096076877844],
-                    mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00",
-                    expandZoomRange:true,
-                    zoom:18
-                },
-                map:{},
-                roadMap:{},
                 option:{
                     overNative: true,
                     autoplay: false,
@@ -65,18 +80,16 @@
                         playbackRateMenuButton:false
                     }
                 },
+                movement:0,
+                left:'800',
+                top:'260',
+                timer:0,
+                zoom:19
+
             }
         },
+        components: { TusvnMap },
         methods: {
-            getWms() {
-                var wms  = new AMap.TileLayer.WMS({
-                    url:'http://10.0.1.22:8080/geoserver/shanghai_qcc/wms',
-                    blend: false,
-                    tileSize: 256,
-                    params:{'LAYERS': 'shanghai_qcc:dl_shcsq_wgs84_zc_0708',VERSION:'1.1.0'}
-                })
-                wms.setMap(this.map);
-            },
             playerError1(e) {
                 console.log("playerError");
                 if(this.option1.sources[0].src != '') {
@@ -87,23 +100,58 @@
                     }, 2000);
                 }
             },
+            animation(left,top){
+                if(this.timer!=0){
+                    clearTimeout(this.timer);
+                }
+                let element = document.getElementById('message');
+                let ele = document.getElementById('fusionRight');
+                let topPosition = ele.clientHeight-160;//整个高度减去弹出框的高度
+                let leftPosition = 0;//向左的偏移
+                if(top<topPosition){ top++;}          //如果xpos小于终点的left,给它加1.
+                if(left >leftPosition){ left--;}       //如果ypos小于终点的left,给它加1.
+                /*setTimeout(()=>{
+                    this.left=0;
+                    this.top=height;
+                },10)*/
+                if(top==topPosition&&left==leftPosition){
+                    clearTimeout(this.timer);
+                    return;
+                }
+                this.timer = setTimeout(()=>{
+                    this.left=left;
+                    this.top=top;
+                    this.animation(left,top)
+                },10)
+            },
+            mapInitComplete(tusvnmap){
+                this.$refs.map.centerAt(121.17265957261286,31.284096076877844);
+                this.$refs.map.zoomTo(this.zoom);
+                this.$refs.map.addImgOverlay('img1', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17265957261286, 31.284096076877844, "{'data':'5'}", [0,0], this.imgClick);
+            },
+            viewLevelChange(tusvnmap,mevent){
+                // console.log("============================viewLevelChange=============================");
+                // console.log(tusvnmap);
+                // console.log(mevent);
+            },
+            dragEnd(map,currentExtend){
+                //拖拽完成后获取边界范围，同时设置地图的中心点
+                console.log("当前的边界范围："+currentExtend);
+            },
+            imgClick(data){
+                debugger
 
+            },
+            map1InitComplete(){
+                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
+                this.$refs.map1.zoomTo(10);
+            },
+            levelChange(){
+
+            }
         },
         mounted() {
-            this.map = new AMap.Map('map',this.mapOption);
-            this.roadMap = new AMap.Map('mapRoad', this.$parent.$parent.defaultMapOption);
-            this.getWms();
-            var pixel = new AMap.Pixel(800,440);
-            var lnglat = this.map.containerToLngLat(pixel);
-            var pixel1 = this.map.lnglatTocontainer([121.17265957261286,31.284096076877844]);
-            console.log("经纬度："+lnglat)
-            console.log("容器像素："+pixel1)
-            let marker = new AMap.Marker({
-                icon: "http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png",
-                position: [121.17265957261286,31.284096076877844],
-            });
-            marker.setMap(this.map);
-           /* Animation.positionMessage('message');*/
+//            this.animation(800,260);
         }
     }
 </script>
@@ -128,6 +176,7 @@
         border:1px solid rgba(211, 134, 0, 0.5);
         position: absolute;
         bottom: 30px;
+        background: #000;
     }
     .base-info{
         padding:30px 0px ;
@@ -148,13 +197,13 @@
         z-index:1;
         padding-top: 5px;
         box-sizing: border-box;
-        animation: move 3s linear;;
+        /*animation: move 3s linear;;*/
 
     }
-    @keyframes move {
+   /* @keyframes move {
         0%{transform:translate(0,0);}
         100%{transform:translate(50px,100px);}
-    }
+    }*/
     .style:before{
         position: absolute;
         content: '';
