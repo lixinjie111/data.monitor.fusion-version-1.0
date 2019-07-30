@@ -122,6 +122,7 @@ export default {
             // this.clickEventKey = this.$data.map.on("click",this.mapClick);
             this.$data.map.getView().on("change:resolution",this.viewLevelChange);
             this.$data.map.on("moveend",this.moveEnd);
+            this.$data.map.on("rendercomplete",this.rendercomplete);
             
             // this.removeClickEvent();
             unByKey(this.clickEventKey);
@@ -145,6 +146,8 @@ export default {
             //     5,
             //     "vectorLayer_01"
             // );
+
+            
         },
         /**
          * 根据像素位置获取经纬度坐标
@@ -364,6 +367,9 @@ export default {
         },
         moveEnd:function(mevent){
             this.$emit("ExtentChange",this,this.getCurrentExtent());
+        },
+        rendercomplete:function(){
+            this.$emit("MapRenderComplete",this);
         },
         /**
          * 固定地图到某一缩放级别，使鼠标滚轮失效
