@@ -43,14 +43,6 @@
         </div>
         <div class="spat-detail clearfix">
             <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
-                <!--<div v-show="key=='key_3'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img" >
-                        <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'"/>
-                        <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>-->
                 <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img">
                         <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
@@ -76,25 +68,6 @@
                     <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                 </div>
             </div>
-            <!--<div class="spat-detail-style">
-              <div class="spat-detail-img">
-                <img src="@/assets/images/car/left-red.png"/>
-              </div>
-              <span class="spat-detail-font">20</span>
-            </div>
-            <div class="spat-detail-style">
-              <div class="spat-detail-img">
-                <img src="@/assets/images/car/car-28.png"/>
-              </div>
-
-              <span class="spat-detail-font spat-detail-color">43</span>
-            </div>
-            <div class="spat-detail-style">
-              <div class="spat-detail-img spat-right">
-                <img src="@/assets/images/car/car-28.png"/>
-              </div>
-              <span class="spat-detail-font spat-detail-color">10</span>
-            </div>-->
         </div>
     </div>
 </template>
@@ -236,7 +209,9 @@
                 this.$refs.map.addImgOverlay('img1', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17265957261286, 31.284096076877844, "{'data':'5'}", [0,0], this.imgClick);
                 this.$refs.map.addImgOverlay('img2', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17244854150163, 31.283475072766722, "{'data':'5'}", [0,0], this.imgClick);
                 this.$refs.map.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
-                },
+                debugger
+                let result = this.$refs.map.getCoordinateFromPixel([117,39]);
+            },
             viewLevelChange(tusvnmap,mevent){
                 // console.log("============================viewLevelChange=============================");
                 // console.log(tusvnmap);
