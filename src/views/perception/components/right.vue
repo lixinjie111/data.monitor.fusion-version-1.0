@@ -15,7 +15,8 @@
                         :isCircle='false'
 
                         @ViewLevelChange="levelChange"
-                        @MapInitComplete='map1InitComplete'>
+                        @MapInitComplete='map1InitComplete'
+                        @MapRenderComplete='mapRenderComplete'>
                 </tusvn-map>
             </div>
         </div>
@@ -168,13 +169,24 @@
                     }
                 },10)
             },
-            mapInitComplete(tusvnmap){
+            mapInitComplete:function(tusvnmap){
                 this.$refs.map.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map.zoomTo(this.zoom);
                 this.$refs.map.addImgOverlay('img1', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17265957261286, 31.284096076877844, "{'data':'5'}", [0,0], this.imgClick);
                 this.$refs.map.addImgOverlay('img2', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17244854150163, 31.283475072766722, "{'data':'5'}", [0,0], this.imgClick);
                 this.$refs.map.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
-                },
+            //    setTimeout(()=>{
+                    
+                    // },2000);
+            },
+            mapRenderComplete:function(map){
+                var coord = map.getCoordinateFromPixel([24,35]);
+                    console.log(coord);
+                    var pixel = map.getPixelFromCoordinate([(121.17188977862558+121.17342936660013)/2,(31.28308488407923+31.28510726967646)/2]);
+                    console.log(pixel);
+            },
+            
+               
             viewLevelChange(tusvnmap,mevent){
                 // console.log("============================viewLevelChange=============================");
                 // console.log(tusvnmap);
