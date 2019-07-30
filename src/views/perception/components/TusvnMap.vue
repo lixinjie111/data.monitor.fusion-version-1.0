@@ -16,117 +16,7 @@
             </div>
         </template>
         
-        <template>
-            <div v-show="showTrafficInfoPop" id="traffic-info-release-popup" class="ol-popup yk-pointer-normal" >
 
-                <img class="yk-close-btn" src="static/images/close.png" @click="closeMyInfoWindow($event)">
-
-                <div id="traffic-info-release-popup-content">                   
-
-                    <div>
-                        <el-row class="yk-pad-10 yk-bottom-border">
-                            <label class="yk-info-window-title">交通信息发布</label>                        
-                        </el-row>
-                        <el-row class="yk-pad-1020">
-                            
-                            <el-form ref="ruleFormMap" :rules="rules" :model="trafficInfo" size="mini" label-width="108px" class="demo-ruleForm yk-left" style="margin-right: 10px;">
-
-                                <el-form-item label="信息类型" class="yk-bottom-12 yk-txt">
-                                    <span>{{trafficInfo.eventName}}</span>
-                                </el-form-item>
-
-                                <el-form-item label="中心位置" prop="name" class="yk-bottom-12 yk-txt">                                
-                                    <span>{{trafficInfo.longitude + ',' + trafficInfo.latitude}}</span>
-                                </el-form-item>
-
-                                <el-form-item label="广播范围" prop="affectRange" class="yk-bottom-12 yk-txt" style="height: 45px;">
-                                    <el-slider style="padding: 0px 5px;" v-model="trafficInfo.affectRange" :marks="broadcastRangeMarks" :min="broadcastMin" :max="broadcastMax" :step="broadcastStep" @change="sliderChange"></el-slider>
-                                </el-form-item>                                
-
-                                <el-form-item label="影响路径" prop="alertPath" class="yk-bottom-12 yk-txt">
-
-                                    <!-- placeholder="格式：1.1,2.2;3.3,4.4" -->
-                                    <el-input size="mini" v-model="select.alertPath" class="yk-readonly" style="margin-right: 50px;">
-                                        <template slot="append">
-                                            <el-button class="yk-btn-append" type="primary" @click="addEffectPath();">
-                                                <template v-if="!select.alertPath">添加</template>
-                                                <template v-else>更新</template>
-                                            </el-button>
-                                        </template>
-                                    </el-input>
-
-                                    <el-tooltip class="yk-btn-tooltip" effect="light" :content="select.alertPath" placement="top-end" popper-class="path-view-popover" v-if="select.alertPath">
-                                       <el-button class="yk-btn-append" type="primary">查看</el-button>
-                                    </el-tooltip>
-                                </el-form-item>
-
-                                <!-- <el-form-item label="影响范围" prop="alertRadius" class="yk-bottom-12 yk-txt">
-                                    <el-input size="mini" v-model="trafficInfo.alertRadius">
-                                        <span slot="append" class="yk-unit">米</span>
-                                    </el-input>
-                                </el-form-item> -->
-                                <!-- <el-input-number v-model.trim="ruleForm.alertRadius" controls-position="right" :min="1" :max="1024"></el-input-number> -->
-                                <el-form-item label="影响范围" prop="alertRadius" class="yk-bottom-12 yk-txt">
-                                    <el-input-number v-model.trim="trafficInfo.alertRadius" controls-position="right" :min="1" :max="1024"></el-input-number>
-                                </el-form-item>
-
-                                <el-form-item label="信息内容" prop="content" class="yk-bottom-16 yk-textarea">
-                                    <el-input type="textarea" size="mini" v-model="trafficInfo.content"></el-input>
-                                </el-form-item>
-
-                                <el-form-item label="发布频率" prop="frequency" class="yk-bottom-12 yk-txt">
-                                    <el-input size="mini" v-model="trafficInfo.frequency">
-
-                                        <template slot="append">
-                                            <select class="yk-w-51 yk-input-select-2" v-model="select.frequencyUnit">
-                                                <option v-for="(item,index) in frequencyUnitList" :key="index" :value="item">{{item.name}}</option>
-                                            </select>
-                                        </template>
-
-                                    </el-input>
-                                </el-form-item>
-                                
-                                <el-form-item label="发送生效时间" prop="beginTime" class="yk-bottom-12 yk-txt">
-                                    <el-date-picker
-                                        v-model="trafficInfo.beginTime"
-                                        type="datetime"
-                                        placeholder="选择日期时间">
-                                    </el-date-picker>
-                                </el-form-item>
-
-                                <el-form-item label="发送失效时间" prop="endTime" class="yk-bottom-12 yk-txt">
-                                    <el-date-picker
-                                        v-model="trafficInfo.endTime"
-                                        type="datetime"
-                                        placeholder="选择日期时间">
-                                    </el-date-picker>
-                                </el-form-item>
-
-                                <el-form-item v-if="trafficInfo.isEdit" prop="datasource" label="信息来源" class="yk-bottom-12  yk-txt">                                    
-                                    <select class="yk-select" v-model="select.datasource">
-                                        <option v-for="(item,index) in datasourceList" :key="index" :value="item">{{item.name}}</option>                                        
-                                    </select>
-                                </el-form-item>
-
-                                <el-form-item label="告警类别" class="yk-bottom-12  yk-txt" v-if="false">                                    
-                                <!-- <el-form-item label="告警类别" class="yk-bottom-12  yk-txt">                                     -->
-                                    <el-input size="mini" v-model="trafficInfo.alertCategory"></el-input>
-                                </el-form-item>
-
-                                <el-form-item style="text-align:right;margin-top: 10px;margin-top: 15px;margin-bottom: 10px;">
-                                    <el-button class="yk-w-80 yk-border-normal" type="warning" v-show="!trafficInfo.isEdit" @click="publichInfo($event);">发布</el-button>
-                                    <el-button class="yk-w-80 yk-border-normal" type="info" v-show="!trafficInfo.isEdit" @click="closeInforWindow($event);">取消</el-button>
-
-                                    <el-button class="yk-w-80 yk-border-normal" type="warning" v-show="trafficInfo.isEdit" @click="updateInfo($event);">更新</el-button>
-                                    <el-button class="yk-border-normal" type="info" v-show="trafficInfo.isEdit" @click="destroyInfo($event);">手动失效</el-button>                                    
-                                </el-form-item>
-
-                            </el-form>
-                        </el-row>
-                    </div>
-                </div>
-            </div>
-        </template>
     </div>
 </template>
 <script>
@@ -800,8 +690,8 @@ export default {
                 })
             });
             
-            this.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
-
+            /*this.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
+*/
             // this.clickEventKey = this.$data.map.on("click",this.mapClick);
             this.$data.map.getView().on("change:resolution",this.viewLevelChange);
             this.$data.map.on("moveend",this.moveEnd);

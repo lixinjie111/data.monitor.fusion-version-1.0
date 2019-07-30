@@ -10,7 +10,13 @@
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2"></video-player>
             </div>
         </div>
-        <div></div>
+        <div class="c-map">
+            <tusvn-map :target-id="'mapMonitor'" ref="tusvnMap"
+                       background="black" minX=325295.155400   minY=3461941.703700  minZ=50
+            maxX=326681.125700  maxY=3462723.022400  maxZ=80
+            @mapcomplete="onMapComplete">
+            </tusvn-map>
+        </div>
         <div class="spat-detail clearfix">
             <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
                 <div v-show="key=='key_3'&&item.flag" class="spat-detail-style">
@@ -92,6 +98,8 @@
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
+    import TusvnMap from '@/components/Tusvn3DMap2'
+    import {getMap} from '@/utils/tusvnMap.js';
     export default {
         data() {
             return {
@@ -171,11 +179,11 @@
                      'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},
                      'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},
                 },
-                realData:{
+               /* realData:{
                     'longitude':116.40741300,
                     'latitude':39.904214,
                     'speed':56.6
-                },
+                },*/
                 timer1:0,
                 timer2:0,
                 vehicleId:'B21E-00-017'
@@ -301,9 +309,18 @@
                     },5000)
                 }
             },
+            onMapComplete:function(){
+                console.log("onMapComplete");
+                getMap(this.$refs.tusvnMap1);
+                /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                this.$refs.tusvnMap1.changeRcuId(window.cfg.websocketUrl,this.roadItem1.camSerialNum);*/
+            },
         },
         mounted() {
             this.getDeviceInfo();
+        },
+        components:{
+            TusvnMap
         },
         beforeDestroy(){
             clearTimeout(this.timer1);
@@ -326,6 +343,9 @@
     }
     .fusion-video .vjs-custom-skin > .video-js .vjs-big-play-button{
         font-size: 0.5em!important;
+    }
+    .video-js{
+        height: 150px!important;
     }
 </style>
 <style lang="scss" scoped>
