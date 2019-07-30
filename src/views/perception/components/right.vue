@@ -19,6 +19,7 @@
                 </tusvn-map>
             </div>
         </div>
+        <div class="map-left"></div>
         <div id="map" class="c-map">
             <div class="style" id="message1" :style="{left:left1+'px',top:top1+'px'}">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
@@ -39,6 +40,61 @@
                     >
 
             </tusvn-map>
+        </div>
+        <div class="spat-detail clearfix">
+            <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
+                <!--<div v-show="key=='key_3'&&item.flag" class="spat-detail-style">
+                    <div class="spat-detail-img" >
+                        <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'"/>
+                        <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"/>
+                        <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"/>
+                    </div>
+                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                </div>-->
+                <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
+                    <div class="spat-detail-img">
+                        <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
+                        <img src="@/assets/images/single/light/left-red.png" class="left-img" v-show="item.lightColor=='RED'"/>
+                        <img src="@/assets/images/single/light/left-green.png" class="left-img" v-show="item.lightColor=='GREEN'"/>
+                    </div>
+                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                </div>
+                <div v-show="key=='key_1'&&item.flag" class="spat-detail-style">
+                    <div class="spat-detail-img spat-straight">
+                        <img src="@/assets/images/single/light/left-yellow.png" class="straight-img" v-show="item.lightColor=='YELLOW'" />
+                        <img src="@/assets/images/single/light/left-red.png" class="straight-img" v-show="item.lightColor=='RED'"/>
+                        <img src="@/assets/images/single/light/left-green.png" class="straight-img" v-show="item.lightColor=='GREEN'"/>
+                    </div>
+                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                </div>
+                <div v-show="key=='key_4'&&item.flag" class="spat-detail-style">
+                    <div class="spat-detail-img spat-right">
+                        <img src="@/assets/images/single/light/left-yellow.png" class="right-img" v-show="item.lightColor=='YELLOW'"/>
+                        <img src="@/assets/images/single/light/left-red.png"  class="right-img" v-show="item.lightColor=='RED'"/>
+                        <img src="@/assets/images/single/light/left-green.png" class="right-img" v-show="item.lightColor=='GREEN'"/>
+                    </div>
+                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                </div>
+            </div>
+            <!--<div class="spat-detail-style">
+              <div class="spat-detail-img">
+                <img src="@/assets/images/car/left-red.png"/>
+              </div>
+              <span class="spat-detail-font">20</span>
+            </div>
+            <div class="spat-detail-style">
+              <div class="spat-detail-img">
+                <img src="@/assets/images/car/car-28.png"/>
+              </div>
+
+              <span class="spat-detail-font spat-detail-color">43</span>
+            </div>
+            <div class="spat-detail-style">
+              <div class="spat-detail-img spat-right">
+                <img src="@/assets/images/car/car-28.png"/>
+              </div>
+              <span class="spat-detail-font spat-detail-color">10</span>
+            </div>-->
         </div>
     </div>
 </template>
@@ -61,7 +117,13 @@
                 timer2:0,
                 zoom:19,
                 topPosition:0,
-                lastPosition:0
+                lastPosition:0,
+                lightData:{
+                    'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
+                    'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},//左转
+                    'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
+                    'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转
+                },
 
             }
         },
@@ -242,6 +304,7 @@
     }
 </style>
 <style lang="scss" scoped>
+    @import '@/assets/scss/theme.scss';
     .perception-road{
         height: 180px;
         width: 270px;
@@ -286,5 +349,89 @@
         bottom: -20px;
         left:16px;
 
+    }
+    .spat-detail{
+        position: absolute;
+        top: 30px;
+        /*left: 0;
+        text-align: center;*/
+        z-index: 1;
+        left:-300px;
+        margin-left:40%;
+        .spat-layout{
+            float: left;
+            margin-left: 20px;
+        }
+        .spat-detail-style{
+            width: 86px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #313131;
+            box-sizing: border-box;
+            padding:6px 2px;
+            /*float: left;
+            margin-left: 20px;*/
+            @include layoutMode(align);
+            .spat-detail-img{
+                width: 32px;
+                height: 32px;
+                background-color: #454545;
+                border-radius: 50%;
+                display: inline-block;
+                position: relative;
+                .left-img{
+                    width: 20px;
+                    height: 18px;
+                }
+                .straight-img{
+                    width: 18px;
+                    height: 20px;
+                }
+                .right-img{
+                    width: 20px;
+                    height: 18px;
+                }
+                img{
+                    position: absolute;
+                    top: 50%;
+                    margin-top:-15px;
+                    left: 50%;
+                    margin-left: -14px;
+                }
+            }
+            .spat-detail-font{
+                letter-spacing: 4px;
+                color: #c8360f;
+                font-size: 36px;
+                display: inline-block;
+                margin-left: 12px;
+            }
+            .spat-detail-color{
+                color: #23b318;
+            }
+            .spat-left{
+                width: 20px;
+                height: 18px;
+            }
+            .spat-straight{
+                transform: rotate(90deg);
+                width: 18px;
+                height: 20px;
+            }
+            .spat-right{
+                transform: rotate(180deg);
+                width: 20px;
+                height: 18px;
+            }
+            .light-yellow{
+                color: #d99f04;
+            }
+            .light-red{
+                color: #c93710;
+            }
+            .light-green{
+                color: #28b51d;
+            }
+        }
     }
 </style>
