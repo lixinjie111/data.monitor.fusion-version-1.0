@@ -11,6 +11,7 @@ const Refresh = resolve => require(['@/views/refresh'], resolve)
 
 const Single = resolve => require(['@/views/single'], resolve)
 const Perception = resolve => require(['@/views/perception'], resolve)
+const Overview = resolve => require(['@/views/overview'], resolve)
 Vue.use(Router)
 
 export default new Router({
@@ -43,6 +44,10 @@ export default new Router({
       name: 'Perception',
       component: Perception,
       meta: {}
+  },{
+    path: '/overview',
+    name: 'Overview',
+    component: Overview
   }],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }

@@ -35,9 +35,10 @@ img {
     border-radius: 33px;
 }
 
-/*.c-scroll-inner {
-    padding-right: 5px;
-}*/
+.c-scroll-inner {
+    // padding-right: 5px;
+    height: 100%;
+}
 
 .c-scroll-inner::-webkit-scrollbar { /*滚动条整体样式*/
     width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
@@ -229,7 +230,6 @@ img {
   top: 0;
   right: 0;
   bottom: 0;
-  width: 270px;
   padding: 0px 30px;
   background:linear-gradient(90deg,transparent 0%,rgb(0,0,0) 100%);
   z-index:1;
