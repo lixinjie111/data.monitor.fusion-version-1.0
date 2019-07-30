@@ -311,7 +311,7 @@
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
-                getMap(this.$refs.tusvnMap1);
+                getMap(this.$refs.tusvnMap);
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.cfg.websocketUrl,this.roadItem1.camSerialNum);*/
             },

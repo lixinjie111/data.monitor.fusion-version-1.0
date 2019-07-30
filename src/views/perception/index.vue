@@ -3,12 +3,12 @@
         <div class="fusion-left">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
-                    <left></left>
+                    <left :currentExtent="currentExtent"></left>
                 </div>
             </div>
         </div>
         <div class="fusion-right">
-            <right></right>
+            <right @getCurrentExtent="getCurrentExtent"></right>
         </div>
     </div>
 </template>
@@ -20,9 +20,14 @@
             return {
                 webSocket:{},
                 vehicleId:'B21E-00-021',
+                currentExtent:[]
             }
         },
         methods: {
+            getCurrentExtent(currentExtent){
+                this.currentExtent = currentExtent;
+//                console.log("边界值："+this.currentExtent);
+            }
         },
         components:{Left,Right},
         mounted() {
@@ -42,7 +47,7 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 330px;
+            width: 360px;
             background: #1a1a1a;;
         }
         .fusion-right{
@@ -50,7 +55,7 @@
             top: 0;
             right: 0;
             bottom: 0;
-            left: 330px;
+            left: 360px;
         }
     }
 </style>

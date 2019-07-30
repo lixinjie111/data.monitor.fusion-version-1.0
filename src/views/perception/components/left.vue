@@ -9,45 +9,49 @@
             <ul class="perception-style">
                 <li>
                     <span class="overview-sign fusion-sign"></span>
-                    <span>融合后感知车辆：34</span>
+                    <span>融合后感知车辆：{{fusionData.veh || 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign fusion-sign"></span>
-                    <span>融合后行人：34</span>
+                    <span>融合非机动车：{{fusionData.nonMotor || 0}}</span>
+                </li>
+                <li>
+                    <span class="overview-sign fusion-sign"></span>
+                    <span>融合后行人：{{fusionData.person || 0}}</span>
                 </li>
             </ul>
             <p class="c-title">感知数据</p>
             <ul  class="perception-style">
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span>平台直连：车辆8</span>
+                    <span>平台直连：车辆 {{platformData.veh || 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span>车辆感知：车辆8，行人3</span>
+                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，非机动车 {{perceptionData.noMotor || 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span>路侧识别：车辆34，行人3</span>
+                    <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，非机动车 {{sideData.noMotor || 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span>V2X通讯：车辆9</span>
+                    <span>V2X通讯：车辆 {{v2xData.veh|| 0}}</span>
                 </li>
             </ul>
             <p class="c-title">交通数据</p>
             <ul class="perception-style">
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>交通事件：1</span>
+                    <span>下发预警信息：{{warningCount}}</span>
                 </li>
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>交通事件：1</span>
+                    <span>接入红绿灯：1</span>
                 </li>
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>交通事件：1</span>
+                    <span>接入交通标志牌：1</span>
                 </li>
             </ul>
         </div>
@@ -56,11 +60,149 @@
 <script>
     export default {
         data() {
-            return {}
-        },
-        methods: {},
-        mounted() {
+            return {
+                webSocket:{},
+                warningWebsocket:{},
+                fusionData:{},
+                platformData:{},
+                perceptionData:{},
+                sideData:{},
+                v2xData:{},
+                warningIdList:[],
+                warningCount:0
 
+            }
+        },
+        props:{
+            currentExtent:{
+                type:Array,
+                default() {
+                    return [];
+                }
+            }
+        },
+        methods: {
+            initWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.webSocket = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+                }
+                _this.webSocket.onmessage = _this.onmessage;
+                _this.webSocket.onclose = _this.onclose;
+                _this.webSocket.onopen = _this.onopen;
+                _this.webSocket.onerror = _this.onerror;
+            },
+            onmessage(mesasge){
+                let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let result = json.result;
+                _this.fusionData = result.stat;
+                //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
+                if(result.cbox){
+                    _this.platformData=result.cbox;
+                }
+                if(result.vehPer){
+                    _this.perceptionData=result.vehPer;
+                }
+                if(result.rcu){
+                    _this.sideData=result.rcu;
+                }
+                if(result.obu){
+                    _this.v2xData=result.obu;
+                }
+            },
+            onclose(data){
+                console.log("结束连接");
+            },
+            onopen(data){
+                //获取车辆状态
+                var fusionStatus = {
+                    "action":"road_real_data_stat",
+                    "region": [[
+                        121.1620245,
+                        31.2859340]
+                        , [
+                            121.1626339,
+                            31.2815266
+                        ], [
+                            121.1781135,
+                            31.2774582
+                        ],
+                        [121.1817312,
+                            31.2867279]]
+                }
+                var fusionStatusMsg = JSON.stringify(fusionStatus);
+                this.sendMsg(fusionStatusMsg);
+            },
+            sendMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.webSocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
+            initWarningWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.warningWebsocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                }
+                _this.warningWebsocket.onmessage = _this.onWarningMessage;
+                _this.warningWebsocket.onclose = _this.onWarningClose;
+                _this.warningWebsocket.onopen = _this.onWarningOpen;
+            },
+            onWarningMessage(mesasge){
+                var _this=this;
+                var json = JSON.parse(mesasge.data);
+                var warningData = json.result.data;
+                let warningId;
+                warningData.forEach(item=>{
+                    warningId = item.warnId;
+                    warningId = warningId.substring(0,"_".lastIndexOf(warningId));
+                    if(_this.warningIdList.indexOf(warningId)!=-1){
+                        _this.warningIdList.push(warningId);
+                        _this.warningCount++;
+                    }
+                })
+            },
+            onWarningClose(data){
+                console.log("结束连接");
+            },
+            onWarningOpen(data){
+                //旁车
+                var warning = {
+                    "action": "clod_event",
+                    "region": [
+                        [121.1620245, 31.2859340],
+                        [121.1626339, 31.2815266],
+                        [121.1781135, 31.2774582],
+                        [121.1817312, 31.2867279]
+                    ]
+                }
+                var warningMsg = JSON.stringify(warning);
+                this.sendWarningMsg(warningMsg);
+            },
+            sendWarningMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.warningWebsocket.send(msg); //send()发送消息
+                        console.log("warning已发送消息:"+ msg);
+                    }
+                }else{
+                    return;
+                }
+            }
+        },
+        mounted() {
+            this.initWebSocket();
+            this.initWarningWebSocket();
+        },
+        destroyed(){
+            this.webSocket.close();
+            this.warningWebsocket.close();
         }
     }
 </script>
@@ -79,6 +221,11 @@
                 border-radius: 50%;
                 display: inline-block;
                 margin-right:20px;
+            }
+            .fusion-font{
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
             }
             .fusion-sign{
                 background:#9b9b9b;
