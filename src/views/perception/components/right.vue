@@ -360,68 +360,65 @@
         margin-left:40%;
         .spat-layout{
             float: left;
-            margin-left: 20px;
+            margin-left: 8px;
         }
         .spat-detail-style{
             width: 86px;
             height: 40px;
             border-radius: 20px;
-            background-color: #313131;
+            background-color:rgba(0,0,0,0.5);
             box-sizing: border-box;
             padding:6px 2px;
             /*float: left;
             margin-left: 20px;*/
             @include layoutMode(align);
+
             .spat-detail-img{
                 width: 32px;
                 height: 32px;
-                background-color: #454545;
+                background-color: rgba(0,0,0,0.8);
                 border-radius: 50%;
                 display: inline-block;
                 position: relative;
+                img{
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                }
                 .left-img{
                     width: 20px;
                     height: 18px;
+                    margin-left: -10px;
+                    margin-top: -9px;
                 }
                 .straight-img{
-                    width: 18px;
-                    height: 20px;
+                    width: 20px;
+                    height: 16px;
+                    margin-left: -10px;
+                    margin-top: -8px;
                 }
                 .right-img{
                     width: 20px;
                     height: 18px;
-                }
-                img{
-                    position: absolute;
-                    top: 50%;
-                    margin-top:-15px;
-                    left: 50%;
-                    margin-left: -14px;
+                    margin-left: -10px;
+                    margin-top: -9px;
                 }
             }
             .spat-detail-font{
                 letter-spacing: 4px;
                 color: #c8360f;
-                font-size: 36px;
+                font-size: 24px;
                 display: inline-block;
                 margin-left: 12px;
             }
             .spat-detail-color{
                 color: #23b318;
             }
-            .spat-left{
-                width: 20px;
-                height: 18px;
-            }
             .spat-straight{
                 transform: rotate(90deg);
-                width: 18px;
-                height: 20px;
             }
             .spat-right{
                 transform: rotate(180deg);
-                width: 20px;
-                height: 18px;
             }
             .light-yellow{
                 color: #d99f04;
