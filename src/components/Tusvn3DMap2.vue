@@ -28,6 +28,7 @@ export default {
 
             ,shps:{}
             ,models:{}
+            ,infoLabels:{gan:{},label:{}}
             ,deviceModels:{
             }
 
@@ -148,6 +149,51 @@ export default {
         },
         getModel:function(id){
           return this.models[id];
+        },
+        remove3DInforLabel:function(name){
+            let gan = this.infoLabels["gan"][name];
+            let label = this.infoLabels["label"][name];
+            if(gan!=null)
+            {
+                dl.removeModel(gan,this.viewer);
+                delete this.infoLabels["gan"][name];
+            }
+            if(label!=null)
+            {
+                dl.removeModel(label,this.viewer);
+                delete this.infoLabels["label"][name];
+            }
+        },
+        add3DInfoLabel:function(name,text,x,y,z){
+            var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05 ,8,0 ,0);
+            var cylinderMat = new THREE.MeshLambertMaterial({//创建材料
+                color:0xFF0000,
+                wireframe:false
+            });
+            //创建圆柱体网格模型
+            var cylinderMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
+            cylinderMesh.position.set(x, y, z);//设置圆柱坐标
+            cylinderMesh.rotation.x=Math.PI/2;
+            cylinderMesh.position.set(x, y, z);
+
+            
+            this.scene.add(cylinderMesh);
+
+            this.infoLabels["gan"][name]=cylinderMesh;
+
+            var text1 = new dl.Text({
+                text:text,
+                fontsize:this.fontSize,
+                borderThickness:0,
+                textColor:{r: 0, g: 0, b: 0, a: 1.0}
+            });
+
+            this.infoLabels["label"][name]=text1;
+            this.scene.add(text1);
+
+            text1.setPositon([x,y,z]);
+            text1.fontface=this.fontface;
+            text1.update();
         },
         updateModelPostion:function(modelId,x,y,z,heading){
             let model = this.models[modelId];
