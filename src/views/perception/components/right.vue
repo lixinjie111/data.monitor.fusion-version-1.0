@@ -42,7 +42,7 @@
 
             </tusvn-map>
         </div>
-        <div class="spat-detail clearfix">
+        <div class="spat-detail clearfix" v-for="item in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
             <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
                 <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img">
@@ -75,7 +75,7 @@
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
     import TusvnMap from './TusvnMap.vue';
-    import {getPerceptionAreaInfo,getVideoByNum} from '@/api/fusion'
+    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData} from '@/api/fusion'
     export default {
         data() {
             return {
@@ -83,8 +83,8 @@
                 rtmp1:'',
                 option2:{},
                 movement:0,
-                left1:'800',
-                top1:'260',
+                left1:'',
+                top1:'',
                 isEnd1:false,
                 isEnd2:false,
                 left2:'700',
@@ -95,16 +95,17 @@
                 topPosition:0,
                 lastPosition:0,
                 lightData:{
-                    'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
+                    /*'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
                     'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},//左转
                     'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
-                    'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转
+                    'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转*/
                 },
                 currentExtent:[],
                 center:[],
                 typicalList:[],
-                video1Show:false
-
+                video1Show:false,
+                lightList:[],
+                webSocket:[]
             }
         },
         components: { TusvnMap },
@@ -252,14 +253,15 @@
                 // console.log(mevent);
             },
             dragEnd(map,currentExtend){
+                console.log("窗口发生变化")
+                this.video1Show=false;
+                this.rtmp1="";
                 this.getCurrentExtent();
                 this.getCenter();
                 this.getPerceptionAreaInfo();
+                this.typeRoadData();
             },
-            imgClick(data){
-
-
-            },
+            imgClick(data){},
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.zoomTo(10);
@@ -299,7 +301,6 @@
                                 this.getVideo(camera,index);
                                 clearTimeout(time);
                             },10000)
-
                         }
                         count++;
                     })
@@ -324,7 +325,7 @@
                     if(index==0){
                         _this.rtmp1 = res.data.rtmp;
                         if(_this.rtmp1==""){
-//                console.log("rtmp1----")
+                            //                console.log("rtmp1----")
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
                         }else{
@@ -333,7 +334,95 @@
                         }
                     }
                 })
-            }
+            },
+            typeRoadData(){
+                this.lightList=[];
+                typeRoadData(
+                    [
+                        {
+
+                            "polygon":this.currentExtent
+                        }
+                    ]
+                ).then(res=>{
+                    let signs = res.data[0].baseData.signs;
+                    let spats = res.data[0].baseData.spats;
+                    let count1 = 0;
+                    let count2 = 0;
+                    this.signCount=0;
+                    this.spatCount=0;
+                    signs.forEach(item=>{
+                        this.$refs.map.addImgOverlay('sign'+count1, 'static/images/fusion/sign.png', 0, item.centerX, item.centerY, "{'data':'5'}", [32,30], this.imgClick);
+                        this.signCount++;
+                        count1++;
+                    })
+                    spats.forEach(item=>{
+                        this.$refs.map.addImgOverlay('spat'+count2, 'static/images/fusion/light.png', 0, item.centerX, item.centerY, "{'data':'5'}", [28,10], this.imgClick);
+                        //存储红绿灯的位置
+                        let pixel = this.$refs.map.getPixelFromCoordinate([item.centerX, item.centerY]);
+                        let obj = {};
+                        obj.left = parseInt(pixel[0]);
+                        obj.top = parseInt(pixel[1])-30;
+                        this.lightList.push(obj);
+                        this.spatCount++;
+                        count2++;
+                    })
+                    this.$emit("count",this.signCount,this.spatCount);
+                })
+            },
+            initWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.webSocket = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+                }
+                _this.webSocket.onmessage = _this.onmessage;
+                _this.webSocket.onclose = _this.onclose;
+                _this.webSocket.onopen = _this.onopen;
+                _this.webSocket.onerror = _this.onerror;
+            },
+            onmessage(mesasge){
+                let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let result = json.result;
+                _this.fusionData = result.stat;
+                //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
+                if(result.cbox){
+                    _this.platformData=result.cbox;
+                }
+                if(result.vehPer){
+                    _this.perceptionData=result.vehPer;
+                }
+                if(result.rcu){
+                    _this.sideData=result.rcu;
+                }
+                if(result.obu){
+                    _this.v2xData=result.obu;
+                }
+            },
+            onclose(data){
+                console.log("结束连接");
+            },
+            onopen(data){
+                //获取车辆状态
+                var fusionStatus = {
+                    "action": "road_real_data",
+                    "data": {
+                        "polygon": [[121.17560999059768, 31.282032221451242],[121.16724149847121, 31.282032221451242],[121.16724149847121, 31.28705868114515],[121.17560999059768, 31.28705868114515]]
+                    }
+                }
+                var fusionStatusMsg = JSON.stringify(fusionStatus);
+                this.sendMsg(fusionStatusMsg);
+            },
+            sendMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.webSocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
         },
         mounted(){
             let _this = this;
@@ -347,19 +436,18 @@
             this.option2 = this.getOption();*/
             window.onresize = function(){ // 定义窗口大小变更通知事件
                 _this.topPosition = ele.clientHeight-160;
-                //全屏
+               /* //全屏
                 if(_this.topPosition>_this.lastPosition){
                     _this.animation(_this.left1,_this.top1,0,1,_this.timer1,0);//left>leftPosition
-                    _this.animation(_this.left2,_this.top2,300,2,_this.timer2,0); //left>leftPosition
-                }/*else{
-                    debugger
+//                    _this.animation(_this.left2,_this.top2,300,2,_this.timer2,0); //left>leftPosition
+                }else{
                     _this.left1 = 0;
                     /!*_this.left2 = 300;*!/
                     _this.top1 = _this.topPosition;
                    /!* _this.top2 = _this.topPosition;*!/
-                }*/
+                }
 
-                _this.lastPosition = _this.topPosition;
+                _this.lastPosition = _this.topPosition;*/
             };
         }
     }
@@ -427,12 +515,7 @@
     }
     .spat-detail{
         position: absolute;
-        top: 30px;
-        /*left: 0;
-        text-align: center;*/
         z-index: 1;
-        left:-300px;
-        margin-left:40%;
         .spat-layout{
             float: left;
             margin-left: 8px;

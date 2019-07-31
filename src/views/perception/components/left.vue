@@ -43,15 +43,15 @@
             <ul class="perception-style">
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>下发预警信息：{{warningCount}}</span>
+                    <span>下发预警信息：{{warningCount|| 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>接入红绿灯：1</span>
+                    <span>接入红绿灯：{{spatCount|| 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>接入交通标志牌：1</span>
+                    <span>接入交通标志牌：{{signCount|| 0}}</span>
                 </li>
             </ul>
         </div>
@@ -79,6 +79,14 @@
                 default() {
                     return [];
                 }
+            },
+            spatCount:{
+                type:Number,
+                default:0
+            },
+            signCount:{
+                type:Number,
+                default:0
             }
         },
         methods: {
@@ -118,18 +126,7 @@
                 //获取车辆状态
                 var fusionStatus = {
                     "action":"road_real_data_stat",
-                    "region": [[
-                        121.1620245,
-                        31.2859340]
-                        , [
-                            121.1626339,
-                            31.2815266
-                        ], [
-                            121.1781135,
-                            31.2774582
-                        ],
-                        [121.1817312,
-                            31.2867279]]
+                    "region": this.currentExtent
                 }
                 var fusionStatusMsg = JSON.stringify(fusionStatus);
                 this.sendMsg(fusionStatusMsg);
@@ -174,12 +171,7 @@
                 //旁车
                 var warning = {
                     "action": "clod_event",
-                    "region": [
-                        [121.1620245, 31.2859340],
-                        [121.1626339, 31.2815266],
-                        [121.1781135, 31.2774582],
-                        [121.1817312, 31.2867279]
-                    ]
+                    "region": this.currentExtent
                 }
                 var warningMsg = JSON.stringify(warning);
                 this.sendWarningMsg(warningMsg);
