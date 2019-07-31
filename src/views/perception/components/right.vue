@@ -15,19 +15,18 @@
                         :isCircle='false'
 
                         @ViewLevelChange="levelChange"
-                        @MapInitComplete='map1InitComplete'
-                        @MapRenderComplete='mapRenderComplete'>
+                        @MapInitComplete='map1InitComplete'>
                 </tusvn-map>
             </div>
         </div>
         <div class="map-left"></div>
         <div id="map" class="c-map">
-            <div class="style" id="message1" :style="{left:left1+'px',top:top1+'px'}">
+            <div class="style" id="message1" :style="{left:left1+'px',top:top1+'px'}" v-show="video1Show">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
             </div>
-            <div class="style" id="message2" :style="{left:left2+'px',top:top2+'px'}">
+            <!--<div class="style" id="message2" :style="{left:left2+'px',top:top2+'px'}">
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2"></video-player>
-            </div>
+            </div>-->
             <tusvn-map
                     ref="map"
                     targetId="ddd"
@@ -37,6 +36,7 @@
 
                     @ViewLevelChange="viewLevelChange"
                     @MapInitComplete='mapInitComplete'
+                    @MapRenderComplete='mapRenderComplete'
                     @ExtentChange="dragEnd"
                     >
 
@@ -75,10 +75,12 @@
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
     import TusvnMap from './TusvnMap.vue';
+    import {getPerceptionAreaInfo,getVideoByNum} from '@/api/fusion'
     export default {
         data() {
             return {
                 option1:{},
+                rtmp1:'',
                 option2:{},
                 movement:0,
                 left1:'800',
@@ -89,7 +91,7 @@
                 top2:'560',
                 timer1:0,
                 timer2:0,
-                zoom:19,
+                zoom:18,
                 topPosition:0,
                 lastPosition:0,
                 lightData:{
@@ -98,6 +100,10 @@
                     'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
                     'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转
                 },
+                currentExtent:[],
+                center:[],
+                typicalList:[],
+                video1Show:false
 
             }
         },
@@ -204,36 +210,54 @@
                     }
                 },10)
             },
-            mapInitComplete:function(tusvnmap){
-                this.$refs.map.centerAt(121.17265957261286,31.284096076877844);
-                this.$refs.map.zoomTo(this.zoom);
-                this.$refs.map.addImgOverlay('img1', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17265957261286, 31.284096076877844, "{'data':'5'}", [0,0], this.imgClick);
-                this.$refs.map.addImgOverlay('img2', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17244854150163, 31.283475072766722, "{'data':'5'}", [0,0], this.imgClick);
-                this.$refs.map.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
-            //    setTimeout(()=>{
-
-                    // },2000);
-            },
-            mapRenderComplete:function(map){
-                var coord = map.getCoordinateFromPixel([24,35]);
-                    console.log(coord);
+            mapInitComplete:function(map){
+                /*var coord = map.getCoordinateFromPixel([0,0]);
+                    console.log("像素转经纬度坐标："+coord);
                     var pixel = map.getPixelFromCoordinate([(121.17188977862558+121.17342936660013)/2,(31.28308488407923+31.28510726967646)/2]);
-                    console.log(pixel);
+                    console.log(pixel);*/
+                this.$refs.map.centerAt(121.17142574453445,31.284545451298197);
+                this.$refs.map.zoomTo(this.zoom);
+                this.$refs.map.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
             },
+            getCurrentExtent: function () {
+                this.currentExtent = [];
+                let result = this.$refs.map.getCurrentExtent();
+                let x1 = result[0];
+                let y1 = result[1];
+                let x2 = result[2];
+                let y2 = result[3];
+                this.currentExtent.push([x2, y1]);
+                this.currentExtent.push([x1, y1]);
+                this.currentExtent.push([x1, y2]);
+                this.currentExtent.push([x2, y2]);
+//                console.log("边界值" + this.currentExtent);
+                this.$emit('getCurrentExtent', this.currentExtent);
 
-
-
+            },
+            getCenter(){
+                this.center= [];
+                let result = this.$refs.map.getCurrentExtent();
+                let x1 = result[0];
+                let y1 = result[1];
+                let x2 = result[2];
+                let y2 = result[3];
+                let x0 = (x1+x2)/2;
+                let y0 = (y1+y2)/2;
+                this.center.push([x0,y0]);
+//                console.log("中心点："+this.center);
+            },
             viewLevelChange(tusvnmap,mevent){
                 // console.log("============================viewLevelChange=============================");
                 // console.log(tusvnmap);
                 // console.log(mevent);
             },
             dragEnd(map,currentExtend){
-                //拖拽完成后获取边界范围，同时设置地图的中心点
-                console.log("当前的边界范围："+currentExtend);
+                this.getCurrentExtent();
+                this.getCenter();
+                this.getPerceptionAreaInfo();
             },
             imgClick(data){
-                debugger
+
 
             },
             map1InitComplete(){
@@ -244,31 +268,96 @@
             },
             levelChange(){
 
+            },
+            mapRenderComplete(map){
+                /*var coord = map.getCoordinateFromPixel([0,0]);
+                console.log("像素转经纬度："+coord);*/
+                /*var pixel = map.getPixelFromCoordinate([(121.17188977862558+121.17342936660013)/2,(31.28308488407923+31.28510726967646)/2]);
+                console.log(pixel);*/
+            },
+            getPerceptionAreaInfo(){
+                getPerceptionAreaInfo({
+                    "areaPoints":this.currentExtent,
+                    "centerPoint": {
+                        "latitude": this.center[0][1],
+                        "longitude": this.center[0][0]
+                    }
+                }).then(res=>{
+                    let data = res.data;
+                    let typicalList = data.shortList;
+                    let count=0;
+                    typicalList.forEach((item,index)=>{
+                        if(index==0){
+                            this.$refs.map.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
+                            let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);
+                            this.left1 = parseInt(pixel[0]);
+                            this.top1=parseInt(pixel[1])-150;
+                            let camera = item.cameraList[0];
+                            //地图移动停止10s
+                            let time = setTimeout(()=>{
+                                this.video1Show=true;
+                                this.getVideo(camera,index);
+                                clearTimeout(time);
+                            },10000)
+
+                        }
+                        count++;
+                    })
+                    let sideList = data.sideList;
+                    sideList.forEach(item=>{
+                        this.$refs.map.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
+                    })
+                });
+            },
+            getVideo(camera,index){
+                let _this = this;
+                //播放20s移动到下方
+                let time1 = setTimeout(()=>{
+                    console.log("动画开始");
+                    _this.animation(_this.left1,_this.top1,0,1,_this.timer1,0);//left>leftPosition
+                    clearTimeout(time1)
+                },50000)
+                getVideoByNum({
+                    "protocal": camera.protocol,
+                    "serialNum": camera.serialNum
+                }).then(res => {
+                    if(index==0){
+                        _this.rtmp1 = res.data.rtmp;
+                        if(_this.rtmp1==""){
+//                console.log("rtmp1----")
+                            _this.option1.notSupportedMessage="";
+                            _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                        }else{
+                            _this.option1.notSupportedMessage= '此视频暂无法播放，请稍候再试';
+                            _this.option1.sources[0].src=_this.rtmp1;
+                        }
+                    }
+                })
             }
         },
         mounted(){
             let _this = this;
             let ele = document.getElementById('fusionRight');
+            this.option1 = this.getOption();
             this.topPosition = ele.clientHeight-160;//整个高度减去弹出框的高度
             this.lastPosition = this.topPosition;
-            console.log("改变前topPosition:"+this.topPosition);
-            this.animation(800,260,0,1,this.timer1,0);//left>leftPosition
+            /*this.animation(800,260,0,1,this.timer1,0);//left>leftPosition
             this.animation(700,560,300,2,this.timer2,0); //left>leftPosition
             this.option1 = this.getOption();
-            this.option2 = this.getOption();
+            this.option2 = this.getOption();*/
             window.onresize = function(){ // 定义窗口大小变更通知事件
                 _this.topPosition = ele.clientHeight-160;
                 //全屏
                 if(_this.topPosition>_this.lastPosition){
                     _this.animation(_this.left1,_this.top1,0,1,_this.timer1,0);//left>leftPosition
                     _this.animation(_this.left2,_this.top2,300,2,_this.timer2,0); //left>leftPosition
-                }else{
-//                    debugger
+                }/*else{
+                    debugger
                     _this.left1 = 0;
-                    _this.left2 = 300;
+                    /!*_this.left2 = 300;*!/
                     _this.top1 = _this.topPosition;
-                    _this.top2 = _this.topPosition;
-                }
+                   /!* _this.top2 = _this.topPosition;*!/
+                }*/
 
                 _this.lastPosition = _this.topPosition;
             };

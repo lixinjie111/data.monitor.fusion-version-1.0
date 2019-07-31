@@ -160,8 +160,8 @@
                 let warningId;
                 warningData.forEach(item=>{
                     warningId = item.warnId;
-                    warningId = warningId.substring(0,"_".lastIndexOf(warningId));
-                    if(_this.warningIdList.indexOf(warningId)!=-1){
+                    warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                    if(_this.warningIdList.indexOf(warningId)==-1){
                         _this.warningIdList.push(warningId);
                         _this.warningCount++;
                     }
