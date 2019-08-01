@@ -74,10 +74,10 @@
             onMapComplete(){
                 getMap(this.$refs.map);
                 this.$refs.map.updateCameraPosition(326297.1669125299,3462321.135051115,30.651420831899046,30.905553118989463,-0.5303922863908559,-2.6312825799826953);
+            }
+        },
+        mounted() {
         }
-    },
-    mounted() {
-    }
 }
 </script>
 <style>
