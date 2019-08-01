@@ -335,7 +335,7 @@
     .fusion-video{
         border:1px solid rgba(211, 134, 0, 0.5);
         margin: 20px 0px;
-        height: 152px;
+        height: 154px;
         box-sizing: border-box;
        /* padding-top: 10px;*/
     }

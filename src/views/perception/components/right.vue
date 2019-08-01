@@ -12,6 +12,7 @@
         </div>
         <div class="map-left"></div>
         <div id="map" class="c-map">
+
             <tusvn-map :target-id="'mapFusion'"  ref="map"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
