@@ -93,8 +93,22 @@ export default {
 
                 //上海自采 裁剪  全局
                 // this.updateCameraPosition(326181.72659014474,3462354.6747002415,737.3642832288795,741.5052736914325,-1.5707963267948966,-0.05266622778143515);
-
+                // var extent = dl.getExtent(this.viewer) ;
+                // debugger
+                this.viewer.addEventListener("camera_changed", this.onCameraChanged)
+                console.log("=======地理范围======="+extent);
             },500);
+        },
+
+        onCameraChanged:function(){
+            this.$emit("CameraChanged",this);
+        },
+
+        /**
+         * 获取三维视窗的二维地理范围
+         */
+        getExtent:function(){
+            return dl.getExtent(this.viewer);
         },
         /**
          *获取相机参数
