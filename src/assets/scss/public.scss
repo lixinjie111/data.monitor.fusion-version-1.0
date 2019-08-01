@@ -197,10 +197,11 @@ img {
   position: relative;
   // margin-top: 28px;
   margin-top: 40px;
-  font-size: 20px;
-  padding: 7px 0;
+  font-size: 16px;
+  padding: 5px 0;
   border-bottom: 1px solid rgba(211, 134, 0 , 0.4);
   font-weight: normal;
+  line-height: 30px;
   &:after {
     content: "";
     position: absolute;
@@ -214,7 +215,7 @@ img {
 .fusion-header{
   height: 60px;
   letter-spacing: 3px;
-  font-size: 30px;
+  font-size: 18px;
   @include layoutMode(both);
   background: #262626;
   .header-img{
@@ -230,7 +231,7 @@ img {
   top: 0;
   right: 0;
   bottom: 0;
-  padding: 0px 30px;
+  padding: 0px 10px;
   background:linear-gradient(90deg,transparent 0%,rgb(0,0,0) 100%);
   z-index:1;
   width: 270px;

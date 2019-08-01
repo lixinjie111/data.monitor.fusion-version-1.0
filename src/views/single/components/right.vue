@@ -21,56 +21,37 @@
             <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
                 <div v-show="key=='key_3'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img" >
-                        <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'"/>
-                        <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"/>
+                        <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'" class="turn-img"/>
+                        <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"  class="turn-img"/>
+                        <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"  class="turn-img"/>
                     </div>
                     <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                 </div>
                 <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img">
-                        <img src="@/assets/images/single/light/left-yellow.png" v-show="item.lightColor=='YELLOW'"/>
-                        <img src="@/assets/images/single/light/left-red.png" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" v-show="item.lightColor=='GREEN'"/>
+                        <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
+                        <img src="@/assets/images/single/light/left-red.png" class="left-img" v-show="item.lightColor=='RED'"/>
+                        <img src="@/assets/images/single/light/left-green.png" class="left-img" v-show="item.lightColor=='GREEN'"/>
                     </div>
                     <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                 </div>
                 <div v-show="key=='key_1'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img spat-straight">
-                        <img src="@/assets/images/single/light/left-yellow.png" v-show="item.lightColor=='YELLOW'" />
-                        <img src="@/assets/images/single/light/left-red.png" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" v-show="item.lightColor=='GREEN'"/>
+                        <img src="@/assets/images/single/light/left-yellow.png" class="straight-img" v-show="item.lightColor=='YELLOW'" />
+                        <img src="@/assets/images/single/light/left-red.png" class="straight-img" v-show="item.lightColor=='RED'"/>
+                        <img src="@/assets/images/single/light/left-green.png" class="straight-img" v-show="item.lightColor=='GREEN'"/>
                     </div>
                     <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                 </div>
                 <div v-show="key=='key_4'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img spat-right">
-                        <img src="@/assets/images/single/light/left-yellow.png" v-show="item.lightColor=='YELLOW'"/>
-                        <img src="@/assets/images/single/light/left-red.png" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" v-show="item.lightColor=='GREEN'"/>
+                        <img src="@/assets/images/single/light/left-yellow.png" class="right-img" v-show="item.lightColor=='YELLOW'"/>
+                        <img src="@/assets/images/single/light/left-red.png"  class="right-img" v-show="item.lightColor=='RED'"/>
+                        <img src="@/assets/images/single/light/left-green.png" class="right-img" v-show="item.lightColor=='GREEN'"/>
                     </div>
                     <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                 </div>
             </div>
-            <!--<div class="spat-detail-style">
-              <div class="spat-detail-img">
-                <img src="@/assets/images/car/left-red.png"/>
-              </div>
-              <span class="spat-detail-font">20</span>
-            </div>
-            <div class="spat-detail-style">
-              <div class="spat-detail-img">
-                <img src="@/assets/images/car/car-28.png"/>
-              </div>
-
-              <span class="spat-detail-font spat-detail-color">43</span>
-            </div>
-            <div class="spat-detail-style">
-              <div class="spat-detail-img spat-right">
-                <img src="@/assets/images/car/car-28.png"/>
-              </div>
-              <span class="spat-detail-font spat-detail-color">10</span>
-            </div>-->
         </div>
         <div class="travel-detail">
             <div class="detail1">
@@ -354,15 +335,15 @@
     .fusion-video{
         border:1px solid rgba(211, 134, 0, 0.5);
         margin: 20px 0px;
-        height: 172px;
+        height: 152px;
         box-sizing: border-box;
-        padding-top: 10px;
+       /* padding-top: 10px;*/
     }
-    .spat-detail{
+    /*.spat-detail{
         position: absolute;
         top: 30px;
-        /*left: 0;
-        text-align: center;*/
+        !*left: 0;
+        text-align: center;*!
         z-index: 1;
         left:-300px;
         margin-left:40%;
@@ -377,8 +358,8 @@
             background-color: #313131;
             box-sizing: border-box;
             padding:6px 2px;
-            /*float: left;
-            margin-left: 20px;*/
+            !*float: left;
+            margin-left: 20px;*!
             @include layoutMode(align);
             .spat-detail-img{
                 width: 48px;
@@ -421,13 +402,100 @@
                 color: #28b51d;
             }
         }
+    }*/
+    .spat-detail{
+        position: absolute;
+        top: 30px;
+        /*left: 0;
+        text-align: center;*/
+        z-index: 1;
+        left:-240px;
+        margin-left:40%;
+        .spat-layout{
+            float: left;
+            margin-left: 8px;
+        }
+        .spat-detail-style{
+            width: 86px;
+            height: 40px;
+            border-radius: 20px;
+            background-color:rgba(99,99,99,0.3);
+            box-sizing: border-box;
+            padding:6px 2px;
+            /*float: left;
+            margin-left: 20px;*/
+            @include layoutMode(align);
+
+            .spat-detail-img{
+                width: 32px;
+                height: 32px;
+                background-color: rgba(99,99,99,0.4);
+                border-radius: 50%;
+                display: inline-block;
+                position: relative;
+                img{
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                }
+                .left-img{
+                    width: 20px;
+                    height: 18px;
+                    margin-left: -10px;
+                    margin-top: -9px;
+                }
+                .turn-img{
+                    width: 16px;
+                    height: 18px;
+                    margin-left: -8px;
+                    margin-top: -9px;
+                }
+                .straight-img{
+                    width: 20px;
+                    height: 16px;
+                    margin-left: -10px;
+                    margin-top: -8px;
+                }
+                .right-img{
+                    width: 20px;
+                    height: 18px;
+                    margin-left: -10px;
+                    margin-top: -9px;
+                }
+            }
+            .spat-detail-font{
+                letter-spacing: 4px;
+                color: #c8360f;
+                font-size: 24px;
+                display: inline-block;
+                margin-left: 12px;
+            }
+            .spat-detail-color{
+                color: #23b318;
+            }
+            .spat-straight{
+                transform: rotate(90deg);
+            }
+            .spat-right{
+                transform: rotate(180deg);
+            }
+            .light-yellow{
+                color: #d99f04;
+            }
+            .light-red{
+                color: #c93710;
+            }
+            .light-green{
+                color: #28b51d;
+            }
+        }
     }
     .travel-detail{
         position: absolute;
         left: -400px;
         margin-left:40%;
-        bottom: 20px;
-        font-size: 20px;
+        bottom: 10px;
+        font-size: 16px;
         letter-spacing: 0px;
        /* background: #24212c;*/
         z-index:1;

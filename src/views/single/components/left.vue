@@ -347,12 +347,12 @@
     .single-info{
         border:1px solid rgba(211,134,0,0.5);
         text-align: center;
-        height: 240px;
+        height: 150px;
         .single-info-header{
             @include layoutMode(between);
             padding:0px 20px ;
-            font-size: 20px;
-            line-height: 48px;
+            font-size: 14px;
+            line-height: 40px;
             letter-spacing: 0px;
             color: #ddd9d1;
             .info-font{
@@ -361,13 +361,16 @@
         }
         .info-img{
             display: block;
-            line-height: 192px;
-            height: 192px;
+            line-height: 110px;
+            height: 110px;
+            img{
+                height:80px;
+            }
         }
     }
     .single-real{
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: 20px;
+        padding-bottom: 20px;
         li{
             float: right;
             width: 48%;
@@ -375,17 +378,17 @@
             margin-bottom: 6px;
             border:1px solid rgba(211, 134, 0, 0.5);
             p{
-                font-size: 16px;
-                line-height: 48px;
+                font-size: 14px;
+                line-height: 40px;
                 color: #ddd9d1;
             }
             .real-content{
                 position: relative;
                 color: #d38600;
                 @include layoutMode(both);
-                height: 92px;
+                height: 60px;
                 box-sizing: border-box;
-                padding-bottom: 20px;
+               /* padding-bottom: 20px;*/
                 .real-img{
                     display: inline-block;
                     width: 46px;
@@ -466,7 +469,7 @@
 
     }
     .fusion-left-map{
-        height:200px;
+        height:180px;
         border:1px solid rgba(211,134,0,0.5);
         .map-style{
             height: 100%;

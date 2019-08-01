@@ -391,7 +391,7 @@
 <style lang="scss" scoped>
     .perception-road{
         height: 163px;
-        width: 315px;
+       /* width: 315px;*/
         // position: relative;
         border: 1px solid #5e5970;
         // margin-right: 30px;
@@ -412,7 +412,7 @@
         }
     }
     .base-info{
-        padding:30px 0px ;
+        padding:10px 0px 30px 0px ;
         text-align: center;
         .weather-icon{
             vertical-align: middle;

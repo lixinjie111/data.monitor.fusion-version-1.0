@@ -28,11 +28,13 @@
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，非机动车 {{perceptionData.noMotor || 0}}</span>
+                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
+                    <!--<span class="fusion-font">车辆感知：车辆 </span>-->
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，非机动车 {{sideData.noMotor || 0}}</span>
+                    <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{sideData.noMotor || 0}}</span>
+                    <!--<span class="fusion-font">路侧识别：车辆 </span>-->
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
@@ -199,25 +201,24 @@
     }
 </script>
 <style lang="scss" scoped>
-    @import '@/assets/scss/theme.scss';
+   /* @import '@/assets/scss/theme.scss';*/
     .perception-style{
         padding: 20px 0px;
+        line-height: 28px;
+        font-size: 14px;
         li{
-            @include layoutMode(align);
             letter-spacing: 1px;
             color: #cccccc;
             font-size: 14px;
             .overview-sign{
-                width: 16px;
-                height: 16px;
+                width: 14px;
+                height: 14px;
                 border-radius: 50%;
                 display: inline-block;
-                margin-right:20px;
+                margin-right:10px;
             }
             .fusion-font{
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
+                word-wrap:break-word
             }
             .fusion-sign{
                 background:#9b9b9b;

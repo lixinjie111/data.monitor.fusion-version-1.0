@@ -106,7 +106,9 @@
                 typicalList:[],
                 video1Show:false,
                 lightList:[],
-                webSocket:[]
+                webSocket:[],
+                layerId:'layer',
+                layerObj:{}
             }
         },
         components: { TusvnMap },
@@ -220,6 +222,8 @@
                 this.$refs.map.centerAt(121.17142574453445,31.284545451298197);
                 this.$refs.map.zoomTo(this.zoom);
                 this.$refs.map.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
+                //新建图层
+                this.$refs.map.addVectorLayer(this.layerId);
             },
             getCurrentExtent: function () {
                 this.currentExtent = [];
@@ -383,12 +387,19 @@
                     this.signCount=0;
                     this.spatCount=0;
                     signs.forEach(item=>{
-                        this.$refs.map.addImgOverlay('sign'+count1, 'static/images/fusion/sign.png', 0, item.centerX, item.centerY, "{'data':'5'}", [32,30], this.imgClick);
+
+                        let bgImgSrc = 'static/images/fusion/sign-bg.png';
+                        let bgImgSize = [44,58];
+                        let bgImgOffset = [0,0];
+                        this.$refs.map.addImg(item.centerX, item.centerY, 'bcg'+count1,this.layerId,bgImgSrc,bgImgSize,0,true,1,bgImgOffset,1,[0.5,1]);
+//                        this.$refs.map.addImgOverlay('bcg'+count1, 'static/images/fusion/sign-bg.png', 0, item.centerX, item.centerY, "{'data':'5'}", [0,0], this.imgClick);
+                        count1++;
+                        this.$refs.map.addImgOverlay('sign'+count1, 'static/images/fusion/sign1.png', 0, item.centerX, item.centerY, "{'data':'5'}", [0,-38], this.imgClick);
                         this.signCount++;
                         count1++;
                     })
                     spats.forEach(item=>{
-                        this.$refs.map.addImgOverlay('spat'+count2, 'static/images/fusion/light.png', 0, item.centerX, item.centerY, "{'data':'5'}", [28,10], this.imgClick);
+                        this.$refs.map.addImgOverlay('spat'+count2, 'static/images/fusion/light.png', 0, item.centerX, item.centerY, "{'data':'5'}", [0,0], this.imgClick);
                         //存储红绿灯的位置
                         let pixel = this.$refs.map.getPixelFromCoordinate([item.centerX, item.centerY]);
                         let obj = {};
@@ -415,20 +426,53 @@
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
-                _this.fusionData = result.stat;
-                //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
-                if(result.cbox){
-                    _this.platformData=result.cbox;
+                let vehData = result.vehDataDTO;
+                let imgSrc;
+                let layerId;
+                //清除图层
+                for(let item in _this.layerObj){
+                    this.$refs.map.removeOverlayById(_this.layerObj[item].layerId);
                 }
-                if(result.vehPer){
-                    _this.perceptionData=result.vehPer;
-                }
-                if(result.rcu){
-                    _this.sideData=result.rcu;
-                }
-                if(result.obu){
-                    _this.v2xData=result.obu;
-                }
+                vehData.forEach(item=>{
+                    //定位的车
+                    if(item.fuselType==1){
+                        //高精度
+                        if(item.fuselLevel==1){
+                            imgSrc = 'static/images/fusion/highPosition.png';
+                        }else{
+                            imgSrc = 'static/images/fusion/lowPosition.png';
+                        }
+                    }else{
+                        if(item.fuselLevel==1){
+                            if(item.target==0||item.target==1||item.target==3){
+                                imgSrc = 'static/images/fusion/person.png';
+                            }
+                            if(item.target==2||item.target==5){
+                                imgSrc = 'static/images/fusion/highPer.png';
+                            }
+                        }else{
+                            if(item.target==0||item.target==1||item.target==3){
+                                imgSrc = 'static/images/fusion/person.png';
+                            }
+                            if(item.target==2||item.target==5){
+                                imgSrc = 'static/images/fusion/lowPer.png';
+                            }
+                        }
+                    }
+
+                    if(!_this.layerObj[item.devId]){
+                        _this.layerObj[item.devId].count=1;
+                        layerId=item.devId+layerObj[item.devId].count;
+                        _this.layerObj[item.devId].layerId = layerId;
+                        this.$refs.map.addImgOverlay(layerId,imgSrc, 0, item.longitude, item.latitude, "{'data':'5'}", [0,0], this.imgClick);
+                    }else{
+                        _this.layerObj[item.devId].count++;
+                        layerId=item.devId+layerObj[item.devId].count;
+                        _this.layerObj[item.devId].layerId = layerId;
+                        this.$refs.map.addImgOverlay(layerId,imgSrc, 0, item.longitude, item.latitude, "{'data':'5'}", [0,0], this.imgClick);
+                    }
+                });
+
             },
             onclose(data){
                 console.log("结束连接");
@@ -465,6 +509,7 @@
             this.animation(700,560,300,2,this.timer2,0); //left>leftPosition
             this.option1 = this.getOption();
             this.option2 = this.getOption();*/
+            this.initWebSocket();
             window.onresize = function(){ // 定义窗口大小变更通知事件
                 _this.topPosition = ele.clientHeight-160;
                /* //全屏
@@ -504,11 +549,11 @@
         width: 270px;
         border:1px solid rgba(211, 134, 0, 0.5);
         position: absolute;
-        bottom: 30px;
+        bottom: 10px;
         background: #000;
     }
     .base-info{
-        padding:30px 0px ;
+        padding:10px 0px ;
         text-align: center;
         .weather-icon{
             vertical-align: middle;
