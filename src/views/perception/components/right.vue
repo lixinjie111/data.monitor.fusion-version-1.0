@@ -7,43 +7,19 @@
                 <span>15.6°</span>
             </div>
             <div class="perception-road" id="mapRoad">
-                <tusvn-map
-                        ref="map1"
-                        targetId="map1"
-                        overlayContainerId="overlay1"
-                        :isMasker='false'
-                        :isCircle='false'
 
-
-                        @MapInitComplete='map1InitComplete'
-                        @MapRenderComplete='mapRenderComplete'>
-                        @ViewLevelChange="levelChange">
-                </tusvn-map>
             </div>
         </div>
         <div class="map-left"></div>
         <div id="map" class="c-map">
-            <div class="style" id="message1" :style="{left:left1+'px',top:top1+'px'}" v-show="video1Show">
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
-            </div>
-            <!--<div class="style" id="message2" :style="{left:left2+'px',top:top2+'px'}">
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2"></video-player>
-            </div>-->
-            <tusvn-map
-                    ref="map"
-                    targetId="ddd"
-                    overlayContainerId="ccc"
-                    :isMasker='false'
-                    :isCircle='false'
-
-                    @ViewLevelChange="levelChange"
-                    @MapInitComplete='mapInitComplete'
-                    @ExtentChange="dragEnd"
-                    >
+            <tusvn-map :target-id="'mapFusion'"  ref="map"
+                       background="black" minX=325295.155400   minY=3461941.703700  minZ=50
+            maxX=326681.125700  maxY=3462723.022400  maxZ=80
+            @mapcomplete="onMapComplete">
 
             </tusvn-map>
         </div>
-        <div class="spat-detail clearfix" v-for="item in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
+        <!--<div class="spat-detail clearfix" v-for="item in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
             <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
                 <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img">
@@ -70,12 +46,13 @@
                     <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
 </template>
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
-    import TusvnMap from './TusvnMap.vue';
+    import {getMap} from '@/utils/tusvnMap.js';
+    import TusvnMap from '@/components/Tusvn3DMap2'
     import {getPerceptionAreaInfo,getVideoByNum,typeRoadData} from '@/api/fusion'
     export default {
         data() {
@@ -83,450 +60,24 @@
                 option1:{},
                 rtmp1:'',
                 option2:{},
-                movement:0,
-                left1:'',
-                top1:'',
-                isEnd1:false,
-                isEnd2:false,
-                left2:'700',
-                top2:'560',
-                timer1:0,
-                timer2:0,
-                zoom:18,
-                topPosition:0,
-                lastPosition:0,
                 lightData:{
                     /*'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
                     'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},//左转
                     'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
                     'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转*/
-                },
-                currentExtent:[],
-                center:[],
-                typicalList:[],
-                video1Show:false,
-                lightList:[],
-                webSocket:[],
-                layerId:'layer',
-                layerObj:{}
+                }
             }
         },
         components: { TusvnMap },
         methods: {
-            getOption(){
-               let option = {
-                    overNative: true,
-                    autoplay: false,
-                    controls: true,
-                    fluid: true,
-                    techOrder: ['flash', 'html5'],
-                    sourceOrder: true,
-                    flash: {
-                    swf: isProduction ? '/fusionMonitor/static/media/video-js.swf' : '/static/media/video-js.swf'
-                },
-                    sources: [
-                        {
-                            type: 'rtmp/mp4',
-                            src: ''
-                        }
-                    ],
-                        muted:true,
-                    width:'100%',
-                    height:'100%',
-                    notSupportedMessage: '视频无法播放，请稍候再试!',
-                    bigPlayButton : false,
-                    /*errorDisplay : false,*/
-                    controlBar: {
-                    timeDivider: false,
-                        durationDisplay: false,
-                        remainingTimeDisplay: false,
-                        currentTimeDisplay:false,
-                        fullscreenToggle: true, //全屏按钮
-                        captionsButton : false,
-                        chaptersButton: false,
-                        subtitlesButton:false,
-                        liveDisplay:false,
-                        playbackRateMenuButton:false
-                }
-                }
-                return option;
-            },
-            playerError1(e) {
-                console.log("playerError");
-                if(this.option1.sources[0].src != '') {
-                    let _videoUrl = this.option1.sources[0].src;
-                    this.option1.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option1.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
-            playerError2(e) {
-                console.log("playerError");
-                if(this.option2.sources[0].src != '') {
-                    let _videoUrl = this.option2.sources[0].src;
-                    this.option2.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option2.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
-            animation(left,top,leftPosition,flag,timer,leftFlag){
-                if(timer!=0){
-                    clearTimeout(timer);
-                }
-                if(top<this.topPosition){ top=top+2;}          //如果xpos小于终点的left,给它加1.
-                if(leftFlag==0){
-                    if(left>leftPosition){
-                        left = left-3;
-                        if(top>=this.topPosition&&left<=leftPosition){
-                            clearTimeout(timer);
-                            return;
-                        }
-                    }else{
-                        left = left;
-                        if(top>=this.topPosition&&left<=leftPosition){
-                            clearTimeout(timer);
-                            return;
-                        }
-                    }
-                }
-                if(leftFlag==1){
-                    left = left+3;
-                    if(top>=this.topPosition&&left>=leftPosition){
-                        clearTimeout(timer);
-                        return;
-                    }
-                }
-                //如果ypos小于终点的left,给它加1.
-                /*if(left <leftPosition){ left = left+3;}  */     //如果ypos小于终点的left,给它加1.
-
-                timer = setTimeout(()=>{
-                    if(flag==1){
-                        this.left1=left;
-                        this.top1=top;
-                        this.animation(left,top,leftPosition,flag,timer,leftFlag)
-                    }
-                    if(flag==2){
-                        this.left2=left;
-                        this.top2=top;
-                        this.animation(left,top,leftPosition,flag,timer,leftFlag)
-                    }
-                },10)
-            },
-            mapInitComplete:function(map){
-                /*var coord = map.getCoordinateFromPixel([0,0]);
-                    console.log("像素转经纬度坐标："+coord);
-                    var pixel = map.getPixelFromCoordinate([(121.17188977862558+121.17342936660013)/2,(31.28308488407923+31.28510726967646)/2]);
-                    console.log(pixel);*/
-                this.$refs.map.centerAt(121.17142574453445,31.284545451298197);
-                this.$refs.map.zoomTo(this.zoom);
-                this.$refs.map.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
-                //新建图层
-                this.$refs.map.addVectorLayer(this.layerId);
-            },
-            getCurrentExtent: function () {
-                this.currentExtent = [];
-                let result = this.$refs.map.getCurrentExtent();
-                let x1 = result[0];
-                let y1 = result[1];
-                let x2 = result[2];
-                let y2 = result[3];
-                this.currentExtent.push([x2, y1]);
-                this.currentExtent.push([x1, y1]);
-                this.currentExtent.push([x1, y2]);
-                this.currentExtent.push([x2, y2]);
-//                console.log("边界值" + this.currentExtent);
-                this.$emit('getCurrentExtent', this.currentExtent);
-
-            },
-            getCenter(){
-                this.center= [];
-                let result = this.$refs.map.getCurrentExtent();
-                let x1 = result[0];
-                let y1 = result[1];
-                let x2 = result[2];
-                let y2 = result[3];
-                let x0 = (x1+x2)/2;
-                let y0 = (y1+y2)/2;
-                this.center.push([x0,y0]);
-//                console.log("中心点："+this.center);
-            },
-            viewLevelChange(tusvnmap,mevent){
-                // console.log("============================viewLevelChange=============================");
-                // console.log(tusvnmap);
-                // console.log(mevent);
-            },
-            dragEnd(map,currentExtend){
-                console.log("窗口发生变化")
-                this.video1Show=false;
-                this.rtmp1="";
-                this.getCurrentExtent();
-                this.getCenter();
-                this.getPerceptionAreaInfo();
-                this.typeRoadData();
-                //拖拽完成后获取边界范围，同时设置地图的中心点
-                // console.log("当前的边界范围："+currentExtend);
-                // debugger;
-                let overviewMap = this.$refs.map1;
-                let overviewLayerId = "overviewLayer"
-                let overviewLayer = overviewMap.getLayerById(overviewLayerId);
-                if(overviewLayer!=null){
-                    overviewMap.removeAllFeature(overviewLayerId);
-                }else{
-                    overviewMap.addVectorLayer(overviewLayerId);
-                }
-                overviewMap.addMultiPolygon([[[
-                                                [currentExtend[0],currentExtend[3]],
-                                                [currentExtend[0],currentExtend[1]],
-                                                [currentExtend[2],currentExtend[1]],
-                                                [currentExtend[2],currentExtend[3]],
-                                                [currentExtend[0],currentExtend[3]]
-                                            ]]], "rectangle",
-                                                [255,0,0,0.4],[255,0,0,1], "round",
-                                                "round", [5,0], null,
-                                                null, 1, overviewLayerId);
-
-                overviewMap.centerAt((currentExtend[0]+currentExtend[2])/2,(currentExtend[1]+currentExtend[3])/2);
-            },
-            imgClick(data){
-                // debugger
-
-            },
-            map1InitComplete(){
-                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
-                this.$refs.map1.zoomTo(10);
-                this.$refs.map1.addWms("shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","gd_road_centerline",1,true,null); // 上海汽车城
-
-            },
-            levelChange(map,level){
-                let l = map.getCurrentLevel();
-                if(l>=5)
-                {
-                    this.$refs.map1.zoomTo(l-5);
-                }
-            },
-            mapRenderComplete(map){
-                /*var coord = map.getCoordinateFromPixel([0,0]);
-                console.log("像素转经纬度："+coord);*/
-                /*var pixel = map.getPixelFromCoordinate([(121.17188977862558+121.17342936660013)/2,(31.28308488407923+31.28510726967646)/2]);
-                console.log(pixel);*/
-            },
-            getPerceptionAreaInfo(){
-                getPerceptionAreaInfo({
-                    "areaPoints":this.currentExtent,
-                    "centerPoint": {
-                        "latitude": this.center[0][1],
-                        "longitude": this.center[0][0]
-                    }
-                }).then(res=>{
-                    let data = res.data;
-                    let typicalList = data.shortList;
-                    let count=0;
-                    typicalList.forEach((item,index)=>{
-                        if(index==0){
-                            this.$refs.map.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
-                            let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);
-                            this.left1 = parseInt(pixel[0]);
-                            this.top1=parseInt(pixel[1])-150;
-                            let camera = item.cameraList[0];
-                            //地图移动停止10s
-                            let time = setTimeout(()=>{
-                                this.video1Show=true;
-                                this.getVideo(camera,index);
-                                clearTimeout(time);
-                            },10000)
-                        }
-                        count++;
-                    })
-                    let sideList = data.sideList;
-                    sideList.forEach(item=>{
-                        this.$refs.map.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
-                    })
-                });
-            },
-            getVideo(camera,index){
-                let _this = this;
-                //播放20s移动到下方
-                let time1 = setTimeout(()=>{
-                    console.log("动画开始");
-                    _this.animation(_this.left1,_this.top1,0,1,_this.timer1,0);//left>leftPosition
-                    clearTimeout(time1)
-                },50000)
-                getVideoByNum({
-                    "protocal": camera.protocol,
-                    "serialNum": camera.serialNum
-                }).then(res => {
-                    if(index==0){
-                        _this.rtmp1 = res.data.rtmp;
-                        if(_this.rtmp1==""){
-                            //                console.log("rtmp1----")
-                            _this.option1.notSupportedMessage="";
-                            _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
-                        }else{
-                            _this.option1.notSupportedMessage= '此视频暂无法播放，请稍候再试';
-                            _this.option1.sources[0].src=_this.rtmp1;
-                        }
-                    }
-                })
-            },
-            typeRoadData(){
-                this.lightList=[];
-                typeRoadData(
-                    [
-                        {
-
-                            "polygon":this.currentExtent
-                        }
-                    ]
-                ).then(res=>{
-                    let signs = res.data[0].baseData.signs;
-                    let spats = res.data[0].baseData.spats;
-                    let count1 = 0;
-                    let count2 = 0;
-                    this.signCount=0;
-                    this.spatCount=0;
-                    signs.forEach(item=>{
-
-                        let bgImgSrc = 'static/images/fusion/sign-bg.png';
-                        let bgImgSize = [44,58];
-                        let bgImgOffset = [0,0];
-                        this.$refs.map.addImg(item.centerX, item.centerY, 'bcg'+count1,this.layerId,bgImgSrc,bgImgSize,0,true,1,bgImgOffset,1,[0.5,1]);
-//                        this.$refs.map.addImgOverlay('bcg'+count1, 'static/images/fusion/sign-bg.png', 0, item.centerX, item.centerY, "{'data':'5'}", [0,0], this.imgClick);
-                        count1++;
-                        this.$refs.map.addImgOverlay('sign'+count1, 'static/images/fusion/sign1.png', 0, item.centerX, item.centerY, "{'data':'5'}", [0,-38], this.imgClick);
-                        this.signCount++;
-                        count1++;
-                    })
-                    spats.forEach(item=>{
-                        this.$refs.map.addImgOverlay('spat'+count2, 'static/images/fusion/light.png', 0, item.centerX, item.centerY, "{'data':'5'}", [0,0], this.imgClick);
-                        //存储红绿灯的位置
-                        let pixel = this.$refs.map.getPixelFromCoordinate([item.centerX, item.centerY]);
-                        let obj = {};
-                        obj.left = parseInt(pixel[0]);
-                        obj.top = parseInt(pixel[1])-30;
-                        this.lightList.push(obj);
-                        this.spatCount++;
-                        count2++;
-                    })
-                    this.$emit("count",this.signCount,this.spatCount);
-                })
-            },
-            initWebSocket(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
-                }
-                _this.webSocket.onmessage = _this.onmessage;
-                _this.webSocket.onclose = _this.onclose;
-                _this.webSocket.onopen = _this.onopen;
-                _this.webSocket.onerror = _this.onerror;
-            },
-            onmessage(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let result = json.result;
-                let vehData = result.vehDataDTO;
-                let imgSrc;
-                let layerId;
-                //清除图层
-                for(let item in _this.layerObj){
-                    this.$refs.map.removeOverlayById(_this.layerObj[item].layerId);
-                }
-                vehData.forEach(item=>{
-                    //定位的车
-                    if(item.fuselType==1){
-                        //高精度
-                        if(item.fuselLevel==1){
-                            imgSrc = 'static/images/fusion/highPosition.png';
-                        }else{
-                            imgSrc = 'static/images/fusion/lowPosition.png';
-                        }
-                    }else{
-                        if(item.fuselLevel==1){
-                            if(item.target==0||item.target==1||item.target==3){
-                                imgSrc = 'static/images/fusion/person.png';
-                            }
-                            if(item.target==2||item.target==5){
-                                imgSrc = 'static/images/fusion/highPer.png';
-                            }
-                        }else{
-                            if(item.target==0||item.target==1||item.target==3){
-                                imgSrc = 'static/images/fusion/person.png';
-                            }
-                            if(item.target==2||item.target==5){
-                                imgSrc = 'static/images/fusion/lowPer.png';
-                            }
-                        }
-                    }
-
-                    if(!_this.layerObj[item.devId]){
-                        _this.layerObj[item.devId].count=1;
-                        layerId=item.devId+layerObj[item.devId].count;
-                        _this.layerObj[item.devId].layerId = layerId;
-                        this.$refs.map.addImgOverlay(layerId,imgSrc, 0, item.longitude, item.latitude, "{'data':'5'}", [0,0], this.imgClick);
-                    }else{
-                        _this.layerObj[item.devId].count++;
-                        layerId=item.devId+layerObj[item.devId].count;
-                        _this.layerObj[item.devId].layerId = layerId;
-                        this.$refs.map.addImgOverlay(layerId,imgSrc, 0, item.longitude, item.latitude, "{'data':'5'}", [0,0], this.imgClick);
-                    }
-                });
-
-            },
-            onclose(data){
-                console.log("结束连接");
-            },
-            onopen(data){
-                //获取车辆状态
-                var fusionStatus = {
-                    "action": "road_real_data",
-                    "data": {
-                        "polygon": [[121.17560999059768, 31.282032221451242],[121.16724149847121, 31.282032221451242],[121.16724149847121, 31.28705868114515],[121.17560999059768, 31.28705868114515]]
-                    }
-                }
-                var fusionStatusMsg = JSON.stringify(fusionStatus);
-                this.sendMsg(fusionStatusMsg);
-            },
-            sendMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.webSocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-        },
-        mounted(){
-            let _this = this;
-            let ele = document.getElementById('fusionRight');
-            this.option1 = this.getOption();
-            this.topPosition = ele.clientHeight-160;//整个高度减去弹出框的高度
-            this.lastPosition = this.topPosition;
-            /*this.animation(800,260,0,1,this.timer1,0);//left>leftPosition
-            this.animation(700,560,300,2,this.timer2,0); //left>leftPosition
-            this.option1 = this.getOption();
-            this.option2 = this.getOption();*/
-            this.initWebSocket();
-            window.onresize = function(){ // 定义窗口大小变更通知事件
-                _this.topPosition = ele.clientHeight-160;
-               /* //全屏
-                if(_this.topPosition>_this.lastPosition){
-                    _this.animation(_this.left1,_this.top1,0,1,_this.timer1,0);//left>leftPosition
-//                    _this.animation(_this.left2,_this.top2,300,2,_this.timer2,0); //left>leftPosition
-                }else{
-                    _this.left1 = 0;
-                    /!*_this.left2 = 300;*!/
-                    _this.top1 = _this.topPosition;
-                   /!* _this.top2 = _this.topPosition;*!/
-                }
-
-                _this.lastPosition = _this.topPosition;*/
-            };
+            onMapComplete(){
+                getMap(this.$refs.map);
+                this.$refs.map.updateCameraPosition(326297.1669125299,3462321.135051115,30.651420831899046,30.905553118989463,-0.5303922863908559,-2.6312825799826953);
         }
+    },
+    mounted() {
     }
+}
 </script>
 <style>
     .style .vjs-error .vjs-error-display:before{
