@@ -14,8 +14,10 @@
                         :isMasker='false'
                         :isCircle='false'
 
-                        @ViewLevelChange="levelChange"
-                        @MapInitComplete='map1InitComplete'>
+
+                        @MapInitComplete='map1InitComplete'
+                        @MapRenderComplete='mapRenderComplete'>
+                        @ViewLevelChange="levelChange">
                 </tusvn-map>
             </div>
         </div>
@@ -34,9 +36,8 @@
                     :isMasker='false'
                     :isCircle='false'
 
-                    @ViewLevelChange="viewLevelChange"
+                    @ViewLevelChange="levelChange"
                     @MapInitComplete='mapInitComplete'
-                    @MapRenderComplete='mapRenderComplete'
                     @ExtentChange="dragEnd"
                     >
 
@@ -260,16 +261,46 @@
                 this.getCenter();
                 this.getPerceptionAreaInfo();
                 this.typeRoadData();
+                //拖拽完成后获取边界范围，同时设置地图的中心点
+                // console.log("当前的边界范围："+currentExtend);
+                // debugger;
+                let overviewMap = this.$refs.map1;
+                let overviewLayerId = "overviewLayer"
+                let overviewLayer = overviewMap.getLayerById(overviewLayerId);
+                if(overviewLayer!=null){
+                    overviewMap.removeAllFeature(overviewLayerId);
+                }else{
+                    overviewMap.addVectorLayer(overviewLayerId);
+                }
+                overviewMap.addMultiPolygon([[[
+                                                [currentExtend[0],currentExtend[3]],
+                                                [currentExtend[0],currentExtend[1]],
+                                                [currentExtend[2],currentExtend[1]],
+                                                [currentExtend[2],currentExtend[3]],
+                                                [currentExtend[0],currentExtend[3]]
+                                            ]]], "rectangle",
+                                                [255,0,0,0.4],[255,0,0,1], "round",
+                                                "round", [5,0], null,
+                                                null, 1, overviewLayerId);
+
+                overviewMap.centerAt((currentExtend[0]+currentExtend[2])/2,(currentExtend[1]+currentExtend[3])/2);
             },
-            imgClick(data){},
+            imgClick(data){
+                // debugger
+
+            },
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.zoomTo(10);
                 this.$refs.map1.addWms("shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","gd_road_centerline",1,true,null); // 上海汽车城
 
             },
-            levelChange(){
-
+            levelChange(map,level){
+                let l = map.getCurrentLevel();
+                if(l>=5)
+                {
+                    this.$refs.map1.zoomTo(l-5);
+                }
             },
             mapRenderComplete(map){
                 /*var coord = map.getCoordinateFromPixel([0,0]);
