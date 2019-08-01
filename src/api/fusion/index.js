@@ -1,0 +1,17 @@
+
+import axios from 'axios';
+import {HTTPURL} from '../requestUrl';
+/**
+ * 获取单车基本数据
+ */
+export const getPerceptionAreaInfo = params => {return axios.post(`${HTTPURL}pf/getPerceptionAreaInfo`, params).then(res => res.data); };
+
+/*
+* 根据摄像头编号获取视频
+*/
+export const getVideoByNum = params => {return axios.post(`${HTTPURL}lc/realData/getCamRealData`, params).then(res => res.data); };
+
+/*
+* 标识牌和红绿灯信息
+*/
+export const typeRoadData = params => {return axios.post(`${HTTPURL}ehb/road/typeRoadData`, params).then(res => res.data); };
