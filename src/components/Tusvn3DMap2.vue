@@ -96,7 +96,7 @@ export default {
                 // var extent = dl.getExtent(this.viewer) ;
                 // debugger
                 this.viewer.addEventListener("camera_changed", this.onCameraChanged)
-                console.log("=======地理范围======="+extent);
+                // console.log("=======地理范围======="+extent);
             },500);
         },
 
