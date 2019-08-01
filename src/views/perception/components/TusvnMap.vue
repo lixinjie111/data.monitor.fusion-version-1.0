@@ -262,7 +262,7 @@ export default {
         // 画 发布信息图标
         drawPubMsgIcon(lon,lat,icon){
             // lon,lat,id,layerId,carImgUrl,size,rotation,rotateWithView,opacity,offset,scale
-            let pubMsgBgIco = 'static/images/ico-bg2.png';
+            let pubMsgBgIco = 'static/images/sign-bg.png';
             let pubMsgBgIcoID = 'bg_' + this.pubMsgIconID;
 
             // [44,58]

@@ -7,42 +7,19 @@
                 <span>15.6°</span>
             </div>
             <div class="perception-road" id="mapRoad">
-                <tusvn-map
-                        ref="map1"
-                        targetId="map1"
-                        overlayContainerId="overlay1"
-                        :isMasker='false'
-                        :isCircle='false'
 
-                        
-                        @MapInitComplete='map1InitComplete'
-                        @MapRenderComplete='mapRenderComplete'>
-                </tusvn-map>
             </div>
         </div>
         <div class="map-left"></div>
         <div id="map" class="c-map">
-            <div class="style" id="message1" :style="{left:left1+'px',top:top1+'px'}">
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
-            </div>
-            <div class="style" id="message2" :style="{left:left2+'px',top:top2+'px'}">
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2"></video-player>
-            </div>
-            <tusvn-map
-                    ref="map"
-                    targetId="ddd"
-                    overlayContainerId="ccc"
-                    :isMasker='false'
-                    :isCircle='false'
-
-                    @ViewLevelChange="levelChange"
-                    @MapInitComplete='mapInitComplete'
-                    @ExtentChange="dragEnd"
-                    >
+            <tusvn-map :target-id="'mapFusion'"  ref="map"
+                       background="black" minX=325295.155400   minY=3461941.703700  minZ=50
+            maxX=326681.125700  maxY=3462723.022400  maxZ=80
+            @mapcomplete="onMapComplete">
 
             </tusvn-map>
         </div>
-        <div class="spat-detail clearfix">
+        <!--<div class="spat-detail clearfix" v-for="item in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
             <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
                 <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img">
@@ -69,237 +46,38 @@
                     <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
 </template>
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
-    import TusvnMap from './TusvnMap.vue';
+    import {getMap} from '@/utils/tusvnMap.js';
+    import TusvnMap from '@/components/Tusvn3DMap2'
+    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData} from '@/api/fusion'
     export default {
         data() {
             return {
                 option1:{},
+                rtmp1:'',
                 option2:{},
-                movement:0,
-                left1:'800',
-                top1:'260',
-                isEnd1:false,
-                isEnd2:false,
-                left2:'700',
-                top2:'560',
-                timer1:0,
-                timer2:0,
-                zoom:19,
-                topPosition:0,
-                lastPosition:0,
                 lightData:{
-                    'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
+                    /*'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
                     'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},//左转
                     'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
-                    'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转
-                },
-
+                    'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转*/
+                }
             }
         },
         components: { TusvnMap },
         methods: {
-            getOption(){
-               let option = {
-                    overNative: true,
-                    autoplay: false,
-                    controls: true,
-                    fluid: true,
-                    techOrder: ['flash', 'html5'],
-                    sourceOrder: true,
-                    flash: {
-                    swf: isProduction ? '/fusionMonitor/static/media/video-js.swf' : '/static/media/video-js.swf'
-                },
-                    sources: [
-                        {
-                            type: 'rtmp/mp4',
-                            src: ''
-                        }
-                    ],
-                        muted:true,
-                    width:'100%',
-                    height:'100%',
-                    notSupportedMessage: '视频无法播放，请稍候再试!',
-                    bigPlayButton : false,
-                    /*errorDisplay : false,*/
-                    controlBar: {
-                    timeDivider: false,
-                        durationDisplay: false,
-                        remainingTimeDisplay: false,
-                        currentTimeDisplay:false,
-                        fullscreenToggle: true, //全屏按钮
-                        captionsButton : false,
-                        chaptersButton: false,
-                        subtitlesButton:false,
-                        liveDisplay:false,
-                        playbackRateMenuButton:false
-                }
-                }
-                return option;
-            },
-            playerError1(e) {
-                console.log("playerError");
-                if(this.option1.sources[0].src != '') {
-                    let _videoUrl = this.option1.sources[0].src;
-                    this.option1.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option1.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
-            playerError2(e) {
-                console.log("playerError");
-                if(this.option2.sources[0].src != '') {
-                    let _videoUrl = this.option2.sources[0].src;
-                    this.option2.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option2.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
-            animation(left,top,leftPosition,flag,timer,leftFlag){
-                if(timer!=0){
-                    clearTimeout(timer);
-                }
-                if(top<this.topPosition){ top=top+2;}          //如果xpos小于终点的left,给它加1.
-                if(leftFlag==0){
-                    if(left>leftPosition){
-                        left = left-3;
-                        if(top>=this.topPosition&&left<=leftPosition){
-                            clearTimeout(timer);
-                            return;
-                        }
-                    }else{
-                        left = left;
-                        if(top>=this.topPosition&&left<=leftPosition){
-                            clearTimeout(timer);
-                            return;
-                        }
-                    }
-                }
-                if(leftFlag==1){
-                    left = left+3;
-                    if(top>=this.topPosition&&left>=leftPosition){
-                        clearTimeout(timer);
-                        return;
-                    }
-                }
-                //如果ypos小于终点的left,给它加1.
-                /*if(left <leftPosition){ left = left+3;}  */     //如果ypos小于终点的left,给它加1.
-
-                timer = setTimeout(()=>{
-                    if(flag==1){
-                        this.left1=left;
-                        this.top1=top;
-                        this.animation(left,top,leftPosition,flag,timer,leftFlag)
-                    }
-                    if(flag==2){
-                        this.left2=left;
-                        this.top2=top;
-                        this.animation(left,top,leftPosition,flag,timer,leftFlag)
-                    }
-                },10)
-            },
-            mapInitComplete:function(tusvnmap){
-                this.$refs.map.centerAt(121.17265957261286,31.284096076877844);
-                this.$refs.map.zoomTo(this.zoom);
-                this.$refs.map.addImgOverlay('img1', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17265957261286, 31.284096076877844, "{'data':'5'}", [0,0], this.imgClick);
-                this.$refs.map.addImgOverlay('img2', 'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png', 0, 121.17244854150163, 31.283475072766722, "{'data':'5'}", [0,0], this.imgClick);
-                this.$refs.map.addWms("shanghai_qcc:dl_shcsq_wgs84_zc_0708","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_zc_0708","",1,true,null); // 上海汽车城
-            //    setTimeout(()=>{
-
-                    // },2000);
-            },
-            mapRenderComplete:function(map){
-                var coord = map.getCoordinateFromPixel([24,35]);
-                    console.log(coord);
-                    var pixel = map.getPixelFromCoordinate([(121.17188977862558+121.17342936660013)/2,(31.28308488407923+31.28510726967646)/2]);
-                    console.log(pixel);
-            },
-
-
-
-            viewLevelChange(tusvnmap,mevent){
-                // console.log("============================viewLevelChange=============================");
-                // console.log(tusvnmap);
-                // console.log(mevent);
-                // debugger
-            },
-            dragEnd(map,currentExtend){
-                //拖拽完成后获取边界范围，同时设置地图的中心点
-                // console.log("当前的边界范围："+currentExtend);
-                // debugger;
-                let overviewMap = this.$refs.map1;
-                let overviewLayerId = "overviewLayer"
-                let overviewLayer = overviewMap.getLayerById(overviewLayerId);
-                if(overviewLayer!=null){
-                    overviewMap.removeAllFeature(overviewLayerId);
-                }else{
-                    overviewMap.addVectorLayer(overviewLayerId);
-                }
-                overviewMap.addMultiPolygon([[[
-                                                [currentExtend[0],currentExtend[3]],
-                                                [currentExtend[0],currentExtend[1]],
-                                                [currentExtend[2],currentExtend[1]],
-                                                [currentExtend[2],currentExtend[3]],
-                                                [currentExtend[0],currentExtend[3]]
-                                            ]]], "rectangle", 
-                                                [255,0,0,0.4],[255,0,0,1], "round", 
-                                                "round", [5,0], null, 
-                                                null, 1, overviewLayerId);
-                
-                overviewMap.centerAt((currentExtend[0]+currentExtend[2])/2,(currentExtend[1]+currentExtend[3])/2);
-            },
-            imgClick(data){
-                // debugger
-
-            },
-            map1InitComplete(){
-                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
-                this.$refs.map1.zoomTo(10);
-                this.$refs.map1.addWms("shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","gd_road_centerline",1,true,null); // 上海汽车城
-
-            },
-            levelChange(map,level){
-                let l = map.getCurrentLevel();
-                if(l>=5)
-                {
-                    this.$refs.map1.zoomTo(l-5);
-                }
-            }
-        },
-        mounted(){
-            let _this = this;
-            let ele = document.getElementById('fusionRight');
-            this.topPosition = ele.clientHeight-160;//整个高度减去弹出框的高度
-            this.lastPosition = this.topPosition;
-            console.log("改变前topPosition:"+this.topPosition);
-            this.animation(800,260,0,1,this.timer1,0);//left>leftPosition
-            this.animation(700,560,300,2,this.timer2,0); //left>leftPosition
-            this.option1 = this.getOption();
-            this.option2 = this.getOption();
-            window.onresize = function(){ // 定义窗口大小变更通知事件
-                _this.topPosition = ele.clientHeight-160;
-                //全屏
-                if(_this.topPosition>_this.lastPosition){
-                    _this.animation(_this.left1,_this.top1,0,1,_this.timer1,0);//left>leftPosition
-                    _this.animation(_this.left2,_this.top2,300,2,_this.timer2,0); //left>leftPosition
-                }else{
-//                    debugger
-                    _this.left1 = 0;
-                    _this.left2 = 300;
-                    _this.top1 = _this.topPosition;
-                    _this.top2 = _this.topPosition;
-                }
-
-                _this.lastPosition = _this.topPosition;
-            };
+            onMapComplete(){
+                getMap(this.$refs.map);
+                this.$refs.map.updateCameraPosition(326297.1669125299,3462321.135051115,30.651420831899046,30.905553118989463,-0.5303922863908559,-2.6312825799826953);
         }
+    },
+    mounted() {
     }
+}
 </script>
 <style>
     .style .vjs-error .vjs-error-display:before{
@@ -322,11 +100,11 @@
         width: 270px;
         border:1px solid rgba(211, 134, 0, 0.5);
         position: absolute;
-        bottom: 30px;
+        bottom: 10px;
         background: #000;
     }
     .base-info{
-        padding:30px 0px ;
+        padding:10px 0px ;
         text-align: center;
         .weather-icon{
             vertical-align: middle;
@@ -364,12 +142,7 @@
     }
     .spat-detail{
         position: absolute;
-        top: 30px;
-        /*left: 0;
-        text-align: center;*/
         z-index: 1;
-        left:-300px;
-        margin-left:40%;
         .spat-layout{
             float: left;
             margin-left: 8px;

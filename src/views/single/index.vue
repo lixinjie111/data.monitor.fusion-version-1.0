@@ -98,7 +98,7 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 330px;
+            width: 270px;
             background: #1a1a1a;;
         }
         .fusion-right{
@@ -106,7 +106,7 @@
             top: 0;
             right: 0;
             bottom: 0;
-            left: 330px;
+            left: 270px;
         }
     }
 </style>

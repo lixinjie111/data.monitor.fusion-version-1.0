@@ -28,11 +28,13 @@
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，非机动车 {{perceptionData.noMotor || 0}}</span>
+                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
+                    <!--<span class="fusion-font">车辆感知：车辆 </span>-->
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，非机动车 {{sideData.noMotor || 0}}</span>
+                    <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{sideData.noMotor || 0}}</span>
+                    <!--<span class="fusion-font">路侧识别：车辆 </span>-->
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
@@ -43,15 +45,15 @@
             <ul class="perception-style">
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>下发预警信息：{{warningCount}}</span>
+                    <span>下发预警信息：{{warningCount|| 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>接入红绿灯：1</span>
+                    <span>接入红绿灯：{{spatCount|| 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign traffic-sign"></span>
-                    <span>接入交通标志牌：1</span>
+                    <span>接入交通标志牌：{{signCount|| 0}}</span>
                 </li>
             </ul>
         </div>
@@ -79,6 +81,14 @@
                 default() {
                     return [];
                 }
+            },
+            spatCount:{
+                type:Number,
+                default:0
+            },
+            signCount:{
+                type:Number,
+                default:0
             }
         },
         methods: {
@@ -118,18 +128,7 @@
                 //获取车辆状态
                 var fusionStatus = {
                     "action":"road_real_data_stat",
-                    "region": [[
-                        121.1620245,
-                        31.2859340]
-                        , [
-                            121.1626339,
-                            31.2815266
-                        ], [
-                            121.1781135,
-                            31.2774582
-                        ],
-                        [121.1817312,
-                            31.2867279]]
+                    "region": this.currentExtent
                 }
                 var fusionStatusMsg = JSON.stringify(fusionStatus);
                 this.sendMsg(fusionStatusMsg);
@@ -160,8 +159,8 @@
                 let warningId;
                 warningData.forEach(item=>{
                     warningId = item.warnId;
-                    warningId = warningId.substring(0,"_".lastIndexOf(warningId));
-                    if(_this.warningIdList.indexOf(warningId)!=-1){
+                    warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                    if(_this.warningIdList.indexOf(warningId)==-1){
                         _this.warningIdList.push(warningId);
                         _this.warningCount++;
                     }
@@ -174,12 +173,7 @@
                 //旁车
                 var warning = {
                     "action": "clod_event",
-                    "region": [
-                        [121.1620245, 31.2859340],
-                        [121.1626339, 31.2815266],
-                        [121.1781135, 31.2774582],
-                        [121.1817312, 31.2867279]
-                    ]
+                    "region": this.currentExtent
                 }
                 var warningMsg = JSON.stringify(warning);
                 this.sendWarningMsg(warningMsg);
@@ -207,25 +201,24 @@
     }
 </script>
 <style lang="scss" scoped>
-    @import '@/assets/scss/theme.scss';
+   /* @import '@/assets/scss/theme.scss';*/
     .perception-style{
         padding: 20px 0px;
+        line-height: 28px;
+        font-size: 14px;
         li{
-            @include layoutMode(align);
             letter-spacing: 1px;
             color: #cccccc;
             font-size: 14px;
             .overview-sign{
-                width: 16px;
-                height: 16px;
+                width: 14px;
+                height: 14px;
                 border-radius: 50%;
                 display: inline-block;
-                margin-right:20px;
+                margin-right:10px;
             }
             .fusion-font{
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
+                word-wrap:break-word
             }
             .fusion-sign{
                 background:#9b9b9b;
