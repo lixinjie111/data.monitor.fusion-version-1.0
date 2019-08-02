@@ -39,14 +39,14 @@ export default {
             this.webSocket.onopen = this.onopen;
             this.webSocket.onerror = this.onerror;
         },
-        onmessage(message){
+        onmessage(message) {
             let _json = JSON.parse(message.data),
             _result = _json.result.allVehicle;
-            if(_result.length == 0) {
+            if (_result.length == 0) {
                 console.log(_json);
                 console.log("当前数据为空",this.dateUtil.formatTime(_json.result.time));
             }
-            if(this.flag) {
+            if (this.flag) {
                 // console.log("绘制前--------");
                 // console.log(_result.length);
                 this.flag = false;
@@ -64,11 +64,11 @@ export default {
                 this.changeLngLat(_responseData);
             }
         },
-        changeLngLat(_allPointData){
+        changeLngLat(_allPointData) {
             let _this = this;
             // console.log(_this.count);
             // _allPointData.forEach((item, index, arr) => {
-            for( let i = 0; i < _allPointData.length; i++){
+            for ( let i = 0; i < _allPointData.length; i++) {
                 // console.log(_allPointData[i].position);
                 (function(itemIndex){
                     // 数组中每一项item的position的经纬度转换
@@ -142,6 +142,7 @@ export default {
                     _markerObj.platNoMarker.on('click', _this.showView);
 
                     _this.responseDataDraw.push(_markerObj);
+                    //console.log('_this.responseDataDraw', _this.responseDataDraw);
                 }
 
                 if(i == _allPointDataLength - 1) {

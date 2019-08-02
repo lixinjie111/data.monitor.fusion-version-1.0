@@ -16,7 +16,8 @@ window.cfg = {
     //外网
     url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台
     websocketUrl:'ws://120.133.21.14:49982/mon',  //监控
-    socketUrl:'ws://120.133.21.14:49999/ws'  //影子系统
+    socketUrl:'ws://120.133.21.14:49999/ws', //影子系统
+    // typicalRoadUrl: 'ws://120.133.21.14:9982/mon', // 路段监控
     /*url: 'http://192.168.1.57:8080/', //监控平台
     socketUrl:'ws://192.168.1.57:9999/ws',  //监控
     swaggerUrl:http://172.17.1.13:9093/monPlatApp/swagger-ui.html

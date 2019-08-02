@@ -12,7 +12,8 @@
         <map-container></map-container>
         <!-- 右侧 -->
         <div class="fusion-right">
-            <right-overview  @queryCrossDetail="queryCrossDetail"></right-overview>
+            <!-- <right-overview  @queryCrossDetail="queryCrossDetail"></right-overview> -->
+            <typical-section  @queryCrossDetail="queryCrossDetail"></typical-section>
         </div>
         <div class="fusion-bottom">
             <bottom-overview></bottom-overview>
@@ -21,15 +22,17 @@
 </template>
 <script>
 import LeftOverview from './components/leftOverview.vue';
-import RightOverview from './components/rightOverview.vue';
+// import RightOverview from './components/rightOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
+import TypicalSection from './components/typicalSection.vue';
 export default {
     components: {
         LeftOverview,
-        RightOverview,
+        // RightOverview,
         MapContainer,
-        BottomOverview
+        BottomOverview,
+        TypicalSection
     },
     data() {
         return {
@@ -127,6 +130,7 @@ export default {
         top: 0;
         right: 0;
         bottom: 0;
+        cursor: pointer;
         background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
         // width:327px; 
     }
