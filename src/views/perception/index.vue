@@ -14,7 +14,7 @@
 </template>
 <script>
     import Left from './components/left.vue'
-    import Right from './components/right.vue'
+    import Right from './components/right'
     export default {
         data() {
             return {
@@ -37,6 +37,7 @@
         },
         components:{Left,Right},
         mounted() {
+
         }
     }
 </script>

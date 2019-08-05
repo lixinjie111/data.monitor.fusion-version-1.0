@@ -17,7 +17,6 @@
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
             @mapcomplete="onMapComplete">
-
             </tusvn-map>
         </div>
         <!--<div class="spat-detail clearfix" v-for="item in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
@@ -74,7 +73,65 @@
             onMapComplete(){
                 getMap(this.$refs.map);
                 this.$refs.map.updateCameraPosition(326297.1669125299,3462321.135051115,30.651420831899046,30.905553118989463,-0.5303922863908559,-2.6312825799826953);
-            }
+            },
+            getPerceptionAreaInfo(){
+                getPerceptionAreaInfo({
+                    "areaPoints":this.currentExtent,
+                    "centerPoint": {
+                        "latitude": this.center[0][1],
+                        "longitude": this.center[0][0]
+                    }
+                }).then(res=>{
+                    let data = res.data;
+                    let typicalList = data.shortList;
+                    let count=0;
+                    typicalList.forEach((item,index)=>{
+                        if(index==0){
+                            this.$refs.map.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
+                            let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);
+                            this.left1 = parseInt(pixel[0]);
+                            this.top1=parseInt(pixel[1])-150;
+                            let camera = item.cameraList[0];
+                            //地图移动停止10s
+                            let time = setTimeout(()=>{
+                                this.video1Show=true;
+                                this.getVideo(camera,index);
+                                clearTimeout(time);
+                            },10000)
+                        }
+                        count++;
+                    })
+                    let sideList = data.sideList;
+                    sideList.forEach(item=>{
+                        this.$refs.map.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
+                    })
+                });
+            },
+            getVideo(camera,index){
+                let _this = this;
+                //播放20s移动到下方
+                let time1 = setTimeout(()=>{
+                    console.log("动画开始");
+                    _this.animation(_this.left1,_this.top1,0,1,_this.timer1,0);//left>leftPosition
+                    clearTimeout(time1)
+                },50000)
+                getVideoByNum({
+                    "protocal": camera.protocol,
+                    "serialNum": camera.serialNum
+                }).then(res => {
+                    if(index==0){
+                        _this.rtmp1 = res.data.rtmp;
+                        if(_this.rtmp1==""){
+                            //                console.log("rtmp1----")
+                            _this.option1.notSupportedMessage="";
+                            _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                        }else{
+                            _this.option1.notSupportedMessage= '此视频暂无法播放，请稍候再试';
+                            _this.option1.sources[0].src=_this.rtmp1;
+                        }
+                    }
+                })
+            },
         },
         mounted() {
         }
@@ -97,12 +154,13 @@
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
     .perception-road{
-        height: 180px;
-        width: 270px;
+        height: 150px;
+        width: 250px;
         border:1px solid rgba(211, 134, 0, 0.5);
         position: absolute;
         bottom: 10px;
         background: #000;
+        right: 10px;
     }
     .base-info{
         padding:10px 0px ;
