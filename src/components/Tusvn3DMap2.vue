@@ -96,14 +96,34 @@ export default {
                 // var extent = dl.getExtent(this.viewer) ;
                 // debugger
                 this.viewer.addEventListener("camera_changed", this.onCameraChanged)
-                // console.log("=======地理范围======="+extent);
-            },500);
+                // console.log("=======地理范围=======");
+                // console.log(extent);
+
+                // let poix = this.worldToScreen(326181.72659014474,3462354.6747002415,12.86);
+
+                // console.log("=======像素位置======="+poix);
+
+            },3000);
         },
 
         onCameraChanged:function(){
             this.$emit("CameraChanged",this);
         },
-
+        /**
+         * 坐标转换
+         */
+        coordinateTransfer:function(longitude,latitude){
+            let targetCoor = proj4(this.destinatePorject,this.sourceProject,[longitude,latitude]);
+            return targetCoor;
+        },
+        /**
+         * 三维坐标转平面像素坐标
+         */
+        worldToScreen:function(x,y,z){
+            let point = new THREE.Vector3(x,y,z==undefined? this.defualtZ:z);
+            return dl.worldToScreen(point,this.viewer);
+        },
+         
         /**
          * 获取三维视窗的二维地理范围
          */
