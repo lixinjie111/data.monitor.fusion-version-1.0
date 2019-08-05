@@ -37,3 +37,21 @@ export const getGpsRealConfig = params => {return axios.post(`${HTTPURL}vl/actVe
  * 信号灯 路口
  */
 export const rwDis = params => {return axios.post(`${HTTPURL}rw/bs/rwDis`, params).then(res => res.data); };
+
+
+/**
+ * 典型路段信息
+ */
+export const getTypicalRoadData = params => {return axios.post(`${HTTPURL}/ehb/road/typeRoad`, params).then(res => res.data); };
+
+/**
+ * 获取四个角的地理位置
+ */
+export const getTypeRoadData = params => { return axios.post(`${HTTPURL}/ehb/road/typeRoadData`, params).then(res => res.data); };
+
+
+/**
+ * 获取天气数据
+ * I_G3_01
+ */
+export const getTopWeather = params => { return axios.post(`${HTTPURL}g/comStat/getTopWeather`, params).then(res => res.data); };

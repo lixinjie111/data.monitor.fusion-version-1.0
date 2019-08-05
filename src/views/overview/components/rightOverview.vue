@@ -1,104 +1,119 @@
 <template>
-  <div class="fusion-right-style">
-        <div class="map-right">
+    <div class="fusion-right-style">
+        <div class="right-road">
             <div class="base-info">
                 <span>2019-09-23 08:00:00</span>
-                <img src="@/assets/images/weather/default.png" class="weather-icon"/>
+                    <img src="@/assets/images/weather/default.png" class="weather-icon"/>
                 <span>15.6°</span>
             </div>
             <div class="perception-road">
-              <div style="padding-left: 7px">
-                  <p @click="queryCrossDetail(cross1)">路口：{{cross1.crossId}}</p>
-              </div>
-              <div id="map1" class="cross-scan"></div>
+                <div style="padding-left: 7px">
+                    <p @click="queryCrossDetail(cross1)">路口：{{cross1.crossId}}</p>
+                </div>
+                <div id="map1" class="cross-scan"></div>
             </div>
             <div class="perception-road">
-              <div style="padding-left: 7px">
-                  <p @click="queryCrossDetail(cross2)">路口：{{cross2.crossId}}</p>
-              </div>
-              <div id="map2" class="cross-scan"></div>
+                <div style="padding-left: 7px">
+                    <p @click="queryCrossDetail(cross2)">路口：{{cross2.crossId}}</p>
+                </div>
+                <div id="map2" class="cross-scan"></div>
             </div>
             <div class="perception-road">
-              <div style="padding-left: 7px">
-                  <p @click="queryCrossDetail(cross3)">路口：{{cross3.crossId}}</p>
-              </div>
-              <div id="map3" class="cross-scan"></div>
+                <div style="padding-left: 7px">
+                    <p @click="queryCrossDetail(cross3)">路口：{{cross3.crossId}}</p>
+                </div>
+                <div id="map3" class="cross-scan"></div>
             </div>
             <div class="perception-road">
-              <div style="padding-left: 7px">
-                  <p @click="queryCrossDetail(cross4)">路口：{{cross4.crossId}}</p>
-              </div>
-              <div id="map4" class="cross-scan"></div>
+                <div style="padding-left: 7px">
+                    <p @click="queryCrossDetail(cross4)">路口：{{cross4.crossId}}</p>
+                </div>
+                <div id="map4" class="cross-scan"></div>
             </div>
-        </div>
-    </div>
+          </div>
+      </div>
 </template>
 <script>
-  import {typeCross} from '@/api/overview/index.js';
-  // import ConvertCoord from '@/assets/js/utils/coordConvert.js'
-    export default {
-        data() {
-            return {
-              cross1:{},
-              cross2:{},
-              cross3:{},
-              cross4:{},
-              map1:{},
-              map2:{},
-              map3:{},
-              map4:{},
-              mapOption:{
-                center: [121.262939,31.245149],
-                zoom: 18,
-                mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
-              },
-              webSocket1:{},
-              webSocket2:{},
-              webSocket3:{},
-              webSocket4:{},
-              map1List:[],
-              map2List:[],
-              map3List:[],
-              map4List:[],
-              count1:0,
-              count2:0,
-              count3:0,
-              count4:0,
-            }
-        },
-        methods: {
-          queryCrossDetail(item) {
+import {typeCross} from '@/api/overview/index.js';
+import ConvertCoord from '@/assets/js/coordConvert.js'
+export default {
+    data() {
+        return {
+            cross1:{},
+            cross2:{},
+            cross3:{},
+            cross4:{},
+            map1:{},
+            map2:{},
+            map3:{},
+            map4:{},
+            mapOption:{
+              center: [121.262939,31.245149],
+              zoom: 18,
+              mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
+            },
+            webSocket1:{},
+            webSocket2:{},
+            webSocket3:{},
+            webSocket4:{},
+            map1List:[], // 车辆
+            map2List:[],
+            map3List:[],
+            map4List:[],
+            map1LightList: [], // 红绿灯
+            map2LightList: [],
+            map3LightList: [],
+            map4LightList: [],
+            count1:0,
+            count2:0,
+            count3:0,
+            count4:0,
+            traficLight: []
+        }
+    },
+    mounted() {
+          this.map1 = new AMap.Map('map1', this.mapOption);
+          this.map2 = new AMap.Map('map2', this.mapOption);
+          this.map3 = new AMap.Map('map3', this.mapOption);
+          this.map4 = new AMap.Map('map4', this.mapOption);
+          this.getTypeCross();
+    },
+    methods: {
+        queryCrossDetail(item) {
             var _this = this;
             this.dialogVisible = true;
             this.$emit("queryCrossDetail",item);
             /*_this.selectedItem = item;
             */
-          },
-          getTypeCross(){
+        },
+        getTypeCross(){
             typeCross().then(res=>{
-              let result = res.data;
-              console.log('result --- 路口数据', result);
-              let baseData;
-              let position;
-              let wms;
-              result.forEach((obj,index)=>{
-                baseData = obj.baseData;
-                position = new AMap.LngLat(baseData.x,baseData.y);
-//                position = ConvertCoord.wgs84togcj02(baseData.x,baseData.y);
-                wms  = new AMap.TileLayer.WMS({
-                  url:'http://10.0.1.22:8080/geoserver/shanghai_qcc/wms',
-                  blend: false,
-                  tileSize: 256,
-                  params:{'LAYERS': 'shanghai_qcc:dl_shcsq_wgs84_gjlk',VERSION:'1.1.0'}
-                })
-                if(index==0){
-                  this.cross1 = obj;
-                  wms.setMap(this.map1);
-                  //将坐标点转换成高德的位置
-                  this.map1.setCenter(position);
-                  this.map1.setZoom(18);
-                  this.initWebSocket1();
-                }
+                let result = res.data;
+                let baseData; // 坐标位置
+                let position; // 位置
+                let traficLight; // 红绿灯的个数和位置
+                let wms;
+                result.forEach((obj,index)=>{
+                    baseData = obj.baseData;
+                    this.traficLight = obj.spatData;
+                    // 地图的经纬度
+                    position = new AMap.LngLat(baseData.x, baseData.y);
+                    // wms图层
+                    wms  = new AMap.TileLayer.WMS({
+                        url:'http://10.0.1.22:8080/geoserver/shanghai_qcc/wms',
+                        blend: false,
+                        tileSize: 256,
+                        params:{'LAYERS': 'shanghai_qcc:dl_shcsq_wgs84_gjlk',VERSION:'1.1.0'}
+                    })
+                  if (index == 0) {
+                      this.cross1 = obj;
+                      // setMap设置图层所属的地图对象
+                      wms.setMap(this.map1);
+                      this.map1.setCenter(position); // 设置中心点（地图的经纬度）
+                      this.map1.setZoom(18); // 设置缩放级别
+                      this.initWebSocket1();
+                      this.changeLngLat(this.traficLight);
+                  }
                 if(index==1){
                   this.cross2 = obj;
                   wms.setMap(this.map2);
@@ -124,8 +139,70 @@
               });
             });
           },
+          // 红绿灯标记
+          changeLngLat(traficLight) {
+              traficLight = traficLight.filter(x => x.hasOwnProperty('marker') === false);
+              let _this = this;
+              for ( let i = 0; i < traficLight.length; i++) {
+                (function(itemIndex){
+                    // 数组中每一项item的position的经纬度转换
+                    let _position = new AMap.LngLat(traficLight[itemIndex].postion.longitude, traficLight[itemIndex].postion.latitude);
+                    traficLight[itemIndex].position = _position;
+                    _this.drawLightMarker(traficLight);
+
+                })(i);
+            };
+          },
+          drawLightMarker(_traficLight) {
+              let roadLight = _traficLight;
+              let _this = this;
+              console.log('roadLight ---', roadLight);
+              for(let i = 0; i < roadLight.length; i++) {
+                let _data = roadLight[i];
+                console.log('_data', _data);
+                if(_data.position) {
+                    let _markerObj = {
+                        marker: null,
+                        spatIdMarker: null
+                    };
+                    _markerObj.marker = new AMap.Marker({
+                        map: _this.map1,
+                        position: _data.position,
+                        icon: "static/images/road/yellow.png",
+                        offset: new AMap.Pixel(-2, -2),
+                        zIndex: 50,
+                        spatId: _data.spatId
+                    });
+                    _markerObj.spatIdMarker = new AMap.Text({
+                        map: _this.map1,
+                        text: "<br/><span style='color:#e6a23c'>"+_data.spatId+'</span>',
+                        anchor: 'center', // 设置文本标记锚点
+                        style: {
+                            'padding': '0 5px',
+                            'border-radius': '4px',
+                            'background-color': 'rgba(55, 186, 123, .2)',
+                            'background-color': 'red',
+                            'border-width': 0,
+                            'text-align': 'center',
+                            'font-size': '10px',
+                            'line-height': '16px',
+                            'letter-spacing': '0',
+                            'margin-top': '14px',  //车头
+                            'color': '#ccc'
+                        },
+                        position: _data.position,
+                        spatId: _data.spatId
+                    });
+                    _markerObj.marker.on('click', _this.showView);
+                    _markerObj.spatIdMarker.on('click', _this.showView);
+                    // _this.map1.add(markerObj.marker);
+                    _this.traficLight.push(_markerObj);
+                }
+              }
+          },
           initWebSocket1(){
             let _this=this;
+            // 利用websocket实时获取数据
             if ('WebSocket' in window) {
               _this.webSocket1 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
             }
@@ -140,13 +217,13 @@
             let result = json.result.vehData;
             let position;
             if(_this.count1==0){
-              //在接受请求前清除地图上的点
+              // 在接受请求前清除地图上的点
               _this.map1.remove(_this.map1List);
               _this.map1List=[];
               result.forEach(item =>{
                 position = new AMap.LngLat(item.longitude,item.latitude);
-//                position = ConvertCoord.wgs84togcj02(item.longitude,item.latitude);
                 _this.count1++;
+                // 利用marker构造点标记
                 let marker = new AMap.Marker({
                   position: position,
                   icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
@@ -206,7 +283,6 @@
               _this.map2List = [];
               result.forEach(item => {
                 position = new AMap.LngLat(item.longitude,item.latitude);
-//                position = ConvertCoord.wgs84togcj02(item.longitude, item.latitude);
                 _this.count2++;
                 let marker = new AMap.Marker({
                   position: position,
@@ -266,7 +342,6 @@
               _this.map3.remove(_this.map3List);
               _this.map3List = [];
               result.forEach(item => {
-//                position = ConvertCoord.wgs84togcj02(item.longitude, item.latitude);
                 position = new AMap.LngLat(item.longitude,item.latitude);
                 _this.count3++;
                 let marker = new AMap.Marker({
@@ -327,7 +402,6 @@
               _this.map4.remove(_this.map4List);
               _this.map4List = [];
               result.forEach(item => {
-//                position = ConvertCoord.wgs84togcj02(item.longitude, item.latitude);
                 position = new AMap.LngLat(item.longitude,item.latitude);
                 _this.count4++;
                 let marker = new AMap.Marker({
@@ -368,15 +442,6 @@
               return;
             }
           }
-        },
-       watch:{
-       },
-        mounted() {
-          this.map1 = new AMap.Map('map1', this.mapOption);
-          this.map2 = new AMap.Map('map2', this.mapOption);
-          this.map3 = new AMap.Map('map3', this.mapOption);
-          this.map4 = new AMap.Map('map4', this.mapOption);
-          this.getTypeCross();
         },
       destroyed(){
         //销毁Socket
