@@ -16,7 +16,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="map"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete">
+            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged'>
             </tusvn-map>
         </div>
         <!--<div class="spat-detail clearfix" v-for="item in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
@@ -73,6 +73,19 @@
             onMapComplete(){
                 getMap(this.$refs.map);
                 this.$refs.map.updateCameraPosition(326297.1669125299,3462321.135051115,30.651420831899046,30.905553118989463,-0.5303922863908559,-2.6312825799826953);
+                /*setInterval(()=>{
+                    let obj = this.$refs.tusvnMap2.getCamera();
+                    console.log("x:"+obj.x+",y"+obj.y+",z:"+obj.z+",radius:"+obj.radius+",pitch:"+obj.pitch+",yaw:"+obj.yaw);
+                },5000)*/
+               /* this.getCurrentExtent();*/
+                },
+            cameraChanged(){
+                console.log("窗口发生变化")
+                this.video1Show=false;
+                this.rtmp1="";
+                this.getCurrentExtent();
+                this.getCenter();
+                this.getPerceptionAreaInfo();
             },
             getPerceptionAreaInfo(){
                 getPerceptionAreaInfo({
@@ -87,8 +100,11 @@
                     let count=0;
                     typicalList.forEach((item,index)=>{
                         if(index==0){
-                            this.$refs.map.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
-                            let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);
+                            //球面坐标转成三维坐标
+                            let utm = this.$refs.map.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
+                            //三维坐标转成平面像素
+                            let pixel = this.$refs.map.worldToScreen(utm[0],utm[1],12.86)
+                            /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
                             this.left1 = parseInt(pixel[0]);
                             this.top1=parseInt(pixel[1])-150;
                             let camera = item.cameraList[0];
@@ -131,6 +147,38 @@
                         }
                     }
                 })
+            },
+            getCurrentExtent() {
+                debugger
+                this.currentExtent = [];
+                let result = this.$refs.map.getExtent();
+                let utm1 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                let x1 = utm1[0];
+                let y1 = utm1[1];
+                let x2 = utm2[0];
+                let y2 = utm2[0];
+                this.currentExtent.push([x2, y1]);
+                this.currentExtent.push([x1, y1]);
+                this.currentExtent.push([x1, y2]);
+                this.currentExtent.push([x2, y2]);
+//                console.log("边界值" + this.currentExtent);
+                this.$emit('getCurrentExtent', this.currentExtent);
+
+            },
+            getCenter(){
+                this.center= [];
+                let result = this.$refs.map.getExtent();
+                let utm1 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                let x1 = utm1[0];
+                let y1 = utm1[1];
+                let x2 = utm2[0];
+                let y2 = utm2[0];
+                let x0 = (x1+x2)/2;
+                let y0 = (y1+y2)/2;
+                this.center.push([x0,y0]);
+//                console.log("中心点："+this.center);
             },
         },
         mounted() {
