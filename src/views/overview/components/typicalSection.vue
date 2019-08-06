@@ -159,34 +159,36 @@ export default {
             southWest.push(bounds.southwest.lng);
             southWest.push(bounds.southwest.lat);
             this.finalFourPosition.push(southWest);
-
-            northEast.push(bounds.northeast.lng);
-            northEast.push(bounds.northeast.lat);
-            this.finalFourPosition.push(northEast);
             // 西北
             northWest.push(bounds.southwest.lng);
             northWest.push(bounds.northeast.lat);
             this.finalFourPosition.push(northWest);
+            // 东北
+            northEast.push(bounds.northeast.lng);
+            northEast.push(bounds.northeast.lat);
+            this.finalFourPosition.push(northEast);
             // 东南
             southEast.push(bounds.northeast.lng);
             southEast.push(bounds.southwest.lat);
             this.finalFourPosition.push(southEast);
             if (num === 0) {
                 this.finalFourPosition1 = this.finalFourPosition;
+                console.log('this.finalFourPosition1.', this.finalFourPosition1);
                 southwest = [bounds.southwest.lng, bounds.southwest.lat];
                 northeast = [bounds.northeast.lng, bounds.northeast.lat];
                 let mapBounds1 = new AMap.Bounds(southwest, northeast);
                 this.map1.setBounds(mapBounds1);
                 // this.fetchRoadData(this.finalFourPosition1, num);
             } else if (num === 1) {
-                this.finalFourPosition2 = this.fourPoint;
+                this.finalFourPosition2 = this.finalFourPosition;
                 var mapBounds2 = new AMap.Bounds(this.finalFourPosition2[1], this.finalFourPosition2[3]);
                 this.map2.setBounds(mapBounds2);
-                this.center = this.map2.getCenter();
-                this.map2.setCenter(this.center);
+                // this.center = this.map2.getCenter();
+                // this.map2.setCenter(this.center);
                 // this.fetchRoadData(this.finalFourPosition2, num);
             } else if (num === 2) {
                 this.finalFourPosition3 = this.finalFourPosition;
+                console.log('this.finalFourPosition3', this.finalFourPosition3);
                 southwest = [bounds.southwest.lng, bounds.southwest.lat];
                 northeast = [bounds.northeast.lng, bounds.northeast.lat];
                 let mapBounds3 = new AMap.Bounds(southwest, northeast);
@@ -269,6 +271,7 @@ export default {
                     if (index === 1) {
                         this.cross2 = result[index];
                         wms.setMap(this.map2);
+                        this.map2.setCenter(position);
                         this.map2.setZoom(18);
                         this.getFourPosition(index);
                         // this.initWebSocket2();
@@ -576,26 +579,26 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            for (let i = 0; i < _this.map1List.length; i++) {
-                if ('marker' in _this.map1List[i] === true) {
-                    _this.map1.remove(_this.map1List[i].marker);
-                }
-                if ('spatIdMarker' in _this.map1List[i] === true) {
-                    _this.map1.remove(_this.map1List[i].spatIdMarker);
-                }
-                if ('markerVel' in _this.map1List[i] === true) {
-                    _this.map1.remove(_this.map1List[i].markerVel);
-                }
-                if ('velicheIdMarker' in this.map1List[i] === true) {
-                    _this.map1.remove(_this.map1List[i].velicheIdMarker);
-                }
-            }
             if ('spatDataDTO' in result === true) {
                 roadLights = result.spatDataDTO;
                 roadLights.map((x, index) => {
                     lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
                     roadLights[index].position = lightPosition;
                 });
+                for (let i = 0; i < _this.map1List.length; i++) {
+                    if ('marker' in _this.map1List[i] === true) {
+                        _this.map1.remove(_this.map1List[i].marker);
+                    }
+                    if ('spatIdMarker' in _this.map1List[i] === true) {
+                        _this.map1.remove(_this.map1List[i].spatIdMarker);
+                    }
+                    if ('markerVel' in _this.map1List[i] === true) {
+                        _this.map1.remove(_this.map1List[i].markerVel);
+                    }
+                    if ('velicheIdMarker' in this.map1List[i] === true) {
+                        _this.map1.remove(_this.map1List[i].velicheIdMarker);
+                    }
+                }
                 for (let i = 0; i < roadLights.length; i++) {
                     let _data = roadLights[i];
                     if(_data.position) {
@@ -693,6 +696,7 @@ export default {
                     'polygon': this.finalFourPosition1
                 }
             }
+            console.log('roadLight 111', roadLight);
             var roadStr = JSON.stringify(roadLight);
             this.sendRoadMsg1(roadStr);
         },
@@ -826,7 +830,6 @@ export default {
                         });
                         _this.map2.add(_markerCar);
                         _this.map2List.push(_markerCar);
-                        arr.pop();
                     }
                 }
             }
@@ -851,11 +854,11 @@ export default {
         },
         onRoadOpen2(data){
             // 获取红绿灯
-            let arr = [[121.17560999059768, 31.282032221451242],[121.16724149847121, 31.282032221451242],[121.16724149847121, 31.28705868114515],[121.17560999059768, 31.28705868114515]]
+            // let arr = [[121.17560999059768, 31.282032221451242],[121.16724149847121, 31.282032221451242],[121.16724149847121, 31.28705868114515],[121.17560999059768, 31.28705868114515]]
             var roadLight = {
                 'action': 'road_real_data',
                 'data': { 
-                    'polygon': arr
+                    'polygon': this.finalFourPosition2
                 }
             }
             var roadStr = JSON.stringify(roadLight);
@@ -890,26 +893,26 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            for (let i = 0; i < _this.map3List.length; i++) {
-                if ('marker' in _this.map3List[i] === true) {
-                    _this.map3.remove(_this.map3List[i].marker);
-                }
-                if ('spatIdMarker' in _this.map3List[i] === true) {
-                    _this.map3.remove(_this.map3List[i].spatIdMarker);
-                }
-                if ('markerVel' in _this.map3List[i] === true) {
-                    _this.map3.remove(_this.map3List[i].markerVel);
-                }
-                if ('velicheIdMarker' in this.map3List[i] === true) {
-                    _this.map3.remove(_this.map3List[i].velicheIdMarker);
-                }
-            }
             if ('spatDataDTO' in result === true) {
                 roadLights = result.spatDataDTO;
                 roadLights.map((x, index) => {
                     lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
                     roadLights[index].position = lightPosition;
                 });
+                for (let i = 0; i < _this.map3List.length; i++) {
+                    if ('marker' in _this.map3List[i] === true) {
+                        _this.map3.remove(_this.map3List[i].marker);
+                    }
+                    if ('spatIdMarker' in _this.map3List[i] === true) {
+                        _this.map3.remove(_this.map3List[i].spatIdMarker);
+                    }
+                    if ('markerVel' in _this.map3List[i] === true) {
+                        _this.map3.remove(_this.map3List[i].markerVel);
+                    }
+                    if ('velicheIdMarker' in this.map3List[i] === true) {
+                        _this.map3.remove(_this.map3List[i].velicheIdMarker);
+                    }
+                }
                 for (let i = 0; i < roadLights.length; i++) {
                     let _data = roadLights[i];
                     if(_data.position) {
@@ -1007,6 +1010,7 @@ export default {
                     'polygon': this.finalFourPosition3
                 }
             }
+            console.log('roadLight 333', roadLight);
             var roadStr = JSON.stringify(roadLight);
             this.sendRoadMsg3(roadStr);
         },
@@ -1039,26 +1043,26 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            for (let i = 0; i < _this.map4List.length; i++) {
-                if ('marker' in _this.map4List[i] === true) {
-                    _this.map4.remove(_this.map4List[i].marker);
-                }
-                if ('spatIdMarker' in _this.map4List[i] === true) {
-                    _this.map4.remove(_this.map4List[i].spatIdMarker);
-                }
-                if ('markerVel' in _this.map4List[i] === true) {
-                    _this.map4.remove(_this.map4List[i].markerVel);
-                }
-                if ('velicheIdMarker' in this.map4List[i] === true) {
-                    _this.map4.remove(_this.map4List[i].velicheIdMarker);
-                }
-            }
             if ('spatDataDTO' in result === true) {
                 roadLights = result.spatDataDTO;
                 roadLights.map((x, index) => {
                     lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
                     roadLights[index].position = lightPosition;
                 });
+                for (let i = 0; i < _this.map4List.length; i++) {
+                    if ('marker' in _this.map4List[i] === true) {
+                        _this.map4.remove(_this.map4List[i].marker);
+                    }
+                    if ('spatIdMarker' in _this.map4List[i] === true) {
+                        _this.map4.remove(_this.map4List[i].spatIdMarker);
+                    }
+                    if ('markerVel' in _this.map4List[i] === true) {
+                        _this.map4.remove(_this.map4List[i].markerVel);
+                    }
+                    if ('velicheIdMarker' in this.map4List[i] === true) {
+                        _this.map4.remove(_this.map4List[i].velicheIdMarker);
+                    }
+                }
                 for (let i = 0; i < roadLights.length; i++) {
                     let _data = roadLights[i];
                     if(_data.position) {

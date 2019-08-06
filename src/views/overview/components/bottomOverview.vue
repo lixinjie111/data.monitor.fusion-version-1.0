@@ -30,7 +30,8 @@ export default {
 			// 获取指定车辆实时信息
             webSocket:{},
             webSocketData: {
-                action: 'vehicleList',
+                // action: 'vehicleList',
+                action: 'can_real_data',
                 token: 'fpx',
                 vehicleIds: 'B21E-00-017,B21E-00-018,B21E-00-019,B21E-00-020'
             }
@@ -41,10 +42,11 @@ export default {
 		// this.initWebSocket();
 	},
 	methods: {
+        // 获取典型车辆
 		getGpsRealConfig() {
-            // console.log('获取典型车辆列表初始化配置数据');
 			getGpsRealConfig().then(res => {
-				this.vehicleIds = res.data;
+                this.vehicleIds = res.data;
+                console.log('this.vehicleIds  ===', this.vehicleIds);
 				this.webSocketData.vehicleIds = res.data;
 				this.initWebSocket();
 			});
@@ -55,12 +57,14 @@ export default {
 				vehicleId: this.vehicleIds
 			}).then(res => {
                 let _responseData = res.data;
+                console.log('_responseData --- 实时数据', _responseData);
 				_responseData.forEach(item => {
 					this.initResult(item.vehicleId, item);
 				});
 			});
 		},
         initResult(attr, result) {
+            console.log('result on msg ===', result);
     		let _filterResult = {};
 			_filterResult.vehicleId = result.vehicleId;
 			_filterResult.transmission = result.transmission;
@@ -75,11 +79,12 @@ export default {
 			_filterResult.vehicleLogo = result.vehicleLogo;
 			_filterResult.plateNo = result.plateNo;
 
-			_filterResult.id = "echarts-" + attr;
-			_filterResult.echarts = null;
-			_filterResult.echartsData = [];
-            _filterResult.echartsData.push(result.speed);
+			// _filterResult.id = "echarts-" + attr;
+			// _filterResult.echarts = null;
+			// _filterResult.echartsData = [];
+            // _filterResult.echartsData.push(result.speed);
             this.responseData.push(_filterResult);
+            console.log('this.responseData ---', this.responseData);
         },
         initWebSocket(){
             // console.log('websocket获取指定车辆实时信息');
@@ -94,7 +99,7 @@ export default {
         onmessage(message){
             let _json = JSON.parse(message.data),
             	_result = _json.result,
-            	_vehicleId = _result.vehicleId;
+                _vehicleId = _result.vehicleId;
         },
         onclose(data){
             // console.log("结束--vehicleList--连接");
