@@ -91,6 +91,13 @@
                 default:0
             }
         },
+        watch:{
+            currentExtent(newValue,oldValue){
+//                console.log("大小："+this.currentExtent.length);
+                this.initWebSocket();
+                this.initWarningWebSocket();
+            }
+        },
         methods: {
             initWebSocket(){
                 let _this=this;
@@ -191,8 +198,7 @@
             }
         },
         mounted() {
-            this.initWebSocket();
-            this.initWarningWebSocket();
+
         },
         destroyed(){
             this.webSocket.close();

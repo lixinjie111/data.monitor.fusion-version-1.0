@@ -167,7 +167,8 @@
                 },*/
                 timer1:0,
                 timer2:0,
-                vehicleId:'B21E-00-017'
+                vehicleId:'B21E-00-017',
+                lightWebsocket:{}
             }
 
         },
@@ -297,9 +298,73 @@
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.cfg.websocketUrl,this.roadItem1.camSerialNum);*/
             },
+            initLightWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.lightWebsocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                }
+                _this.lightWebsocket.onmessage = _this.onLightMessage;
+                _this.lightWebsocket.onclose = _this.onLightClose;
+                _this.lightWebsocket.onopen = _this.onLightOpen;
+            },
+            onLightMessage(mesasge){
+                var _this=this;
+                var json = JSON.parse(mesasge.data);
+                var lightData = json.result.data;
+                var resultData=[];
+                lightData.forEach(item=>{
+                    let option={
+                        position:new AMap.LngLat(item.longitude, item.latitude),
+                        leftTime:item.leftTime,
+                        light:item.light,
+                        direction:item.direction,
+                        longitude:item.longitude,
+                        latitude:item.latitude
+                    }
+                    resultData.push(option);
+                });
+                resultData.forEach(function (item,index,arr) {
+                    let direction = item.direction + "";
+                    let key = 'key_' + direction;
+                    if (_this.lightData[key].flag) {
+                        /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
+                        _this.lightData[key].spareTime = item.leftTime;
+                        _this.lightData[key].lightColor = item.light;
+                        _this.lightData[key].flag = true;
+                        _this.lightData[key].time = null;
+                        //延长时间
+                        _this.lightData[key].time = setTimeout(item => {
+                            _this.lightData[key].flag = false;
+                        }, 3000)
+                    }
+                })
+            },
+            onLightClose(data){
+                console.log("结束连接");
+            },
+            onLightOpen(data){
+                //旁车
+                var light = {
+                    "action": "spat",
+                    "vehicleId": this.vehicleId
+                }
+                var lightMsg = JSON.stringify(light);
+                this.sendLightMsg(lightMsg);
+            },
+            sendLightMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.lightWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.lightWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
         },
-        mounted() {
+        mounted(){
             this.getDeviceInfo();
+            this.initLightWebSocket();
         },
         components:{
             TusvnMap

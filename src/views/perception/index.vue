@@ -37,7 +37,14 @@
         },
         components:{Left,Right},
         mounted() {
-
+            /*this.$on("getCurrentExtent",(currentExtent) =>{
+                this.currentExtent = currentExtent;
+                console.log("边界值："+this.currentExtent);
+            })
+            this.$on("count",(spatCount,signCount) =>{
+                this.spatCount = spatCount;
+                this.signCount = signCount;
+            })*/
         }
     }
 </script>

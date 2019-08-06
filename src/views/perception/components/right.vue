@@ -22,11 +22,11 @@
             <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
             </div>
-            <!--<tusvn-map :target-id="'mapFusion'"  ref="map"
+            <tusvn-map :target-id="'mapFusion'"  ref="map"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
             @mapcomplete="onMapComplete" @CameraChanged='cameraChanged'>
-            </tusvn-map>-->
+            </tusvn-map>
         </div>
         <div class="spat-detail clearfix" v-for="item in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
             <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
@@ -87,7 +87,12 @@
                 opacity:0,
                 spatCount:0,
                 signCount:0,
-                center:[]
+                center:[],
+                mapOption:{
+                    center: [121.262939,31.245149],
+                    zoom: 18,
+                    mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
+                },
             }
         },
         components: { TusvnMap,TusvnMap1},
@@ -219,7 +224,7 @@
                                 this.video1Show=true;
                                 this.getVideo(camera,index);
                                 clearTimeout(time);
-                            },50)
+                            },10000)
                         }
                         count++;
                     })
@@ -236,7 +241,7 @@
                     let ele = document.getElementById("message1");
                     ele.className="style style1";
                     clearTimeout(time1);
-                },1000)
+                },20000)
                 getVideoByNum({
                     "protocal": camera.protocol,
                     "serialNum": camera.serialNum
@@ -324,6 +329,15 @@
         },
         mounted() {
             this.option1 = this.getOption();
+            /*let map1 = new AMap.Map('mapRoad', this.mapOption);
+            var wms  = new AMap.TileLayer.WMS({
+                url:'http://10.0.1.22:8080/geoserver/shanghai_qcc/wms',
+                blend: false,
+                tileSize: 256,
+                params:{'LAYERS': 'shanghai_qcc:gd_dlzc',VERSION:'1.1.0'}
+            })
+            wms.setMap(map1);
+            map1.setZoom(12);*/
             /*let time1 = setTimeout(()=>{
                 let ele = document.getElementById("message1");
                 ele.className="style style1";
