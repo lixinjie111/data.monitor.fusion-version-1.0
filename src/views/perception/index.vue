@@ -28,7 +28,7 @@
         methods: {
             getCurrentExtent(currentExtent){
                 this.currentExtent = currentExtent;
-//                console.log("边界值："+this.currentExtent);
+                console.log("边界值："+this.currentExtent);
             },
             count(spatCount,signCount){
                 this.spatCount = spatCount;
