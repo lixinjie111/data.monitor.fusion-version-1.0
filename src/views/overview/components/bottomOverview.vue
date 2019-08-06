@@ -153,8 +153,7 @@ export default {
             letter-spacing: 2px;
             color: #ccc;
             display: inline-block;
-            background-color: #5e5970;
-            opacity: 0.3;
+            background-color: rgba(94, 89, 112, 0.3);
         }
         .car-detail {
             height: 80px;

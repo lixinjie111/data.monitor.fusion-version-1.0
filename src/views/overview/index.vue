@@ -15,7 +15,7 @@
             <!-- <span>{{formatTime || '--'}}</span> -->
             <span class="base-time">{{formatTime || '--'}}</span>
             <span>
-                <em >{{city.province}}{{city.district}}</em>
+                <em >{{city.district}}</em>
                 <!-- <em>上海市闵行区</em> -->
                 <img src="@/assets/images/weather/default.png" class="weather-icon"/>
                 <em class="c-middle">{{weather.wendu || '--'}}°</em>
@@ -81,7 +81,6 @@ export default {
             let geocoder = new AMap.Geocoder();
             geocoder.getAddress(this.defaultCenterPoint, (status, result) => {
                 if (status === 'complete' && result.regeocode) {
-                    console.log('result', result);
                     let data = result.regeocode.addressComponent;
                     this.city.province = data.province;
                     this.city.district = data.district;
