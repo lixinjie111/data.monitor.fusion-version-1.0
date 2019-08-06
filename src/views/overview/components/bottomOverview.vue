@@ -46,7 +46,6 @@ export default {
 		getGpsRealConfig() {
 			getGpsRealConfig().then(res => {
                 this.vehicleIds = res.data;
-                console.log('this.vehicleIds  ===', this.vehicleIds);
 				this.webSocketData.vehicleIds = res.data;
 				this.initWebSocket();
 			});
@@ -57,14 +56,12 @@ export default {
 				vehicleId: this.vehicleIds
 			}).then(res => {
                 let _responseData = res.data;
-                console.log('_responseData --- 实时数据', _responseData);
 				_responseData.forEach(item => {
 					this.initResult(item.vehicleId, item);
 				});
 			});
 		},
         initResult(attr, result) {
-            console.log('result on msg ===', result);
     		let _filterResult = {};
 			_filterResult.vehicleId = result.vehicleId;
 			_filterResult.transmission = result.transmission;
@@ -84,7 +81,6 @@ export default {
 			// _filterResult.echartsData = [];
             // _filterResult.echartsData.push(result.speed);
             this.responseData.push(_filterResult);
-            console.log('this.responseData ---', this.responseData);
         },
         initWebSocket(){
             // console.log('websocket获取指定车辆实时信息');

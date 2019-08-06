@@ -10,15 +10,12 @@ const weather = {
 	mutations: {
 		SET_DISTRICT_DATA: (state, districtData) => {
             state.districtData = districtData;
-            console.log('state.districtData', state.districtData);
         },
         SET_WEATHER_DATA: (state, weather) => {
             state.weather = weather;
-            console.log('state.weather', state.weather);
         },
         SET_FORMATETIME_DATA: (state, formatTime) => {
             state.formatTime = formatTime;
-            console.log('state.formatTime', state.formatTime);
         }
 	},
 	actions: {

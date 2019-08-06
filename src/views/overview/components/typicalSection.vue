@@ -173,7 +173,6 @@ export default {
             this.finalFourPosition.push(southEast);
             if (num === 0) {
                 this.finalFourPosition1 = this.finalFourPosition;
-                console.log('this.finalFourPosition1.', this.finalFourPosition1);
                 southwest = [bounds.southwest.lng, bounds.southwest.lat];
                 northeast = [bounds.northeast.lng, bounds.northeast.lat];
                 let mapBounds1 = new AMap.Bounds(southwest, northeast);
@@ -188,7 +187,6 @@ export default {
                 // this.fetchRoadData(this.finalFourPosition2, num);
             } else if (num === 2) {
                 this.finalFourPosition3 = this.finalFourPosition;
-                console.log('this.finalFourPosition3', this.finalFourPosition3);
                 southwest = [bounds.southwest.lng, bounds.southwest.lat];
                 northeast = [bounds.northeast.lng, bounds.northeast.lat];
                 let mapBounds3 = new AMap.Bounds(southwest, northeast);
@@ -696,7 +694,6 @@ export default {
                     'polygon': this.finalFourPosition1
                 }
             }
-            console.log('roadLight 111', roadLight);
             var roadStr = JSON.stringify(roadLight);
             this.sendRoadMsg1(roadStr);
         },
@@ -1010,7 +1007,6 @@ export default {
                     'polygon': this.finalFourPosition3
                 }
             }
-            console.log('roadLight 333', roadLight);
             var roadStr = JSON.stringify(roadLight);
             this.sendRoadMsg3(roadStr);
         },
