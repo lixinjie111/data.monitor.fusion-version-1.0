@@ -1,14 +1,14 @@
 <template>
     <div class="fusion-right-style">
         <div class="right-road">
-            <div class="base-info">
+            <!-- <div class="base-info">
                 <span>{{formatTime || '--'}}</span>
                 <span>
                     <em >{{city.province}}{{city.district}}</em>
                     <img src="@/assets/images/weather/default.png" class="weather-icon"/>
                     <em class="c-middle">{{weather.wendu || '--'}}°</em>
                 </span>
-            </div>
+            </div> -->
             <div class="perception-road" @click="showRoadDetail(1)">
                 <div class="road-word" >
                     <p @click="queryCrossDetail(cross1)">{{cross1.name}}</p>
@@ -37,20 +37,20 @@
       </div>
 </template>
 <script>
-import {typeCross, getTypicalRoadData, getTypeRoadData, getTopWeather} from '@/api/overview/index.js';
+import {typeCross, getTypicalRoadData, getTypeRoadData} from '@/api/overview/index.js';
 import ConvertCoord from '@/assets/js/coordConvert.js';
 export default {
     data() {
         return {
-            responseData: {
-                timestamp: new Date().getTime()
-            },
-            defaultCenterPoint: [121.262939,31.245149],
-            requestData: {
-                disCode: ''
-            },
-            city: {},
-            weather: {},
+            // responseData: {
+            //     timestamp: new Date().getTime()
+            // },
+            // defaultCenterPoint: [121.262939,31.245149],
+            // requestData: {
+            //     disCode: ''
+            // },
+            // city: {},
+            // weather: {},
             cross1:{},
             cross2:{},
             cross3:{},
@@ -64,10 +64,10 @@ export default {
                 zoom: 18,
                 mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
             },
-            webSocket1:{},
-            webSocket2:{},
-            webSocket3:{},
-            webSocket4:{},
+            // webSocket1:{},
+            // webSocket2:{},
+            // webSocket3:{},
+            // webSocket4:{},
             map1List:[], // 车辆
             map2List:[],
             map3List:[],
@@ -104,34 +104,34 @@ export default {
             // this.getTypeCross();
             this.fetchTypicalRoad();
             // 获取地区和天气
-            this.getAddress();
+            // this.getAddress();
     },
     methods: {
         // 获取地区
-        getAddress() {
-            let geocoder = new AMap.Geocoder();
-            geocoder.getAddress(this.defaultCenterPoint, (status, result) => {
-                if (status === 'complete' && result.regeocode) {
-                    console.log('result', result);
-                    let data = result.regeocode.addressComponent;
-                    this.city.province = data.province;
-                    this.city.district = data.district;
-                    this.requestData.disCode = data.adcode;
-                    this.$store.commit('SET_DISTRICT_DATA', result.regeocode.addressComponent);
-                     this.getTopWeather();
-                } else {
-                    console.log('根据经纬度获取地区失败');
-                }
-            });
-        },
+        // getAddress() {
+        //     let geocoder = new AMap.Geocoder();
+        //     geocoder.getAddress(this.defaultCenterPoint, (status, result) => {
+        //         if (status === 'complete' && result.regeocode) {
+        //             console.log('result', result);
+        //             let data = result.regeocode.addressComponent;
+        //             this.city.province = data.province;
+        //             this.city.district = data.district;
+        //             this.requestData.disCode = data.adcode;
+        //             this.$store.commit('SET_DISTRICT_DATA', result.regeocode.addressComponent);
+        //              this.getTopWeather();
+        //         } else {
+        //             console.log('根据经纬度获取地区失败');
+        //         }
+        //     });
+        // },
         // 获取天气
-        getTopWeather() {
-            getTopWeather(this.requestData).then(res => {
-                this.weather = res.data;
-                this.$store.commit('SET_WEATHER_DATA', this.weather);
-            });
-        },
-        // 查看路口的具体信息
+        // getTopWeather() {
+        //     getTopWeather(this.requestData).then(res => {
+        //         this.weather = res.data;
+        //         this.$store.commit('SET_WEATHER_DATA', this.weather);
+        //     });
+        // },
+        // 点击路口路由跳转到具体的路口详情
         showRoadDetail(num) {
             if (num === 1) {
                 this.$router.push({
@@ -222,14 +222,14 @@ export default {
                 northeast = [bounds.northeast.lng, bounds.northeast.lat];
                 let mapBounds3 = new AMap.Bounds(southwest, northeast);
                 this.map3.setBounds(mapBounds3);
-                this.fetchRoadData(this.finalFourPosition3, num);
+                // this.fetchRoadData(this.finalFourPosition3, num);
             } else if (num === 3) {
                 this.finalFourPosition4 = this.finalFourPosition;
                 southwest = [bounds.southwest.lng, bounds.southwest.lat];
                 northeast = [bounds.northeast.lng, bounds.northeast.lat];
                 let mapBounds4 = new AMap.Bounds(southwest, northeast);
                 this.map4.setBounds(mapBounds4);
-                this.fetchRoadData(this.finalFourPosition4, num);
+                // this.fetchRoadData(this.finalFourPosition4, num);
             }
         },
         fetchRoadData(finalFourPosition, num) {
@@ -293,7 +293,8 @@ export default {
                         // 设置缩放级别
                         this.map1.setZoom(18);
                         this.getFourPosition(index);
-                        this.initWebSocket1();
+                        // this.initWebSocket1();
+                        // 路口1实时数据
                         // this.getRoadRunningData1();
                     }
                     if (index === 1) {
@@ -301,17 +302,19 @@ export default {
                         wms.setMap(this.map2);
                         this.map2.setZoom(18);
                         this.getFourPosition(index);
-                        this.initWebSocket2();
-                        this.getRoadRunningData1();
+                        // this.initWebSocket2();
+                        // 路口2实时数据
+                        this.getRoadRunningData2();
                     }
                     if (index === 2) {
                         this.cross3 = result[index];
                         wms.setMap(this.map3);
                         this.map3.setCenter(position);
                         this.map3.setZoom(18);
-                        // this.getFourPosition(index);
-                        this.initWebSocket3();
-                        // this.getRoadRunningData1();
+                        this.getFourPosition(index);
+                        // this.initWebSocket3();
+                        // 路口3实时数据
+                        this.getRoadRunningData3();
                     }
                     if (index === 3) {
                         this.cross4 = result[index];
@@ -319,7 +322,9 @@ export default {
                         this.map4.setCenter(position);
                         this.map4.setZoom(18);
                         this.getFourPosition(index);
-                        this.initWebSocket4();
+                        // this.initWebSocket4();
+                        // 路口4实时数据
+                        this.getRoadRunningData4();
                     } 
                 });
             })
@@ -583,17 +588,18 @@ export default {
                 }
             }
         },
-        initWebSocket1() {
-            let _this=this;
-            // 利用websocket实时获取数据
-            if ('WebSocket' in window) {
-                _this.webSocket1 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
-            }
-            _this.webSocket1.onmessage = _this.onmessage1;
-            _this.webSocket1.onclose = _this.onclose1;
-            _this.webSocket1.onopen = _this.onopen1;
-            _this.webSocket1.onerror = _this.onerror1;
-        },
+        // initWebSocket1() {
+        //     let _this=this;
+        //     // 利用websocket实时获取数据
+        //     if ('WebSocket' in window) {
+        //         _this.webSocket1 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+        //     }
+        //     _this.webSocket1.onmessage = _this.onmessage1;
+        //     _this.webSocket1.onclose = _this.onclose1;
+        //     _this.webSocket1.onopen = _this.onopen1;
+        //     _this.webSocket1.onerror = _this.onerror1;
+        // },
+        // 第一个路段
         getRoadRunningData1() {
             let _this = this;
             if ('WebSocket' in window) {
@@ -612,11 +618,22 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            _this.map2.remove(this.map2List);
-            _this.map2List = [];
+            for (let i = 0; i < _this.map1List.length; i++) {
+                if ('marker' in _this.map1List[i] === true) {
+                    _this.map1.remove(_this.map1List[i].marker);
+                }
+                if ('spatIdMarker' in _this.map1List[i] === true) {
+                    _this.map1.remove(_this.map1List[i].spatIdMarker);
+                }
+                if ('markerVel' in _this.map1List[i] === true) {
+                    _this.map1.remove(_this.map1List[i].markerVel);
+                }
+                if ('velicheIdMarker' in this.map1List[i] === true) {
+                    _this.map1.remove(_this.map1List[i].velicheIdMarker);
+                }
+            }
             if ('spatDataDTO' in result === true) {
                 roadLights = result.spatDataDTO;
-                // console.log('roadLights --- 红绿灯', roadLights);
                 roadLights.map((x, index) => {
                     lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
                     roadLights[index].position = lightPosition;
@@ -630,14 +647,14 @@ export default {
                         };
                         _markerObj.marker = new AMap.Marker({
                             position: _data.position,
-                            map: _this.map2,
+                            map: _this.map1,
                             icon: this.dealLight(_data), // 添加 Icon 图标 URL
                             offset: new AMap.Pixel(-20, -10),
                             spatId: _data.spatId
                         });
                         _markerObj.spatIdMarker = new AMap.Text({
-                            map: _this.map2,
-                            text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
+                            map: _this.map1,
+                            // text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
                             anchor: 'center', // 设置文本标记锚点
                             style: {
                                 'padding': '0 5px',
@@ -655,14 +672,13 @@ export default {
                             position: _data.position,
                             spatId: _data.spatId
                         });
-                        _this.map2.add(_markerObj);
-                        _this.map2List.push(_markerObj);
+                        _this.map1.add(_markerObj);
+                        _this.map1List.push(_markerObj);
                     }
                 }
             }
             if ('vehDataDTO' in result === true) {
                 roadSenseCars = result.vehDataDTO;
-                // console.log('路口的数据', roadSenseCars);
                 roadSenseCars.map(x => {
                     carPosition = new AMap.LngLat(x.longitude, x.latitude);
                     this.$set(x, 'position', carPosition);
@@ -671,19 +687,19 @@ export default {
                     let _data = roadSenseCars[i];
                     if (_data.position) {
                         let _markerCar = {
-                            marker: null,
+                            markerVel: null,
                             velicheIdMarker: null
                         };
-                        _markerCar.marker = new AMap.Marker({
+                        _markerCar.markerVel = new AMap.Marker({
                             position: _data.position,
-                            map: _this.map2,
+                            map: _this.map1,
                             icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-2, -2),
-                            vehicleId: _data.vehicleId
+                            offset: new AMap.Pixel(-15, -10),
+                            devId: _data.devId
                         });
                         _markerCar.velicheIdMarker = new AMap.Text({
-                            map: _this.map2,
-                            text: "<span style='color:#e6a23c'>" + _data.vehicleId + '</span>',
+                            map: _this.map1,
+                            text: "<span style='color:#e6a23c'>" + _data.devId + '</span>',
                             anchor: 'center', // 设置文本标记锚点
                             style: {
                                 'padding': '0 5px',
@@ -698,28 +714,13 @@ export default {
                                 'color': '#ccc'
                             },
                             position: _data.position,
-                            vehicleId: _data.vehicleId
+                            devId: _data.devId
                         });
-                        _this.map2.add(_markerCar);
-                        _this.map2List.push(_markerCar);
+                        _this.map1.add(_markerCar);
+                        _this.map1List.push(_markerCar);
                     }
                 }
             }
-        },
-        // 根据状态返回红，黄，绿灯
-        dealLight(data) {
-            if ('status' in data === true) {
-                if (data.status === 'RED') {
-                    return 'static/images/road/red.png';
-                } else if (data.status === 'YELLOW') {
-                    return 'static/images/road/yellow.png';
-                } else if (data.status === 'GREEN') {
-                    return 'static/images/road/green.png';
-                }
-            } else {
-                return 'static/images/road/green.png';
-            }
-            
         },
         onRoadClose1(data){
             console.log("结束连接");
@@ -747,285 +748,732 @@ export default {
                 return;
             }
         },
-        onmessage1(mesasge){
-            let _this=this;
-            let json = JSON.parse(mesasge.data);
-            let result = json.result.vehData;
-            let position;
-            if (_this.count1==0){
-                // 在接受请求前清除地图上的点
-                _this.map1.remove(_this.map1List);
-                _this.map1List=[];
-                result.forEach(item =>{
-                    position = new AMap.LngLat(item.longitude,item.latitude);
-                _this.count1++;
-                // 利用marker构造点标记
-                let marker = new AMap.Marker({
-                    position: position,
-                    icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                    angle: item.heading,
-                    retate: '90deg',
-                    offset:new AMap.Pixel(-8, -16)
+        // 第二个路段
+        getRoadRunningData2() {
+            let _this = this;
+            if ('WebSocket' in window) {
+                _this.roadWebSocket2 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+            }
+            _this.roadWebSocket2.onmessage = _this.onRoadMessage2;
+            _this.roadWebSocket2.onclose = _this.onRoadClose2;
+            _this.roadWebSocket2.onopen = _this.onRoadOpen2;
+            _this.roadWebSocket2.onerror = _this.onRoadError2;
+        },
+        onRoadMessage2(message) {
+            let _this = this;
+            let jsonData = JSON.parse(message.data);
+            let result = jsonData.result;
+            let roadLights;
+            let roadSenseCars;
+            let lightPosition;
+            let carPosition;
+            for (let i = 0; i < _this.map2List.length; i++) {
+                if ('marker' in _this.map2List[i] === true) {
+                    _this.map2.remove(_this.map2List[i].marker);
+                }
+                if ('spatIdMarker' in _this.map2List[i] === true) {
+                    _this.map2.remove(_this.map2List[i].spatIdMarker);
+                }
+                if ('markerVel' in _this.map2List[i] === true) {
+                    _this.map2.remove(_this.map2List[i].markerVel);
+                }
+                if ('velicheIdMarker' in this.map2List[i] === true) {
+                    _this.map2.remove(_this.map2List[i].velicheIdMarker);
+                }
+            }
+            if ('spatDataDTO' in result === true) {
+                roadLights = result.spatDataDTO;
+                roadLights.map((x, index) => {
+                    lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
+                    roadLights[index].position = lightPosition;
                 });
-                _this.map1.add(marker);
-                _this.map1List.push(marker);
-
+                for (let i = 0; i < roadLights.length; i++) {
+                    let _data = roadLights[i];
+                    if(_data.position) {
+                        let _markerObj = {
+                            marker: null,
+                            spatIdMarker: null
+                        };
+                        _markerObj.marker = new AMap.Marker({
+                            position: _data.position,
+                            map: _this.map2,
+                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
+                            offset: new AMap.Pixel(-20, -10),
+                            spatId: _data.spatId
+                        });
+                        _markerObj.spatIdMarker = new AMap.Text({
+                            map: _this.map2,
+                            // text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
+                            anchor: 'center', // 设置文本标记锚点
+                            style: {
+                                'padding': '0 5px',
+                                'border-radius': '4px',
+                                // 'background-color': 'rgba(55, 186, 123, .2)',
+                                'background-color': 'red',
+                                'border-width': '0',
+                                'text-align': 'center',
+                                'font-size': '10px',
+                                'line-height': '16px',
+                                'letter-spacing': '0',
+                                'margin-top': '14px',  //车头
+                                'color': '#ccc'
+                            },
+                            position: _data.position,
+                            spatId: _data.spatId
+                        });
+                        _this.map2.add(_markerObj);
+                        _this.map2List.push(_markerObj);
+                    }
+                }
+            }
+            if ('vehDataDTO' in result === true) {
+                roadSenseCars = result.vehDataDTO;
+                roadSenseCars.map(x => {
+                    carPosition = new AMap.LngLat(x.longitude, x.latitude);
+                    this.$set(x, 'position', carPosition);
                 });
-                if (this.count1 === result.length ){
-                    _this.count1=0;
+                for (let i = 0; i < roadSenseCars.length; i++) {
+                    let _data = roadSenseCars[i];
+                    if (_data.position) {
+                        let _markerCar = {
+                            markerVel: null,
+                            velicheIdMarker: null
+                        };
+                        _markerCar.markerVel = new AMap.Marker({
+                            position: _data.position,
+                            map: _this.map2,
+                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+                            offset: new AMap.Pixel(-15, -10),
+                            devId: _data.devId
+                        });
+                        _markerCar.velicheIdMarker = new AMap.Text({
+                            map: _this.map2,
+                            text: "<span style='color:#e6a23c'>" + _data.devId + '</span>',
+                            anchor: 'center', // 设置文本标记锚点
+                            style: {
+                                'padding': '0 5px',
+                                'border-radius': '4px',
+                                'background-color': 'rgba(55, 186, 123, .2)',
+                                'border-width': 0,
+                                'text-align': 'center',
+                                'font-size': '10px',
+                                'line-height': '16px',
+                                'letter-spacing': '0',
+                                'margin-top': '14px',  //车头
+                                'color': '#ccc'
+                            },
+                            position: _data.position,
+                            devId: _data.devId
+                        });
+                        _this.map2.add(_markerCar);
+                        _this.map2List.push(_markerCar);
+                    }
                 }
             }
         },
-        onclose1(data){
+        //  ---- 根据状态返回红，黄，绿灯
+        dealLight(data) {
+            if ('status' in data === true) {
+                if (data.status === 'RED') {
+                    return 'static/images/road/red.png';
+                } else if (data.status === 'YELLOW') {
+                    return 'static/images/road/yellow.png';
+                } else if (data.status === 'GREEN') {
+                    return 'static/images/road/green.png';
+                }
+            } else {
+                return 'static/images/road/green.png';
+            }
+            
+        },
+        onRoadClose2(data){
             console.log("结束连接");
         },
-        onopen1(data){
-            //获取在驶车辆状态
-            var cross1 = {
-                'action':'cross_real_data',
-                'token':'tusvn',
-                'crossId':this.cross1.crossId
+        onRoadOpen2(data){
+            // 获取红绿灯
+            let arr = [[121.17560999059768, 31.282032221451242],[121.16724149847121, 31.282032221451242],[121.16724149847121, 31.28705868114515],[121.17560999059768, 31.28705868114515]]
+            var roadLight = {
+                'action': 'road_real_data',
+                'data': { 
+                    'polygon': arr
+                }
             }
-            var cross1Msg = JSON.stringify(cross1);
-            this.sendMsg1(cross1Msg);
+            console.log('roadLight', roadLight);
+            var roadStr = JSON.stringify(roadLight);
+            this.sendRoadMsg2(roadStr);
         },
-        sendMsg1(msg) {
-            let _this=this;
-            if(window.WebSocket){
-              if(_this.webSocket1.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                _this.webSocket1.send(msg); //send()发送消息
-              }
-            }else{
-              return;
-            }
-        },
-        initWebSocket2(){
-            let _this=this;
-            if ('WebSocket' in window) {
-              _this.webSocket2 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
-            }
-            _this.webSocket2.onmessage = _this.onmessage2;
-            _this.webSocket2.onclose = _this.onclose2;
-            _this.webSocket2.onopen = _this.onopen2;
-            _this.webSocket2.onerror = _this.onerror2;
-        },
-        onmessage2(mesasge){
-            let _this=this;
-            let json = JSON.parse(mesasge.data);
-            let result = json.result.vehData;
-            let position;
-            if(_this.count2==0) {
-              //在接受请求前清除地图上的点
-              _this.map2.remove(_this.map2List);
-              _this.map2List = [];
-              result.forEach(item => {
-                position = new AMap.LngLat(item.longitude,item.latitude);
-                _this.count2++;
-                let marker = new AMap.Marker({
-                  position: position,
-                  icon: 'static/images/road/car.png',
-                  angle: item.heading,
-                  offset:new AMap.Pixel(-8, -16)
-                });
-                _this.map2.add(marker);
-                _this.map2List.push(marker);
-
-              });
-              if (this.count2 == result.length) {
-                _this.count2 = 0;
-              }
-            }
-
-        },
-        onclose2(data){
-            console.log("结束连接");
-        },
-        onopen2(data){
-            let cross2 = {
-              'action':'cross_real_data',
-              'token':'tusvn',
-              'crossId':this.cross2.crossId
-            }
-            let cross2Msg = JSON.stringify(cross2);
-            this.sendMsg2(cross2Msg);
-        },
-        sendMsg2(msg) {
-            let _this=this;
-            if(window.WebSocket){
-              if(_this.webSocket2.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                _this.webSocket2.send(msg); //send()发送消息
-              }
-            }else{
-              return;
-            }
-        },
-        initWebSocket3(){
-            let _this=this;
-            if ('WebSocket' in window) {
-              _this.webSocket3 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
-            }
-            _this.webSocket3.onmessage = _this.onmessage3;
-            _this.webSocket3.onclose = _this.onclose3;
-            _this.webSocket3.onopen = _this.onopen3;
-            _this.webSocket3.onerror = _this.onerror3;
-        },
-        onmessage3(mesasge){
-            let _this=this;
-            let json = JSON.parse(mesasge.data);
-            let result = json.result.vehData;
-            let position;
-            if(_this.count3==0) {
-              //在接受请求前清除地图上的点
-              _this.map3.remove(_this.map3List);
-              _this.map3List = [];
-              result.forEach(item => {
-                position = new AMap.LngLat(item.longitude,item.latitude);
-                _this.count3++;
-                let marker = new AMap.Marker({
-                  position: position,
-                  icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                  angle: item.heading,
-                  offset:new AMap.Pixel(-8, -16)
-                });
-                _this.map3.add(marker);
-                _this.map3List.push(marker);
-
-              });
-              if (this.count3 == result.length) {
-                _this.count3 = 0;
-              }
-            }
-
-        },
-        onclose3(data){
-            console.log("结束连接");
-        },
-        onopen3(data){
-            let cross3 = {
-              'action':'cross_real_data',
-              'token':'tusvn',
-              'crossId':this.cross3.crossId
-            }
-            let cross3Msg = JSON.stringify(cross3);
-            this.sendMsg3(cross3Msg);
-        },
-        sendMsg3(msg) {
-            let _this=this;
-            if(window.WebSocket){
-              if(_this.webSocket3.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                _this.webSocket3.send(msg); //send()发送消息
-              }
-            }else{
-              return;
-            }
-        },
-        initWebSocket4(){
-            let _this=this;
-            if ('WebSocket' in window) {
-              _this.webSocket4 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
-            }
-            _this.webSocket4.onmessage = _this.onmessage4;
-            _this.webSocket4.onclose = _this.onclose4;
-            _this.webSocket4.onopen = _this.onopen4;
-            _this.webSocket4.onerror = _this.onerror4;
-        },
-        onmessage4(mesasge){
-            let _this=this;
-            let json = JSON.parse(mesasge.data);
-            let result = json.result.vehData;
-            let position;
-            if(_this.count4==0) {
-              //在接受请求前清除地图上的点
-              _this.map4.remove(_this.map4List);
-              _this.map4List = [];
-              result.forEach(item => {
-                position = new AMap.LngLat(item.longitude,item.latitude);
-                _this.count4++;
-                let marker = new AMap.Marker({
-                  position: position,
-                  icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                  angle: item.heading,
-                  offset:new AMap.Pixel(-8, -16)
-                });
-                _this.map4.add(marker);
-                _this.map4List.push(marker);
-
-              });
-              if (this.count4 == result.length) {
-                _this.count4 = 0;
-              }
-            }
-
-        },
-        onclose4(data){
-            console.log("结束连接");
-        },
-        onopen4(data){
-            let cross4 = {
-              'action':'cross_real_data',
-              'token':'tusvn',
-              'crossId':this.cross4.crossId
-            }
-            let cross4Msg = JSON.stringify(cross4);
-            this.sendMsg4(cross4Msg);
-        },
-        sendMsg4(msg) {
-            let _this=this;
+        sendRoadMsg2(msg) {
+            let _this = this;
             if (window.WebSocket) {
-                if(_this.webSocket4.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                    _this.webSocket4.send(msg); //send()发送消息
+                if (_this.roadWebSocket2.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                    _this.roadWebSocket2.send(msg); //send()发送消息
                 }
             } else {
                 return;
             }
-        }
-    },
-    computed: {
-        // formatTime() {
-        //     if(this.responseData.timestamp){
-        //         let formatTime = this.$dateUtil.formatTime(this.responseData.timestamp);
-        //         return this.$dateUtil.formatTime(this.responseData.timestamp);
-        //     }else {
-        //         return '--'
+        },
+        // 第三个路段
+        getRoadRunningData3() {
+            let _this = this;
+            if ('WebSocket' in window) {
+                _this.roadWebSocket3 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+            }
+            _this.roadWebSocket3.onmessage = _this.onRoadMessage3;
+            _this.roadWebSocket3.onclose = _this.onRoadClose3;
+            _this.roadWebSocket3.onopen = _this.onRoadOpen3;
+            _this.roadWebSocket3.onerror = _this.onRoadError3;
+        },
+        onRoadMessage3(message) {
+            let _this = this;
+            let jsonData = JSON.parse(message.data);
+            let result = jsonData.result;
+            let roadLights;
+            let roadSenseCars;
+            let lightPosition;
+            let carPosition;
+            for (let i = 0; i < _this.map3List.length; i++) {
+                if ('marker' in _this.map3List[i] === true) {
+                    _this.map3.remove(_this.map3List[i].marker);
+                }
+                if ('spatIdMarker' in _this.map3List[i] === true) {
+                    _this.map3.remove(_this.map3List[i].spatIdMarker);
+                }
+                if ('markerVel' in _this.map3List[i] === true) {
+                    _this.map3.remove(_this.map3List[i].markerVel);
+                }
+                if ('velicheIdMarker' in this.map3List[i] === true) {
+                    _this.map3.remove(_this.map3List[i].velicheIdMarker);
+                }
+            }
+            if ('spatDataDTO' in result === true) {
+                roadLights = result.spatDataDTO;
+                roadLights.map((x, index) => {
+                    lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
+                    roadLights[index].position = lightPosition;
+                });
+                for (let i = 0; i < roadLights.length; i++) {
+                    let _data = roadLights[i];
+                    if(_data.position) {
+                        let _markerObj = {
+                            marker: null,
+                            spatIdMarker: null
+                        };
+                        _markerObj.marker = new AMap.Marker({
+                            position: _data.position,
+                            map: _this.map3,
+                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
+                            offset: new AMap.Pixel(-20, -10),
+                            spatId: _data.spatId
+                        });
+                        _markerObj.spatIdMarker = new AMap.Text({
+                            map: _this.map3,
+                            // text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
+                            anchor: 'center', // 设置文本标记锚点
+                            style: {
+                                'padding': '0 5px',
+                                'border-radius': '4px',
+                                // 'background-color': 'rgba(55, 186, 123, .2)',
+                                'background-color': 'red',
+                                'border-width': '0',
+                                'text-align': 'center',
+                                'font-size': '10px',
+                                'line-height': '16px',
+                                'letter-spacing': '0',
+                                'margin-top': '14px',  //车头
+                                'color': '#ccc'
+                            },
+                            position: _data.position,
+                            spatId: _data.spatId
+                        });
+                        _this.map3.add(_markerObj);
+                        _this.map3List.push(_markerObj);
+                    }
+                }
+            }
+            if ('vehDataDTO' in result === true) {
+                roadSenseCars = result.vehDataDTO;
+                roadSenseCars.map(x => {
+                    carPosition = new AMap.LngLat(x.longitude, x.latitude);
+                    this.$set(x, 'position', carPosition);
+                });
+                for (let i = 0; i < roadSenseCars.length; i++) {
+                    let _data = roadSenseCars[i];
+                    if (_data.position) {
+                        let _markerCar = {
+                            markerVel: null,
+                            velicheIdMarker: null
+                        };
+                        _markerCar.markerVel = new AMap.Marker({
+                            position: _data.position,
+                            map: _this.map3,
+                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+                            offset: new AMap.Pixel(-15, -10),
+                            devId: _data.devId
+                        });
+                        _markerCar.velicheIdMarker = new AMap.Text({
+                            map: _this.map3,
+                            text: "<span style='color:#e6a23c'>" + _data.devId + '</span>',
+                            anchor: 'center', // 设置文本标记锚点
+                            style: {
+                                'padding': '0 5px',
+                                'border-radius': '4px',
+                                'background-color': 'rgba(55, 186, 123, .2)',
+                                'border-width': 0,
+                                'text-align': 'center',
+                                'font-size': '10px',
+                                'line-height': '16px',
+                                'letter-spacing': '0',
+                                'margin-top': '14px',  //车头
+                                'color': '#ccc'
+                            },
+                            position: _data.position,
+                            devId: _data.devId
+                        });
+                        _this.map3.add(_markerCar);
+                        _this.map3List.push(_markerCar);
+                    }
+                }
+            }
+        },
+        onRoadClose3(data){
+            console.log("结束连接");
+        },
+        onRoadOpen3(data){
+            // 获取红绿灯
+            let arr = [[121.17560999059768, 31.282032221451242],[121.16724149847121, 31.282032221451242],[121.16724149847121, 31.28705868114515],[121.17560999059768, 31.28705868114515]]
+            var roadLight = {
+                'action': 'road_real_data',
+                'data': { 
+                    'polygon': arr
+                }
+            }
+            console.log('roadLight', roadLight);
+            var roadStr = JSON.stringify(roadLight);
+            this.sendRoadMsg3(roadStr);
+        },
+        sendRoadMsg3(msg) {
+            let _this = this;
+            if (window.WebSocket) {
+                if (_this.roadWebSocket3.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                    _this.roadWebSocket3.send(msg); //send()发送消息
+                }
+            } else {
+                return;
+            }
+        },
+        // 第四个路段
+        getRoadRunningData4() {
+            let _this = this;
+            if ('WebSocket' in window) {
+                _this.roadWebSocket4 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+            }
+            _this.roadWebSocket4.onmessage = _this.onRoadMessage4;
+            _this.roadWebSocket4.onclose = _this.onRoadClose4;
+            _this.roadWebSocket4.onopen = _this.onRoadOpen4;
+            _this.roadWebSocket4.onerror = _this.onRoadError4;
+        },
+        onRoadMessage4(message) {
+            let _this = this;
+            let jsonData = JSON.parse(message.data);
+            let result = jsonData.result;
+            let roadLights;
+            let roadSenseCars;
+            let lightPosition;
+            let carPosition;
+            for (let i = 0; i < _this.map4List.length; i++) {
+                if ('marker' in _this.map4List[i] === true) {
+                    _this.map4.remove(_this.map4List[i].marker);
+                }
+                if ('spatIdMarker' in _this.map4List[i] === true) {
+                    _this.map4.remove(_this.map4List[i].spatIdMarker);
+                }
+                if ('markerVel' in _this.map4List[i] === true) {
+                    _this.map4.remove(_this.map4List[i].markerVel);
+                }
+                if ('velicheIdMarker' in this.map4List[i] === true) {
+                    _this.map4.remove(_this.map4List[i].velicheIdMarker);
+                }
+            }
+            if ('spatDataDTO' in result === true) {
+                roadLights = result.spatDataDTO;
+                roadLights.map((x, index) => {
+                    lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
+                    roadLights[index].position = lightPosition;
+                });
+                for (let i = 0; i < roadLights.length; i++) {
+                    let _data = roadLights[i];
+                    if(_data.position) {
+                        let _markerObj = {
+                            marker: null,
+                            spatIdMarker: null
+                        };
+                        _markerObj.marker = new AMap.Marker({
+                            position: _data.position,
+                            map: _this.map4,
+                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
+                            offset: new AMap.Pixel(-20, -10),
+                            spatId: _data.spatId
+                        });
+                        _markerObj.spatIdMarker = new AMap.Text({
+                            map: _this.map4,
+                            // text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
+                            anchor: 'center', // 设置文本标记锚点
+                            style: {
+                                'padding': '0 5px',
+                                'border-radius': '4px',
+                                // 'background-color': 'rgba(55, 186, 123, .2)',
+                                'background-color': 'red',
+                                'border-width': '0',
+                                'text-align': 'center',
+                                'font-size': '10px',
+                                'line-height': '16px',
+                                'letter-spacing': '0',
+                                'margin-top': '14px',  //车头
+                                'color': '#ccc'
+                            },
+                            position: _data.position,
+                            spatId: _data.spatId
+                        });
+                        _this.map4.add(_markerObj);
+                        _this.map4List.push(_markerObj);
+                    }
+                }
+            }
+            if ('vehDataDTO' in result === true) {
+                roadSenseCars = result.vehDataDTO;
+                roadSenseCars.map(x => {
+                    carPosition = new AMap.LngLat(x.longitude, x.latitude);
+                    this.$set(x, 'position', carPosition);
+                });
+                for (let i = 0; i < roadSenseCars.length; i++) {
+                    let _data = roadSenseCars[i];
+                    if (_data.position) {
+                        let _markerCar = {
+                            markerVel: null,
+                            velicheIdMarker: null
+                        };
+                        _markerCar.markerVel = new AMap.Marker({
+                            position: _data.position,
+                            map: _this.map4,
+                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+                            offset: new AMap.Pixel(-15, -10),
+                            devId: _data.devId
+                        });
+                        _markerCar.velicheIdMarker = new AMap.Text({
+                            map: _this.map4,
+                            text: "<span style='color:#e6a23c'>" + _data.devId + '</span>',
+                            anchor: 'center', // 设置文本标记锚点
+                            style: {
+                                'padding': '0 5px',
+                                'border-radius': '4px',
+                                'background-color': 'rgba(55, 186, 123, .2)',
+                                'border-width': 0,
+                                'text-align': 'center',
+                                'font-size': '10px',
+                                'line-height': '16px',
+                                'letter-spacing': '0',
+                                'margin-top': '14px',  //车头
+                                'color': '#ccc'
+                            },
+                            position: _data.position,
+                            devId: _data.devId
+                        });
+                        _this.map4.add(_markerCar);
+                        _this.map4List.push(_markerCar);
+                    }
+                }
+            }
+        },
+        onRoadClose4(data){
+            console.log("结束连接");
+        },
+        onRoadOpen4(data){
+            // 获取红绿灯
+            let arr = [[121.17560999059768, 31.282032221451242],[121.16724149847121, 31.282032221451242],[121.16724149847121, 31.28705868114515],[121.17560999059768, 31.28705868114515]]
+            var roadLight = {
+                'action': 'road_real_data',
+                'data': { 
+                    'polygon': arr
+                }
+            }
+            console.log('roadLight', roadLight);
+            var roadStr = JSON.stringify(roadLight);
+            this.sendRoadMsg4(roadStr);
+        },
+        sendRoadMsg4(msg) {
+            let _this = this;
+            if (window.WebSocket) {
+                if (_this.roadWebSocket4.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                    _this.roadWebSocket4.send(msg); //send()发送消息
+                }
+            } else {
+                return;
+            }
+        },
+        // onmessage1(mesasge){
+        //     let _this=this;
+        //     let json = JSON.parse(mesasge.data);
+        //     let result = json.result.vehData;
+        //     let position;
+        //     if (_this.count1==0){
+        //         // 在接受请求前清除地图上的点
+        //         _this.map1.remove(_this.map1List);
+        //         _this.map1List=[];
+        //         result.forEach(item =>{
+        //             position = new AMap.LngLat(item.longitude,item.latitude);
+        //         _this.count1++;
+        //         // 利用marker构造点标记
+        //         let marker = new AMap.Marker({
+        //             position: position,
+        //             icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+        //             angle: item.heading,
+        //             retate: '90deg',
+        //             offset:new AMap.Pixel(-8, -16)
+        //         });
+        //         _this.map1.add(marker);
+        //         _this.map1List.push(marker);
+        //         });
+        //         if (this.count1 === result.length ){
+        //             _this.count1=0;
+        //         }
         //     }
         // },
-        formatTime: {
-            get() {
-                if(this.responseData.timestamp){
-                    return this.$dateUtil.formatTime(this.responseData.timestamp);
-                } else {
-                    return '--'
-                }
-            },
-            set() {
-                this.$store.commit('SET_FORMATETIME_DATA', this.$dateUtil.formatTime(this.responseData.timestamp));
-            }
-        },
-        warningNum: {
-            get() {
-                if(this.responseData.warningNum || this.responseData.warningNum == 0){
-                    return parseFloat(this.responseData.warningNum).toLocaleString();
-                }else {
-                    return '--'
-                }
-            },
-            set() {
-                this.$store.commit('SET_FORMATETIME_DATA', parseFloat(this.responseData.warningNum).toLocaleString());
-            }
-        },
-        faultNum: {
-            get() {
-                if(this.responseData.faultNum || this.responseData.faultNum == 0){
-                    return parseFloat(this.responseData.faultNum).toLocaleString();
-                }else {
-                    return '--'
-                }
-            },
-            set(val) {
-                this.$store.commit('SET_FORMATETIME_DATA', parseFloat(this.responseData.faultNum).toLocaleString());
-            }
-        }
+        // onclose1(data){
+        //     console.log("结束连接");
+        // },
+        // onopen1(data){
+        //     //获取在驶车辆状态
+        //     var cross1 = {
+        //         'action':'cross_real_data',
+        //         'token':'tusvn',
+        //         'crossId':this.cross1.crossId
+        //     }
+        //     var cross1Msg = JSON.stringify(cross1);
+        //     this.sendMsg1(cross1Msg);
+        // },
+        // sendMsg1(msg) {
+        //     let _this=this;
+        //     if(window.WebSocket){
+        //       if(_this.webSocket1.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+        //         _this.webSocket1.send(msg); //send()发送消息
+        //       }
+        //     }else{
+        //       return;
+        //     }
+        // },
+        // initWebSocket2(){
+        //     let _this=this;
+        //     if ('WebSocket' in window) {
+        //       _this.webSocket2 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+        //     }
+        //     _this.webSocket2.onmessage = _this.onmessage2;
+        //     _this.webSocket2.onclose = _this.onclose2;
+        //     _this.webSocket2.onopen = _this.onopen2;
+        //     _this.webSocket2.onerror = _this.onerror2;
+        // },
+        // onmessage2(mesasge){
+        //     let _this=this;
+        //     let json = JSON.parse(mesasge.data);
+        //     let result = json.result.vehData;
+        //     let position;
+        //     if(_this.count2==0) {
+        //       //在接受请求前清除地图上的点
+        //       _this.map2.remove(_this.map2List);
+        //       _this.map2List = [];
+        //       result.forEach(item => {
+        //         position = new AMap.LngLat(item.longitude,item.latitude);
+        //         _this.count2++;
+        //         let marker = new AMap.Marker({
+        //           position: position,
+        //           icon: 'static/images/road/car.png',
+        //           angle: item.heading,
+        //           offset:new AMap.Pixel(-8, -16)
+        //         });
+        //         _this.map2.add(marker);
+        //         _this.map2List.push(marker);
+        //       });
+        //       if (this.count2 == result.length) {
+        //         _this.count2 = 0;
+        //       }
+        //     }
+        // },
+        // onclose2(data){
+        //     console.log("结束连接");
+        // },
+        // onopen2(data){
+        //     let cross2 = {
+        //       'action':'cross_real_data',
+        //       'token':'tusvn',
+        //       'crossId':this.cross2.crossId
+        //     }
+        //     let cross2Msg = JSON.stringify(cross2);
+        //     this.sendMsg2(cross2Msg);
+        // },
+        // sendMsg2(msg) {
+        //     let _this=this;
+        //     if(window.WebSocket){
+        //       if(_this.webSocket2.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+        //         _this.webSocket2.send(msg); //send()发送消息
+        //       }
+        //     }else{
+        //       return;
+        //     }
+        // },
+        // initWebSocket3(){
+        //     let _this=this;
+        //     if ('WebSocket' in window) {
+        //       _this.webSocket3 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+        //     }
+        //     _this.webSocket3.onmessage = _this.onmessage3;
+        //     _this.webSocket3.onclose = _this.onclose3;
+        //     _this.webSocket3.onopen = _this.onopen3;
+        //     _this.webSocket3.onerror = _this.onerror3;
+        // },
+        // onmessage3(mesasge){
+        //     let _this=this;
+        //     let json = JSON.parse(mesasge.data);
+        //     let result = json.result.vehData;
+        //     let position;
+        //     if(_this.count3==0) {
+        //       //在接受请求前清除地图上的点
+        //       _this.map3.remove(_this.map3List);
+        //       _this.map3List = [];
+        //       result.forEach(item => {
+        //         position = new AMap.LngLat(item.longitude,item.latitude);
+        //         _this.count3++;
+        //         let marker = new AMap.Marker({
+        //           position: position,
+        //           icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+        //           angle: item.heading,
+        //           offset:new AMap.Pixel(-8, -16)
+        //         });
+        //         _this.map3.add(marker);
+        //         _this.map3List.push(marker);
+        //       });
+        //       if (this.count3 == result.length) {
+        //         _this.count3 = 0;
+        //       }
+        //     }
+        // },
+        // onclose3(data){
+        //     console.log("结束连接");
+        // },
+        // onopen3(data){
+        //     let cross3 = {
+        //       'action':'cross_real_data',
+        //       'token':'tusvn',
+        //       'crossId':this.cross3.crossId
+        //     }
+        //     let cross3Msg = JSON.stringify(cross3);
+        //     this.sendMsg3(cross3Msg);
+        // },
+        // sendMsg3(msg) {
+        //     let _this=this;
+        //     if(window.WebSocket){
+        //       if(_this.webSocket3.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+        //         _this.webSocket3.send(msg); //send()发送消息
+        //       }
+        //     }else{
+        //       return;
+        //     }
+        // },
+        // initWebSocket4(){
+        //     let _this=this;
+        //     if ('WebSocket' in window) {
+        //       _this.webSocket4 = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+        //     }
+        //     _this.webSocket4.onmessage = _this.onmessage4;
+        //     _this.webSocket4.onclose = _this.onclose4;
+        //     _this.webSocket4.onopen = _this.onopen4;
+        //     _this.webSocket4.onerror = _this.onerror4;
+        // },
+        // onmessage4(mesasge){
+        //     let _this=this;
+        //     let json = JSON.parse(mesasge.data);
+        //     let result = json.result.vehData;
+        //     let position;
+        //     if(_this.count4==0) {
+        //       //在接受请求前清除地图上的点
+        //       _this.map4.remove(_this.map4List);
+        //       _this.map4List = [];
+        //       result.forEach(item => {
+        //         position = new AMap.LngLat(item.longitude,item.latitude);
+        //         _this.count4++;
+        //         let marker = new AMap.Marker({
+        //           position: position,
+        //           icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+        //           angle: item.heading,
+        //           offset:new AMap.Pixel(-8, -16)
+        //         });
+        //         _this.map4.add(marker);
+        //         _this.map4List.push(marker);
+        //       });
+        //       if (this.count4 == result.length) {
+        //         _this.count4 = 0;
+        //       }
+        //     }
+        // },
+        // onclose4(data){
+        //     console.log("结束连接");
+        // },
+        // onopen4(data){
+        //     let cross4 = {
+        //       'action':'cross_real_data',
+        //       'token':'tusvn',
+        //       'crossId':this.cross4.crossId
+        //     }
+        //     let cross4Msg = JSON.stringify(cross4);
+        //     this.sendMsg4(cross4Msg);
+        // },
+        // sendMsg4(msg) {
+        //     let _this=this;
+        //     if (window.WebSocket) {
+        //         if(_this.webSocket4.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+        //             _this.webSocket4.send(msg); //send()发送消息
+        //         }
+        //     } else {
+        //         return;
+        //     }
+        // }
     },
+    // computed: {
+    //     formatTime: {
+    //         get() {
+    //             if(this.responseData.timestamp){
+    //                 return this.$dateUtil.formatTime(this.responseData.timestamp);
+    //             } else {
+    //                 return '--'
+    //             }
+    //         },
+    //         set() {
+    //             this.$store.commit('SET_FORMATETIME_DATA', this.$dateUtil.formatTime(this.responseData.timestamp));
+    //         }
+    //     },
+    //     warningNum: {
+    //         get() {
+    //             if(this.responseData.warningNum || this.responseData.warningNum == 0){
+    //                 return parseFloat(this.responseData.warningNum).toLocaleString();
+    //             }else {
+    //                 return '--'
+    //             }
+    //         },
+    //         set() {
+    //             this.$store.commit('SET_FORMATETIME_DATA', parseFloat(this.responseData.warningNum).toLocaleString());
+    //         }
+    //     },
+    //     faultNum: {
+    //         get() {
+    //             if(this.responseData.faultNum || this.responseData.faultNum == 0){
+    //                 return parseFloat(this.responseData.faultNum).toLocaleString();
+    //             }else {
+    //                 return '--'
+    //             }
+    //         },
+    //         set(val) {
+    //             this.$store.commit('SET_FORMATETIME_DATA', parseFloat(this.responseData.faultNum).toLocaleString());
+    //         }
+    //     }
+    // },
     destroyed(){
         //销毁Socket
         this.webSocket1.close();
@@ -1038,26 +1486,29 @@ export default {
 </script>
 <style lang="scss" scoped>
     .perception-road{
-        height: 163px;
+        position: relative;
+        height: 176px;
         width: 315px;
         border: 1px solid #5e5970;
         padding: 5px 6px 6px 6px;
         margin-bottom: 20px;
+        top:33px;
         .road-word {
-            position: relative;
+            // position: relative;
+            position: absolute;
             z-index: 2;
             padding-left: 7px;
         }
         .cross-scan {
           display: block;
-          position: relative;
-          top: -38px;
-          bottom: 20px;
-          left: 0;
+        //   position: relative;
+        //   top: -38px;
+        //   bottom: 20px;
+        //   left: 0;
           height: 100%;
           width: 100%;
           overflow: hidden;
-          z-index: 1;
+        //   z-index: 1;
         }
     }
     .base-info{

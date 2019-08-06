@@ -4,10 +4,10 @@
 //-----------------------------------------------------
 @import '@/assets/scss/theme.scss';
 
-/*@font-face {
+@font-face {
   font-family: carFont;
   src: url("../font/NeogreyRegular.otf");
-}*/
+}
 
 [v-cloak] {
   display: none;
@@ -259,7 +259,7 @@ img {
 }
 .right-road{
   position: absolute;
-  top: 0;
+  top: 38px;
   right: 0;
   bottom: 0;
   padding: 0px 30px;
