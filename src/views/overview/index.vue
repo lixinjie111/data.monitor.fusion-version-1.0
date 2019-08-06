@@ -11,11 +11,23 @@
         <!-- 地图 -->
         <map-container></map-container>
         <!-- 右侧 -->
+        <div class="base-info">
+            <!-- <span>{{formatTime || '--'}}</span> -->
+            <span class="base-time">{{formatTime || '--'}}</span>
+            <span>
+                <em >{{city.province}}{{city.district}}</em>
+                <!-- <em>上海市闵行区</em> -->
+                <img src="@/assets/images/weather/default.png" class="weather-icon"/>
+                <em class="c-middle">{{weather.wendu || '--'}}°</em>
+                <!-- <em class="c-middle">33°</em> -->
+            </span>
+        </div>
         <div class="fusion-right">
             <!-- <right-overview  @queryCrossDetail="queryCrossDetail"></right-overview> -->
             <typical-section  @queryCrossDetail="queryCrossDetail"></typical-section>
         </div>
         <div class="fusion-bottom">
+            <!-- 底部车辆信息 -->
             <bottom-overview></bottom-overview>
         </div>
     </div>
@@ -26,6 +38,7 @@ import LeftOverview from './components/leftOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
 import TypicalSection from './components/typicalSection.vue';
+import {getTopWeather} from '@/api/overview/index.js';
 export default {
     components: {
         LeftOverview,
@@ -36,6 +49,15 @@ export default {
     },
     data() {
         return {
+            responseData: {
+                timestamp: new Date().getTime()
+            },
+            defaultCenterPoint: [121.262939,31.245149],
+            requestData: {
+                disCode: ''
+            },
+            city: {},
+            weather: {},
             webSocket:{},
             realData:{
                 oilDoor:0,
@@ -48,7 +70,36 @@ export default {
             vehicleId:'B21E-00-021',
         }
     },
+    mounted() {
+        this.initWebSocket();
+        // 获取地区和天气
+        this.getAddress();
+    },
     methods: {
+        // 获取地区
+        getAddress() {
+            let geocoder = new AMap.Geocoder();
+            geocoder.getAddress(this.defaultCenterPoint, (status, result) => {
+                if (status === 'complete' && result.regeocode) {
+                    console.log('result', result);
+                    let data = result.regeocode.addressComponent;
+                    this.city.province = data.province;
+                    this.city.district = data.district;
+                    this.requestData.disCode = data.adcode;
+                    this.$store.commit('SET_DISTRICT_DATA', result.regeocode.addressComponent);
+                     this.getTopWeather();
+                } else {
+                    console.log('根据经纬度获取地区失败');
+                }
+            });
+        },
+        // 获取天气
+        getTopWeather() {
+            getTopWeather(this.requestData).then(res => {
+                this.weather = res.data;
+                this.$store.commit('SET_WEATHER_DATA', this.weather);
+            });
+        },
         initWebSocket(){
             let _this=this;
             if ('WebSocket' in window) {
@@ -102,9 +153,44 @@ export default {
             console.error("WebSocket error observed:", event);
         }
     },
-    mounted() {
-        this.initWebSocket();
-    }
+    computed: {
+        formatTime: {
+            get() {
+                if(this.responseData.timestamp){
+                    return this.$dateUtil.formatTime(this.responseData.timestamp);
+                } else {
+                    return '--'
+                }
+            },
+            set() {
+                this.$store.commit('SET_FORMATETIME_DATA', this.$dateUtil.formatTime(this.responseData.timestamp));
+            }
+        },
+        warningNum: {
+            get() {
+                if(this.responseData.warningNum || this.responseData.warningNum == 0){
+                    return parseFloat(this.responseData.warningNum).toLocaleString();
+                }else {
+                    return '--'
+                }
+            },
+            set() {
+                this.$store.commit('SET_FORMATETIME_DATA', parseFloat(this.responseData.warningNum).toLocaleString());
+            }
+        },
+        faultNum: {
+            get() {
+                if(this.responseData.faultNum || this.responseData.faultNum == 0){
+                    return parseFloat(this.responseData.faultNum).toLocaleString();
+                }else {
+                    return '--'
+                }
+            },
+            set(val) {
+                this.$store.commit('SET_FORMATETIME_DATA', parseFloat(this.responseData.faultNum).toLocaleString());
+            }
+        }
+    },
 }
 </script>
 <style lang="scss" scoped>
@@ -114,6 +200,7 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
+    // overflow: scroll;
     .fusion-left{
         position: absolute;
         left: 0;
@@ -133,6 +220,52 @@ export default {
         cursor: pointer;
         background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
         // width:327px; 
+    }
+    .base-info {
+        position:absolute;
+        right: 30px;
+        top:20px;
+        height: 30px;
+        // background-color: red;
+        bottom: 33px;
+        z-index: 2;
+        .base-time{
+            display: inline-block;
+            margin-right: 31px;
+        }
+        .weather-icon{
+            vertical-align: middle;
+            padding-left: 10px;
+        }
+    }
+    .style{
+        width: 260px;
+        height: 160px;
+        border:4px solid #666666;
+        position: absolute;
+        left: 800px;
+        /*top: calc(440px-160px-20px);*/
+        top:260px;
+        // z-index:1;
+        padding-top: 5px;
+        box-sizing: border-box;
+        animation: move 3s linear;;
+
+    }
+    @keyframes move {
+        0%{transform:translate(0,0);}
+        100%{transform:translate(50px,100px);}
+    }
+    .style:before{
+        position: absolute;
+        content: '';
+        width: 0;
+        height: 0;
+        border-top:20px solid #666666;
+        border-right:16px solid transparent;
+        bottom: -20px;
+        left:16px;
+
     }
     .fusion-bottom {
         position: absolute;

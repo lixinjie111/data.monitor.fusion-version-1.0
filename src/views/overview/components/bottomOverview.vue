@@ -8,13 +8,13 @@
                    <img :src="item.vehicleLogo" class="car-img" />
                 </div>
                 <div class="car-detail-info">
-                       <p class="car-plate">{{item.plateNo}}</p>
-                       <div class="driving-info">
-                           <span class="driving-level">L{{item.autoLevel}}</span>
-                           <span class="driving-trans">{{item.transmission}}</span>
-                           <span class="direction" :style="{transform:'rotate('+ item.headingAngle +'deg)'}"></span>
-                       </div>
-                   </div>
+                    <p class="car-plate">{{item.plateNo}}</p>
+                    <div class="driving-info">
+                        <span class="driving-level">L{{item.autoLevel}}</span>
+                        <span class="driving-trans">{{item.transmission}}</span>
+                        <span class="direction" :style="{transform:'rotate('+ item.headingAngle +'deg)'}"></span>
+                    </div>
+                </div>
             </li>
         </ul>
 </template>
@@ -141,11 +141,10 @@ export default {
     .car-info-li {
         list-style-type: none;
         display: flex;
-        width: 280px;
+        // width: 269px;
         margin-right: 10px;
         cursor: pointer;
-        background-image: linear-gradient(90deg, #000 0%, #000 100%);
-        opacity: 0.6;
+        background-color: rgba(94, 89, 112, 0.3);
         .car-index {
             text-align: center;
             width: 40px;
@@ -155,6 +154,7 @@ export default {
             color: #ccc;
             display: inline-block;
             background-color: #5e5970;
+            opacity: 0.3;
         }
         .car-detail {
             height: 80px;
@@ -162,7 +162,7 @@ export default {
                 width: 98px;
                 height: 100%;
                 display: block;
-                padding: 0 9px 9px 9px;
+                padding: 0 9px;
 				object-fit: cover;
             }
         }
@@ -170,10 +170,12 @@ export default {
             // height: 100%;
             .car-plate {
                 font-size: 14px;
+                padding-right: 16px;
             }
             .driving-info {
                 line-height: 26px;
                 height: 26px;
+                padding-right: 16px;
                 @include layoutMode(between);
                 .driving-level{
                     width: 26px;
