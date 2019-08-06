@@ -81,13 +81,6 @@ export default {
                     }
                 })(i);
             };
-            // _allPointData.map((x, index) => {
-            //     let position = ConvertCoord.wgs84togcj02(x.position[0], x.position[1]);
-            //     _allPointData[index].position = position;
-            //     _this.count = index;
-            // });
-            // console.log('_allPointData.length', _allPointData.length);
-            // _this.drawMarker(_allPointData);
         },
         drawMarker(allPointData) {
             let _this = this,
