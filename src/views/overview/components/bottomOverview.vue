@@ -100,6 +100,18 @@ export default {
             let _json = JSON.parse(message.data),
             	_result = _json.result,
                 _vehicleId = _result.vehicleId;
+            this.responseData.forEach((item, index) => {
+            	if (item.vehicleId === _vehicleId ) {
+		            item.transmission = _result.transmission;
+            		if(_result.transmission != 'P') {
+		            	item.speed = _result.speed;
+		            	item.headingAngle = _result.headingAngle;
+		            	item.turnLight = _result.turnLight;
+            		}else {
+            			item.speed = 0;
+            		}
+            	}
+            });
         },
         onclose(data){
             // console.log("结束--vehicleList--连接");
