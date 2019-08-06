@@ -30,7 +30,8 @@ export default {
 			// 获取指定车辆实时信息
             webSocket:{},
             webSocketData: {
-                action: 'vehicleList',
+                // action: 'vehicleList',
+                action: 'can_real_data',
                 token: 'fpx',
                 vehicleIds: 'B21E-00-017,B21E-00-018,B21E-00-019,B21E-00-020'
             }
@@ -41,10 +42,10 @@ export default {
 		// this.initWebSocket();
 	},
 	methods: {
+        // 获取典型车辆
 		getGpsRealConfig() {
-            // console.log('获取典型车辆列表初始化配置数据');
 			getGpsRealConfig().then(res => {
-				this.vehicleIds = res.data;
+                this.vehicleIds = res.data;
 				this.webSocketData.vehicleIds = res.data;
 				this.initWebSocket();
 			});
@@ -75,10 +76,10 @@ export default {
 			_filterResult.vehicleLogo = result.vehicleLogo;
 			_filterResult.plateNo = result.plateNo;
 
-			_filterResult.id = "echarts-" + attr;
-			_filterResult.echarts = null;
-			_filterResult.echartsData = [];
-            _filterResult.echartsData.push(result.speed);
+			// _filterResult.id = "echarts-" + attr;
+			// _filterResult.echarts = null;
+			// _filterResult.echartsData = [];
+            // _filterResult.echartsData.push(result.speed);
             this.responseData.push(_filterResult);
         },
         initWebSocket(){
@@ -94,7 +95,19 @@ export default {
         onmessage(message){
             let _json = JSON.parse(message.data),
             	_result = _json.result,
-            	_vehicleId = _result.vehicleId;
+                _vehicleId = _result.vehicleId;
+            this.responseData.forEach((item, index) => {
+            	if (item.vehicleId === _vehicleId ) {
+		            item.transmission = _result.transmission;
+            		if(_result.transmission != 'P') {
+		            	item.speed = _result.speed;
+		            	item.headingAngle = _result.headingAngle;
+		            	item.turnLight = _result.turnLight;
+            		}else {
+            			item.speed = 0;
+            		}
+            	}
+            });
         },
         onclose(data){
             // console.log("结束--vehicleList--连接");
@@ -153,8 +166,7 @@ export default {
             letter-spacing: 2px;
             color: #ccc;
             display: inline-block;
-            background-color: #5e5970;
-            opacity: 0.3;
+            background-color: rgba(94, 89, 112, 0.3);
         }
         .car-detail {
             height: 80px;

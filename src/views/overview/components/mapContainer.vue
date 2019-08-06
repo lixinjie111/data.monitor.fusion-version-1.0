@@ -47,13 +47,11 @@ export default {
                 console.log("当前数据为空",this.dateUtil.formatTime(_json.result.time));
             }
             if (this.flag) {
-                // console.log("绘制前--------");
-                // console.log(_result.length);
                 this.flag = false;
                 let _responseData = _result.map( item => {
                     let _option = {
                         vehicleId: item.vehicleId,
-                        platNo: item.platNo,
+                        plateNo: item.plateNo,
                         source: item.source.join(','),
                         heading: item.heading,
                         // position: new AMap.LngLat(item.longitude, item.latitude)
@@ -113,7 +111,7 @@ export default {
                     });
                     _markerObj.platNoMarker = new AMap.Text({
                         map: _this.AMap,
-                        text: _data.platNo+"<br/><span style='color:#e6a23c'>"+_data.source+'</span>',
+                        text: _data.plateNo+"<br/><span style='color:#e6a23c'>"+_data.source+'</span>',
                         // text: '京N123456',
                         anchor: 'center', // 设置文本标记锚点
                         style: {
@@ -135,7 +133,6 @@ export default {
                     _markerObj.platNoMarker.on('click', _this.showView);
 
                     _this.responseDataDraw.push(_markerObj);
-                    //console.log('_this.responseDataDraw', _this.responseDataDraw);
                 }
 
                 if(i == _allPointDataLength - 1) {
