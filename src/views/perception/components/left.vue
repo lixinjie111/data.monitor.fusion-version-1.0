@@ -94,6 +94,7 @@
         watch:{
             currentExtent(newValue,oldValue){
 //                console.log("大小："+this.currentExtent.length);
+                this.warningCount=0;
                 this.initWebSocket();
                 this.initWarningWebSocket();
             }
@@ -160,18 +161,15 @@
                 _this.warningWebsocket.onopen = _this.onWarningOpen;
             },
             onWarningMessage(mesasge){
-                var _this=this;
-                var json = JSON.parse(mesasge.data);
-                var warningData = json.result.data;
-                let warningId;
-                warningData.forEach(item=>{
-                    warningId = item.warnId;
-                    warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                    if(_this.warningIdList.indexOf(warningId)==-1){
-                        _this.warningIdList.push(warningId);
+                let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let warningData = json.result.data;
+                let type = json.result.type;
+                if(type=='CLOUD'){
+                    warningData.forEach(item=>{
                         _this.warningCount++;
-                    }
-                })
+                    });
+                }
             },
             onWarningClose(data){
                 console.log("结束连接");

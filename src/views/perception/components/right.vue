@@ -2,9 +2,10 @@
     <div class="fusion-right-style" id="fusionRight">
         <div class="map-right">
             <div class="base-info">
-                <span>2019-09-23 08:00:00</span>
+                <!--<span>{{formatTime || '&#45;&#45;'}}</span>
+                <span>{{district  || '&#45;&#45;'}}</span>
                 <img src="@/assets/images/weather/default.png" class="weather-icon"/>
-                <span>15.6°</span>
+                <span>{{wendu || '&#45;&#45;'}}°</span>-->
             </div>
             <div class="perception-road" id="mapRoad">
                 <tusvn-map1
@@ -19,7 +20,7 @@
         </div>
         <div class="map-left"></div>
         <div id="map" class="c-map">
-            <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}">
+            <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}" v-show="video1Show">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
             </div>
             <tusvn-map :target-id="'mapFusion'"  ref="map"
@@ -79,7 +80,7 @@
                 },
                 left1:'',
                 bottom1:'',
-                video1Show:true,
+                video1Show:false,
                 option1:{},
                 topPosition:0,
                 leftPosition:0,
@@ -93,9 +94,37 @@
                     zoom: 18,
                     mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
                 },
+                weather:{},
+                cameraParam:{},
+                step:5,
+                step1:1,
+                mapTime1:0,
+                mapTime2:0,
+                mapTime3:0,
+                mapTime4:0,
+            }
+        },
+        props:{
+            realData:{
+                type:Object,
+                default() {
+                    return {
+
+                    };
+                }
             }
         },
         components: { TusvnMap,TusvnMap1},
+        watch: {
+            realData: {
+                handler(newName, oldName) {
+                    this.moveMap();
+                },
+//                immediate: true,
+                deep: true
+
+            }
+        },
         methods: {
             getOption(){
                 let option = {
@@ -148,12 +177,15 @@
             onMapComplete(){
                 getMap(this.$refs.map);
                 this.$refs.map.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-               /* setInterval(()=>{
-                    let obj = this.$refs.map.getCamera();
-                    console.log("x:"+obj.x+",y"+obj.y+",z:"+obj.z+",radius:"+obj.radius+",pitch:"+obj.pitch+",yaw:"+obj.yaw);
-                },5000)*/
-               /* this.getCurrentExtent();*/
-                },
+                this.cameraParam = this.$refs.map.getCamera();
+                //向左移5米
+                /*let x = obj.x;
+                let y = obj.y;
+                let z = obj.z;
+                let radius = obj.radius;
+                let pitch = obj.pitch;
+                let yaw = obj.yaw;*/
+             },
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.zoomTo(10);
@@ -162,6 +194,7 @@
             },
             cameraChanged(){
                 console.log("窗口发生变化")
+                this.cameraParam = this.$refs.map.getCamera();
                 this.video1Show=false;
                 this.rtmp1="";
                 this.getCurrentExtent();
@@ -177,19 +210,13 @@
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
                 let currentExtend = this.currentExtent;
-                overviewMap.addMultiPolygon([[[
-                        [currentExtend[0],currentExtend[3]],
-                        [currentExtend[0],currentExtend[1]],
-                        [currentExtend[2],currentExtend[1]],
-                        [currentExtend[2],currentExtend[3]],
-                        [currentExtend[0],currentExtend[3]]
-                    ]]], "rectangle",
+//                debugger;
+                overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
                     null, 1, overviewLayerId);
 
-                overviewMap.centerAt((currentExtend[0]+currentExtend[2])/2,(currentExtend[1]+currentExtend[3])/2);
-
+                overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
             getPerceptionAreaInfo(){
                 getPerceptionAreaInfo({
@@ -291,7 +318,7 @@
                 let x0 = (x1+x2)/2;
                 let y0 = (y1+y2)/2;
                 this.center.push([x0,y0]);
-                console.log("中心点："+this.center);
+//                console.log("中心点："+this.center);
             },
             typeRoadData(){
                 this.lightList=[];
@@ -320,12 +347,99 @@
                         let obj = {};
                         obj.left = parseInt(pixel[0]);
                         obj.top = parseInt(pixel[1]);
-                        this.lightList.push(obj);
+//                        this.lightList.push(obj);
                         this.spatCount++;
                     })
                     this.$emit("count",this.signCount,this.spatCount);
                 })
             },
+            moveMap(){
+                /*direction:方向 "停",0;"上",1;"下",2;"左",3;"右",4;
+                status:状态 动一步 0 ;一直动 1*/
+                let direction = this.realData.direction;
+                let status = this.realData.status;
+                let x = this.cameraParam.x;
+                let y = this.cameraParam.y;
+
+                //动一步
+                if(status=='0'){
+                    clearInterval(this.mapTime1);
+                    clearInterval(this.mapTime2);
+                    clearInterval(this.mapTime3);
+                    clearInterval(this.mapTime4);
+                    //向上
+                    if(direction=='1'){
+                        this.cameraParam.y=y+this.step;
+                    }
+                    //向下
+                    if(direction=='2'){
+                        this.cameraParam.y=y-this.step;
+                    }
+                    //向左
+                    if(direction=='3'){
+                        this.cameraParam.x=x-this.step;
+                    }
+                    //向右
+                    if(direction=='4'){
+                        this.cameraParam.x=x+this.step;
+                    }
+                    this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                }else{
+                    //停止
+                    if(direction=='0'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        //
+                    }
+                    //向上
+                    if(direction=='1'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.mapTime1 = setInterval(()=>{
+                            this.cameraParam.y=this.cameraParam.y+this.step1;
+                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                        },1000)
+                    }
+                    //向下
+                    if(direction=='2'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.mapTime2 = setInterval(()=>{
+                            this.cameraParam.y=this.cameraParam.y-this.step1;
+                            console.log("向下："+this.cameraParam.y)
+                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                        },1000)
+                    }
+                    //向左
+                    if(direction=='3'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.mapTime3 = setInterval(()=>{
+                            this.cameraParam.x=this.cameraParam.x-this.step1;
+                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                        },1000)
+                    }
+                    //向右
+                    if(direction=='4'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.mapTime4 = setInterval(()=>{
+                            this.cameraParam.x=this.cameraParam.x+this.step1;
+                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                        },1000)
+                    }
+                }
+            }
         },
         mounted() {
             this.option1 = this.getOption();
@@ -343,6 +457,12 @@
                 ele.className="style style1";
                 clearTimeout(time1);
             },1000)*/
+        },
+        destroyed(){
+            clearInterval(this.mapTime1);
+            clearInterval(this.mapTime2);
+            clearInterval(this.mapTime3);
+            clearInterval(this.mapTime4);
         }
 }
 </script>
