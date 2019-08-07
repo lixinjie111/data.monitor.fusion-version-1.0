@@ -20,13 +20,16 @@ export default {
                 zoom: 11,
                 mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
             },
-            changeCenterPoint: defaultCenterPoint
+            changeCenterPoint: defaultCenterPoint,
         }
     },
     watch: {
         "$route"(val) {
             // console.log(val);
         }
+    },
+    methods: {
+
     }
 }
 </script>
