@@ -28,12 +28,12 @@
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
+                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
                     <!--<span class="fusion-font">车辆感知：车辆 </span>-->
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;非机动车 {{sideData.noMotor || 0}}</span>
+                    <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{sideData.noMotor || 0}}</span>
                     <!--<span class="fusion-font">路侧识别：车辆 </span>-->
                 </li>
                 <li>
@@ -89,6 +89,13 @@
             signCount:{
                 type:Number,
                 default:0
+            }
+        },
+        watch:{
+            currentExtent(newValue,oldValue){
+//                console.log("大小："+this.currentExtent.length);
+                this.initWebSocket();
+                this.initWarningWebSocket();
             }
         },
         methods: {
@@ -191,8 +198,7 @@
             }
         },
         mounted() {
-            this.initWebSocket();
-            this.initWarningWebSocket();
+
         },
         destroyed(){
             this.webSocket.close();
@@ -215,7 +221,7 @@
                 height: 14px;
                 border-radius: 50%;
                 display: inline-block;
-                /*margin-right:10px;*/
+                margin-right:2px;
             }
             .fusion-font{
                 word-wrap:break-word

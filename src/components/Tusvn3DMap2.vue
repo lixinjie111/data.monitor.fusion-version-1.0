@@ -112,8 +112,8 @@ export default {
         /**
          * 坐标转换
          */
-        coordinateTransfer:function(longitude,latitude){
-            let targetCoor = proj4(this.destinatePorject,this.sourceProject,[longitude,latitude]);
+        coordinateTransfer:function(sourceProject,destinatePorject,longitude,latitude){
+            let targetCoor = proj4(sourceProject,destinatePorject,[longitude,latitude]);
             return targetCoor;
         },
         /**

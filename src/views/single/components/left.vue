@@ -469,7 +469,7 @@
 
     }
     .fusion-left-map{
-        height:180px;
+        height:150px;
         border:1px solid rgba(211,134,0,0.5);
         .map-style{
             height: 100%;

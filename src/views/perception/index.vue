@@ -14,7 +14,7 @@
 </template>
 <script>
     import Left from './components/left.vue'
-    import Right from './components/right.vue'
+    import Right from './components/right'
     export default {
         data() {
             return {
@@ -28,7 +28,7 @@
         methods: {
             getCurrentExtent(currentExtent){
                 this.currentExtent = currentExtent;
-//                console.log("边界值："+this.currentExtent);
+                console.log("边界值："+this.currentExtent);
             },
             count(spatCount,signCount){
                 this.spatCount = spatCount;
@@ -37,6 +37,14 @@
         },
         components:{Left,Right},
         mounted() {
+            /*this.$on("getCurrentExtent",(currentExtent) =>{
+                this.currentExtent = currentExtent;
+                console.log("边界值："+this.currentExtent);
+            })
+            this.$on("count",(spatCount,signCount) =>{
+                this.spatCount = spatCount;
+                this.signCount = signCount;
+            })*/
         }
     }
 </script>
