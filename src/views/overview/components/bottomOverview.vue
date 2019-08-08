@@ -175,7 +175,7 @@ export default {
                 height: 100%;
                 display: block;
                 padding: 0 9px;
-				object-fit: cover;
+				object-fit: contain;
             }
         }
         .car-detail-info {
