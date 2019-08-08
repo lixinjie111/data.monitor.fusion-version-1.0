@@ -1,11 +1,6 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
         <div class="map-right">
-            <div class="base-info">
-                <span>2019-09-23 08:00:00</span>
-                <img src="@/assets/images/weather/default.png" class="weather-icon"/>
-                <span>15.6°</span>
-            </div>
             <div class="perception-road" id="mapRoad">
                 <tusvn-map1
                         ref="map1"
@@ -19,7 +14,7 @@
         </div>
         <div class="map-left"></div>
         <div id="map" class="c-map">
-            <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}">
+            <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}" v-show="video1Show">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
             </div>
             <tusvn-map :target-id="'mapFusion'"  ref="map"
@@ -28,8 +23,16 @@
             @mapcomplete="onMapComplete" @CameraChanged='cameraChanged'>
             </tusvn-map>
         </div>
-        <div class="spat-detail clearfix" v-for="item in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
-            <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
+        <div class="spat-detail clearfix" v-for="obj in lightObj" :style="{left:obj.left+'px',top:obj.top+'px'}" v-show="obj.flag">
+            <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">
+                <div v-show="key=='key_3'&&item.flag" class="spat-detail-style">
+                    <div class="spat-detail-img" >
+                        <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'" class="turn-img"/>
+                        <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"  class="turn-img"/>
+                        <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"  class="turn-img"/>
+                    </div>
+                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                </div>
                 <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
                     <div class="spat-detail-img">
                         <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
@@ -70,16 +73,16 @@
                 option1:{},
                 rtmp1:'',
                 option2:{},
-                lightList:[],
+                lightObj:{},
                 lightData:{
-                    'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
+                    /*'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
                     'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},//左转
                     'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
-                    'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转
+                    'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转*/
                 },
                 left1:'',
                 bottom1:'',
-                video1Show:true,
+                video1Show:false,
                 option1:{},
                 topPosition:0,
                 leftPosition:0,
@@ -93,9 +96,39 @@
                     zoom: 18,
                     mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
                 },
+                weather:{},
+                cameraParam:{},
+                step:5,
+                step1:1,
+                mapTime1:0,
+                mapTime2:0,
+                mapTime3:0,
+                mapTime4:0,
+                isConMov:false,
+                lightWebsocket:{}
+            }
+        },
+        props:{
+            realData:{
+                type:Object,
+                default() {
+                    return {
+
+                    };
+                }
             }
         },
         components: { TusvnMap,TusvnMap1},
+        watch: {
+            realData: {
+                handler(newName, oldName) {
+                    this.moveMap();
+                },
+//                immediate: true,
+                deep: true
+
+            }
+        },
         methods: {
             getOption(){
                 let option = {
@@ -148,12 +181,16 @@
             onMapComplete(){
                 getMap(this.$refs.map);
                 this.$refs.map.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-               /* setInterval(()=>{
-                    let obj = this.$refs.map.getCamera();
-                    console.log("x:"+obj.x+",y"+obj.y+",z:"+obj.z+",radius:"+obj.radius+",pitch:"+obj.pitch+",yaw:"+obj.yaw);
-                },5000)*/
-               /* this.getCurrentExtent();*/
-                },
+                this.cameraParam = this.$refs.map.getCamera();
+
+                //向左移5米
+                /*let x = obj.x;
+                let y = obj.y;
+                let z = obj.z;
+                let radius = obj.radius;
+                let pitch = obj.pitch;
+                let yaw = obj.yaw;*/
+             },
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.zoomTo(10);
@@ -162,12 +199,17 @@
             },
             cameraChanged(){
                 console.log("窗口发生变化")
+                this.cameraParam = this.$refs.map.getCamera();
                 this.video1Show=false;
                 this.rtmp1="";
                 this.getCurrentExtent();
                 this.getCenter();
-                this.getPerceptionAreaInfo();
-                this.typeRoadData();
+                if(!this.isConMov){
+                    let ele = document.getElementById("message1");
+                    ele.className="style";
+                    this.getPerceptionAreaInfo();
+                    this.typeRoadData();
+                }
                 let overviewMap = this.$refs.map1;
                 let overviewLayerId = "overviewLayer"
                 let overviewLayer = overviewMap.getLayerById(overviewLayerId);
@@ -177,19 +219,13 @@
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
                 let currentExtend = this.currentExtent;
-                overviewMap.addMultiPolygon([[[
-                        [currentExtend[0],currentExtend[3]],
-                        [currentExtend[0],currentExtend[1]],
-                        [currentExtend[2],currentExtend[1]],
-                        [currentExtend[2],currentExtend[3]],
-                        [currentExtend[0],currentExtend[3]]
-                    ]]], "rectangle",
+//                debugger;
+                overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
                     null, 1, overviewLayerId);
 
-                overviewMap.centerAt((currentExtend[0]+currentExtend[2])/2,(currentExtend[1]+currentExtend[3])/2);
-
+                overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
             getPerceptionAreaInfo(){
                 getPerceptionAreaInfo({
@@ -272,18 +308,18 @@
                 this.currentExtent.push([x1, y1]);
                 this.currentExtent.push([x1, y2]);
                 this.currentExtent.push([x2, y2]);*/
-               this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
-//                console.log("边界值" + this.currentExtent);
+                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
+                console.log("边界值" + this.currentExtent);
                 this.$emit('getCurrentExtent', this.currentExtent);
 
             },
             getCenter(){
                 this.center= [];
                 let result = this.$refs.map.getExtent();
-//                let utm1 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-//                let utm2 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
-                let utm1 = [121.16305725240798,31.279518991604288];
-                let utm2 = [121.17979423666091,31.289571910992105];
+                let utm1 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                /*let utm1 = [121.16305725240798,31.279518991604288];
+                let utm2 = [121.17979423666091,31.289571910992105];*/
                 let x1 = utm1[0];
                 let y1 = utm1[1];
                 let x2 = utm2[0];
@@ -291,14 +327,13 @@
                 let x0 = (x1+x2)/2;
                 let y0 = (y1+y2)/2;
                 this.center.push([x0,y0]);
-                console.log("中心点："+this.center);
+//                console.log("中心点："+this.center);
             },
             typeRoadData(){
-                this.lightList=[];
+                this.lightObj={};
                 typeRoadData(
                     [
                         {
-
                             "polygon":this.currentExtent
                         }
                     ]
@@ -320,15 +355,203 @@
                         let obj = {};
                         obj.left = parseInt(pixel[0]);
                         obj.top = parseInt(pixel[1]);
-                        this.lightList.push(obj);
+                        obj.flag = false;
+                        let spatId = "light_"+item.uid;
+                        this.lightObj[spatId]=obj;
                         this.spatCount++;
                     })
                     this.$emit("count",this.signCount,this.spatCount);
                 })
             },
+            moveMap(){
+                /*direction:方向 "停",0;"上",1;"下",2;"左",3;"右",4;
+                status:状态 动一步 0 ;一直动 1*/
+                let direction = this.realData.direction;
+                let status = this.realData.status;
+                let x = this.cameraParam.x;
+                let y = this.cameraParam.y;
+
+                //动一步
+                if(status=='0'){
+                    clearInterval(this.mapTime1);
+                    clearInterval(this.mapTime2);
+                    clearInterval(this.mapTime3);
+                    clearInterval(this.mapTime4);
+                    //向上
+                    if(direction=='1'){
+                        if(this.cameraParam.y>=this.$refs.map.maxY){
+                            return;
+                        }
+                        this.cameraParam.y=y+this.step;
+                    }
+                    //向下
+                    if(direction=='2'){
+                        if(this.cameraParam.y<=this.$refs.map.minY){
+                            return;
+                        }
+                        this.cameraParam.y=y-this.step;
+                    }
+                    //向左
+                    if(direction=='3'){
+                        if(this.cameraParam.x<=this.$refs.map.minX){
+                            return;
+                        }
+                        this.cameraParam.x=x-this.step;
+                    }
+                    //向右
+                    if(direction=='4'){
+                        if(this.cameraParam.x>=this.$refs.map.maxX){
+                            return;
+                        }
+                        this.cameraParam.x=x+this.step;
+                    }
+                    this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                }else{
+                    //停止
+                    if(direction=='0'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.isConMov=false;
+                        return;
+                        //
+                    }
+                    this.isConMov=true;
+                    //向上
+                    if(direction=='1'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.mapTime1 = setInterval(()=>{
+                            if(this.cameraParam.y>=this.maxY){
+                                clearInterval(this.mapTime1);
+                                return;
+                            }
+                            this.cameraParam.y=this.cameraParam.y+this.step1;
+                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                        },500)
+                    }
+                    //向下
+                    if(direction=='2'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.mapTime2 = setInterval(()=>{
+                            if(this.cameraParam.y<=this.minY){
+                                clearInterval(this.mapTime2);
+                                return;
+                            }
+                            this.cameraParam.y=this.cameraParam.y-this.step1;
+                            console.log("向下："+this.cameraParam.y)
+                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                        },500)
+                    }
+                    //向左
+                    if(direction=='3'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.mapTime3 = setInterval(()=>{
+                            if(this.cameraParam.x<=this.minX){
+                                clearInterval(this.mapTime3);
+                                return;
+                            }
+                            this.cameraParam.x=this.cameraParam.x-this.step1;
+                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                        },500)
+                    }
+                    //向右
+                    if(direction=='4'){
+                        clearInterval(this.mapTime1);
+                        clearInterval(this.mapTime2);
+                        clearInterval(this.mapTime3);
+                        clearInterval(this.mapTime4);
+                        this.mapTime4 = setInterval(()=>{
+                            if(this.cameraParam.x>=this.maxX){
+                                clearInterval(this.mapTime4);
+                                return;
+                            }
+                            this.cameraParam.x=this.cameraParam.x+this.step1;
+                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                        },500)
+                    }
+                }
+            },
+            initLightWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.lightWebsocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                }
+                _this.lightWebsocket.onmessage = _this.onLightMessage;
+                _this.lightWebsocket.onclose = _this.onLightClose;
+                _this.lightWebsocket.onopen = _this.onLightOpen;
+            },
+            onLightMessage(mesasge){
+                let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let data = json.result.spatDataDTO;
+                let resultData=[];
+                data.forEach(item=>{
+                    let option={
+                        leftTime:item.leftTime,
+                        light:item.status,
+                        direction:item.direction,
+                        spatId:item.spatId
+
+                    }
+                    resultData.push(option);
+                });
+                resultData.forEach(function (item,index,arr) {
+                    let spatId="light_"+item.spatId;
+                    _this.lightObj[spatId].flag=true;
+                    let direction = item.direction + "";
+                    let lightData={};
+                    let key = 'key_' + direction;
+                    /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
+                    lightData[key].spareTime = item.leftTime;
+                    lightData[key].lightColor = item.light;
+                    lightData[key].flag = true;
+                    lightData[key].time = null;
+                    //延长时间
+                    lightData[key].time = setTimeout(item => {
+                        lightData[key].flag = false;
+                        _this.lightObj[spatId].flag=false;
+                    }, 3000)
+                    _this.lightObj[spatId].lightData=lightData;
+                })
+            },
+            onLightClose(data){
+                console.log("结束连接");
+            },
+            onLightOpen(data){
+                //旁车
+                var light = {
+                    "action": "road_real_data",
+                    "data": {
+                        "polygon": this.currentExtent
+                    }
+                }
+                var lightMsg = JSON.stringify(light);
+                this.sendLightMsg(lightMsg);
+            },
+            sendLightMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.lightWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.lightWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            }
         },
         mounted() {
             this.option1 = this.getOption();
+            this.initLightWebSocket();
             /*let map1 = new AMap.Map('mapRoad', this.mapOption);
             var wms  = new AMap.TileLayer.WMS({
                 url:'http://10.0.1.22:8080/geoserver/shanghai_qcc/wms',
@@ -343,6 +566,13 @@
                 ele.className="style style1";
                 clearTimeout(time1);
             },1000)*/
+        },
+        destroyed(){
+            clearInterval(this.mapTime1);
+            clearInterval(this.mapTime2);
+            clearInterval(this.mapTime3);
+            clearInterval(this.mapTime4);
+            this.lightWebsocket.close();
         }
 }
 </script>
@@ -446,6 +676,12 @@
                     position: absolute;
                     top: 50%;
                     left: 50%;
+                }
+                .turn-img{
+                    width: 16px;
+                    height: 18px;
+                    margin-left: -8px;
+                    margin-top: -9px;
                 }
                 .left-img{
                     width: 20px;

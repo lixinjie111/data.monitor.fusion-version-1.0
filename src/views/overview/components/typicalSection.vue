@@ -580,7 +580,7 @@ export default {
             if ('spatDataDTO' in result === true) {
                 roadLights = result.spatDataDTO;
                 roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
+                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
                     roadLights[index].position = lightPosition;
                 });
                 for (let i = 0; i < _this.map1List.length; i++) {
@@ -728,7 +728,7 @@ export default {
             if ('spatDataDTO' in result === true) {
                 roadLights = result.spatDataDTO;
                 roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
+                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
                     roadLights[index].position = lightPosition;
                 });
                 for (let i = 0; i < _this.map2List.length; i++) {
@@ -891,7 +891,7 @@ export default {
             if ('spatDataDTO' in result === true) {
                 roadLights = result.spatDataDTO;
                 roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
+                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
                     roadLights[index].position = lightPosition;
                 });
                 for (let i = 0; i < _this.map3List.length; i++) {
@@ -1039,7 +1039,7 @@ export default {
             if ('spatDataDTO' in result === true) {
                 roadLights = result.spatDataDTO;
                 roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.postion.longitude, x.postion.latitude);
+                    lightPosition = new AMap.LngLat(x.position.longitude, x.poistion.latitude);
                     roadLights[index].position = lightPosition;
                 });
                 for (let i = 0; i < _this.map4List.length; i++) {

@@ -266,3 +266,21 @@ img {
   background:linear-gradient(90deg,transparent 0%,rgb(0,0,0) 100%);
   z-index:1;
 }
+
+.base-info {
+  position:absolute;
+  right: 30px;
+  top:20px;
+  height: 30px;
+  // background-color: red;
+  bottom: 33px;
+  z-index: 2;
+  .base-time{
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .weather-icon{
+    vertical-align: middle;
+    padding-left: 10px;
+  }
+}

@@ -12,14 +12,11 @@
         <map-container></map-container>
         <!-- 右侧 -->
         <div class="base-info">
-            <!-- <span>{{formatTime || '--'}}</span> -->
-            <span class="base-time">{{formatTime || '--'}}</span>
+            <span class="base-time">{{$parent.formatTime || '--'}}</span>
             <span>
-                <em >{{city.district}}</em>
-                <!-- <em>上海市闵行区</em> -->
+                <em >{{$parent.city.district || '--'}}</em>
                 <img src="@/assets/images/weather/default.png" class="weather-icon"/>
-                <em class="c-middle">{{weather.wendu || '--'}}°</em>
-                <!-- <em class="c-middle">33°</em> -->
+                <em class="c-middle">{{$parent.weather.wendu || '--'}}°</em>
             </span>
         </div>
         <div class="fusion-right">
@@ -38,7 +35,6 @@ import LeftOverview from './components/leftOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
 import TypicalSection from './components/typicalSection.vue';
-import {getTopWeather} from '@/api/overview/index.js';
 export default {
     components: {
         LeftOverview,
@@ -49,16 +45,12 @@ export default {
     },
     data() {
         return {
-            responseData: {
-                timestamp: new Date().getTime()
-            },
             defaultCenterPoint: [121.262939,31.245149],
             requestData: {
                 disCode: ''
             },
-            city: {},
-            weather: {},
             webSocket:{},
+            socket:{},
             realData:{
                 oilDoor:0,
                 brakePedal:0,
@@ -72,33 +64,8 @@ export default {
     },
     mounted() {
         this.initWebSocket();
-        // 获取地区和天气
-        this.getAddress();
     },
     methods: {
-        // 获取地区
-        getAddress() {
-            let geocoder = new AMap.Geocoder();
-            geocoder.getAddress(this.defaultCenterPoint, (status, result) => {
-                if (status === 'complete' && result.regeocode) {
-                    let data = result.regeocode.addressComponent;
-                    this.city.province = data.province;
-                    this.city.district = data.district;
-                    this.requestData.disCode = data.adcode;
-                    this.$store.commit('SET_DISTRICT_DATA', result.regeocode.addressComponent);
-                     this.getTopWeather();
-                } else {
-                    console.log('根据经纬度获取地区失败');
-                }
-            });
-        },
-        // 获取天气
-        getTopWeather() {
-            getTopWeather(this.requestData).then(res => {
-                this.weather = res.data;
-                this.$store.commit('SET_WEATHER_DATA', this.weather);
-            });
-        },
         initWebSocket(){
             let _this=this;
             if ('WebSocket' in window) {
@@ -150,46 +117,85 @@ export default {
         },
         onerror(event){
             console.error("WebSocket error observed:", event);
-        }
-    },
-    computed: {
-        formatTime: {
-            get() {
-                if(this.responseData.timestamp){
-                    return this.$dateUtil.formatTime(this.responseData.timestamp);
-                } else {
-                    return '--'
-                }
-            },
-            set() {
-                this.$store.commit('SET_FORMATETIME_DATA', this.$dateUtil.formatTime(this.responseData.timestamp));
+        },
+        initWebSocket1(){
+            let _this=this;
+            if ('WebSocket' in window) {
+                _this.socket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
+                _this.socket.onmessage = this.onmessage1;
+                _this.socket.onclose = this.onclose1;
+                _this.socket.onopen = this.onopen1;
+                _this.socket.onerror = this.onerror1;
             }
         },
-        warningNum: {
-            get() {
-                if(this.responseData.warningNum || this.responseData.warningNum == 0){
-                    return parseFloat(this.responseData.warningNum).toLocaleString();
-                }else {
-                    return '--'
+        onmessage1(mesasge){
+            let _this=this;
+            let json = JSON.parse(mesasge.data);
+            let type = json.result.type;
+            let data = json.result.data;
+            let currentRoute = _this.$router.currentRoute.name;
+            let name;
+            if(type=='home'){
+                name = 'Overview';
+                if(name==currentRoute){
+                    return;
                 }
-            },
-            set() {
-                this.$store.commit('SET_FORMATETIME_DATA', parseFloat(this.responseData.warningNum).toLocaleString());
+                this.$router.push({
+                    name: name
+                });
+            }
+            if(type=='vehicle'){
+                name = 'Single';
+                if(name==currentRoute){
+                    return;
+                }
+                this.$router.push({
+                    name: name,
+                    params:{id:data.id}
+                });
+            }
+            if(type=='road'){
+                name = 'Perception';
+                if(name==currentRoute){
+                    return;
+                }
+                this.$router.push({
+                    name: name,
+                    params:{id:data.id}
+                });
             }
         },
-        faultNum: {
-            get() {
-                if(this.responseData.faultNum || this.responseData.faultNum == 0){
-                    return parseFloat(this.responseData.faultNum).toLocaleString();
-                }else {
-                    return '--'
-                }
-            },
-            set(val) {
-                this.$store.commit('SET_FORMATETIME_DATA', parseFloat(this.responseData.faultNum).toLocaleString());
+        onclose1(data){
+            console.log("结束连接");
+        },
+        onopen1(data){
+            //获取车辆状态
+            var operationStatus = {
+                "action":"operation_command"
             }
+            var operationStatusMsg = JSON.stringify(operationStatus);
+            this.sendMsg1(operationStatusMsg);
+        },
+        sendMsg1(msg) {
+            let _this=this;
+            if(window.WebSocket){
+                if(_this.socket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                    _this.socket.send(msg); //send()发送消息
+                }
+            }else{
+                return;
+            }
+        },
+        mounted() {
+            this.initWebSocket();
+            this.initWebSocket1();
+        },
+        destroyed(){
+            //销毁Socket
+            this.socket.close();
+            this.initWebSocket.close();
         }
-    },
+    }
 }
 </script>
 <style lang="scss" scoped>
@@ -220,23 +226,7 @@ export default {
         background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
         // width:327px; 
     }
-    .base-info {
-        position:absolute;
-        right: 30px;
-        top:20px;
-        height: 30px;
-        // background-color: red;
-        bottom: 33px;
-        z-index: 2;
-        .base-time{
-            display: inline-block;
-            margin-right: 31px;
-        }
-        .weather-icon{
-            vertical-align: middle;
-            padding-left: 10px;
-        }
-    }
+
     .style{
         width: 260px;
         height: 160px;

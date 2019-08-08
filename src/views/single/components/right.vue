@@ -155,10 +155,14 @@
                     }
                 },
                 lightData:{
-                     'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
+                     /*'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
                      'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},
                      'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},
-                     'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},
+                     'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},*/
+                    'key_3':{},
+                    'key_2':{},
+                    'key_1':{},
+                    'key_4':{},
                 },
                /* realData:{
                     'longitude':116.40741300,
@@ -327,17 +331,15 @@
                 resultData.forEach(function (item,index,arr) {
                     let direction = item.direction + "";
                     let key = 'key_' + direction;
-                    if (_this.lightData[key].flag) {
-                        /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
-                        _this.lightData[key].spareTime = item.leftTime;
-                        _this.lightData[key].lightColor = item.light;
-                        _this.lightData[key].flag = true;
-                        _this.lightData[key].time = null;
-                        //延长时间
-                        _this.lightData[key].time = setTimeout(item => {
-                            _this.lightData[key].flag = false;
-                        }, 3000)
-                    }
+                    /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
+                    _this.lightData[key].spareTime = item.leftTime;
+                    _this.lightData[key].lightColor = item.light;
+                    _this.lightData[key].flag = true;
+                    _this.lightData[key].time = null;
+                    //延长时间
+                    _this.lightData[key].time = setTimeout(item => {
+                        _this.lightData[key].flag = false;
+                    }, 3000)
                 })
             },
             onLightClose(data){
@@ -375,6 +377,7 @@
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);
             this.timer2 = null;//清除直播报活
+            this.lightWebsocket.close();
 
         }
     }
