@@ -7,6 +7,14 @@
                 </div>
             </div>
         </div>
+        <div class="base-info">
+            <span class="base-time">{{$parent.formatTime || '--'}}</span>
+            <span>
+                    <em >{{$parent.city.district || '--'}}</em>
+                    <img src="@/assets/images/weather/default.png" class="weather-icon"/>
+                    <em class="c-middle">{{$parent.weather.wendu || '--'}}°</em>
+                </span>
+        </div>
         <div class="fusion-right">
             <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData"></right>
         </div>

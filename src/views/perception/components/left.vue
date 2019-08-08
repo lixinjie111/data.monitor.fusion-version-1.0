@@ -114,7 +114,9 @@
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
-                _this.fusionData = result.stat;
+                if(result.stat){
+                    _this.fusionData = result.stat;
+                }
                 //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
                 if(result.cbox){
                     _this.platformData=result.cbox;

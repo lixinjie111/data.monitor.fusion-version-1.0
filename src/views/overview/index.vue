@@ -14,7 +14,7 @@
         <div class="base-info">
             <span class="base-time">{{$parent.formatTime || '--'}}</span>
             <span>
-                <em >{{$parent.city.district}}</em>
+                <em >{{$parent.city.district || '--'}}</em>
                 <img src="@/assets/images/weather/default.png" class="weather-icon"/>
                 <em class="c-middle">{{$parent.weather.wendu || '--'}}°</em>
             </span>
@@ -185,6 +185,15 @@ export default {
             }else{
                 return;
             }
+        },
+        mounted() {
+            this.initWebSocket();
+            this.initWebSocket1();
+        },
+        destroyed(){
+            //销毁Socket
+            this.socket.close();
+            this.initWebSocket.close();
         }
     }
 }
@@ -217,23 +226,7 @@ export default {
         background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
         // width:327px; 
     }
-    .base-info {
-        position:absolute;
-        right: 30px;
-        top:20px;
-        height: 30px;
-        // background-color: red;
-        bottom: 33px;
-        z-index: 2;
-        .base-time{
-            display: inline-block;
-            margin-right: 31px;
-        }
-        .weather-icon{
-            vertical-align: middle;
-            padding-left: 10px;
-        }
-    }
+
     .style{
         width: 260px;
         height: 160px;
