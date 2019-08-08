@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import {getTopWeather} from '@/api/overview/index.js';
 export default {
     name: 'App',
     data() {
@@ -21,6 +22,14 @@ export default {
                 mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
             },
             changeCenterPoint: defaultCenterPoint,
+            responseData: {
+                timestamp: new Date().getTime()
+            },
+            requestData: {
+                disCode: ''
+            },
+            city: {},
+            weather: {},
         }
     },
     watch: {
@@ -28,8 +37,55 @@ export default {
             // console.log(val);
         }
     },
+    mounted() {
+        this.getAddress();
+    },
     methods: {
-
+         getAddress() {
+            let geocoder = new AMap.Geocoder();
+            geocoder.getAddress(this.defaultCenterPoint, (status, result) => {
+                if (status === 'complete' && result.regeocode) {
+                    let data = result.regeocode.addressComponent;
+                    this.city.province = data.province;
+                    this.city.district = data.district;
+                    this.requestData.disCode = data.adcode;
+                    this.$store.commit('SET_DISTRICT_DATA', result.regeocode.addressComponent);
+                     this.getTopWeather();
+                } else {
+                    console.log('根据经纬度获取地区失败');
+                }
+            });
+        },
+        // 获取天气
+        getTopWeather() {
+            getTopWeather(this.requestData).then(res => {
+                this.weather = res.data;
+                this.$store.commit('SET_WEATHER_DATA', this.weather);
+            });
+        }
+    },
+    computed: {
+        formatTime() {
+            if(this.responseData.timestamp){
+                return this.$dateUtil.formatTime(this.responseData.timestamp);
+            }else {
+                return '--'
+            }
+        },
+        warningNum() {
+            if(this.responseData.warningNum || this.responseData.warningNum == 0){
+                return parseFloat(this.responseData.warningNum).toLocaleString();
+            }else {
+                return '--'
+            }
+        },
+        faultNum() {
+            if(this.responseData.faultNum || this.responseData.faultNum == 0){
+                return parseFloat(this.responseData.faultNum).toLocaleString();
+            }else {
+                return '--'
+            }
+        }
     }
 }
 </script>
