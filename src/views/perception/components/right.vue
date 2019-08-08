@@ -17,7 +17,7 @@
             <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}" v-show="video1Show">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
             </div>
-            <tusvn-map :target-id="'mapFusion'"  ref="map"
+            <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
             @mapcomplete="onMapComplete" @CameraChanged='cameraChanged'>
@@ -179,9 +179,9 @@
                 }
             },
             onMapComplete(){
-                getMap(this.$refs.map);
-                this.$refs.map.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                this.cameraParam = this.$refs.map.getCamera();
+                getMap(this.$refs.perceptionMap);
+                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                this.cameraParam = this.$refs.perceptionMap.getCamera();
 
                 //向左移5米
                 /*let x = obj.x;
@@ -199,7 +199,7 @@
             },
             cameraChanged(){
                 console.log("窗口发生变化")
-                this.cameraParam = this.$refs.map.getCamera();
+                this.cameraParam = this.$refs.perceptionMap.getCamera();
                 this.video1Show=false;
                 this.rtmp1="";
                 this.getCurrentExtent();
@@ -244,9 +244,9 @@
                         if(index==0){
 
                             //球面坐标转成三维坐标
-                            let utm = this.$refs.map.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
+                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
                             //三维坐标转成平面像素
-                            let pixel = this.$refs.map.worldToScreen(utm[0],utm[1],12.86);
+                            let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
 
                             /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
                             this.left1 = parseInt(pixel[0]);
@@ -266,7 +266,7 @@
                     })
                     /*let sideList = data.sideList;*/
                     sideList.forEach(item=>{
-                        this.$refs.map.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
+                        this.$refs.perceptionMap.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
                     })
                 });
             },
@@ -297,9 +297,9 @@
             },
             getCurrentExtent() {
                 this.currentExtent = [];
-                let result = this.$refs.map.getExtent();
-                let utm1 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-                let utm2 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                let result = this.$refs.perceptionMap.getExtent();
+                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
                 let x1 = utm1[0];
                 let y1 = utm1[1];
                 let x2 = utm2[0];
@@ -315,9 +315,9 @@
             },
             getCenter(){
                 this.center= [];
-                let result = this.$refs.map.getExtent();
-                let utm1 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-                let utm2 = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                let result = this.$refs.perceptionMap.getExtent();
+                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
                 /*let utm1 = [121.16305725240798,31.279518991604288];
                 let utm2 = [121.17979423666091,31.289571910992105];*/
                 let x1 = utm1[0];
@@ -344,14 +344,14 @@
                     this.spatCount=0;
                     signs.forEach(item=>{
                         this.signCount++;
-                        let utm = this.$refs.map.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",item.centerX, item.centerY);
-                        this.$refs.map.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],12.68);
+                        let utm = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",item.centerX, item.centerY);
+                        this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],12.68);
                     })
                     spats.forEach(item=>{
                         //球面坐标转成三维坐标
-                        let utm = this.$refs.map.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
+                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
                         //三维坐标转成平面像素
-                        let pixel = this.$refs.map.worldToScreen(utm[0],utm[1],12.86);
+                        let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
                         let obj = {};
                         obj.left = parseInt(pixel[0]);
                         obj.top = parseInt(pixel[1]);
@@ -379,33 +379,33 @@
                     clearInterval(this.mapTime4);
                     //向上
                     if(direction=='1'){
-                        if(this.cameraParam.y>=this.$refs.map.maxY){
+                        if(this.cameraParam.y>=this.$refs.perceptionMap.maxY){
                             return;
                         }
                         this.cameraParam.y=y+this.step;
                     }
                     //向下
                     if(direction=='2'){
-                        if(this.cameraParam.y<=this.$refs.map.minY){
+                        if(this.cameraParam.y<=this.$refs.perceptionMap.minY){
                             return;
                         }
                         this.cameraParam.y=y-this.step;
                     }
                     //向左
                     if(direction=='3'){
-                        if(this.cameraParam.x<=this.$refs.map.minX){
+                        if(this.cameraParam.x<=this.$refs.perceptionMap.minX){
                             return;
                         }
                         this.cameraParam.x=x-this.step;
                     }
                     //向右
                     if(direction=='4'){
-                        if(this.cameraParam.x>=this.$refs.map.maxX){
+                        if(this.cameraParam.x>=this.$refs.perceptionMap.maxX){
                             return;
                         }
                         this.cameraParam.x=x+this.step;
                     }
-                    this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                    this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                 }else{
                     //停止
                     if(direction=='0'){
@@ -430,7 +430,7 @@
                                 return;
                             }
                             this.cameraParam.y=this.cameraParam.y+this.step1;
-                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },500)
                     }
                     //向下
@@ -446,7 +446,7 @@
                             }
                             this.cameraParam.y=this.cameraParam.y-this.step1;
                             console.log("向下："+this.cameraParam.y)
-                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },500)
                     }
                     //向左
@@ -461,7 +461,7 @@
                                 return;
                             }
                             this.cameraParam.x=this.cameraParam.x-this.step1;
-                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },500)
                     }
                     //向右
@@ -476,7 +476,7 @@
                                 return;
                             }
                             this.cameraParam.x=this.cameraParam.x+this.step1;
-                            this.$refs.map.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },500)
                     }
                 }

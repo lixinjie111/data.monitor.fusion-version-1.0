@@ -98,7 +98,7 @@ export default {
 
             //车辆监控
             // this.initCarTrackWebsocket(this.cartrackwebsocketUrl);
-            this.changeMainCarId("ws://120.133.21.14:49982/mon",'B21E-00-024');
+            // this.changeMainCarId("ws://120.133.21.14:49982/mon",'B21E-00-024');
             setTimeout(()=>{
                 //科技园
                 // this.updateCameraPosition(442454.32658068417,4427227.807881102,37.735093606867046,0.0000028926452461693342,-0.39699074074074336,-0.730706721974606);
@@ -872,9 +872,8 @@ export default {
                 if(carModel==null)
                 {
                     this.addModel(vid,"./static/map3d/map_photo/car.3DS",data2.longitude,data2.latitude,this.defualtZ);
-                    this.add3DInfoLabel(vid,vid,data2.longitude,data2.latitude,this.defualtZ);
+                    // this.add3DInfoLabel(vid,vid,data2.longitude,data2.latitude,this.defualtZ);
                 }
-                // return;
 
                 let carData = this.carBusinessData[vid];
                 let lastUtmPosition = null;
