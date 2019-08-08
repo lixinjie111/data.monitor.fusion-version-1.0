@@ -1053,7 +1053,19 @@ export default {
         }, 1000);
     },
     destroyed(){
-
+        if ('WebSocket' in window) {
+            if(window.WebSocket){
+                if(this.carTrackWebsocket!=null)
+                {
+                    if(this.carTrackWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        this.carTrackWebsocket.close();
+                    }
+                }
+                this.carTrackWebsocket=null;
+            }
+        }else{
+            console.log("该浏览器不支持websocket");
+        }
     }
 }
 </script>
