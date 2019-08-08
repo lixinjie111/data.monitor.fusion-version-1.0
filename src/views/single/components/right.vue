@@ -297,6 +297,7 @@
                 this.$refs.tusvnMap.updateCameraPosition(326181.72659014474,3462354.6747002415,737.3642832288795,741.5052736914325,-1.5707963267948966,-0.05266622778143515);
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.cfg.websocketUrl,this.roadItem1.camSerialNum);*/
+                this.$refs.tusvnMap.changeMainCarId("ws://120.133.21.14:49982/mon",'B21E-00-024');
             },
             initLightWebSocket(){
                 let _this=this;
