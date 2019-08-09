@@ -756,7 +756,7 @@ export default {
                             position: _data.position,
                             map: _this.map2,
                             icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-20, -10),
+                            offset: new AMap.Pixel(2, -5),
                             spatId: _data.spatId
                         });
                         _markerObj.spatIdMarker = new AMap.Text({
@@ -801,7 +801,7 @@ export default {
                             position: _data.position,
                             map: _this.map2,
                             icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-15, -10),
+                            offset: new AMap.Pixel(-10, -10),
                             devId: _data.devId,
                             angle: _data.heading
                         });
@@ -919,7 +919,7 @@ export default {
                             position: _data.position,
                             map: _this.map3,
                             icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-20, -10),
+                            offset: new AMap.Pixel(-5, -5),
                             spatId: _data.spatId
                         });
                         _markerObj.spatIdMarker = new AMap.Text({
