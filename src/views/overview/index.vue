@@ -76,10 +76,11 @@ export default {
             _this.webSocket.onopen = _this.onopen;
             _this.webSocket.onerror = _this.onerror;
         },
-        queryCrossDetail(item){
-            this.dialogVisible=true;
-            this.selectedItem = item;
-        },
+        // queryCrossDetail(item){
+        //     this.dialogVisible=true;
+        //     this.selectedItem = item;
+        //     console.log('this.selectedItem', this.selectedItem);
+        // },
         onmessage(mesasge){
             let _this=this;
             var json = JSON.parse(mesasge.data);
