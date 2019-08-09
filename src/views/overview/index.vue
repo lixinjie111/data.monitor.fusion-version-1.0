@@ -20,7 +20,6 @@
             </span>
         </div>
         <div class="fusion-right">
-            <!-- <right-overview  @queryCrossDetail="queryCrossDetail"></right-overview> -->
             <typical-section  @queryCrossDetail="queryCrossDetail"></typical-section>
         </div>
         <div class="fusion-bottom">
@@ -31,14 +30,12 @@
 </template>
 <script>
 import LeftOverview from './components/leftOverview.vue';
-// import RightOverview from './components/rightOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
 import TypicalSection from './components/typicalSection.vue';
 export default {
     components: {
         LeftOverview,
-        // RightOverview,
         MapContainer,
         BottomOverview,
         TypicalSection
