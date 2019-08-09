@@ -105,7 +105,9 @@
                 mapTime3:0,
                 mapTime4:0,
                 isConMov:false,
-                lightWebsocket:{}
+                lightWebsocket:{},
+                longitude:this.$route.params.longitude,
+                latitude:this.$route.params.latitude
             }
         },
         props:{
@@ -180,7 +182,15 @@
             },
             onMapComplete(){
                 getMap(this.$refs.perceptionMap);
-                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                //设置地图的中心点
+                if(this.longitude||this.latitude){
+                    let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",this.longitude, this.latitude);
+                    let x=utm[0];
+                    let y=utm[1];
+                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                    return;
+                }
+//                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 
                 //向左移5米
@@ -344,7 +354,8 @@
                     this.spatCount=0;
                     signs.forEach(item=>{
                         this.signCount++;
-                        let utm = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",item.centerX, item.centerY);
+                        //将小的转成大的
+                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
                         this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],12.68);
                     })
                     spats.forEach(item=>{
@@ -431,7 +442,7 @@
                             }
                             this.cameraParam.y=this.cameraParam.y+this.step1;
                             this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-                        },500)
+                        },100)
                     }
                     //向下
                     if(direction=='2'){
@@ -447,7 +458,7 @@
                             this.cameraParam.y=this.cameraParam.y-this.step1;
                             console.log("向下："+this.cameraParam.y)
                             this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-                        },500)
+                        },100)
                     }
                     //向左
                     if(direction=='3'){
@@ -462,7 +473,7 @@
                             }
                             this.cameraParam.x=this.cameraParam.x-this.step1;
                             this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-                        },500)
+                        },100)
                     }
                     //向右
                     if(direction=='4'){
@@ -477,14 +488,14 @@
                             }
                             this.cameraParam.x=this.cameraParam.x+this.step1;
                             this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-                        },500)
+                        },100)
                     }
                 }
             },
             initLightWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.lightWebsocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                    _this.lightWebsocket = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
                 }
                 _this.lightWebsocket.onmessage = _this.onLightMessage;
                 _this.lightWebsocket.onclose = _this.onLightClose;
@@ -495,34 +506,37 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
                 let resultData=[];
-                data.forEach(item=>{
-                    let option={
-                        leftTime:item.leftTime,
-                        light:item.status,
-                        direction:item.direction,
-                        spatId:item.spatId
+                if(data&&data.length>0){
+                    data.forEach(item=>{
+                        let option={
+                            leftTime:item.leftTime,
+                            light:item.status,
+                            direction:item.direction,
+                            spatId:item.spatId
 
-                    }
-                    resultData.push(option);
-                });
-                resultData.forEach(function (item,index,arr) {
-                    let spatId="light_"+item.spatId;
-                    _this.lightObj[spatId].flag=true;
-                    let direction = item.direction + "";
-                    let lightData={};
-                    let key = 'key_' + direction;
-                    /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
-                    lightData[key].spareTime = item.leftTime;
-                    lightData[key].lightColor = item.light;
-                    lightData[key].flag = true;
-                    lightData[key].time = null;
-                    //延长时间
-                    lightData[key].time = setTimeout(item => {
-                        lightData[key].flag = false;
-                        _this.lightObj[spatId].flag=false;
-                    }, 3000)
-                    _this.lightObj[spatId].lightData=lightData;
-                })
+                        }
+                        resultData.push(option);
+                    });
+                    resultData.forEach(function (item,index,arr) {
+                        let spatId="light_"+item.spatId;
+                        _this.lightObj[spatId].flag=true;
+                        item.direction.substring();
+                        let direction = item.direction + "";
+                        let lightData={};
+                        let key = 'key_' + direction;
+                        /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
+                        lightData[key].spareTime = item.leftTime;
+                        lightData[key].lightColor = item.light;
+                        lightData[key].flag = true;
+                        lightData[key].time = null;
+                        //延长时间
+                        lightData[key].time = setTimeout(item => {
+                            lightData[key].flag = false;
+                            _this.lightObj[spatId].flag=false;
+                        }, 3000)
+                        _this.lightObj[spatId].lightData=lightData;
+                    })
+                }
             },
             onLightClose(data){
                 console.log("结束连接");
@@ -532,7 +546,12 @@
                 var light = {
                     "action": "road_real_data",
                     "data": {
-                        "polygon": this.currentExtent
+                        "polygon": [
+                            [121.17979423666091, 31.279518991604288],
+                            [121.16305725240798, 31.279518991604288],
+                            [121.16305725240798, 31.289571910992105],
+                            [121.17979423666091, 31.289571910992105]
+                        ]
                     }
                 }
                 var lightMsg = JSON.stringify(light);

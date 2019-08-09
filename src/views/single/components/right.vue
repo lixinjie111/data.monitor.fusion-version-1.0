@@ -171,7 +171,7 @@
                 },*/
                 timer1:0,
                 timer2:0,
-                vehicleId:'B21E-00-017',
+                vehicleId:this.$route.params.id,
                 lightWebsocket:{}
             }
 

@@ -30,6 +30,8 @@ export default {
             },
             city: {},
             weather: {},
+
+
         }
     },
     watch: {
@@ -85,6 +87,10 @@ export default {
             }else {
                 return '--'
             }
+        },
+        socket (){
+            let socket = new WebSocket(window.cfg.websocketUrl);
+            return socket;
         }
     }
 }

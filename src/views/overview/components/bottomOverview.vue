@@ -133,7 +133,7 @@ export default {
         	const { href } = this.$router.resolve({
                 name: 'Single',
                 params: {
-                    vehicleId: carId
+                    id: carId
                 }
             })
             window.open(href, '_blank')

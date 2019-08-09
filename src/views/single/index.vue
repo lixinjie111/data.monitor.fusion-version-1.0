@@ -19,7 +19,7 @@
         data() {
             return {
                 webSocket:{},
-                socket:{},
+                socket:this.$parent.socket,
                 realData:{
                     oilDoor:0,
                     brakePedal:0,
@@ -34,7 +34,7 @@
             initWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket('ws://172.17.1.13:9982/mon');  //获得WebSocket对象
+                    _this.webSocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
                 }
                 _this.webSocket.onmessage = _this.onmessage;
                 _this.webSocket.onclose = _this.onclose;
@@ -151,12 +151,17 @@
         components:{Left,Right},
         mounted() {
             this.initWebSocket();
-            this.initWebSocket1();
+//            this.initWebSocket1();
+            this.socket.onmessage = this.onmessage1;
+            this.socket.onclose = this.onclose1;
+            this.socket.onopen = this.onopen1;
+            this.socket.onerror = this.onerror1;
+
         },
         destroyed(){
             //销毁Socket
             this.webSocket.close();
-            this.socket.close();
+//            this.socket.close();
         }
     }
 </script>

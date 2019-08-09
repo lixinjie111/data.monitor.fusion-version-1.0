@@ -26,7 +26,7 @@
     export default {
         data() {
             return {
-                socket:{},
+                socket:this.$parent.socket,
                 vehicleId:'B21E-00-021',
                 currentExtent:[],
                 spatCount:0,
@@ -120,11 +120,15 @@
         },
         components:{Left,Right},
         mounted() {
-            this.initWebSocket1();
+//            this.initWebSocket1();
+            this.socket.onmessage = this.onmessage1;
+            this.socket.onclose = this.onclose1;
+            this.socket.onopen = this.onopen1;
+            this.socket.onerror = this.onerror1;
         },
         destroyed(){
             //销毁Socket
-            this.socket.close();
+//            this.socket.close();
         }
     }
 </script>

@@ -50,7 +50,7 @@ export default {
                 disCode: ''
             },
             webSocket:{},
-            socket:{},
+            socket:this.$parent.socket,
             realData:{
                 oilDoor:0,
                 brakePedal:0,
@@ -188,11 +188,15 @@ export default {
         },
         mounted() {
             this.initWebSocket();
-            this.initWebSocket1();
+            /*this.initWebSocket1();*/
+            this.socket.onmessage = this.onmessage1;
+            this.socket.onclose = this.onclose1;
+            this.socket.onopen = this.onopen1;
+            this.socket.onerror = this.onerror1;
         },
         destroyed(){
             //销毁Socket
-            this.socket.close();
+           /* this.socket.close();*/
             this.initWebSocket.close();
         }
     }
