@@ -20,7 +20,7 @@
             </span>
         </div>
         <div class="fusion-right">
-            <typical-section  @queryCrossDetail="queryCrossDetail"></typical-section>
+            <typical-section ></typical-section>
         </div>
         <div class="fusion-bottom">
             <!-- 底部车辆信息 -->
