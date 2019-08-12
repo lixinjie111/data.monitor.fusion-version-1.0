@@ -20,8 +20,7 @@
             </span>
         </div>
         <div class="fusion-right">
-            <!-- <right-overview  @queryCrossDetail="queryCrossDetail"></right-overview> -->
-            <typical-section  @queryCrossDetail="queryCrossDetail"></typical-section>
+            <typical-section ></typical-section>
         </div>
         <div class="fusion-bottom">
             <!-- 底部车辆信息 -->
@@ -31,14 +30,12 @@
 </template>
 <script>
 import LeftOverview from './components/leftOverview.vue';
-// import RightOverview from './components/rightOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
 import TypicalSection from './components/typicalSection.vue';
 export default {
     components: {
         LeftOverview,
-        // RightOverview,
         MapContainer,
         BottomOverview,
         TypicalSection
@@ -76,10 +73,11 @@ export default {
             _this.webSocket.onopen = _this.onopen;
             _this.webSocket.onerror = _this.onerror;
         },
-        queryCrossDetail(item){
-            this.dialogVisible=true;
-            this.selectedItem = item;
-        },
+        // queryCrossDetail(item){
+        //     this.dialogVisible=true;
+        //     this.selectedItem = item;
+        //     console.log('this.selectedItem', this.selectedItem);
+        // },
         onmessage(mesasge){
             let _this=this;
             var json = JSON.parse(mesasge.data);

@@ -130,13 +130,12 @@ export default {
             }
         },
         showView(carId) {
-        	const { href } = this.$router.resolve({
+            this.$router.push({
                 name: 'Single',
                 params: {
                     id: carId
                 }
-            })
-            window.open(href, '_blank')
+            });
         }
 	},
     destroyed(){
@@ -175,7 +174,7 @@ export default {
                 height: 100%;
                 display: block;
                 padding: 0 9px;
-				object-fit: cover;
+				object-fit: contain;
             }
         }
         .car-detail-info {
