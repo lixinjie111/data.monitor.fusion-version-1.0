@@ -54,6 +54,10 @@ export default {
             ,defualtZ:this.z==undefined?13.816:this.z
             ,rcuId:"2046A1037E1F"
 
+
+            ,perceptionParams:null
+            ,lastPerceptionMessage:null
+
             //车辆监控
             ,cartrackwebsocketUrl:"ws://120.133.21.14:49982/mon"
             ,carid:'B21E-00-024'
@@ -121,7 +125,12 @@ export default {
 
                 // console.log("=======像素位置======="+poix);
 
-            },3000);
+                // this.changeRcuId2("ws://120.133.21.14:49982/mon","{\"action\": \"road_real_data\",\"data\": {\"polygon\": [[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]]}}");
+
+            },500);
+            setInterval(() => {
+                this.processPerceptionMesage();
+            }, 500);
         },
 
         onCameraChanged:function(){
@@ -584,10 +593,147 @@ export default {
                 }
             }
         },
+        onPerceptionMessage:function(data){
+            this.lastPerceptionMessage = data;
+            return;
+            // this.models={};
+            // this.count++;
+            // if((this.count%this.interval)!=0)
+            // {
+            //     return;
+            // }
+            
+        },
+        addPerceptionData:function(data)
+        {
+            this.lastPerceptionMessage = data;
+        },
+        processPerceptionMesage:function(){
+            let data = null;
+            if(this.lastPerceptionMessage==null)
+            {
+                return;
+            }else{
+                data = this.lastPerceptionMessage;
+            }
+            var data2 = JSON.parse(data.data);
+            let fusionList = data2.result.vehDataDTO;
+            // var deviceid = null;
+            if(fusionList.length>0)
+            {
+                // var time = this.timetrans(rsuDatas.result[0].timestamp);
+                // this.$emit('showTimeStamp',time);
+
+                for(let n=0;n<fusionList.length;n++)
+                {
+                    var fusionData = fusionList[n];
+                    var deviceid = fusionData.devId;
+                    if(this.deviceModels[deviceid]==null)
+                    {
+                        this.deviceModels[deviceid]={cars:[],persons:[],texts:[]};
+                        for(let m = 0;m<this.cacheModelNum;m++)
+                        {
+                            //车
+                            var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+                            var model1 = new THREE.Mesh( geoBox1, this.matStdObjects );
+                            model1.position.set( 0, 0, 0 );
+                            model1.rotation.set( this.pitch,this.yaw,this.roll );
+                            model1.castShadow = true;
+                            model1.receiveShadow = true;
+
+                            this.scene.add(model1);
+                            this.deviceModels[deviceid].cars[m] = model1;
+
+                            var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
+                            var pmodel1 = new THREE.Mesh( pBox1, this.person );
+                            pmodel1.position.set( 0, 0, 0 );
+                            pmodel1.rotation.set( 0, 0, 0 );
+                            pmodel1.castShadow = true;
+                            pmodel1.receiveShadow = true;
+
+                            this.deviceModels[deviceid].persons[m]= pmodel1;
+                            this.scene.add(pmodel1);
+
+
+                            var text1 = new dl.Text({
+                                text:"",
+                                fontsize:this.fontSize,
+                                borderThickness:0,
+                                textColor:{r: 0, g: 0, b: 0, a: 1.0}
+                            });
+
+                            this.deviceModels[deviceid].texts[m]=text1;
+                            this.scene.add(text1);
+                            text1.setPositon([0,0,0]);
+                            text1.fontface=this.fontface;
+                            text1.update();
+                        }
+                    }else{
+                        for(let p=0;p<this.deviceModels[deviceid].cars.length;p++)
+                        {
+                            let car = this.deviceModels[deviceid].cars[p];
+                            car.position.x = 0;
+                            car.position.y = 0;
+                            car.position.z = 0;
+
+                        }
+
+                        for(let p=0;p<this.deviceModels[deviceid].persons.length;p++)
+                        {
+                            let person = this.deviceModels[deviceid].persons[p];
+                            person.position.x = 0;
+                            person.position.y = 0;
+                            person.position.z = 0;
+                        }
+
+                        for(let p=0;p<this.deviceModels[deviceid].texts.length;p++){
+                            var text1 = this.deviceModels[deviceid].texts[p];
+                            text1.setPositon([0,0,0]);
+                            text1.update();
+                        }
+                    }
+                }
+            }
+            for(let i = 0;i<fusionList.length;i++)
+            {
+                let d = fusionList[i];
+                let dUTM = proj4(this.sourceProject,this.destinatePorject,[d.longitude,d.latitude]);
+
+                if(d.targetType==0||d.targetType==1||d.targetType==3)
+                {
+                    if(i<this.deviceModels[deviceid].persons.length)
+                    {
+                        let mdl = this.deviceModels[deviceid].persons[i];
+                        mdl.position.x = dUTM[0];
+                        mdl.position.y = dUTM[1];
+                        mdl.position.z = this.defualtZ+4;
+
+                        let text = this.deviceModels[deviceid].texts[i];
+                        text.setText(d.vehicleId.substr(0,8));
+                        text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
+                    }
+                }else{
+                    if(i<this.deviceModels[deviceid].cars.length)
+                    {
+                        let mdl = this.deviceModels[deviceid].cars[i];
+                        mdl.position.x = dUTM[0];
+                        mdl.position.y = dUTM[1];
+                        mdl.position.z = this.defualtZ+4;
+
+                        this.changeModelColor(d,mdl);
+
+                        let text = this.deviceModels[deviceid].texts[i];
+                        text.setText(d.vehicleId.substr(0,8));
+                        text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
+                    }
+                }
+            }
+        },
         onClose:function(data){
             console.log("结束连接");
         },
-        reset3DMap:function(){
+        reset3DMap:function()
+        {
             for(var key in this.deviceModels){
                 for(let p=0;p<this.deviceModels[key].cars.length;p++)
                 {
@@ -648,9 +794,38 @@ export default {
                  console.log("该浏览器不支持websocket");
              }
         },
+        changeRcuId2:function(url,params)
+        {
+            this.websocketUrl = url;
+            // this.rcuId = rcuid;
+            this.perceptionParams = params;
+            this.deviceModels = {};
+             if ('WebSocket' in window) {
+                if(window.WebSocket){
+                    if(this.hostWebsocket!=null)
+                    {
+                        if(this.hostWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                            this.hostWebsocket.close();
+                        }
+                    }
+                    this.hostWebsocket=null;
+                    this.hostWebsocket = new WebSocket(this.websocketUrl);
+                    this.hostWebsocket.onmessage = this.onPerceptionMessage;
+                    this.hostWebsocket.onclose = this.onClose;
+                    this.hostWebsocket.onopen = this.onOpen2;
+                    this.hostWebsocket.onerror = this.onError;
+                }
+             }else{
+                 console.log("该浏览器不支持websocket");
+             }
+        },
         onOpen:function(){
             var hostVehicle = '{"action":"RCUPer","devId":"'+this.rcuId+'"}';
             this.sendMsg(hostVehicle);
+        },
+        onOpen2:function(){
+            var params = this.perceptionParams;
+            this.sendMsg(params);
         },
         sendMsg:function(msg){
             if(window.WebSocket){
