@@ -130,13 +130,12 @@ export default {
             }
         },
         showView(carId) {
-        	const { href } = this.$router.resolve({
-                name: 'Single',
-                params: {
+            this.$router.push({
+                path: '/single',
+                query: {
                     vehicleId: carId
                 }
-            })
-            window.open(href, '_blank')
+            });
         }
 	},
     destroyed(){

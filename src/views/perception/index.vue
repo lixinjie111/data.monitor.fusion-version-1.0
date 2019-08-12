@@ -26,7 +26,7 @@
     export default {
         data() {
             return {
-                socket:{},
+                socket:this.$parent.socket,
                 vehicleId:'B21E-00-021',
                 currentExtent:[],
                 spatCount:0,
@@ -58,35 +58,35 @@
                 let json = JSON.parse(mesasge.data);
                 let type = json.result.type;
                 let data = json.result.data;
-                let currentRoute = _this.$router.currentRoute.name;
-                let name;
+                let currentRoute = _this.$router.currentRoute.path;
+                let path;
                 if(type=='home'){
-                    name = 'Overview';
-                    if(name==currentRoute){
+                    path = '/overview';
+                    if(path==currentRoute){
                         return;
                     }
                     this.$router.push({
-                        name: name
+                        path: path
                     });
                 }
                 if(type=='vehicle'){
-                    name = 'Single';
-                    if(name==currentRoute){
+                    path = '/single';
+                    if(path==currentRoute){
                         return;
                     }
                     this.$router.push({
-                        name: name,
-                        params:{id:data.id}
+                        path: path,
+                        query:{vehicleId:data.id}
                     });
                 }
                 if(type=='road'){
-                    name = 'Perception';
-                    if(name==currentRoute){
+                    path = '/perception';
+                   /* if(name==currentRoute){
                         return;
-                    }
+                    }*/
                     this.$router.push({
-                        name: name,
-                        params:{id:data.id}
+                        path: path,
+                        query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
                     });
                 }
                 if(type=='map'){
@@ -120,11 +120,16 @@
         },
         components:{Left,Right},
         mounted() {
-            this.initWebSocket1();
+//            this.initWebSocket1();
+            debugger
+            this.socket.onmessage = this.onmessage1;
+            this.socket.onclose = this.onclose1;
+            this.socket.onopen = this.onopen1;
+            this.socket.onerror = this.onerror1;
         },
         destroyed(){
             //销毁Socket
-            this.socket.close();
+//            this.socket.close();
         }
     }
 </script>

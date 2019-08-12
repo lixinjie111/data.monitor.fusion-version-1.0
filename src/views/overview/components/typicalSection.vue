@@ -1,35 +1,27 @@
 <template>
     <div class="fusion-right-style">
         <div class="right-road">
-            <!-- <div class="base-info">
-                <span>{{formatTime || '--'}}</span>
-                <span>
-                    <em >{{city.province}}{{city.district}}</em>
-                    <img src="@/assets/images/weather/default.png" class="weather-icon"/>
-                    <em class="c-middle">{{weather.wendu || '--'}}°</em>
-                </span>
-            </div> -->
             <div class="perception-road" @click="showRoadDetail(1)">
                 <div class="road-word" >
-                    <p @click="queryCrossDetail(cross1)">{{cross1.name}}</p>
+                    <p>{{cross1.name}}</p>
                 </div>
                 <div id="map1" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(2)">
                 <div class="road-word">
-                    <p @click="queryCrossDetail(cross2)">{{cross2.name}}</p>
+                    <p>{{cross2.name}}</p>
                 </div>
                 <div id="map2" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(3)">
                 <div class="road-word" >
-                    <p @click="queryCrossDetail(cross3)">{{cross3.name}}</p>
+                    <p >{{cross3.name}}</p>
                 </div>
                 <div id="map3" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(4)">
                 <div  class="road-word">
-                    <p @click="queryCrossDetail(cross4)">{{cross4.name}}</p>
+                    <p>{{cross4.name}}</p>
                 </div>
                 <div id="map4" class="cross-scan"></div>
             </div>
@@ -42,15 +34,6 @@ import ConvertCoord from '@/assets/js/coordConvert.js';
 export default {
     data() {
         return {
-            // responseData: {
-            //     timestamp: new Date().getTime()
-            // },
-            // defaultCenterPoint: [121.262939,31.245149],
-            // requestData: {
-            //     disCode: ''
-            // },
-            // city: {},
-            // weather: {},
             cross1:{},
             cross2:{},
             cross3:{},
@@ -64,10 +47,6 @@ export default {
                 zoom: 18,
                 mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
             },
-            // webSocket1:{},
-            // webSocket2:{},
-            // webSocket3:{},
-            // webSocket4:{},
             map1List:[], // 车辆
             map2List:[],
             map3List:[],
@@ -86,14 +65,15 @@ export default {
             basicRoadData3: [],
             basicRoadData4: [],
             finalFourPosition: [],
-            traficLight1: [],
-            traficLight2: [],
-            traficLight3: [],
-            traficLight4: [],
             fourRoadLight: [],
             roadWebSocket1: {},
-            center: [],
-            fourPoint: [[121.17560999059768, 31.282032221451242],[121.16724149847121, 31.282032221451242],[121.16724149847121, 31.28705868114515],[121.17560999059768, 31.28705868114515]]
+            roadWebSocket2: {},
+            roadWebSocket3: {},
+            roadWebSocket4: {},
+            finalFourPosition1: [],
+            finalFourPosition2: [],
+            finalFourPosition3: [],
+            finalFourPosition4: [],
         }
     },
     mounted() {
@@ -103,49 +83,37 @@ export default {
             this.map4 = new AMap.Map('map4', this.mapOption);
             // this.getTypeCross();
             this.fetchTypicalRoad();
-            // 获取地区和天气
-            // this.getAddress();
     },
     methods: {
         // 点击路口路由跳转到具体的路口详情
         showRoadDetail(num) {
             if (num === 1) {
                 this.$router.push({
-                    path: '../../perception',
-                    query: {
-                        'id': this.cross1.id
-                    }
+                    path: '/perception',
+                    query:{id:this.cross1.id,longitude:this.cross1.longitude,latitude:this.cross1.latitude}
                 });
             } else if (num === 2) {
                 this.$router.push({
-                    path: '../../perception',
-                    query: {
-                        'id': this.cross2.id
-                    }
+                    path: '/perception',
+                    query:{id:this.cross2.id,longitude:this.cross2.longitude,latitude:this.cross2.latitude}
                 });
             } else if (num === 3) {
                 this.$router.push({
-                    path: '../../perception',
-                    query: {
-                        'id': this.cross3.id
-                    }
+                    path: '/perception',
+                    query:{id:this.cross3.id,longitude:this.cross3.longitude,latitude:this.cross3.latitude}
                 });
             } else {
                 this.$router.push({
-                    path: '../../perception',
-                    query: {
-                        'id': this.cross4.id
-                    }
+                    path: '/perception',
+                    query:{id:this.cross4.id,longitude:this.cross4.longitude,latitude:this.cross4.latitude}
                 });
             }
         },
-        queryCrossDetail(item) {
-            var _this = this;
-            this.dialogVisible = true;
-            this.$emit("queryCrossDetail",item);
-            /*_this.selectedItem = item;
-            */
-        },
+        // queryCrossDetail(item) {
+        //     var _this = this;
+        //     this.dialogVisible = true;
+        //     this.$emit("queryCrossDetail",item);
+        // },
         // 获取各个路段的四个角的位置
         getPositionData(bounds, num) {
             this.finalFourPosition = [];
@@ -259,6 +227,8 @@ export default {
                         wms.setMap(this.map1);
                         // 设置中心点（地图的经纬度）
                         this.map1.setCenter(position);
+                        this.cross1.longitude=x.longitude;
+                        this.cross1.latitude=x.latitude;
                         // 设置缩放级别
                         this.map1.setZoom(18);
                         this.getFourPosition(index);
@@ -270,6 +240,8 @@ export default {
                         this.cross2 = result[index];
                         wms.setMap(this.map2);
                         this.map2.setCenter(position);
+                        this.cross2.longitude=x.longitude;
+                        this.cross2.latitude=x.latitude;
                         this.map2.setZoom(18);
                         this.getFourPosition(index);
                         // this.initWebSocket2();
@@ -280,6 +252,8 @@ export default {
                         this.cross3 = result[index];
                         wms.setMap(this.map3);
                         this.map3.setCenter(position);
+                        this.cross3.longitude=x.longitude;
+                        this.cross3.latitude=x.latitude;
                         this.map3.setZoom(18);
                         this.getFourPosition(index);
                         // this.initWebSocket3();
@@ -290,6 +264,8 @@ export default {
                         this.cross4 = result[index];
                         wms.setMap(this.map4);
                         this.map4.setCenter(position);
+                        this.cross4.longitude=x.longitude;
+                        this.cross4.latitude=x.latitude;
                         this.map4.setZoom(18);
                         this.getFourPosition(index);
                         // this.initWebSocket4();
@@ -756,7 +732,7 @@ export default {
                             position: _data.position,
                             map: _this.map2,
                             icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-20, -10),
+                            offset: new AMap.Pixel(2, -5),
                             spatId: _data.spatId
                         });
                         _markerObj.spatIdMarker = new AMap.Text({
@@ -801,7 +777,7 @@ export default {
                             position: _data.position,
                             map: _this.map2,
                             icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-15, -10),
+                            offset: new AMap.Pixel(-10, -10),
                             devId: _data.devId,
                             angle: _data.heading
                         });
@@ -919,7 +895,7 @@ export default {
                             position: _data.position,
                             map: _this.map3,
                             icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-20, -10),
+                            offset: new AMap.Pixel(-5, -5),
                             spatId: _data.spatId
                         });
                         _markerObj.spatIdMarker = new AMap.Text({
