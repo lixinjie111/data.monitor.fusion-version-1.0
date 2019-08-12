@@ -117,9 +117,7 @@
                 mapTime3:0,
                 mapTime4:0,
                 isConMov:false,
-                lightWebsocket:{},
-                longitude:this.$route.params.longitude,
-                latitude:this.$route.params.latitude
+                lightWebsocket:{}
             }
         },
         props:{
@@ -194,16 +192,19 @@
             },
             onMapComplete(){
                 getMap(this.$refs.perceptionMap);
+                let longitude=parseInt(this.$route.query.longitude);
+                let latitude=parseInt(this.$route.query.latitude);
                 //设置地图的中心点
-                if(this.longitude||this.latitude){
-                    let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",this.longitude, this.latitude);
+                /*if(longitude||latitude){
+                    let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                     let x=utm[0];
                     let y=utm[1];
                     this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                     return;
                 }else{
                     this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                }
+                }*/
+                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 
                 //向左移5米

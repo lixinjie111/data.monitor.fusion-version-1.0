@@ -131,9 +131,9 @@ export default {
         },
         showView(carId) {
             this.$router.push({
-                name: 'Single',
-                params: {
-                    id: carId
+                path: '/single',
+                query: {
+                    vehicleId: carId
                 }
             });
         }

@@ -90,7 +90,7 @@
                     'scale': 0,
                     'all': 1
                 },
-                vehicleId:this.$route.params.id,
+                vehicleId:this.$route.query.vehicleId,
                 flag: true,
                 count:0
             }

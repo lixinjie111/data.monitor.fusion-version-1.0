@@ -58,36 +58,35 @@
                 let json = JSON.parse(mesasge.data);
                 let type = json.result.type;
                 let data = json.result.data;
-                let currentRoute = _this.$router.currentRoute.name;
-                let name;
+                let currentRoute = _this.$router.currentRoute.path;
+                let path;
                 if(type=='home'){
-                    name = 'Overview';
-                    if(name==currentRoute){
+                    path = '/overview';
+                    if(path==currentRoute){
                         return;
                     }
                     this.$router.push({
-                        name: name
+                        path: path
                     });
                 }
                 if(type=='vehicle'){
-                    name = 'Single';
-                    if(name==currentRoute){
+                    path = '/single';
+                    if(path==currentRoute){
                         return;
                     }
                     this.$router.push({
-                        name: name,
-                        params:{id:data.id}
+                        path: path,
+                        query:{vehicleId:data.id}
                     });
                 }
                 if(type=='road'){
-                    name = 'Perception';
-                    if(name==currentRoute){
+                    path = '/perception';
+                   /* if(name==currentRoute){
                         return;
-                    }
+                    }*/
                     this.$router.push({
-                        name: name,
-                        params:{id:data.id,longitude:data.longitude,latitude:data.latitude}
-                        /*params:{id:data.id}*/
+                        path: path,
+                        query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
                     });
                 }
                 if(type=='map'){
@@ -122,6 +121,7 @@
         components:{Left,Right},
         mounted() {
 //            this.initWebSocket1();
+            debugger
             this.socket.onmessage = this.onmessage1;
             this.socket.onclose = this.onclose1;
             this.socket.onopen = this.onopen1;

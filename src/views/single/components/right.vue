@@ -164,14 +164,9 @@
                     'key_1':{},
                     'key_4':{},
                 },
-               /* realData:{
-                    'longitude':116.40741300,
-                    'latitude':39.904214,
-                    'speed':56.6
-                },*/
                 timer1:0,
                 timer2:0,
-                vehicleId:this.$route.params.id,
+                vehicleId:this.$route.query.vehicleId,
                 lightWebsocket:{}
             }
 
@@ -368,6 +363,7 @@
         mounted(){
             this.getDeviceInfo();
             this.initLightWebSocket();
+            console.log("vehicleId:"+this.vehicleId)
         },
         components:{
             TusvnMap
