@@ -42,80 +42,10 @@ export default {
     },
     data() {
         return {
-            defaultCenterPoint: [121.262939,31.245149],
-            requestData: {
-                disCode: ''
-            },
-            webSocket:{},
-            socket:{},
-            realData:{
-                oilDoor:0,
-                brakePedal:0,
-                headingAngle:0,
-                turnLight:'',
-                gpsTime:''
-            },
-            selectedItem:{},
-            vehicleId:'B21E-00-021',
+            socket:{}
         }
     },
-    mounted() {
-        this.initWebSocket();
-    },
     methods: {
-        initWebSocket(){
-            let _this=this;
-            if ('WebSocket' in window) {
-                _this.webSocket = new WebSocket('ws://172.17.1.13:9982/mon');  //获得WebSocket对象
-            }
-            _this.webSocket.onmessage = _this.onmessage;
-            _this.webSocket.onclose = _this.onclose;
-            _this.webSocket.onopen = _this.onopen;
-            _this.webSocket.onerror = _this.onerror;
-        },
-        // queryCrossDetail(item){
-        //     this.dialogVisible=true;
-        //     this.selectedItem = item;
-        //     console.log('this.selectedItem', this.selectedItem);
-        // },
-        onmessage(mesasge){
-            let _this=this;
-            var json = JSON.parse(mesasge.data);
-            /*var type = json.action;*/
-            // console.log("data.transmission========"+data.transmission);
-            if(json.result.transmission=='P'){
-                this.realData.transmission='P';
-                this.realData.oilDoor=0;
-                this.realData.brakePedal=0;
-            }else{
-                this.realData = json.result;
-            }
-        },
-        onclose(data){
-            console.log("结束连接");
-        },
-        onopen(data){
-            var real = {
-                'action':'can_real_data',
-                /*'vid':this.vehicleID,*/
-                'vehicleIds':this.vehicleId
-            }
-            var realMsg = JSON.stringify(real);
-            this.sendMsg(realMsg);
-        },
-        sendMsg(msg) {
-            let _this=this;
-            if(window.WebSocket){
-                if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                    _this.webSocket.send(msg); //send()发送消息
-                }
-            }else{
-                return;
-            }
-        },
-        onerror(event){
-            console.error("WebSocket error observed:", event);
-        },
         initWebSocket1(){
             let _this=this;
             if ('WebSocket' in window) {
@@ -185,13 +115,11 @@ export default {
             }
         },
         mounted() {
-            this.initWebSocket();
             this.initWebSocket1();
         },
         destroyed(){
             //销毁Socket
             this.socket.close();
-            this.initWebSocket.close();
         }
     }
 }
