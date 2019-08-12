@@ -628,7 +628,7 @@ export default {
                         _markerCar.markerVel = new AMap.Marker({
                             position: _data.position,
                             map: _this.map1,
-                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+                            icon: 'static/images/road/car.jpg', // 添加 Icon 图标 URL
                             offset: new AMap.Pixel(-15, -10),
                             devId: _data.devId,
                             angle: _data.heading
@@ -733,7 +733,8 @@ export default {
                             map: _this.map2,
                             icon: this.dealLight(_data), // 添加 Icon 图标 URL
                             offset: new AMap.Pixel(2, -5),
-                            spatId: _data.spatId
+                            spatId: _data.spatId,
+                            zIndex: 50
                         });
                         _markerObj.spatIdMarker = new AMap.Text({
                             map: _this.map2,
@@ -776,7 +777,7 @@ export default {
                         _markerCar.markerVel = new AMap.Marker({
                             position: _data.position,
                             map: _this.map2,
-                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+                            icon: 'static/images/road/car.jpg',
                             offset: new AMap.Pixel(-10, -10),
                             devId: _data.devId,
                             angle: _data.heading
@@ -791,7 +792,7 @@ export default {
                                 'background-color': 'rgba(55, 186, 123, .2)',
                                 'border-width': 0,
                                 'text-align': 'center',
-                                'font-size': '10px',
+                                'font-size': '8px',
                                 'line-height': '16px',
                                 'letter-spacing': '0',
                                 'margin-top': '14px',  //车头
@@ -800,6 +801,7 @@ export default {
                             position: _data.position,
                             devId: _data.devId
                         });
+
                         _this.map2.add(_markerCar);
                         _this.map2List.push(_markerCar);
                     }
@@ -810,14 +812,14 @@ export default {
         dealLight(data) {
             if ('status' in data === true) {
                 if (data.status === 'RED') {
-                    return 'static/images/road/red.png';
+                    return 'static/images/road/red.jpg';
                 } else if (data.status === 'YELLOW') {
-                    return 'static/images/road/yellow.png';
+                    return 'static/images/road/yellow.jpg';
                 } else if (data.status === 'GREEN') {
-                    return 'static/images/road/green.png';
+                    return 'static/images/road/green.jpg';
                 }
             } else {
-                return 'static/images/road/green.png';
+                return 'static/images/road/green.jpg';
             }
             
         },
@@ -939,7 +941,7 @@ export default {
                         _markerCar.markerVel = new AMap.Marker({
                             position: _data.position,
                             map: _this.map3,
-                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+                            icon: 'static/images/road/car.jpg', // 添加 Icon 图标 URL
                             offset: new AMap.Pixel(-15, -10),
                             devId: _data.devId,
                             angle: _data.heading
@@ -1087,7 +1089,7 @@ export default {
                         _markerCar.markerVel = new AMap.Marker({
                             position: _data.position,
                             map: _this.map4,
-                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+                            icon: 'static/images/road/car.jpg', // 添加 Icon 图标 URL
                             offset: new AMap.Pixel(-15, -10),
                             devId: _data.devId,
                             angle: _data.heading
