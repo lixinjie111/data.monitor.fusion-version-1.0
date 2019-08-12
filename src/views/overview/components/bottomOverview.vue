@@ -131,9 +131,9 @@ export default {
         },
         showView(carId) {
             this.$router.push({
-                path: '../../single',
+                path: '/single',
                 query: {
-                    'vehicleId': carId 
+                    vehicleId: carId
                 }
             });
         }

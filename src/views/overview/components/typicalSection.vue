@@ -3,25 +3,25 @@
         <div class="right-road">
             <div class="perception-road" @click="showRoadDetail(1)">
                 <div class="road-word" >
-                    <p @click="queryCrossDetail(cross1)">{{cross1.name}}</p>
+                    <p>{{cross1.name}}</p>
                 </div>
                 <div id="map1" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(2)">
                 <div class="road-word">
-                    <p @click="queryCrossDetail(cross2)">{{cross2.name}}</p>
+                    <p>{{cross2.name}}</p>
                 </div>
                 <div id="map2" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(3)">
                 <div class="road-word" >
-                    <p @click="queryCrossDetail(cross3)">{{cross3.name}}</p>
+                    <p >{{cross3.name}}</p>
                 </div>
                 <div id="map3" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(4)">
                 <div  class="road-word">
-                    <p @click="queryCrossDetail(cross4)">{{cross4.name}}</p>
+                    <p>{{cross4.name}}</p>
                 </div>
                 <div id="map4" class="cross-scan"></div>
             </div>
@@ -89,31 +89,23 @@ export default {
         showRoadDetail(num) {
             if (num === 1) {
                 this.$router.push({
-                    path: '../../perception',
-                    query: {
-                        'id': this.cross1.id
-                    }
+                    path: '/perception',
+                    query:{id:this.cross1.id,longitude:this.cross1.longitude,latitude:this.cross1.latitude}
                 });
             } else if (num === 2) {
                 this.$router.push({
-                    path: '../../perception',
-                    query: {
-                        'id': this.cross2.id
-                    }
+                    path: '/perception',
+                    query:{id:this.cross2.id,longitude:this.cross2.longitude,latitude:this.cross2.latitude}
                 });
             } else if (num === 3) {
                 this.$router.push({
-                    path: '../../perception',
-                    query: {
-                        'id': this.cross3.id
-                    }
+                    path: '/perception',
+                    query:{id:this.cross3.id,longitude:this.cross3.longitude,latitude:this.cross3.latitude}
                 });
             } else {
                 this.$router.push({
-                    path: '../../perception',
-                    query: {
-                        'id': this.cross4.id
-                    }
+                    path: '/perception',
+                    query:{id:this.cross4.id,longitude:this.cross4.longitude,latitude:this.cross4.latitude}
                 });
             }
         },
@@ -235,6 +227,8 @@ export default {
                         wms.setMap(this.map1);
                         // 设置中心点（地图的经纬度）
                         this.map1.setCenter(position);
+                        this.cross1.longitude=x.longitude;
+                        this.cross1.latitude=x.latitude;
                         // 设置缩放级别
                         this.map1.setZoom(18);
                         this.getFourPosition(index);
@@ -246,6 +240,8 @@ export default {
                         this.cross2 = result[index];
                         wms.setMap(this.map2);
                         this.map2.setCenter(position);
+                        this.cross2.longitude=x.longitude;
+                        this.cross2.latitude=x.latitude;
                         this.map2.setZoom(18);
                         this.getFourPosition(index);
                         // this.initWebSocket2();
@@ -256,6 +252,8 @@ export default {
                         this.cross3 = result[index];
                         wms.setMap(this.map3);
                         this.map3.setCenter(position);
+                        this.cross3.longitude=x.longitude;
+                        this.cross3.latitude=x.latitude;
                         this.map3.setZoom(18);
                         this.getFourPosition(index);
                         // this.initWebSocket3();
@@ -266,6 +264,8 @@ export default {
                         this.cross4 = result[index];
                         wms.setMap(this.map4);
                         this.map4.setCenter(position);
+                        this.cross4.longitude=x.longitude;
+                        this.cross4.latitude=x.latitude;
                         this.map4.setZoom(18);
                         this.getFourPosition(index);
                         // this.initWebSocket4();

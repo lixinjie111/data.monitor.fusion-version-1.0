@@ -90,11 +90,12 @@
                     'scale': 0,
                     'all': 1
                 },
-                vehicleId:'B21E-00-017',
+                vehicleId:this.$route.query.vehicleId,
                 flag: true,
                 count:0
             }
         },
+
         computed:{
             oilLeftWidth(){
                 let oilData = parseFloat(this.realData.oilDoor/100);
@@ -117,6 +118,7 @@
         },
         methods: {
             getBaseData(){
+                console.log("id:"+this.$route.params.id);
                 var _this = this;
                 getVehicleBaseData({
                     'vehicleId': this.vehicleId,
