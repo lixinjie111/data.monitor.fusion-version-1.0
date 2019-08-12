@@ -121,7 +121,6 @@
         components:{Left,Right},
         mounted() {
 //            this.initWebSocket1();
-            debugger
             this.socket.onmessage = this.onmessage1;
             this.socket.onclose = this.onclose1;
             this.socket.onopen = this.onopen1;

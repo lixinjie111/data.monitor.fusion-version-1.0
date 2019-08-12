@@ -224,8 +224,11 @@
             cameraChanged(){
                 console.log("窗口发生变化")
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
-                this.video1Show=false;
-                this.rtmp1="";
+                if(this.video1Show&&this.rtmp1!=''){
+                    console.log("视频一直重置。。。")
+                    this.video1Show=false;
+                    this.rtmp1="";
+                }
                 this.getCurrentExtent();
                 this.getCenter();
                 if(!this.isConMov){
@@ -463,6 +466,7 @@
                         //
                     }
                     this.isConMov=true;
+                    this.lightList=[];
                     //向上
                     if(direction=='1'){
                         clearInterval(this.mapTime1);
@@ -537,6 +541,7 @@
             },
             onLightMessage(mesasge){
                 let _this=this;
+                _this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
                 let resultData=[];

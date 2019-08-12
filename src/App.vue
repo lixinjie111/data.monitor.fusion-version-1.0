@@ -30,6 +30,7 @@ export default {
             },
             city: {},
             weather: {},
+            changeCenterPoint: [121.17265957261286,31.284096076877844]
 
 
         }
@@ -45,7 +46,7 @@ export default {
     methods: {
          getAddress() {
             let geocoder = new AMap.Geocoder();
-            geocoder.getAddress(this.defaultCenterPoint, (status, result) => {
+            geocoder.getAddress(this.changeCenterPoint, (status, result) => {
                 if (status === 'complete' && result.regeocode) {
                     let data = result.regeocode.addressComponent;
                     this.city.province = data.province;

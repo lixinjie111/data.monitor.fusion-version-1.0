@@ -332,6 +332,7 @@
                     _this.lightData[key].flag = true;
                     _this.lightData[key].time = null;
                     //延长时间
+                    clearTimeout(_this.lightData[key].time);
                     _this.lightData[key].time = setTimeout(item => {
                         _this.lightData[key].flag = false;
                     }, 3000)
@@ -391,8 +392,8 @@
     .fusion-video .vjs-custom-skin > .video-js .vjs-big-play-button{
         font-size: 0.5em!important;
     }
-    .video-js{
-        height: 150px!important;
+    .fusion-video .video-js{
+        height: 180px!important;
     }
 </style>
 <style lang="scss" scoped>
@@ -400,7 +401,7 @@
     .fusion-video{
         border:1px solid rgba(211, 134, 0, 0.5);
         margin: 20px 0px;
-        height: 154px;
+        height: 184px;
         box-sizing: border-box;
        /* padding-top: 10px;*/
     }
