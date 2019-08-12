@@ -42,7 +42,6 @@ export default {
     },
     data() {
         return {
-            socket:{},
             socket:this.$parent.socket
         }
     },
@@ -114,15 +113,16 @@ export default {
             }else{
                 return;
             }
-        },
-        mounted() {
-            this.socket.onmessage = this.onmessage1;
-            this.socket.onclose = this.onclose1;
-            this.socket.onopen = this.onopen1;
-            this.socket.onerror = this.onerror1;
-        },
-        destroyed(){}
-    }
+        }
+    },
+    mounted() {
+        console.log("......");
+        this.socket.onmessage = this.onmessage1;
+        this.socket.onclose = this.onclose1;
+        this.socket.onopen = this.onopen1;
+        this.socket.onerror = this.onerror1;
+    },
+    destroyed(){}
 }
 </script>
 <style lang="scss" scoped>
