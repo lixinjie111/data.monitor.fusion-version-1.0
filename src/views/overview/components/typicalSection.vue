@@ -553,107 +553,57 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            if ('spatDataDTO' in result === true) {
-                roadLights = result.spatDataDTO;
-                roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
-                    roadLights[index].position = lightPosition;
-                });
-                for (let i = 0; i < _this.map1List.length; i++) {
-                    if ('marker' in _this.map1List[i] === true) {
-                        _this.map1.remove(_this.map1List[i].marker);
-                    }
-                    if ('spatIdMarker' in _this.map1List[i] === true) {
-                        _this.map1.remove(_this.map1List[i].spatIdMarker);
-                    }
-                    if ('markerVel' in _this.map1List[i] === true) {
-                        _this.map1.remove(_this.map1List[i].markerVel);
-                    }
-                    if ('velicheIdMarker' in this.map1List[i] === true) {
-                        _this.map1.remove(_this.map1List[i].velicheIdMarker);
-                    }
-                }
-                for (let i = 0; i < roadLights.length; i++) {
-                    let _data = roadLights[i];
-                    if(_data.position) {
-                        let _markerObj = {
-                            marker: null,
-                            spatIdMarker: null
-                        };
-                        _markerObj.marker = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map1,
-                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-20, -10),
-                            spatId: _data.spatId
-                        });
-                        _markerObj.spatIdMarker = new AMap.Text({
-                            map: _this.map1,
-                            // text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
-                            anchor: 'center', // 设置文本标记锚点
-                            style: {
-                                'padding': '0 5px',
-                                'border-radius': '4px',
-                                // 'background-color': 'rgba(55, 186, 123, .2)',
-                                'background-color': 'red',
-                                'border-width': '0',
-                                'text-align': 'center',
-                                'font-size': '10px',
-                                'line-height': '16px',
-                                'letter-spacing': '0',
-                                'margin-top': '14px',  //车头
-                                'color': '#ccc'
-                            },
-                            position: _data.position,
-                            spatId: _data.spatId
-                        });
-                        _this.map1.add(_markerObj);
-                        _this.map1List.push(_markerObj);
+            if (this.count1 === 0) {
+                this.map1.remove(this.map1List);
+                this.map1List = [];
+                if ('spatDataDTO' in result === true) {
+                    roadLights = result.spatDataDTO;
+                    roadLights.map((x, index) => {
+                        lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
+                        roadLights[index].position = lightPosition;
+                    });
+                    for (let i = 0; i < roadLights.length; i++) {
+                        let _data = roadLights[i];
+                        if(_data.position) {
+                            let marker = new AMap.Marker({
+                                position: _data.position,
+                                map: _this.map1,
+                                icon: this.dealLight(_data), // 添加 Icon 图标 URL
+                                offset: new AMap.Pixel(-2, -5),
+                                spatId: _data.spatId,
+                                zIndex: 100
+                            });
+                            _this.map1.add(marker);
+                            _this.map1List.push(marker);
+                        }
                     }
                 }
-            }
-            if ('vehDataDTO' in result === true) {
-                roadSenseCars = result.vehDataDTO;
-                roadSenseCars.map(x => {
-                    carPosition = new AMap.LngLat(x.longitude, x.latitude);
-                    this.$set(x, 'position', carPosition);
-                });
-                for (let i = 0; i < roadSenseCars.length; i++) {
-                    let _data = roadSenseCars[i];
-                    if (_data.position) {
-                        let _markerCar = {
-                            markerVel: null,
-                            velicheIdMarker: null
-                        };
-                        _markerCar.markerVel = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map1,
-                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-15, -10),
-                            devId: _data.devId,
-                            angle: _data.heading
-                        });
-                        _markerCar.velicheIdMarker = new AMap.Text({
-                            map: _this.map1,
-                            text: "<span style='color:#e6a23c'>" + _data.plateNo + '</span>',
-                            anchor: 'center', // 设置文本标记锚点
-                            style: {
-                                'padding': '0 5px',
-                                'border-radius': '4px',
-                                'background-color': 'rgba(55, 186, 123, .2)',
-                                'border-width': 0,
-                                'text-align': 'center',
-                                'font-size': '10px',
-                                'line-height': '16px',
-                                'letter-spacing': '0',
-                                'margin-top': '14px',  //车头
-                                'color': '#ccc'
-                            },
-                            position: _data.position,
-                            devId: _data.devId
-                        });
-                        _this.map1.add(_markerCar);
-                        _this.map1List.push(_markerCar);
+                if ('vehDataDTO' in result === true) {
+                    roadSenseCars = result.vehDataDTO;
+                    roadSenseCars.map(x => {
+                        carPosition = new AMap.LngLat(x.longitude, x.latitude);
+                        _this.$set(x, 'position', carPosition);
+                    });
+                    for (let i = 0; i < roadSenseCars.length; i++) {
+                        let _data = roadSenseCars[i];
+                        this.count1 ++;
+                        if (_data.position) {
+                            let markerCar = new AMap.Marker({
+                                position: _data.position,
+                                map: _this.map1,
+                                icon: 'static/images/road/car.png',
+                                offset: new AMap.Pixel(-10, -10),
+                                devId: _data.devId,
+                                angle: _data.heading,
+                                zIndex: 1
+                            });
+                        
+                            _this.map1.add(markerCar);
+                            _this.map1List.push(markerCar);
+                            if (this.count1 === roadSenseCars.length) {
+                                this.count1 = 0;
+                            }
+                        }
                     }
                 }
             }
@@ -701,123 +651,74 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            if ('spatDataDTO' in result === true) {
-                roadLights = result.spatDataDTO;
-                roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
-                    roadLights[index].position = lightPosition;
-                });
-                for (let i = 0; i < _this.map2List.length; i++) {
-                    if ('marker' in _this.map2List[i] === true) {
-                        _this.map2.remove(_this.map2List[i].marker);
-                    }
-                    if ('spatIdMarker' in _this.map2List[i] === true) {
-                        _this.map2.remove(_this.map2List[i].spatIdMarker);
-                    }
-                    if ('markerVel' in _this.map2List[i] === true) {
-                        _this.map2.remove(_this.map2List[i].markerVel);
-                    }
-                    if ('velicheIdMarker' in this.map2List[i] === true) {
-                        _this.map2.remove(_this.map2List[i].velicheIdMarker);
-                    }
-                }
-                for (let i = 0; i < roadLights.length; i++) {
-                    let _data = roadLights[i];
-                    if(_data.position) {
-                        let _markerObj = {
-                            marker: null,
-                            spatIdMarker: null
-                        };
-                        _markerObj.marker = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map2,
-                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(2, -5),
-                            spatId: _data.spatId
-                        });
-                        _markerObj.spatIdMarker = new AMap.Text({
-                            map: _this.map2,
-                            anchor: 'center', // 设置文本标记锚点
-                            style: {
-                                'padding': '0 5px',
-                                'border-radius': '4px',
-                                // 'background-color': 'rgba(55, 186, 123, .2)',
-                                // 'background-color': 'red',
-                                'border-width': '0',
-                                'text-align': 'center',
-                                'font-size': '10px',
-                                'line-height': '16px',
-                                'letter-spacing': '0',
-                                'margin-top': '14px',  //车头
-                                'color': '#ccc'
-                            },
-                            position: _data.position,
-                            spatId: _data.spatId
-                        });
-                        _this.map2.add(_markerObj);
-                        _this.map2List.push(_markerObj);
+            if (this.count2 === 0) {
+                this.map2.remove(this.map2List);
+                this.map2List = [];
+                if ('spatDataDTO' in result === true) {
+                    roadLights = result.spatDataDTO;
+                    roadLights.map((x, index) => {
+                        lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
+                        roadLights[index].position = lightPosition;
+                    });
+                    for (let i = 0; i < roadLights.length; i++) {
+                        let _data = roadLights[i];
+                        if(_data.position) {
+                            let marker = new AMap.Marker({
+                                position: _data.position,
+                                map: _this.map2,
+                                icon: this.dealLight(_data), // 添加 Icon 图标 URL
+                                offset: new AMap.Pixel(-2, -5),
+                                spatId: _data.spatId,
+                                zIndex: 100
+                            });
+                            _this.map2.add(marker);
+                            _this.map2List.push(marker);
+                        }
                     }
                 }
-            }
-            if ('vehDataDTO' in result === true) {
-                let arr = [];
-                roadSenseCars = result.vehDataDTO;
-                roadSenseCars.map(x => {
-                    carPosition = new AMap.LngLat(x.longitude, x.latitude);
-                    this.$set(x, 'position', carPosition);
-                });
-                for (let i = 0; i < roadSenseCars.length; i++) {
-                    let _data = roadSenseCars[i];
-                    if (_data.position) {
-                        let _markerCar = {
-                            markerVel: null,
-                            velicheIdMarker: null
-                        };
-                        _markerCar.markerVel = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map2,
-                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-10, -10),
-                            devId: _data.devId,
-                            angle: _data.heading
-                        });
-                        _markerCar.velicheIdMarker = new AMap.Text({
-                            map: _this.map2,
-                            text: "<span style='color:#e6a23c'>" + _data.plateNo + '</span>',
-                            anchor: 'center', // 设置文本标记锚点
-                            style: {
-                                'padding': '0 5px',
-                                'border-radius': '4px',
-                                'background-color': 'rgba(55, 186, 123, .2)',
-                                'border-width': 0,
-                                'text-align': 'center',
-                                'font-size': '10px',
-                                'line-height': '16px',
-                                'letter-spacing': '0',
-                                'margin-top': '14px',  //车头
-                                'color': '#ccc'
-                            },
-                            position: _data.position,
-                            devId: _data.devId
-                        });
-                        _this.map2.add(_markerCar);
-                        _this.map2List.push(_markerCar);
+                if ('vehDataDTO' in result === true) {
+                    roadSenseCars = result.vehDataDTO;
+                    console.log('car length', roadSenseCars.length);
+                    roadSenseCars.map(x => {
+                        carPosition = new AMap.LngLat(x.longitude, x.latitude);
+                        _this.$set(x, 'position', carPosition);
+                    });
+                    for (let i = 0; i < roadSenseCars.length; i++) {
+                        let _data = roadSenseCars[i];
+                        this.count2 ++;
+                        if (_data.position) {
+                            let markerCar = new AMap.Marker({
+                                position: _data.position,
+                                map: _this.map2,
+                                icon: 'static/images/road/car.png',
+                                offset: new AMap.Pixel(-15, -10),
+                                devId: _data.devId,
+                                angle: _data.heading,
+                                zIndex: 1
+                            });
+                        
+                            _this.map2.add(markerCar);
+                            _this.map2List.push(markerCar);
+                            if (this.count2 === roadSenseCars.length) {
+                                this.count2 = 0;
+                            }
+                        }
                     }
                 }
             }
         },
-        //  ---- 根据状态返回红，黄，绿灯
+        // 根据状态返回红，黄，绿灯
         dealLight(data) {
             if ('status' in data === true) {
                 if (data.status === 'RED') {
-                    return 'static/images/road/red.png';
+                    return 'static/images/road/red.jpg';
                 } else if (data.status === 'YELLOW') {
-                    return 'static/images/road/yellow.png';
+                    return 'static/images/road/yellow.jpg';
                 } else if (data.status === 'GREEN') {
-                    return 'static/images/road/green.png';
+                    return 'static/images/road/green.jpg';
                 }
             } else {
-                return 'static/images/road/green.png';
+                return 'static/images/road/green.jpg';
             }
             
         },
@@ -864,107 +765,57 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            if ('spatDataDTO' in result === true) {
-                roadLights = result.spatDataDTO;
-                roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
-                    roadLights[index].position = lightPosition;
-                });
-                for (let i = 0; i < _this.map3List.length; i++) {
-                    if ('marker' in _this.map3List[i] === true) {
-                        _this.map3.remove(_this.map3List[i].marker);
-                    }
-                    if ('spatIdMarker' in _this.map3List[i] === true) {
-                        _this.map3.remove(_this.map3List[i].spatIdMarker);
-                    }
-                    if ('markerVel' in _this.map3List[i] === true) {
-                        _this.map3.remove(_this.map3List[i].markerVel);
-                    }
-                    if ('velicheIdMarker' in this.map3List[i] === true) {
-                        _this.map3.remove(_this.map3List[i].velicheIdMarker);
-                    }
-                }
-                for (let i = 0; i < roadLights.length; i++) {
-                    let _data = roadLights[i];
-                    if(_data.position) {
-                        let _markerObj = {
-                            marker: null,
-                            spatIdMarker: null
-                        };
-                        _markerObj.marker = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map3,
-                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-5, -5),
-                            spatId: _data.spatId
-                        });
-                        _markerObj.spatIdMarker = new AMap.Text({
-                            map: _this.map3,
-                            // text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
-                            anchor: 'center', // 设置文本标记锚点
-                            style: {
-                                'padding': '0 5px',
-                                'border-radius': '4px',
-                                // 'background-color': 'rgba(55, 186, 123, .2)',
-                                'background-color': 'red',
-                                'border-width': '0',
-                                'text-align': 'center',
-                                'font-size': '10px',
-                                'line-height': '16px',
-                                'letter-spacing': '0',
-                                'margin-top': '14px',  //车头
-                                'color': '#ccc'
-                            },
-                            position: _data.position,
-                            spatId: _data.spatId
-                        });
-                        _this.map3.add(_markerObj);
-                        _this.map3List.push(_markerObj);
+            if (this.count3 === 0) {
+                this.map3.remove(this.map3List);
+                this.map3List = [];
+                if ('spatDataDTO' in result === true) {
+                    roadLights = result.spatDataDTO;
+                    roadLights.map((x, index) => {
+                        lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
+                        roadLights[index].position = lightPosition;
+                    });
+                    for (let i = 0; i < roadLights.length; i++) {
+                        let _data = roadLights[i];
+                        if(_data.position) {
+                            let marker = new AMap.Marker({
+                                position: _data.position,
+                                map: _this.map3,
+                                icon: this.dealLight(_data), // 添加 Icon 图标 URL
+                                offset: new AMap.Pixel(-2, -5),
+                                spatId: _data.spatId,
+                                zIndex: 100
+                            });
+                            _this.map3.add(marker);
+                            _this.map3List.push(marker);
+                        }
                     }
                 }
-            }
-            if ('vehDataDTO' in result === true) {
-                roadSenseCars = result.vehDataDTO;
-                roadSenseCars.map(x => {
-                    carPosition = new AMap.LngLat(x.longitude, x.latitude);
-                    this.$set(x, 'position', carPosition);
-                });
-                for (let i = 0; i < roadSenseCars.length; i++) {
-                    let _data = roadSenseCars[i];
-                    if (_data.position) {
-                        let _markerCar = {
-                            markerVel: null,
-                            velicheIdMarker: null
-                        };
-                        _markerCar.markerVel = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map3,
-                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-15, -10),
-                            devId: _data.devId,
-                            angle: _data.heading
-                        });
-                        _markerCar.velicheIdMarker = new AMap.Text({
-                            map: _this.map3,
-                            text: "<span style='color:#e6a23c'>" + _data.plateNo + '</span>',
-                            anchor: 'center', // 设置文本标记锚点
-                            style: {
-                                'padding': '0 5px',
-                                'border-radius': '4px',
-                                'background-color': 'rgba(55, 186, 123, .2)',
-                                'border-width': 0,
-                                'text-align': 'center',
-                                'font-size': '10px',
-                                'line-height': '16px',
-                                'letter-spacing': '0',
-                                'margin-top': '14px',  //车头
-                                'color': '#ccc'
-                            },
-                            position: _data.position,
-                            devId: _data.devId
-                        });
-                        _this.map3.add(_markerCar);
-                        _this.map3List.push(_markerCar);
+                if ('vehDataDTO' in result === true) {
+                    roadSenseCars = result.vehDataDTO;
+                    roadSenseCars.map(x => {
+                        carPosition = new AMap.LngLat(x.longitude, x.latitude);
+                        _this.$set(x, 'position', carPosition);
+                    });
+                    for (let i = 0; i < roadSenseCars.length; i++) {
+                        let _data = roadSenseCars[i];
+                        this.count3 ++;
+                        if (_data.position) {
+                            let markerCar = new AMap.Marker({
+                                position: _data.position,
+                                map: _this.map3,
+                                icon: 'static/images/road/car.png',
+                                offset: new AMap.Pixel(-15, -10),
+                                devId: _data.devId,
+                                angle: _data.heading,
+                                zIndex: 1
+                            });
+                        
+                            _this.map3.add(markerCar);
+                            _this.map3List.push(markerCar);
+                            if (this.count3 === roadSenseCars.length) {
+                                this.count3 = 0;
+                            }
+                        }
                     }
                 }
             }
@@ -1012,110 +863,166 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            if ('spatDataDTO' in result === true) {
-                roadLights = result.spatDataDTO;
-                roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.position.longitude, x.poistion.latitude);
-                    roadLights[index].position = lightPosition;
-                });
-                for (let i = 0; i < _this.map4List.length; i++) {
-                    if ('marker' in _this.map4List[i] === true) {
-                        _this.map4.remove(_this.map4List[i].marker);
-                    }
-                    if ('spatIdMarker' in _this.map4List[i] === true) {
-                        _this.map4.remove(_this.map4List[i].spatIdMarker);
-                    }
-                    if ('markerVel' in _this.map4List[i] === true) {
-                        _this.map4.remove(_this.map4List[i].markerVel);
-                    }
-                    if ('velicheIdMarker' in this.map4List[i] === true) {
-                        _this.map4.remove(_this.map4List[i].velicheIdMarker);
+            if (this.count4 === 0) {
+                this.map4.remove(this.map2List);
+                this.map4List = [];
+                if ('spatDataDTO' in result === true) {
+                    roadLights = result.spatDataDTO;
+                    roadLights.map((x, index) => {
+                        lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
+                        roadLights[index].position = lightPosition;
+                    });
+                    for (let i = 0; i < roadLights.length; i++) {
+                        let _data = roadLights[i];
+                        if(_data.position) {
+                            let marker = new AMap.Marker({
+                                position: _data.position,
+                                map: _this.map4,
+                                icon: this.dealLight(_data), // 添加 Icon 图标 URL
+                                offset: new AMap.Pixel(-2, -5),
+                                spatId: _data.spatId,
+                                zIndex: 100
+                            });
+                            _this.map4.add(marker);
+                            _this.map4List.push(marker);
+                        }
                     }
                 }
-                for (let i = 0; i < roadLights.length; i++) {
-                    let _data = roadLights[i];
-                    if(_data.position) {
-                        let _markerObj = {
-                            marker: null,
-                            spatIdMarker: null
-                        };
-                        _markerObj.marker = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map4,
-                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-20, -10),
-                            spatId: _data.spatId
-                        });
-                        _markerObj.spatIdMarker = new AMap.Text({
-                            map: _this.map4,
-                            // text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
-                            anchor: 'center', // 设置文本标记锚点
-                            style: {
-                                'padding': '0 5px',
-                                'border-radius': '4px',
-                                // 'background-color': 'rgba(55, 186, 123, .2)',
-                                'background-color': 'red',
-                                'border-width': '0',
-                                'text-align': 'center',
-                                'font-size': '10px',
-                                'line-height': '16px',
-                                'letter-spacing': '0',
-                                'margin-top': '14px',  //车头
-                                'color': '#ccc'
-                            },
-                            position: _data.position,
-                            spatId: _data.spatId
-                        });
-                        _this.map4.add(_markerObj);
-                        _this.map4List.push(_markerObj);
+                if ('vehDataDTO' in result === true) {
+                    roadSenseCars = result.vehDataDTO;
+                    roadSenseCars.map(x => {
+                        carPosition = new AMap.LngLat(x.longitude, x.latitude);
+                        _this.$set(x, 'position', carPosition);
+                    });
+                    for (let i = 0; i < roadSenseCars.length; i++) {
+                        let _data = roadSenseCars[i];
+                        this.count4 ++;
+                        if (_data.position) {
+                            let markerCar = new AMap.Marker({
+                                position: _data.position,
+                                map: _this.map4,
+                                icon: 'static/images/road/car.png',
+                                offset: new AMap.Pixel(-15, -10),
+                                devId: _data.devId,
+                                angle: _data.heading,
+                                zIndex: 1
+                            });
+                        
+                            _this.map4.add(markerCar);
+                            _this.map4List.push(markerCar);
+                            if (this.count4 === roadSenseCars.length) {
+                                this.count4 = 0;
+                            }
+                        }
                     }
                 }
             }
-            if ('vehDataDTO' in result === true) {
-                roadSenseCars = result.vehDataDTO;
-                roadSenseCars.map(x => {
-                    carPosition = new AMap.LngLat(x.longitude, x.latitude);
-                    this.$set(x, 'position', carPosition);
-                });
-                for (let i = 0; i < roadSenseCars.length; i++) {
-                    let _data = roadSenseCars[i];
-                    if (_data.position) {
-                        let _markerCar = {
-                            markerVel: null,
-                            velicheIdMarker: null
-                        };
-                        _markerCar.markerVel = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map4,
-                            icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-15, -10),
-                            devId: _data.devId,
-                            angle: _data.heading
-                        });
-                        _markerCar.velicheIdMarker = new AMap.Text({
-                            map: _this.map4,
-                            text: "<span style='color:#e6a23c'>" + _data.plateNo + '</span>',
-                            anchor: 'center', // 设置文本标记锚点
-                            style: {
-                                'padding': '0 5px',
-                                'border-radius': '4px',
-                                'background-color': 'rgba(55, 186, 123, .2)',
-                                'border-width': 0,
-                                'text-align': 'center',
-                                'font-size': '10px',
-                                'line-height': '16px',
-                                'letter-spacing': '0',
-                                'margin-top': '14px',  //车头
-                                'color': '#ccc'
-                            },
-                            position: _data.position,
-                            devId: _data.devId
-                        });
-                        _this.map4.add(_markerCar);
-                        _this.map4List.push(_markerCar);
-                    }
-                }
-            }
+            // if ('spatDataDTO' in result === true) {
+            //     roadLights = result.spatDataDTO;
+            //     roadLights.map((x, index) => {
+            //         lightPosition = new AMap.LngLat(x.position.longitude, x.poistion.latitude);
+            //         roadLights[index].position = lightPosition;
+            //     });
+            //     for (let i = 0; i < _this.map4List.length; i++) {
+            //         if ('marker' in _this.map4List[i] === true) {
+            //             _this.map4.remove(_this.map4List[i].marker);
+            //         }
+            //         if ('spatIdMarker' in _this.map4List[i] === true) {
+            //             _this.map4.remove(_this.map4List[i].spatIdMarker);
+            //         }
+            //     }
+            //     for (let i = 0; i < roadLights.length; i++) {
+            //         let _data = roadLights[i];
+            //         if(_data.position) {
+            //             let _markerObj = {
+            //                 marker: null,
+            //                 spatIdMarker: null
+            //             };
+            //             _markerObj.marker = new AMap.Marker({
+            //                 position: _data.position,
+            //                 map: _this.map4,
+            //                 icon: this.dealLight(_data), // 添加 Icon 图标 URL
+            //                 offset: new AMap.Pixel(-20, -10),
+            //                 spatId: _data.spatId
+            //             });
+            //             _markerObj.spatIdMarker = new AMap.Text({
+            //                 map: _this.map4,
+            //                 // text: "<span style='color:#e6a23c'>" + _data.spatId + '</span>',
+            //                 anchor: 'center', // 设置文本标记锚点
+            //                 style: {
+            //                     'padding': '0 5px',
+            //                     'border-radius': '4px',
+            //                     // 'background-color': 'rgba(55, 186, 123, .2)',
+            //                     'background-color': 'red',
+            //                     'border-width': '0',
+            //                     'text-align': 'center',
+            //                     'font-size': '10px',
+            //                     'line-height': '16px',
+            //                     'letter-spacing': '0',
+            //                     'margin-top': '14px',  //车头
+            //                     'color': '#ccc'
+            //                 },
+            //                 position: _data.position,
+            //                 spatId: _data.spatId
+            //             });
+            //             _this.map4.add(_markerObj);
+            //             _this.map4List.push(_markerObj);
+            //         }
+            //     }
+            // }
+            // if ('vehDataDTO' in result === true) {
+            //     roadSenseCars = result.vehDataDTO;
+            //     roadSenseCars.map(x => {
+            //         carPosition = new AMap.LngLat(x.longitude, x.latitude);
+            //         _this.$set(x, 'position', carPosition);
+            //     });
+            //     for (let i = 0; i < _this.map4List.length; i++) {
+            //         if ('marker' in _this.map4List[i] === true) {
+            //             _this.map4.remove(_this.map4List[i].marker);
+            //         }
+            //         if ('spatIdMarker' in _this.map4List[i] === true) {
+            //             _this.map4.remove(_this.map4List[i].spatIdMarker);
+            //         }
+            //     }
+            //     for (let i = 0; i < roadSenseCars.length; i++) {
+            //         let _data = roadSenseCars[i];
+            //         if (_data.position) {
+            //             let _markerCar = {
+            //                 markerVel: null,
+            //                 velicheIdMarker: null
+            //             };
+            //             _markerCar.markerVel = new AMap.Marker({
+            //                 position: _data.position,
+            //                 map: _this.map4,
+            //                 icon: 'static/images/road/car.png', // 添加 Icon 图标 URL
+            //                 offset: new AMap.Pixel(-15, -10),
+            //                 devId: _data.devId,
+            //                 angle: _data.heading
+            //             });
+            //             _markerCar.velicheIdMarker = new AMap.Text({
+            //                 map: _this.map4,
+            //                 // text: "<span style='color:#e6a23c'>" + _data.plateNo + '</span>',
+            //                 anchor: 'center', // 设置文本标记锚点
+            //                 style: {
+            //                     'padding': '0 5px',
+            //                     'border-radius': '4px',
+            //                     'background-color': 'rgba(55, 186, 123, .2)',
+            //                     'border-width': 0,
+            //                     'text-align': 'center',
+            //                     'font-size': '10px',
+            //                     'line-height': '16px',
+            //                     'letter-spacing': '0',
+            //                     'margin-top': '14px',  //车头
+            //                     'color': '#ccc'
+            //                 },
+            //                 position: _data.position,
+            //                 devId: _data.devId
+            //             });
+            //             _this.map4.add(_markerCar);
+            //             _this.map4List.push(_markerCar);
+            //         }
+            //     }
+            // }
         },
         onRoadClose4(data){
             console.log("结束连接");
