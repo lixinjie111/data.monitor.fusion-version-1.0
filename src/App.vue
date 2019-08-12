@@ -49,8 +49,7 @@ export default {
                     this.city.province = data.province;
                     this.city.district = data.district;
                     this.requestData.disCode = data.adcode;
-                    this.$store.commit('SET_DISTRICT_DATA', result.regeocode.addressComponent);
-                     this.getTopWeather();
+                    this.getTopWeather();
                 } else {
                     console.log('根据经纬度获取地区失败');
                 }
@@ -60,7 +59,6 @@ export default {
         getTopWeather() {
             getTopWeather(this.requestData).then(res => {
                 this.weather = res.data;
-                this.$store.commit('SET_WEATHER_DATA', this.weather);
             });
         }
     },
