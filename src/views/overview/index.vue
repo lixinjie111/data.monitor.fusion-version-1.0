@@ -59,9 +59,6 @@ export default {
             vehicleId:'B21E-00-021',
         }
     },
-    mounted() {
-        this.initWebSocket();
-    },
     methods: {
         initWebSocket(){
             let _this=this;
@@ -167,6 +164,7 @@ export default {
             console.log("结束连接");
         },
         onopen1(data){
+            debugger
             //获取车辆状态
             var operationStatus = {
                 "action":"operation_command"
@@ -185,18 +183,12 @@ export default {
             }
         },
         mounted() {
-            this.initWebSocket();
-            /*this.initWebSocket1();*/
             this.socket.onmessage = this.onmessage1;
             this.socket.onclose = this.onclose1;
             this.socket.onopen = this.onopen1;
             this.socket.onerror = this.onerror1;
         },
-        destroyed(){
-            //销毁Socket
-           /* this.socket.close();*/
-            this.initWebSocket.close();
-        }
+        destroyed(){}
     }
 }
 </script>

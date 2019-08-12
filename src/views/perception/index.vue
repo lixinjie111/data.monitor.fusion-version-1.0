@@ -86,7 +86,8 @@
                     }
                     this.$router.push({
                         name: name,
-                        params:{id:data.id}
+                        params:{id:data.id,longitude:data.longitude,latitude:data.latitude}
+                        /*params:{id:data.id}*/
                     });
                 }
                 if(type=='map'){

@@ -3,25 +3,25 @@
         <div class="right-road">
             <div class="perception-road" @click="showRoadDetail(1)">
                 <div class="road-word" >
-                    <p @click="queryCrossDetail(cross1)">{{cross1.name}}</p>
+                    <p>{{cross1.name}}</p>
                 </div>
                 <div id="map1" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(2)">
                 <div class="road-word">
-                    <p @click="queryCrossDetail(cross2)">{{cross2.name}}</p>
+                    <p>{{cross2.name}}</p>
                 </div>
                 <div id="map2" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(3)">
                 <div class="road-word" >
-                    <p @click="queryCrossDetail(cross3)">{{cross3.name}}</p>
+                    <p >{{cross3.name}}</p>
                 </div>
                 <div id="map3" class="cross-scan"></div>
             </div>
             <div class="perception-road" @click="showRoadDetail(4)">
                 <div  class="road-word">
-                    <p @click="queryCrossDetail(cross4)">{{cross4.name}}</p>
+                    <p>{{cross4.name}}</p>
                 </div>
                 <div id="map4" class="cross-scan"></div>
             </div>

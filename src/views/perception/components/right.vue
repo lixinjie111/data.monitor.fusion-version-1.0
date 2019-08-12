@@ -13,6 +13,42 @@
             </div>
         </div>
         <div class="map-left"></div>
+        <div class="spat-detail " v-for="(obj,key) in lightList" :style="{left:obj.left+'px',top:obj.top+'px'}" >
+                <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">
+                    <div v-show="item.key=='TURN'&&item.flag" class="spat-detail-style">
+                        <div class="spat-detail-img" >
+                            <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'" class="turn-img"/>
+                            <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"  class="turn-img"/>
+                            <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"  class="turn-img"/>
+                        </div>
+                        <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                    </div>
+                    <div v-show="item.key=='LEFT'&&item.flag" class="spat-detail-style">
+                        <div class="spat-detail-img">
+                            <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
+                            <img src="@/assets/images/single/light/left-red.png" class="left-img" v-show="item.lightColor=='RED'"/>
+                            <img src="@/assets/images/single/light/left-green.png" class="left-img" v-show="item.lightColor=='GREEN'"/>
+                        </div>
+                        <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                    </div>
+                    <div v-show="item.key=='CROSS'&&item.flag" class="spat-detail-style">
+                        <div class="spat-detail-img spat-straight">
+                            <img src="@/assets/images/single/light/left-yellow.png" class="straight-img" v-show="item.lightColor=='YELLOW'" />
+                            <img src="@/assets/images/single/light/left-red.png" class="straight-img" v-show="item.lightColor=='RED'"/>
+                            <img src="@/assets/images/single/light/left-green.png" class="straight-img" v-show="item.lightColor=='GREEN'"/>
+                        </div>
+                        <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                    </div>
+                    <div v-show="item.key=='RIGHT'&&item.flag" class="spat-detail-style">
+                        <div class="spat-detail-img spat-right">
+                            <img src="@/assets/images/single/light/left-yellow.png" class="right-img" v-show="item.lightColor=='YELLOW'"/>
+                            <img src="@/assets/images/single/light/left-red.png"  class="right-img" v-show="item.lightColor=='RED'"/>
+                            <img src="@/assets/images/single/light/left-green.png" class="right-img" v-show="item.lightColor=='GREEN'"/>
+                        </div>
+                        <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
+                    </div>
+                </div>
+            </div>
         <div id="map" class="c-map">
             <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}" v-show="video1Show">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
@@ -23,42 +59,7 @@
             @mapcomplete="onMapComplete" @CameraChanged='cameraChanged'>
             </tusvn-map>
         </div>
-        <div class="spat-detail clearfix" v-for="obj in lightObj" :style="{left:obj.left+'px',top:obj.top+'px'}" v-show="obj.flag">
-            <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">
-                <div v-show="key=='key_3'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img" >
-                        <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'" class="turn-img"/>
-                        <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"  class="turn-img"/>
-                        <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"  class="turn-img"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>
-                <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img">
-                        <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
-                        <img src="@/assets/images/single/light/left-red.png" class="left-img" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" class="left-img" v-show="item.lightColor=='GREEN'"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>
-                <div v-show="key=='key_1'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img spat-straight">
-                        <img src="@/assets/images/single/light/left-yellow.png" class="straight-img" v-show="item.lightColor=='YELLOW'" />
-                        <img src="@/assets/images/single/light/left-red.png" class="straight-img" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" class="straight-img" v-show="item.lightColor=='GREEN'"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>
-                <div v-show="key=='key_4'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img spat-right">
-                        <img src="@/assets/images/single/light/left-yellow.png" class="right-img" v-show="item.lightColor=='YELLOW'"/>
-                        <img src="@/assets/images/single/light/left-red.png"  class="right-img" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" class="right-img" v-show="item.lightColor=='GREEN'"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>
-            </div>
-        </div>
+
     </div>
 </template>
 <script>
@@ -73,12 +74,23 @@
                 option1:{},
                 rtmp1:'',
                 option2:{},
-                lightObj:{},
+                lightList:[],
+                lightObj:{
+                    /*'light_273':{
+                        left:250,
+                        top:260,
+                        lightData:{'TURN':{spareTime:10,time:null,lightColor:'GREEN',flag:true}}
+                    }*/
+                },
                 lightData:{
-                    /*'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
-                    'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},//左转
-                    'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
-                    'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转*/
+                    /*'TURN':{spareTime:10,time:null,lightColor:'GREEN',flag:true},//转弯
+                    'LEFT':{spareTime:10,time:null,lightColor:'RED',flag:true},//左转
+                    'CROSS':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
+                    'RIGHT':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转*/
+                    'TURN':{},//转弯
+                    'LEFT':{},//左转
+                    'CROSS':{},//直行
+                    'RIGHT':{}
                 },
                 left1:'',
                 bottom1:'',
@@ -189,8 +201,9 @@
                     let y=utm[1];
                     this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                     return;
+                }else{
+                    this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 }
-//                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 
                 //向左移5米
@@ -340,7 +353,7 @@
 //                console.log("中心点："+this.center);
             },
             typeRoadData(){
-                this.lightObj={};
+                this.lightList=[];
                 typeRoadData(
                     [
                         {
@@ -363,15 +376,35 @@
                         let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
                         //三维坐标转成平面像素
                         let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                        let info = item.info.split(",");
                         let obj = {};
                         obj.left = parseInt(pixel[0]);
                         obj.top = parseInt(pixel[1]);
                         obj.flag = false;
                         let spatId = "light_"+item.uid;
-                        this.lightObj[spatId]=obj;
+                        obj.spatId = spatId;
+                        let lightData = [{'key':'TURN',"flag":false},{'key':'LEFT',"flag":false},{'key':'CROSS',"flag":false},{'key':'RIGHT',"flag":false}];
+                        info.forEach(item1=>{
+                            let obj1={};
+                            if(item1==1){
+                                lightData[2].flag=true;
+                            }
+                            if(item1==2){
+                                lightData[1].flag=true;
+                            }
+                            if(item1==3){
+                                lightData[0].flag=true;
+                            }
+                            if(item1==4){
+                                lightData[3].flag=true;
+                            }
+                        })
+                        this.$set(obj,'lightData',lightData);
+                        this.lightList.push(obj);
                         this.spatCount++;
                     })
                     this.$emit("count",this.signCount,this.spatCount);
+                    this.initLightWebSocket();
                 })
             },
             moveMap(){
@@ -506,6 +539,7 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
                 let resultData=[];
+                /*_this.lightObj={};*/
                 if(data&&data.length>0){
                     data.forEach(item=>{
                         let option={
@@ -517,24 +551,24 @@
                         }
                         resultData.push(option);
                     });
+                    //找出原来的
+
                     resultData.forEach(function (item,index,arr) {
                         let spatId="light_"+item.spatId;
-                        _this.lightObj[spatId].flag=true;
-                        item.direction.substring();
-                        let direction = item.direction + "";
-                        let lightData={};
-                        let key = 'key_' + direction;
-                        /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
-                        lightData[key].spareTime = item.leftTime;
-                        lightData[key].lightColor = item.light;
-                        lightData[key].flag = true;
-                        lightData[key].time = null;
-                        //延长时间
-                        lightData[key].time = setTimeout(item => {
-                            lightData[key].flag = false;
-                            _this.lightObj[spatId].flag=false;
-                        }, 3000)
-                        _this.lightObj[spatId].lightData=lightData;
+                        let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
+                        _this.lightList.forEach((item1,index1)=>{
+                            //相交的
+                            if(item1.spatId==spatId){
+                                /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
+                                let lightData=item1.lightData;
+                                lightData.forEach(item2=>{
+                                    if(item2.key==key){
+                                        _this.$set(item2,"spareTime",item.leftTime);
+                                        _this.$set(item2,"lightColor",item.light);
+                                    }
+                                })
+                            }
+                        })
                     })
                 }
             },
@@ -570,7 +604,6 @@
         },
         mounted() {
             this.option1 = this.getOption();
-            this.initLightWebSocket();
             /*let map1 = new AMap.Map('mapRoad', this.mapOption);
             var wms  = new AMap.TileLayer.WMS({
                 url:'http://10.0.1.22:8080/geoserver/shanghai_qcc/wms',
@@ -640,7 +673,6 @@
         z-index:1;
         padding-top: 5px;
         box-sizing: border-box;
-        z-index:1;
         transition: all 2s ease-in-out;
         opacity: 0;
         /*animation: move 3s linear;*/
@@ -668,7 +700,7 @@
     }
     .spat-detail{
         position: absolute;
-        z-index: 1;
+        z-index: 2;
         .spat-layout{
             float: left;
             margin-left: 8px;
