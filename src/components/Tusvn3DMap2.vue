@@ -54,6 +54,9 @@ export default {
             ,defualtZ:this.z==undefined?13.816:this.z
             ,rcuId:"2046A1037E1F"
 
+            ,cameraDefualtZ:16.86
+            ,cameraDefualtRadius:10
+            ,cameraDefualtPitch:-0.2
 
             ,perceptionParams:null
             ,lastPerceptionMessage:null
@@ -974,7 +977,7 @@ export default {
                         let mesh1 = new THREE.MeshStandardMaterial( { color: 0xab6604, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } );
                         var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
                         var model1 = new THREE.Mesh( geoBox1, mesh1);
-                        this.animateCar(pcar,model1);
+                        // this.animateCar(pcar,model1);
                         this.animateCar(pcar)
                     }
                     
@@ -1064,7 +1067,7 @@ export default {
                     //vid与设定的主车vid相等则做相机跟随操作
                     if(this.mainCarVID == vid)
                     {
-                        this.updateCameraPosition(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.defualtZ,this.defualtRadius,this.defualtPitch,-Math.PI / 180 * (data2.heading));
+                        this.updateCameraPosition(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.cameraDefualtZ,this.cameraDefualtRadius,this.cameraDefualtPitch,-Math.PI / 180 * (data2.heading));
                     }
 
                     this.carBusinessData[vid]['lastUtmPosition'] = {};
@@ -1127,10 +1130,10 @@ export default {
                             if(this.mainCarVID==vid)
                                 {
                                     dl.moveTo({
-                                        position: [this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.defualtZ],
-                                        radius: this.defualtRadius,
+                                        position: [this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.cameraDefualtZ],
+                                        radius: this.cameraDefualtRadius,
                                         yaw: -Math.PI / 180 * (this.carBusinessData[vid]['lastUtmPosition'].rotation),
-                                        pitch: this.defualtPitch
+                                        pitch: this.cameraDefualtPitch
 
                                     });
                                 }
@@ -1168,10 +1171,10 @@ export default {
                                             if(this.mainCarVID==vid)
                                             {
                                                 dl.moveTo({
-                                                    position: [this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.defualtZ],
-                                                    radius: this.defualtRadius,
+                                                    position: [this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.cameraDefualtZ],
+                                                    radius: this.cameraDefualtRadius,
                                                     yaw: -Math.PI / 180 * (this.carBusinessData[vid]['lastUtmPosition'].rotation),
-                                                    pitch: this.defualtPitch
+                                                    pitch: this.cameraDefualtPitch
 
                                                 });
                                             }
