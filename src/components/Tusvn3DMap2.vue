@@ -54,6 +54,9 @@ export default {
             ,defualtZ:this.z==undefined?13.816:this.z
             ,rcuId:"2046A1037E1F"
 
+            ,cameraDefualtZ:16.86
+            ,cameraDefualtRadius:10
+            ,cameraDefualtPitch:-0.2
 
             ,perceptionParams:null
             ,lastPerceptionMessage:null
@@ -124,7 +127,7 @@ export default {
                 // let poix = this.worldToScreen(326181.72659014474,3462354.6747002415,12.86);
 
                 // console.log("=======像素位置======="+poix);
-
+// 
                 // this.changeRcuId2("ws://120.133.21.14:49982/mon","{\"action\": \"road_real_data\",\"data\": {\"polygon\": [[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]]}}");
 
             },500);
@@ -351,18 +354,18 @@ export default {
                     this.scene.add(pmodel1);
 
 
-                    var text1 = new dl.Text({
-                        text:"",
-                        fontsize:this.fontSize,
-                        borderThickness:0,
-                        textColor:{r: 0, g: 0, b: 0, a: 1.0}
-                    });
+                    // var text1 = new dl.Text({
+                    //     text:"",
+                    //     fontsize:this.fontSize,
+                    //     borderThickness:0,
+                    //     textColor:{r: 0, g: 0, b: 0, a: 1.0}
+                    // });
 
-                    this.deviceModels[deviceid].texts[m]=text1;
-                    this.scene.add(text1);
-                    text1.setPositon([0,0,0]);
-                    text1.fontface=this.fontface;
-                    text1.update();
+                    // this.deviceModels[deviceid].texts[m]=text1;
+                    // this.scene.add(text1);
+                    // text1.setPositon([0,0,0]);
+                    // text1.fontface=this.fontface;
+                    // text1.update();
                 }
             }else{
                 for(let p=0;p<this.deviceModels[deviceid].cars.length;p++)
@@ -413,18 +416,18 @@ export default {
                         this.scene.add(pmodel1);
 
 
-                        var text1 = new dl.Text({
-                            text:"",
-                            fontsize:this.fontSize,
-                            borderThickness:0,
-                            textColor:{r: 0, g: 0, b: 0, a: 1.0}
-                        });
+                        // var text1 = new dl.Text({
+                        //     text:"",
+                        //     fontsize:this.fontSize,
+                        //     borderThickness:0,
+                        //     textColor:{r: 0, g: 0, b: 0, a: 1.0}
+                        // });
 
-                        this.deviceModels[deviceid].texts[m]=text1;
-                        this.scene.add(text1);
-                        text1.setPositon([0,0,0]);
-                        text1.fontface=this.fontface;
-                        text1.update();
+                        // this.deviceModels[deviceid].texts[m]=text1;
+                        // this.scene.add(text1);
+                        // text1.setPositon([0,0,0]);
+                        // text1.fontface=this.fontface;
+                        // text1.update();
                     }
                 }else{
                     for(let p=0;p<this.deviceModels[deviceid].cars.length;p++)
@@ -457,9 +460,9 @@ export default {
                         mdl.position.y = dUTM[1];
                         mdl.position.z = this.defualtZ+4;
 
-                        let text = this.deviceModels[deviceid].texts[i];
-                        text.setText(d.uuid.substr(0,8));
-                        text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
+                        // let text = this.deviceModels[deviceid].texts[i];
+                        // text.setText(d.uuid.substr(0,8));
+                        // text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
                     }
                 }else{
                     if(i<this.deviceModels[deviceid].cars.length)
@@ -469,9 +472,9 @@ export default {
                         mdl.position.y = dUTM[1];
                         mdl.position.z = this.defualtZ+4;
 
-                        let text = this.deviceModels[deviceid].texts[i];
-                        text.setText(d.uuid.substr(0,8));
-                        text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
+                        // let text = this.deviceModels[deviceid].texts[i];
+                        // text.setText(d.uuid.substr(0,8));
+                        // text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
                     }
                 }
             }
@@ -608,6 +611,26 @@ export default {
         {
             this.lastPerceptionMessage = data;
         },
+        resetModels:function(){
+            this.lastPerceptionMessage=null;
+            for(var deviceid in this.deviceModels)
+            {
+                for(let p=0;p<this.deviceModels[deviceid].cars.length;p++)
+                {
+                    let car = this.deviceModels[deviceid].cars[p];
+                    car.position.x = 0;
+                    car.position.y = 0;
+                    car.position.z = 0;
+                }
+                for(let p=0;p<this.deviceModels[deviceid].persons.length;p++)
+                {
+                    let person = this.deviceModels[deviceid].persons[p];
+                    person.position.x = 0;
+                    person.position.y = 0;
+                    person.position.z = 0;
+                }
+            }
+        },
         processPerceptionMesage:function(){
             let data = null;
             if(this.lastPerceptionMessage==null)
@@ -655,18 +678,18 @@ export default {
                             this.scene.add(pmodel1);
 
 
-                            var text1 = new dl.Text({
-                                text:"",
-                                fontsize:this.fontSize,
-                                borderThickness:0,
-                                textColor:{r: 0, g: 0, b: 0, a: 1.0}
-                            });
+                            // var text1 = new dl.Text({
+                            //     text:"",
+                            //     fontsize:this.fontSize,
+                            //     borderThickness:0,
+                            //     textColor:{r: 0, g: 0, b: 0, a: 1.0}
+                            // });
 
-                            this.deviceModels[deviceid].texts[m]=text1;
-                            this.scene.add(text1);
-                            text1.setPositon([0,0,0]);
-                            text1.fontface=this.fontface;
-                            text1.update();
+                            // this.deviceModels[deviceid].texts[m]=text1;
+                            // this.scene.add(text1);
+                            // text1.setPositon([0,0,0]);
+                            // text1.fontface=this.fontface;
+                            // text1.update();
                         }
                     }else{
                         for(let p=0;p<this.deviceModels[deviceid].cars.length;p++)
@@ -686,11 +709,11 @@ export default {
                             person.position.z = 0;
                         }
 
-                        for(let p=0;p<this.deviceModels[deviceid].texts.length;p++){
-                            var text1 = this.deviceModels[deviceid].texts[p];
-                            text1.setPositon([0,0,0]);
-                            text1.update();
-                        }
+                        // for(let p=0;p<this.deviceModels[deviceid].texts.length;p++){
+                        //     var text1 = this.deviceModels[deviceid].texts[p];
+                        //     text1.setPositon([0,0,0]);
+                        //     text1.update();
+                        // }
                     }
                 }
             }
@@ -708,9 +731,9 @@ export default {
                         mdl.position.y = dUTM[1];
                         mdl.position.z = this.defualtZ+4;
 
-                        let text = this.deviceModels[deviceid].texts[i];
-                        text.setText(d.vehicleId.substr(0,8));
-                        text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
+                        // let text = this.deviceModels[deviceid].texts[i];
+                        // text.setText(d.vehicleId.substr(0,8));
+                        // text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
                     }
                 }else{
                     if(i<this.deviceModels[deviceid].cars.length)
@@ -722,9 +745,9 @@ export default {
 
                         this.changeModelColor(d,mdl);
 
-                        let text = this.deviceModels[deviceid].texts[i];
-                        text.setText(d.vehicleId.substr(0,8));
-                        text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
+                        // let text = this.deviceModels[deviceid].texts[i];
+                        // text.setText(d.vehicleId.substr(0,8));
+                        // text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
                     }
                 }
             }
@@ -954,7 +977,7 @@ export default {
                         let mesh1 = new THREE.MeshStandardMaterial( { color: 0xab6604, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } );
                         var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
                         var model1 = new THREE.Mesh( geoBox1, mesh1);
-                        this.animateCar(pcar,model1);
+                        // this.animateCar(pcar,model1);
                         this.animateCar(pcar)
                     }
                     
@@ -1044,7 +1067,7 @@ export default {
                     //vid与设定的主车vid相等则做相机跟随操作
                     if(this.mainCarVID == vid)
                     {
-                        this.updateCameraPosition(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.defualtZ,this.defualtRadius,this.defualtPitch,-Math.PI / 180 * (data2.heading));
+                        this.updateCameraPosition(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.cameraDefualtZ,this.cameraDefualtRadius,this.cameraDefualtPitch,-Math.PI / 180 * (data2.heading));
                     }
 
                     this.carBusinessData[vid]['lastUtmPosition'] = {};
@@ -1107,10 +1130,10 @@ export default {
                             if(this.mainCarVID==vid)
                                 {
                                     dl.moveTo({
-                                        position: [this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.defualtZ],
-                                        radius: this.defualtRadius,
+                                        position: [this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.cameraDefualtZ],
+                                        radius: this.cameraDefualtRadius,
                                         yaw: -Math.PI / 180 * (this.carBusinessData[vid]['lastUtmPosition'].rotation),
-                                        pitch: this.defualtPitch
+                                        pitch: this.cameraDefualtPitch
 
                                     });
                                 }
@@ -1148,10 +1171,10 @@ export default {
                                             if(this.mainCarVID==vid)
                                             {
                                                 dl.moveTo({
-                                                    position: [this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.defualtZ],
-                                                    radius: this.defualtRadius,
+                                                    position: [this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.cameraDefualtZ],
+                                                    radius: this.cameraDefualtRadius,
                                                     yaw: -Math.PI / 180 * (this.carBusinessData[vid]['lastUtmPosition'].rotation),
-                                                    pitch: this.defualtPitch
+                                                    pitch: this.cameraDefualtPitch
 
                                                 });
                                             }
