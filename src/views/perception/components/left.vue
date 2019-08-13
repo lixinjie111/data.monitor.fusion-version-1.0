@@ -167,10 +167,18 @@
                 let json = JSON.parse(mesasge.data);
                 let warningData = json.result.data;
                 let type = json.result.type;
+                let warningId;
                 if(type=='CLOUD'){
                     warningData.forEach(item=>{
-                        _this.warningCount++;
-                    });
+                        warningId = item.warnId;
+                        warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                        if(_this.warningIdList.indexOf(warningId)==-1){
+                            console.log("warningId:"+warningId);
+                            console.log("索引:"+_this.warningIdList.indexOf(warningId));
+                            _this.warningIdList.push(warningId);
+                            _this.warningCount++;
+                        }
+                    })
                 }
             },
             onWarningClose(data){
