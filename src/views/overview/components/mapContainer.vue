@@ -149,13 +149,12 @@ export default {
             }
         },
         showView(e) {
-            const { href } = this.$router.resolve({
-                name: 'Single',
-                params: {
-                    vehicleId: e.target.get("vehicleId")
+            this.$router.push({
+                path: '/single',
+                query: {
+                    'vehicleId': e.target.get("vehicleId")
                 }
-            })
-            window.open(href, '_blank')
+            });
         },
         onclose(data){
             // console.log("结束--vehicleOnline--连接");
