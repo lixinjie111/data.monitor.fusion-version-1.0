@@ -30,6 +30,10 @@ export default new Router({
     meta: {
       showHeader: true
     }
+  },{
+    path: '/',
+    name: 'index',
+    redirect: 'Overview'
   },{ 
     path: '/refresh', 
     name: 'Refresh', 
