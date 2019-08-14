@@ -53,18 +53,18 @@
                 let path;
                 if(type=='home'){
                     path = '/overview';
-                    if(path==currentRoute){
+                    /*if(path==currentRoute){
                         return;
-                    }
+                    }*/
                     this.$router.push({
                         path: path
                     });
                 }
                 if(type=='vehicle'){
                     path = '/single';
-                    if(path==currentRoute){
+                   /* if(path==currentRoute){
                         return;
-                    }
+                    }*/
                     this.$router.push({
                         path: path,
                         query:{vehicleId:data.id}
