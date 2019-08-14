@@ -678,7 +678,7 @@ export default {
                 }
                 if ('vehDataDTO' in result === true) {
                     roadSenseCars = result.vehDataDTO;
-                    console.log('car length', roadSenseCars.length);
+//                    console.log('car length', roadSenseCars.length);
                     roadSenseCars.map(x => {
                         carPosition = new AMap.LngLat(x.longitude, x.latitude);
                         _this.$set(x, 'position', carPosition);

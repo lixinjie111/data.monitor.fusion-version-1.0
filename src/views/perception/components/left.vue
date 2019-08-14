@@ -1,7 +1,7 @@
 <template>
     <div class="fusion-left-style">
         <div class="fusion-header">
-            <img src="@/assets/images/logo.png" class="header-img"/>
+            <img src="@/assets/images/logo.png" class="header-img" @click="routeGo"/>
             感知融合平台
         </div>
         <div class="fusion-left-main">
@@ -203,6 +203,11 @@
                 }else{
                     return;
                 }
+            },
+            routeGo(){
+                this.$router.push({
+                    path: '/overview'
+                });
             }
         },
         mounted() {

@@ -117,7 +117,8 @@
                 mapTime3:0,
                 mapTime4:0,
                 isConMov:false,
-                lightWebsocket:{}
+                lightWebsocket:{},
+                isFirst:true
             }
         },
         props:{
@@ -223,14 +224,23 @@
             },
             cameraChanged(){
                 console.log("窗口发生变化")
-                this.cameraParam = this.$refs.perceptionMap.getCamera();
-                if(this.video1Show||this.rtmp1!=''){
-                    this.rtmp1="";
-                    this.$refs.videoPlayer.player.src("");
-                    this.video1Show=false;
+                //地图不是第一次初始化
+                if(!this.isFirst){
+                    if(this.video1Show||this.rtmp1!=''){
+                        this.rtmp1="";
+                        this.$refs.videoPlayer.player.src("");
+                        this.video1Show=false;
+                    }
+                    this.lightWebsocket.close();
+                    this.$refs.perceptionMap.resetModels();
+
                 }
+                this.isFirst=false;
+                this.cameraParam = this.$refs.perceptionMap.getCamera();
+
                 this.getCurrentExtent();
                 this.getCenter();
+                //地图不连续动
                 if(!this.isConMov){
                     let ele = document.getElementById("message1");
                     ele.className="style";
@@ -375,6 +385,27 @@
                     })
                     spats.forEach(item=>{
                         let spats = item.spats;
+                        let spatObj={"turn":{},"left":{},"cross":{},"right":{}};
+                        spats.forEach(spat=>{
+                            let lightDirection = spat.lightDirection;
+                            if(lightDirection==1){
+                                spatObj["cross"]=spat;
+                            }
+                            if(lightDirection==2){
+                                spatObj["left"]=spat;
+                            }
+                            if(lightDirection==3){
+                                spatObj["turn"]=spat;
+                            }
+                            if(lightDirection==4){
+                                spatObj["right"]=spat;
+                            }
+                        });
+                        for(let key in spatObj){
+                            if(!spatObj[key].spatId){
+                                delete spatObj[key].spatId;
+                            }
+                        }
                         spats.forEach((item1,index)=>{
                             let lightData = [{'key':'TURN',"flag":false},{'key':'LEFT',"flag":false},{'key':'CROSS',"flag":false},{'key':'RIGHT',"flag":false}];
                             let obj = {};
@@ -387,7 +418,7 @@
                             obj.left = parseInt(pixel[0]);
                             obj.top = parseInt(pixel[1]);
                             if(index>0){
-                                obj.left= obj.left+120*index;
+                                obj.left = obj.left+120*index;
                             }
                             let spatId = "light_"+item1.spatId;
                             obj.spatId = spatId;
@@ -632,6 +663,7 @@
             clearInterval(this.mapTime3);
             clearInterval(this.mapTime4);
             this.lightWebsocket.close();
+            this.$refs.perceptionMap.reset3DMap();
         }
 }
 </script>

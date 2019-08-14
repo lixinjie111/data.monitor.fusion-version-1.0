@@ -369,11 +369,13 @@
             TusvnMap
         },
         beforeDestroy(){
+
             clearTimeout(this.timer1);
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);
             this.timer2 = null;//清除直播报活
             this.lightWebsocket.close();
+            this.$refs.tusvnMap.reset3DMap();
 
         }
     }
