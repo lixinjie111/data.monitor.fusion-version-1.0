@@ -34,7 +34,7 @@
             initWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                    _this.webSocket = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
                 }
                 _this.webSocket.onmessage = _this.onmessage;
                 _this.webSocket.onclose = _this.onclose;
@@ -78,16 +78,6 @@
             },
             onerror(event){
                 console.error("WebSocket error observed:", event);
-            },
-            initWebSocket1(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.socket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
-                    _this.socket.onmessage = this.onmessage1;
-                    _this.socket.onclose = this.onclose1;
-                    _this.socket.onopen = this.onopen1;
-                    _this.socket.onerror = this.onerror1;
-                }
             },
             onmessage1(mesasge){
                 let _this=this;
@@ -156,7 +146,6 @@
         components:{Left,Right},
         mounted() {
             this.initWebSocket();
-//            this.initWebSocket1();
             this.socket.onmessage = this.onmessage1;
             this.socket.onclose = this.onclose1;
             this.socket.onopen = this.onopen1;

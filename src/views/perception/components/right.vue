@@ -227,13 +227,14 @@
                 }
                 this.isFirst=false;
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
-
-                this.getCurrentExtent();
-                this.getCenter();
+//                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
                 if(!this.isConMov){
                     let ele = document.getElementById("message1");
                     ele.className="style";
+                    this.getCurrentExtent();
+                    this.getCenter();
+                    this.$emit('getCurrentExtent', this.currentExtent);
                     this.getPerceptionAreaInfo();
                     this.typeRoadData();
                 }
@@ -335,7 +336,6 @@
                 this.currentExtent.push([x1, y2]);
                 this.currentExtent.push([x2, y2]);*/
                 this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
-                this.$emit('getCurrentExtent', this.currentExtent);
 
             },
             getCenter(){
@@ -429,7 +429,6 @@
                 let status = this.realData.status;
                 let x = this.cameraParam.x;
                 let y = this.cameraParam.y;
-
                 //动一步
                 if(status=='0'){
                     clearInterval(this.mapTime1);
@@ -447,31 +446,31 @@
                     }
                     //向上
                     if(direction=='1'){
-                        if(this.cameraParam.y>=this.$refs.perceptionMap.maxY){
-                            return;
-                        }
-                        this.cameraParam.y=y+this.step;
-                    }
-                    //向下
-                    if(direction=='2'){
                         if(this.cameraParam.y<=this.$refs.perceptionMap.minY){
                             return;
                         }
                         this.cameraParam.y=y-this.step;
                     }
-                    //向左
-                    if(direction=='3'){
-                        if(this.cameraParam.x<=this.$refs.perceptionMap.minX){
+                    //向下
+                    if(direction=='2'){
+                        if(this.cameraParam.y>=this.$refs.perceptionMap.maxY){
                             return;
                         }
-                        this.cameraParam.x=x-this.step;
+                        this.cameraParam.y=y+this.step;
                     }
-                    //向右
-                    if(direction=='4'){
+                    //向左
+                    if(direction=='3'){
                         if(this.cameraParam.x>=this.$refs.perceptionMap.maxX){
                             return;
                         }
                         this.cameraParam.x=x+this.step;
+                    }
+                    //向右
+                    if(direction=='4'){
+                        if(this.cameraParam.x<=this.$refs.perceptionMap.minX){
+                            return;
+                        }
+                        this.cameraParam.x=x-this.step;
                     }
                     this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                 }else{
@@ -485,11 +484,11 @@
                         clearInterval(this.mapTime3);
                         clearInterval(this.mapTime4);
                         this.mapTime1 = setInterval(()=>{
-                            if(this.cameraParam.y>=this.maxY){
+                            if(this.cameraParam.y<=this.$refs.perceptionMap.minY){
                                 clearInterval(this.mapTime1);
                                 return;
                             }
-                            this.cameraParam.y=this.cameraParam.y+this.step1;
+                            this.cameraParam.y=this.cameraParam.y-this.step1;
                             this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },100)
                     }
@@ -500,12 +499,11 @@
                         clearInterval(this.mapTime3);
                         clearInterval(this.mapTime4);
                         this.mapTime2 = setInterval(()=>{
-                            if(this.cameraParam.y<=this.minY){
+                            if(this.cameraParam.y>=this.$refs.perceptionMap.maxY){
                                 clearInterval(this.mapTime2);
                                 return;
                             }
-                            this.cameraParam.y=this.cameraParam.y-this.step1;
-                            console.log("向下："+this.cameraParam.y)
+                            this.cameraParam.y=this.cameraParam.y+this.step1;
                             this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },100)
                     }
@@ -516,11 +514,11 @@
                         clearInterval(this.mapTime3);
                         clearInterval(this.mapTime4);
                         this.mapTime3 = setInterval(()=>{
-                            if(this.cameraParam.x<=this.minX){
+                            if(this.cameraParam.x>=this.$refs.perceptionMap.maxX){
                                 clearInterval(this.mapTime3);
                                 return;
                             }
-                            this.cameraParam.x=this.cameraParam.x-this.step1;
+                            this.cameraParam.x=this.cameraParam.x+this.step1;
                             this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },100)
                     }
@@ -531,11 +529,11 @@
                         clearInterval(this.mapTime3);
                         clearInterval(this.mapTime4);
                         this.mapTime4 = setInterval(()=>{
-                            if(this.cameraParam.x>=this.maxX){
+                            if(this.cameraParam.x<=this.$refs.perceptionMap.minX){
                                 clearInterval(this.mapTime4);
                                 return;
                             }
-                            this.cameraParam.x=this.cameraParam.x+this.step1;
+                            this.cameraParam.x=this.cameraParam.x-this.step1;
                             this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },100)
                     }
@@ -556,7 +554,6 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
                 let resultData=[];
-                /*_this.lightObj={};*/
                 if(data&&data.length>0){
                     data.forEach(item=>{
                         let option={
@@ -568,7 +565,6 @@
                         }
                         resultData.push(option);
                     });
-
                     resultData.forEach(function (item,index,arr) {
                         let spatId="light_"+item.spatId;
                         let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
@@ -614,20 +610,6 @@
         },
         mounted() {
             this.option1 = this.getOption();
-            /*let map1 = new AMap.Map('mapRoad', this.mapOption);
-            var wms  = new AMap.TileLayer.WMS({
-                url:'http://10.0.1.22:8080/geoserver/shanghai_qcc/wms',
-                blend: false,
-                tileSize: 256,
-                params:{'LAYERS': 'shanghai_qcc:gd_dlzc',VERSION:'1.1.0'}
-            })
-            wms.setMap(map1);
-            map1.setZoom(12);*/
-            /*let time1 = setTimeout(()=>{
-                let ele = document.getElementById("message1");
-                ele.className="style style1";
-                clearTimeout(time1);
-            },1000)*/
         },
         destroyed(){
             clearInterval(this.mapTime1);
@@ -635,7 +617,9 @@
             clearInterval(this.mapTime3);
             clearInterval(this.mapTime4);
             this.lightWebsocket.close();
-            this.$refs.perceptionMap.reset3DMap();
+            if(this.$refs.perceptionMap){
+                this.$refs.perceptionMap.reset3DMap();
+            }
         }
 }
 </script>

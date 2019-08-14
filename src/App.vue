@@ -30,6 +30,7 @@ export default {
             },
             city: {},
             weather: {},
+            time:0,
             changeCenterPoint: [121.17265957261286,31.284096076877844]
 
 
@@ -89,8 +90,29 @@ export default {
         },
         socket (){
             let socket = new WebSocket(window.cfg.websocketUrl);
+            /*if(socket.readyState!=WebSocket.OPEN){
+                let i=0;
+                this.time = setInterval(()=>{
+                    i++;
+                    //尝试建立连接5次
+                    if(i==5){
+                        clearInterval(this.time);
+                        return;
+                    }
+                    if(socket.readyState==WebSocket.OPEN){
+                        clearInterval(this.time);
+                        return;
+                    }
+                    console.log("i:"+i)
+                    socket = new WebSocket(window.cfg.websocketUrl);
+                    return socket;
+                },1000)
+            }*/
             return socket;
         }
+    },
+    destroyed(){
+        clearInterval(this.time);
     }
 }
 </script>

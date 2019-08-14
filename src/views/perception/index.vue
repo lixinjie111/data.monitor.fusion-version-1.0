@@ -31,7 +31,8 @@
                 currentExtent:[],
                 spatCount:0,
                 signCount:0,
-                realData:{}
+                realData:{},
+                time:0
             }
         },
         methods: {
@@ -42,16 +43,6 @@
             count(spatCount,signCount){
                 this.spatCount = spatCount;
                 this.signCount = signCount;
-            },
-            initWebSocket1(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.socket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
-                    _this.socket.onmessage = this.onmessage1;
-                    _this.socket.onclose = this.onclose1;
-                    _this.socket.onopen = this.onopen1;
-                    _this.socket.onerror = this.onerror1;
-                }
             },
             onmessage1(mesasge){
                 let _this=this;
@@ -99,6 +90,7 @@
                 console.log("结束连接");
             },
             onopen1(data){
+                console.log("发送消息")
                 //获取车辆状态
                 var operationStatus = {
                     "action":"operation_command"
@@ -120,15 +112,44 @@
         },
         components:{Left,Right},
         mounted() {
-//            this.initWebSocket1();
-            this.socket.onmessage = this.onmessage1;
-            this.socket.onclose = this.onclose1;
-            this.socket.onopen = this.onopen1;
-            this.socket.onerror = this.onerror1;
+            let _this = this;
+            _this.socket.onmessage = _this.onmessage1;
+            _this.socket.onclose = _this.onclose1;
+            _this.socket.onopen = _this.onopen1;
+            _this.socket.onerror = _this.onerror1;
+            /*if(_this.socket.readyState==WebSocket.OPEN){
+                _this.socket.onmessage = _this.onmessage1;
+                _this.socket.onclose = _this.onclose1;
+                _this.socket.onopen = _this.onopen1;
+                _this.socket.onerror = _this.onerror1;
+            }else{
+                let i= 0;
+                _this.time=setInterval(()=>{
+                    i++;
+                    //尝试发送6次
+                    if(i==100){
+                        clearInterval(_this.time);
+                        return;
+                    }
+                    if(_this.socket.readyState==WebSocket.OPEN){
+                        _this.socket.onopen = _this.onopen1;
+                        _this.socket.onmessage = _this.onmessage1;
+                        _this.socket.onclose = _this.onclose1;
+                        _this.socket.onerror = _this.onerror1;
+                        clearInterval(_this.time);
+                        return;
+                    }
+                    _this.socket.onmessage = _this.onmessage1;
+                    _this.socket.onclose = _this.onclose1;
+                    _this.socket.onopen = _this.onopen1;
+                    _this.socket.onerror = _this.onerror1;
+                },10);
+            }*/
         },
         destroyed(){
             //销毁Socket
 //            this.socket.close();
+            clearInterval(this.time);
         }
     }
 </script>
