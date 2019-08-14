@@ -15,7 +15,7 @@
             </div>
             <div class="perception-road" @click="showRoadDetail(3)">
                 <div class="road-word" >
-                    <p >{{cross3.name}}</p>
+                    <p>{{cross3.name}}</p>
                 </div>
                 <div id="map3" class="cross-scan"></div>
             </div>
@@ -95,23 +95,19 @@ export default {
         showRoadDetail(num) {
             if (num === 1) {
                 this.$router.push({
-                    path: '/perception',
-                    query:{id:this.cross1.id,longitude:this.cross1.longitude,latitude:this.cross1.latitude}
+                    path: '/perception/'+this.cross1.longitude+"/"+this.cross1.latitude,
                 });
             } else if (num === 2) {
                 this.$router.push({
-                    path: '/perception',
-                    query:{id:this.cross2.id,longitude:this.cross2.longitude,latitude:this.cross2.latitude}
+                    path: '/perception/'+this.cross2.longitude+"/"+this.cross2.latitude,
                 });
             } else if (num === 3) {
                 this.$router.push({
-                    path: '/perception',
-                    query:{id:this.cross3.id,longitude:this.cross3.longitude,latitude:this.cross3.latitude}
+                    path: '/perception/'+this.cross3.longitude+"/"+this.cross3.latitude,
                 });
             } else {
                 this.$router.push({
-                    path: '/perception',
-                    query:{id:this.cross4.id,longitude:this.cross4.longitude,latitude:this.cross4.latitude}
+                    path: '/perception/'+this.cross4.longitude+"/"+this.cross4.latitude,
                 });
             }
         },

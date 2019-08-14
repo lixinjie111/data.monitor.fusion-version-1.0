@@ -27,7 +27,12 @@
                     turnLight:'',
                     gpsTime:''
                 },
-                vehicleId:this.$route.query.vehicleId
+                vehicleId:this.$route.params.vehicleId
+            }
+        },
+        watch:{
+            '$route.params.vehicleId':function () {
+                this.$router.replace("/refresh");
             }
         },
         methods: {
@@ -60,7 +65,6 @@
             onopen(data){
                 var real = {
                     'action':'can_real_data',
-                    /*'vid':this.vehicleID,*/
                     'vehicleIds':this.vehicleId
                 }
                 var realMsg = JSON.stringify(real);
@@ -101,8 +105,7 @@
                         return;
                     }*/
                     this.$router.push({
-                        path: path,
-                        query:{vehicleId:data.id}
+                        path: path+"/"+data.id
                     });
                 }
                 if(type=='road'){
@@ -111,8 +114,7 @@
                          return;
                      }*/
                     this.$router.push({
-                        path: path,
-                        query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
+                        path: path+"/"+data.position.longitude+"/"+data.position.latitude
                     });
                 }
                 if(type=='map'){
@@ -145,6 +147,7 @@
         },
         components:{Left,Right},
         mounted() {
+            console.log("切换车")
             this.initWebSocket();
             this.socket.onmessage = this.onmessage1;
             this.socket.onclose = this.onclose1;

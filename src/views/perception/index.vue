@@ -27,12 +27,17 @@
         data() {
             return {
                 socket:this.$parent.socket,
-                vehicleId:'B21E-00-021',
                 currentExtent:[],
                 spatCount:0,
                 signCount:0,
                 realData:{},
                 time:0
+            }
+        },
+        watch:{
+            '$route.params':function (newValue,oldValue) {
+//                console.log(newValue.lon,newValue.lat);
+                this.$router.replace("/refresh");
             }
         },
         methods: {
@@ -62,22 +67,20 @@
                 }
                 if(type=='vehicle'){
                     path = '/single';
-                   /* if(path==currentRoute){
+                    /*if(path==currentRoute){
                         return;
                     }*/
                     this.$router.push({
-                        path: path,
-                        query:{vehicleId:data.id}
+                        path: path+"/"+data.id
                     });
                 }
                 if(type=='road'){
                     path = '/perception';
-                   /* if(name==currentRoute){
-                        return;
-                    }*/
+                    /* if(name==currentRoute){
+                         return;
+                     }*/
                     this.$router.push({
-                        path: path,
-                        query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
+                        path: path+"/"+data.position.longitude+"/"+data.position.latitude
                     });
                 }
                 if(type=='map'){
@@ -113,11 +116,8 @@
         components:{Left,Right},
         mounted() {
             let _this = this;
-            _this.socket.onmessage = _this.onmessage1;
-            _this.socket.onclose = _this.onclose1;
-            _this.socket.onopen = _this.onopen1;
-            _this.socket.onerror = _this.onerror1;
-            /*if(_this.socket.readyState==WebSocket.OPEN){
+
+            if(_this.socket.readyState==WebSocket.OPEN){
                 _this.socket.onmessage = _this.onmessage1;
                 _this.socket.onclose = _this.onclose1;
                 _this.socket.onopen = _this.onopen1;
@@ -127,7 +127,7 @@
                 _this.time=setInterval(()=>{
                     i++;
                     //尝试发送6次
-                    if(i==100){
+                    if(i==6){
                         clearInterval(_this.time);
                         return;
                     }
@@ -143,8 +143,8 @@
                     _this.socket.onclose = _this.onclose1;
                     _this.socket.onopen = _this.onopen1;
                     _this.socket.onerror = _this.onerror1;
-                },10);
-            }*/
+                },1000);
+            }
         },
         destroyed(){
             //销毁Socket

@@ -183,8 +183,8 @@
             },
             onMapComplete(){
                 getMap(this.$refs.perceptionMap);
-                let longitude=parseInt(this.$route.query.longitude);
-                let latitude=parseInt(this.$route.query.latitude);
+                let longitude=parseInt(this.$route.params.lon);
+                let latitude=parseInt(this.$route.params.lat);
                 //设置地图的中心点
                 /*if(longitude||latitude){
                     let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);

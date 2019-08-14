@@ -46,6 +46,16 @@ export default {
         }
     },
     methods: {
+        initWebSocket1(){
+            let _this=this;
+            if ('WebSocket' in window) {
+                _this.socket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
+                _this.socket.onmessage = this.onmessage1;
+                _this.socket.onclose = this.onclose1;
+                _this.socket.onopen = this.onopen1;
+                _this.socket.onerror = this.onerror1;
+            }
+        },
         onmessage1(mesasge){
             let _this=this;
             let json = JSON.parse(mesasge.data);
@@ -68,8 +78,7 @@ export default {
                     return;
                 }*/
                 this.$router.push({
-                    path: path,
-                    query:{vehicleId:data.id}
+                    path: path+"/"+data.id
                 });
             }
             if(type=='road'){
@@ -78,8 +87,7 @@ export default {
                      return;
                  }*/
                 this.$router.push({
-                    path: path,
-                    query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
+                    path: path+"/"+data.position.longitude+"/"+data.position.latitude
                 });
             }
             if(type=='map'){
@@ -111,6 +119,7 @@ export default {
         }
     },
     mounted() {
+        console.log("......");
         this.socket.onmessage = this.onmessage1;
         this.socket.onclose = this.onclose1;
         this.socket.onopen = this.onopen1;

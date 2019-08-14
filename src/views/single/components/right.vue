@@ -166,7 +166,7 @@
                 },
                 timer1:0,
                 timer2:0,
-                vehicleId:this.$route.query.vehicleId,
+                vehicleId:this.$route.params.vehicleId,
                 lightWebsocket:{}
             }
 
