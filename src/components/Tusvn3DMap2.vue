@@ -60,6 +60,7 @@ export default {
 
             ,perceptionParams:null
             ,lastPerceptionMessage:null
+            ,platformCars:null
 
             //车辆监控
             ,cartrackwebsocketUrl:"ws://120.133.21.14:49982/mon"
@@ -108,6 +109,7 @@ export default {
             // this.initCarTrackWebsocket(this.cartrackwebsocketUrl);
             // this.changeMainCarId("ws://120.133.21.14:49982/mon",'B21E-00-024');
             setTimeout(()=>{
+                
                 //科技园
                 // this.updateCameraPosition(442454.32658068417,4427227.807881102,37.735093606867046,0.0000028926452461693342,-0.39699074074074336,-0.730706721974606);
                 //科技园 小图
@@ -134,8 +136,20 @@ export default {
             setInterval(() => {
                 this.processPerceptionMesage();
             }, 500);
-        },
 
+            setInterval(() => {
+               this.processPlatformCars();
+            }, 500);
+        },
+        /**
+         * 地图沿屏幕x,y,z方向移动
+         * x,相对屏幕横方向移动距离,单位 米,可选,默认值 0.0
+         * y,相对屏幕竖方向移动距离,单位 米,可选,默认值 0.0
+         * z,相对屏幕外方向移动距离,单位 米,可选,默认值 0.0
+         */
+        move:function(x,y,z){
+            dl.translate({viewer:this.viewer,x:x,y:y,z:z})
+        },
         onCameraChanged:function(){
             this.$emit("CameraChanged",this);
         },
@@ -598,6 +612,11 @@ export default {
         },
         onPerceptionMessage:function(data){
             this.lastPerceptionMessage = data;
+            var data2 = JSON.parse(data.data);
+            if(data2.result.dataFlag == 1)
+            {
+                this.platformCars=data2.result.vehDataDTO;
+            }
             return;
             // this.models={};
             // this.count++;
@@ -610,6 +629,11 @@ export default {
         addPerceptionData:function(data)
         {
             this.lastPerceptionMessage = data;
+            var data2 = JSON.parse(data.data);
+            if(data2.result.dataFlag == 1)
+            {
+                this.platformCars=data2.result.vehDataDTO;
+            }
         },
         resetModels:function(){
             this.lastPerceptionMessage=null;
@@ -631,6 +655,44 @@ export default {
                 }
             }
         },
+        processPlatformCars:function(){
+            if(this.platformCars!=null)
+            {
+                for(var key in this.models)
+                {
+                    let tag = false;
+                    for(let i=0;i<this.platformCars.length;i++)
+                    {
+                        let vehid = this.platformCars[i].vehicleId;
+                        if(key == vehid)
+                        {
+                            tag = true;
+                            break;
+                        }
+                    }
+                    if(!tag)
+                    {
+                        // debugger
+                        console.log(dl.models);
+                        let model = this.models[key];
+                        // dl.removeModel(model,this.viewer);
+                        model.position.set( 0, 0, 0 );
+                        delete this.models[key];
+                        // this.tweens[key].stop();
+                        delete this.tweens[key];
+                    }
+                }
+                for(let i=0;i<this.platformCars.length;i++)
+                {
+                    // debugger;
+                    let d = this.platformCars[i];
+                    if(d.type == 1)
+                    {
+                        this.animateCar2(d);
+                    }
+                }
+            }
+        },
         processPerceptionMesage:function(){
             let data = null;
             if(this.lastPerceptionMessage==null)
@@ -647,10 +709,11 @@ export default {
                 // var time = this.timetrans(rsuDatas.result[0].timestamp);
                 // this.$emit('showTimeStamp',time);
 
-                for(let n=0;n<fusionList.length;n++)
-                {
-                    var fusionData = fusionList[n];
-                    var deviceid = fusionData.devId;
+                // for(let n=0;n<fusionList.length;n++)
+                // {
+                //     var fusionData = fusionList[n];
+                    // var deviceid = fusionData.devId;
+                    var deviceid ="0";
                     if(this.deviceModels[deviceid]==null)
                     {
                         this.deviceModels[deviceid]={cars:[],persons:[],texts:[]};
@@ -667,15 +730,15 @@ export default {
                             this.scene.add(model1);
                             this.deviceModels[deviceid].cars[m] = model1;
 
-                            var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
-                            var pmodel1 = new THREE.Mesh( pBox1, this.person );
-                            pmodel1.position.set( 0, 0, 0 );
-                            pmodel1.rotation.set( 0, 0, 0 );
-                            pmodel1.castShadow = true;
-                            pmodel1.receiveShadow = true;
+                            // var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
+                            // var pmodel1 = new THREE.Mesh( pBox1, this.person );
+                            // pmodel1.position.set( 0, 0, 0 );
+                            // pmodel1.rotation.set( 0, 0, 0 );
+                            // pmodel1.castShadow = true;
+                            // pmodel1.receiveShadow = true;
 
-                            this.deviceModels[deviceid].persons[m]= pmodel1;
-                            this.scene.add(pmodel1);
+                            // this.deviceModels[deviceid].persons[m]= pmodel1;
+                            // this.scene.add(pmodel1);
 
 
                             // var text1 = new dl.Text({
@@ -701,13 +764,13 @@ export default {
 
                         }
 
-                        for(let p=0;p<this.deviceModels[deviceid].persons.length;p++)
-                        {
-                            let person = this.deviceModels[deviceid].persons[p];
-                            person.position.x = 0;
-                            person.position.y = 0;
-                            person.position.z = 0;
-                        }
+                        // for(let p=0;p<this.deviceModels[deviceid].persons.length;p++)
+                        // {
+                        //     let person = this.deviceModels[deviceid].persons[p];
+                        //     person.position.x = 0;
+                        //     person.position.y = 0;
+                        //     person.position.z = 0;
+                        // }
 
                         // for(let p=0;p<this.deviceModels[deviceid].texts.length;p++){
                         //     var text1 = this.deviceModels[deviceid].texts[p];
@@ -715,13 +778,18 @@ export default {
                         //     text1.update();
                         // }
                     }
-                }
+                // }
             }
             for(let i = 0;i<fusionList.length;i++)
             {
                 let d = fusionList[i];
-                let dUTM = proj4(this.sourceProject,this.destinatePorject,[d.longitude,d.latitude]);
 
+                if(d.type==1)
+                {
+                    continue;
+                }
+
+                let dUTM = proj4(this.sourceProject,this.destinatePorject,[d.longitude,d.latitude]);
                 if(d.targetType==0||d.targetType==1||d.targetType==3)
                 {
                     if(i<this.deviceModels[deviceid].persons.length)
@@ -1178,6 +1246,199 @@ export default {
 
                                                 });
                                             }
+                                        }
+                                    )
+                                    .onComplete((d)=>{
+                                        // console.log('onComplete', d)
+                                    })
+                            ;
+
+                    }
+                    this.tweens[vid].start();
+                    // this.tweens[vid].update();
+
+                    if(this.carBusinessData[vid]['nowUtmPosition'] == null)
+                    {
+                        this.carBusinessData[vid]['nowUtmPosition'] = {};
+                    }
+
+                    this.carBusinessData[vid]['nowUtmPosition'].x = this.carBusinessData[vid]['nowPosition'][0];
+                    this.carBusinessData[vid]['nowUtmPosition'].y = this.carBusinessData[vid]['nowPosition'][1];
+                    this.carBusinessData[vid]['nowUtmPosition'].rotation = this.carBusinessData[vid]['nowPosition'][2];
+                    this.carBusinessData[vid]['nowUtmPosition'].gpstime = this.carBusinessData[vid]['nowPosition'][3];
+
+                    this.carBusinessData[vid]['lastUtmPosition'] = this.carBusinessData[vid]['nowUtmPosition'];
+                    this.carBusinessData[vid]['utmposition'] = this.carBusinessData[vid]['nowPosition'];
+                }
+
+            }
+        },
+        animateCar2:function(data2,model){
+            if(data2!=null)
+            {
+                // debugger
+                data2.gpsTime = new Date().getTime();
+                let vid = data2.vehicleId;
+                let carModel = this.models[vid];
+                if(carModel==null)
+                {
+                    if(model==undefined||model==null)
+                    {
+                        this.addModel(vid,"./static/map3d/map_photo/car.3DS",data2.longitude,data2.latitude,this.defualtZ);
+                    }else{
+                        // debugger;
+                        this.models[vid]=model;
+                    }
+                    // this.add3DInfoLabel(vid,vid,data2.longitude,data2.latitude,this.defualtZ);
+                }
+
+                let carData = this.carBusinessData[vid];
+                let lastUtmPosition = null;
+                if(carData!=null)
+                {
+                    lastUtmPosition = this.carBusinessData[vid]['lastUtmPosition'];
+                }else{
+                    carData = {};
+                    this.carBusinessData[vid]={};
+                }
+
+                if(this.carBusinessData[vid]['lastUtmPosition'] == null)
+                {
+                    this.carBusinessData[vid]['utmposition'] = proj4(this.sourceProject,this.destinatePorject,[data2.longitude,data2.latitude]);
+                    if(this.models[vid] instanceof dl.Model)
+                    {
+                        this.models[vid].position.x = this.carBusinessData[vid]['utmposition'][0];
+                        this.models[vid].position.y = this.carBusinessData[vid]['utmposition'][1];
+                    }else{
+                        this.models[vid].position.set(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.defualtZ );
+                        this.changeModelColor(data2,this.models[vid]);
+                    }
+                    
+
+                    // this.infoLabels["gan"][vid].position.set(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1],this.defualtZ+4);
+                    // this.infoLabels["label"][vid].setPositon([this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1],this.defualtZ+8]);
+                    // this.infoLabels["label"][vid].update();
+
+                    // this.infoLabels[vid].position.y = this.carBusinessData[vid]['utmposition'][1];
+
+
+                    this.carBusinessData[vid]['utmposition'][2] = data2.heading;
+                    this.carBusinessData[vid]['utmposition'][3] = data2.gpsTime;
+                     if(this.models[vid] instanceof dl.Model)
+                    {
+                        this.models[vid].setHeading(-Math.PI / 180 * (data2.heading));
+                    }else{
+                        this.models[vid].rotation.set( this.pitch,this.yaw,(-Math.PI / 180) * data2.heading);
+                    }
+                    //vid与设定的主车vid相等则做相机跟随操作
+                    // if(this.mainCarVID == vid)
+                    // {
+                    //     this.updateCameraPosition(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.cameraDefualtZ,this.cameraDefualtRadius,this.cameraDefualtPitch,-Math.PI / 180 * (data2.heading));
+                    // }
+
+                    this.carBusinessData[vid]['lastUtmPosition'] = {};
+                    this.carBusinessData[vid]['lastUtmPosition'].x=this.carBusinessData[vid]['utmposition'][0];
+                    this.carBusinessData[vid]['lastUtmPosition'].y=this.carBusinessData[vid]['utmposition'][1];
+                    this.carBusinessData[vid]['lastUtmPosition'].rotation=this.carBusinessData[vid]['utmposition'][2];
+                    this.carBusinessData[vid]['lastUtmPosition'].gpstime=this.carBusinessData[vid]['utmposition'][3];
+
+                    // console.log(this.carBusinessData[vid]['lastUtmPosition']);
+
+                }else{
+                    // console.log(this.carBusinessData[vid]['lastUtmPosition']);
+                    if(data2.gpsTime<this.carBusinessData[vid]['lastUtmPosition'].gpstime)
+                    {
+                        console.log('未按照顺序抵达');
+                        return;
+                    }
+                    // if(this.mainCarVID==vid)
+                    // {
+                    //     dl.moveTo({
+                    //         position: [this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.defualtZ],
+                    //         radius: this.defualtRadius,
+                    //         yaw: -Math.PI / 180 * (this.carBusinessData[vid]['utmposition'][2]),
+                    //         pitch: this.defualtPitch
+
+                    //     });
+                    // }
+                    this.carBusinessData[vid]['nowPosition'] = proj4(this.sourceProject,this.destinatePorject,[data2.longitude,data2.latitude]);
+                    this.carBusinessData[vid]['nowPosition'][2] = data2.heading;
+                    this.carBusinessData[vid]['nowPosition'][3] = data2.gpsTime;
+                    if(this.tweens[vid]==null)
+                    {
+                        this.tweens[vid] = new TWEEN.Tween(this.carBusinessData[vid]['lastUtmPosition'])
+                        .to({x: this.carBusinessData[vid]['nowPosition'][0], y: this.carBusinessData[vid]['nowPosition'][1], rotation: this.carBusinessData[vid]['nowPosition'][2]}, this.carBusinessData[vid]['nowPosition'][3]-this.carBusinessData[vid]['lastUtmPosition'].gpstime)
+                        .delay(0)
+                        // .easing(TWEEN.Easing.Elastic.In)
+                        .easing(TWEEN.Easing.Linear.None)
+                        .onUpdate(
+                            (d)=>{
+                                // console.log("onUpdate");
+                                // console.log(d);
+                                if(this.models[vid] instanceof dl.Model)
+                                {
+                                    if(this.models[vid]!=undefined&&this.models[vid]!=null)
+                                    {
+                                        this.models[vid].position.x = this.carBusinessData[vid]['lastUtmPosition'].x;
+                                        this.models[vid].position.y = this.carBusinessData[vid]['lastUtmPosition'].y;
+                                        this.models[vid].setHeading(-Math.PI / 180 * (this.carBusinessData[vid]['lastUtmPosition'].rotation));
+                                    }
+                                }else{
+                                    if(this.models[vid]!=undefined&&this.models[vid]!=null)
+                                    {
+                                            this.models[vid].position.set(this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.defualtZ );
+                                            // this.changeModelColor(data2,this.models[vid]);
+                                            this.models[vid].rotation.set( this.pitch,this.yaw,(-Math.PI / 180) * this.carBusinessData[vid]['lastUtmPosition'].rotation);
+                                    }
+                                }
+                            
+                            //    this.infoLabels[vid].position.x = this.carBusinessData[vid]['lastUtmPosition'].x;
+                            //    this.infoLabels[vid].position.y = this.carBusinessData[vid]['lastUtmPosition'].y;
+
+                            // this.infoLabels["gan"][vid].position.set(this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y,this.defualtZ+4);
+                            // this.infoLabels["label"][vid].setPositon([this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y,this.defualtZ+8]);
+                            // this.infoLabels["label"][vid].update();
+
+                            
+                            }
+                        );
+
+                    }else{
+                            this.tweens[vid].stop();
+                            this.tweens[vid]=
+                                new TWEEN.Tween(this.carBusinessData[vid]['lastUtmPosition'])
+                                    .to({x: this.carBusinessData[vid]['nowPosition'][0], y: this.carBusinessData[vid]['nowPosition'][1], rotation: this.carBusinessData[vid]['nowPosition'][2]}, this.carBusinessData[vid]['nowPosition'][3]-this.carBusinessData[vid]['lastUtmPosition'].gpstime)
+                                    .delay(0)
+                                    // .easing(TWEEN.Easing.Elastic.In)
+                                    .easing(TWEEN.Easing.Linear.None)
+                                    .onUpdate(
+                                        (d)=>{
+                                            // console.log("onUpdate");
+                                            // console.log(d);
+                                            if(this.models[vid] instanceof dl.Model)
+                                            {
+                                                if(this.models[vid]!=undefined&&this.models[vid]!=null)
+                                                {
+                                                    this.models[vid].position.x = this.carBusinessData[vid]['lastUtmPosition'].x;
+                                                    this.models[vid].position.y = this.carBusinessData[vid]['lastUtmPosition'].y;
+                                                    this.models[vid].setHeading(-Math.PI / 180 * (this.carBusinessData[vid]['lastUtmPosition'].rotation));
+                                                }
+                                                
+                                            }else{
+                                                if(this.models[vid]!=undefined&&this.models[vid]!=null)
+                                                {
+                                                    this.models[vid].position.set(this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y, this.defualtZ );
+                                                    // this.changeModelColor(data2,this.models[vid]);
+                                                    this.models[vid].rotation.set( this.pitch,this.yaw,(-Math.PI / 180) * this.carBusinessData[vid]['lastUtmPosition'].rotation);
+                                                }
+                                            }
+
+                                            
+                                            // this.infoLabels["gan"][vid].position.set(this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y,this.defualtZ+4);
+                                            // this.infoLabels["label"][vid].setPositon([this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y,this.defualtZ+8]);
+                                            // this.infoLabels["label"][vid].update();
+
+                                            
                                         }
                                     )
                                     .onComplete((d)=>{
