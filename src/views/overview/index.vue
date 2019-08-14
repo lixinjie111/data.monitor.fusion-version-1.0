@@ -65,21 +65,20 @@ export default {
             let path;
             if(type=='home'){
                 path = '/overview';
-                if(path==currentRoute){
+                /*if(path==currentRoute){
                     return;
-                }
+                }*/
                 this.$router.push({
                     path: path
                 });
             }
             if(type=='vehicle'){
                 path = '/single';
-                if(path==currentRoute){
+                /*if(path==currentRoute){
                     return;
-                }
+                }*/
                 this.$router.push({
-                    path: path,
-                    query:{vehicleId:data.id}
+                    path: path+"/"+data.id
                 });
             }
             if(type=='road'){
@@ -88,8 +87,7 @@ export default {
                      return;
                  }*/
                 this.$router.push({
-                    path: path,
-                    query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
+                    path: path+"/"+data.position.longitude+"/"+data.position.latitude
                 });
             }
             if(type=='map'){

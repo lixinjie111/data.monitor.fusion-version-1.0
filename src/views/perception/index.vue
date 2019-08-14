@@ -27,11 +27,17 @@
         data() {
             return {
                 socket:this.$parent.socket,
-                vehicleId:'B21E-00-021',
                 currentExtent:[],
                 spatCount:0,
                 signCount:0,
-                realData:{}
+                realData:{},
+                time:0
+            }
+        },
+        watch:{
+            '$route.params':function (newValue,oldValue) {
+//                console.log(newValue.lon,newValue.lat);
+                this.$router.replace("/refresh");
             }
         },
         methods: {
@@ -43,16 +49,6 @@
                 this.spatCount = spatCount;
                 this.signCount = signCount;
             },
-            initWebSocket1(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.socket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
-                    _this.socket.onmessage = this.onmessage1;
-                    _this.socket.onclose = this.onclose1;
-                    _this.socket.onopen = this.onopen1;
-                    _this.socket.onerror = this.onerror1;
-                }
-            },
             onmessage1(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
@@ -62,31 +58,29 @@
                 let path;
                 if(type=='home'){
                     path = '/overview';
-                    if(path==currentRoute){
+                    /*if(path==currentRoute){
                         return;
-                    }
+                    }*/
                     this.$router.push({
                         path: path
                     });
                 }
                 if(type=='vehicle'){
                     path = '/single';
-                    if(path==currentRoute){
+                    /*if(path==currentRoute){
                         return;
-                    }
+                    }*/
                     this.$router.push({
-                        path: path,
-                        query:{vehicleId:data.id}
+                        path: path+"/"+data.id
                     });
                 }
                 if(type=='road'){
                     path = '/perception';
-                   /* if(name==currentRoute){
-                        return;
-                    }*/
+                    /* if(name==currentRoute){
+                         return;
+                     }*/
                     this.$router.push({
-                        path: path,
-                        query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
+                        path: path+"/"+data.position.longitude+"/"+data.position.latitude
                     });
                 }
                 if(type=='map'){
@@ -99,6 +93,7 @@
                 console.log("结束连接");
             },
             onopen1(data){
+                console.log("发送消息")
                 //获取车辆状态
                 var operationStatus = {
                     "action":"operation_command"
@@ -120,15 +115,41 @@
         },
         components:{Left,Right},
         mounted() {
-//            this.initWebSocket1();
-            this.socket.onmessage = this.onmessage1;
-            this.socket.onclose = this.onclose1;
-            this.socket.onopen = this.onopen1;
-            this.socket.onerror = this.onerror1;
+            let _this = this;
+
+            if(_this.socket.readyState==WebSocket.OPEN){
+                _this.socket.onmessage = _this.onmessage1;
+                _this.socket.onclose = _this.onclose1;
+                _this.socket.onopen = _this.onopen1;
+                _this.socket.onerror = _this.onerror1;
+            }else{
+                let i= 0;
+                _this.time=setInterval(()=>{
+                    i++;
+                    //尝试发送6次
+                    if(i==6){
+                        clearInterval(_this.time);
+                        return;
+                    }
+                    if(_this.socket.readyState==WebSocket.OPEN){
+                        _this.socket.onopen = _this.onopen1;
+                        _this.socket.onmessage = _this.onmessage1;
+                        _this.socket.onclose = _this.onclose1;
+                        _this.socket.onerror = _this.onerror1;
+                        clearInterval(_this.time);
+                        return;
+                    }
+                    _this.socket.onmessage = _this.onmessage1;
+                    _this.socket.onclose = _this.onclose1;
+                    _this.socket.onopen = _this.onopen1;
+                    _this.socket.onerror = _this.onerror1;
+                },1000);
+            }
         },
         destroyed(){
             //销毁Socket
 //            this.socket.close();
+            clearInterval(this.time);
         }
     }
 </script>

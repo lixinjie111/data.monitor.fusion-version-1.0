@@ -150,10 +150,7 @@ export default {
         },
         showView(e) {
             this.$router.push({
-                path: '/single',
-                query: {
-                    'vehicleId': e.target.get("vehicleId")
-                }
+                path: '/single/'+e.target.get("vehicleId"),
             });
         },
         onclose(data){

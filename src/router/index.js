@@ -40,12 +40,12 @@ export default new Router({
     component: Refresh,
     meta: {}
   },{
-      path: '/single',
+      path: '/single/:vehicleId',
       name: 'Single',
       component: Single,
       meta: {}
   },{
-      path: '/perception',
+      path: '/perception/:lon/:lat',
       name: 'Perception',
       component: Perception,
       meta: {}
