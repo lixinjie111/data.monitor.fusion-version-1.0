@@ -13,9 +13,9 @@
             </div>
         </div>
         <div class="map-left"></div>
-        <div class="spat-detail " v-for="(obj,key) in lightList" :style="{left:obj.left+'px',top:obj.top+'px'}" >
-                <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">
-                    <div v-show="item.key=='TURN'&&item.flag" class="spat-detail-style">
+        <div class="spat-detail " v-for="(item,key) in lightList" :style="{left:item.left+'px',top:item.top+'px'}" >
+               <!-- <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">-->
+                    <div v-show="item.key=='turn'" class="spat-detail-style">
                         <div class="spat-detail-img" >
                             <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'" class="turn-img"/>
                             <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"  class="turn-img"/>
@@ -23,7 +23,7 @@
                         </div>
                         <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                     </div>
-                    <div v-show="item.key=='LEFT'&&item.flag" class="spat-detail-style">
+                    <div v-show="item.key=='left'" class="spat-detail-style">
                         <div class="spat-detail-img">
                             <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
                             <img src="@/assets/images/single/light/left-red.png" class="left-img" v-show="item.lightColor=='RED'"/>
@@ -31,7 +31,7 @@
                         </div>
                         <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                     </div>
-                    <div v-show="item.key=='CROSS'&&item.flag" class="spat-detail-style">
+                    <div v-show="item.key=='cross'" class="spat-detail-style">
                         <div class="spat-detail-img spat-straight">
                             <img src="@/assets/images/single/light/left-yellow.png" class="straight-img" v-show="item.lightColor=='YELLOW'" />
                             <img src="@/assets/images/single/light/left-red.png" class="straight-img" v-show="item.lightColor=='RED'"/>
@@ -39,7 +39,7 @@
                         </div>
                         <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                     </div>
-                    <div v-show="item.key=='RIGHT'&&item.flag" class="spat-detail-style">
+                    <div v-show="item.key=='right'" class="spat-detail-style">
                         <div class="spat-detail-img spat-right">
                             <img src="@/assets/images/single/light/left-yellow.png" class="right-img" v-show="item.lightColor=='YELLOW'"/>
                             <img src="@/assets/images/single/light/left-red.png"  class="right-img" v-show="item.lightColor=='RED'"/>
@@ -48,7 +48,6 @@
                         <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
                     </div>
                 </div>
-            </div>
         <div id="map" class="c-map">
             <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}" v-show="video1Show">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer"></video-player>
@@ -59,7 +58,6 @@
             @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' >
             </tusvn-map>
         </div>
-
     </div>
 </template>
 <script>
@@ -74,24 +72,16 @@
                 option1:{},
                 rtmp1:'',
                 option2:{},
-                lightList:[],
-                lightObj:{
-                    /*'light_273':{
+                lightList:[
+                    /*{
                         left:250,
                         top:260,
-                        lightData:{'TURN':{spareTime:10,time:null,lightColor:'GREEN',flag:true}}
+                        key:'turn',
+                        lightColor:'RED',
+                        spareTime:'10'
+
                     }*/
-                },
-                lightData:{
-                    /*'TURN':{spareTime:10,time:null,lightColor:'GREEN',flag:true},//转弯
-                    'LEFT':{spareTime:10,time:null,lightColor:'RED',flag:true},//左转
-                    'CROSS':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},//直行
-                    'RIGHT':{spareTime:10,time:null,lightColor:'RED',flag:true},//右转*/
-                    'TURN':{},//转弯
-                    'LEFT':{},//左转
-                    'CROSS':{},//直行
-                    'RIGHT':{}
-                },
+                ],
                 left1:'',
                 bottom1:'',
                 video1Show:false,
@@ -384,9 +374,9 @@
                         this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],12.68);
                     })
                     spats.forEach(item=>{
-                        let spats = item.spats;
+                        let spatList = item.spats;
                         let spatObj={"turn":{},"left":{},"cross":{},"right":{}};
-                        spats.forEach(spat=>{
+                        spatList.forEach(spat=>{
                             let lightDirection = spat.lightDirection;
                             if(lightDirection==1){
                                 spatObj["cross"]=spat;
@@ -401,44 +391,32 @@
                                 spatObj["right"]=spat;
                             }
                         });
+                        let i=0;
                         for(let key in spatObj){
-                            if(!spatObj[key].spatId){
-                                delete spatObj[key].spatId;
+                            let item1 = spatObj[key];
+                            if(item1.roadId){
+                                let obj = {};
+                                let longitude = parseFloat(item1.lightPos.split(",")[0]);
+                                let latitude = parseFloat(item1.lightPos.split(",")[1]);
+                                //球面坐标转成三维坐标
+                                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
+                                //三维坐标转成平面像素
+                                let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                                obj.left = parseInt(pixel[0]);
+                                obj.top = parseInt(pixel[1]);
+                                if(i>0){
+                                    obj.left = obj.left+120*i;
+                                }
+                                let spatId = "light_"+item1.spatId;
+                                obj.spatId = spatId;
+                                obj.key = key;
+                                obj.spareTime = '';
+                                obj.lightColor='';
+                                this.spatCount++;
+                                this.lightList.push(obj);
+                                i++;
                             }
                         }
-                        spats.forEach((item1,index)=>{
-                            let lightData = [{'key':'TURN',"flag":false},{'key':'LEFT',"flag":false},{'key':'CROSS',"flag":false},{'key':'RIGHT',"flag":false}];
-                            let obj = {};
-                            let longitude = parseFloat(item1.lightPos.split(",")[0]);
-                            let latitude = parseFloat(item1.lightPos.split(",")[1]);
-                            //球面坐标转成三维坐标
-                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
-                            //三维坐标转成平面像素
-                            let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                            obj.left = parseInt(pixel[0]);
-                            obj.top = parseInt(pixel[1]);
-                            if(index>0){
-                                obj.left = obj.left+120*index;
-                            }
-                            let spatId = "light_"+item1.spatId;
-                            obj.spatId = spatId;
-                            let lightDirection = item1.lightDirection;
-                            if(lightDirection==1){
-                                lightData[2].flag=true;
-                            }
-                            if(lightDirection==2){
-                                lightData[1].flag=true;
-                            }
-                            if(lightDirection==3){
-                                lightData[0].flag=true;
-                            }
-                            if(lightDirection==4){
-                                lightData[3].flag=true;
-                            }
-                            this.spatCount++;
-                            this.$set(obj,'lightData',lightData);
-                            this.lightList.push(obj);
-                        })
                     })
                     this.$emit("count",this.signCount,this.spatCount);
                     this.initLightWebSocket();
@@ -597,14 +575,8 @@
                         _this.lightList.forEach((item1,index1)=>{
                             //相交的
                             if(item1.spatId==spatId){
-                                /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
-                                let lightData=item1.lightData;
-                                lightData.forEach(item2=>{
-                                    if(item2.key==key){
-                                        _this.$set(item2,"spareTime",item.leftTime);
-                                        _this.$set(item2,"lightColor",item.light);
-                                    }
-                                })
+                                item1.spareTime = item.leftTime;
+                                item1.lightColor = item.light;
                             }
                         })
                     })
