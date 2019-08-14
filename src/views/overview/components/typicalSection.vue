@@ -520,27 +520,25 @@ export default {
             let roadSenseCars;
             let lightPosition;
             let carPosition;
-            if ('spatDataDTO' in result === true) {
-                roadLights = result.spatDataDTO;
-                if (roadLights.length > 0) {
-                    roadLights.map((x, index) => {
-                        lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
-                        roadLights[index].position = lightPosition;
-                    });
-                    for (let i = 0; i < roadLights.length; i++) {
-                        let _data = roadLights[i];
-                        if(_data.position) {
-                            let marker = new AMap.Marker({
-                                position: _data.position,
-                                map: _this.map1,
-                                icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                                offset: new AMap.Pixel(-2, -5),
-                                spatId: _data.spatId,
-                                zIndex: 100
-                            });
-                            _this.map1.add(marker);
-                            _this.map1LightList.push(marker);
-                        }
+            roadLights = result.spatDataDTO;
+            if (roadLights.length > 0) {
+                roadLights.map((x, index) => {
+                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
+                    roadLights[index].position = lightPosition;
+                });
+                for (let i = 0; i < roadLights.length; i++) {
+                    let _data = roadLights[i];
+                    if(_data.position) {
+                        let marker = new AMap.Marker({
+                            position: _data.position,
+                            map: _this.map1,
+                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
+                            offset: new AMap.Pixel(-2, -5),
+                            spatId: _data.spatId,
+                            zIndex: 100
+                        });
+                        _this.map1.add(marker);
+                        _this.map1LightList.push(marker);
                     }
                 }
             }
