@@ -147,7 +147,7 @@
         },
         components:{Left,Right},
         mounted() {
-            console.log("切换车")
+//            console.log("切换车")
             this.initWebSocket();
             this.socket.onmessage = this.onmessage1;
             this.socket.onclose = this.onclose1;

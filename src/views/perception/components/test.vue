@@ -39,12 +39,12 @@
                 },5000)
                 },
             cameraChanged(){}*/
-           go(){
+          /* go(){
                this.$router.push({
                    path: "/routeTest",
                    query:{vehicleId:"t120"}
                });
-           }
+           }*/
         },
         mounted() {
 
