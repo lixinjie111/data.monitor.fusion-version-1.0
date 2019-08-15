@@ -108,7 +108,8 @@
                 mapTime4:0,
                 isConMov:false,
                 lightWebsocket:{},
-                isFirst:true
+                isFirst:true,
+                time:0
             }
         },
         props:{
@@ -183,11 +184,10 @@
             },
             onMapComplete(){
                 getMap(this.$refs.perceptionMap);
-                let longitude=parseInt(this.$route.params.lon);
-                let latitude=parseInt(this.$route.params.lat);
+                let longitude=parseFloat(this.$route.params.lon);
+                let latitude=parseFloat(this.$route.params.lat);
                 //设置地图的中心点
-                /*if(longitude||latitude){
-                    debugger
+                if(longitude||latitude){
                     let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                     let x=utm[0];
                     let y=utm[1];
@@ -195,8 +195,8 @@
                     return;
                 }else{
                     this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                }*/
-                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                }
+//                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 
                 //向左移5米
@@ -215,6 +215,19 @@
             },
             cameraChanged(){
                 console.log("窗口发生变化")
+                if(this.isFirst){
+                    this.time = setTimeout(()=>{
+                        let ele = document.getElementById("message1");
+                        ele.className="style";
+                        this.getCurrentExtent();
+                        this.getCenter();
+                        this.$emit('getCurrentExtent', this.currentExtent);
+                        this.getPerceptionAreaInfo();
+                        this.typeRoadData();
+                        this.getMap();
+                        clearTimeout(this.time);
+                    },500)
+                }
                 //地图不是第一次初始化
                 if(!this.isFirst){
                     if(this.video1Show||this.rtmp1!=''){
@@ -226,11 +239,11 @@
                     this.$refs.perceptionMap.resetModels();
 
                 }
-                this.isFirst=false;
+
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
-                if(!this.isConMov){
+                if(!this.isConMov&&!this.isFirst){
                     let ele = document.getElementById("message1");
                     ele.className="style";
                     this.getCurrentExtent();
@@ -239,8 +252,15 @@
                     this.getPerceptionAreaInfo();
                     this.typeRoadData();
                 }
+                //不是第一次
+                if(!this.isFirst){
+                   this.getMap();
+                }
+                this.isFirst=false;
+            },
+            getMap(){
                 let overviewMap = this.$refs.map1;
-                let overviewLayerId = "overviewLayer"
+                let overviewLayerId = "overviewLayer";
                 let overviewLayer = overviewMap.getLayerById(overviewLayerId);
                 if(overviewLayer!=null){
                     overviewMap.removeAllFeature(overviewLayerId);
@@ -337,7 +357,6 @@
                 this.currentExtent.push([x1, y2]);
                 this.currentExtent.push([x2, y2]);
 //                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
-
             },
             getCenter(){
                 this.center= [];
@@ -393,6 +412,8 @@
                             }
                         });
                         let i=0;
+                        let top;
+                        let left;
                         for(let key in spatObj){
                             let item1 = spatObj[key];
                             if(item1.roadId){
@@ -403,10 +424,15 @@
                                 let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                                 //三维坐标转成平面像素
                                 let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                                obj.left = parseInt(pixel[0]);
-                                obj.top = parseInt(pixel[1]);
+                                if(i==0){
+                                   obj.left = parseInt(pixel[0]);
+                                   obj.top = parseInt(pixel[1]);
+                                   top=obj.top;
+                                   left=obj.left;
+                                }
                                 if(i>0){
-                                    obj.left = obj.left+120*i;
+                                    obj.left = left+56*i;
+                                    obj.top=top;
                                 }
                                 let spatId = "light_"+item1.spatId;
                                 obj.spatId = spatId;
@@ -628,6 +654,7 @@
             clearInterval(this.mapTime2);
             clearInterval(this.mapTime3);
             clearInterval(this.mapTime4);
+            clearTimeout(this.time);
             this.lightWebsocket.close();
             if(this.$refs.perceptionMap){
                 this.$refs.perceptionMap.reset3DMap();
@@ -708,25 +735,25 @@
     .spat-detail{
         position: absolute;
         z-index: 2;
+        padding:4px;
+        background: #333333;
+        border-radius: 4px;
         .spat-layout{
             float: left;
             margin-left: 8px;
         }
         .spat-detail-style{
-            width: 86px;
-            height: 40px;
+            width: 54px;
+            height: 30px;
             border-radius: 20px;
-            background-color:rgba(0,0,0,0.5);
+            background-color:#333333;
             box-sizing: border-box;
-            padding:6px 2px;
-            /*float: left;
-            margin-left: 20px;*/
             @include layoutMode(align);
 
             .spat-detail-img{
-                width: 32px;
-                height: 32px;
-                background-color: rgba(0,0,0,0.8);
+                width: 24px;
+                height: 24px;
+                background-color: #4e4d4d;
                 border-radius: 50%;
                 display: inline-block;
                 position: relative;
@@ -742,30 +769,30 @@
                     margin-top: -9px;
                 }
                 .left-img{
-                    width: 20px;
-                    height: 18px;
-                    margin-left: -10px;
-                    margin-top: -9px;
-                }
-                .straight-img{
-                    width: 20px;
-                    height: 16px;
+                    width: 18px;
+                    height: 14px;
                     margin-left: -10px;
                     margin-top: -8px;
                 }
+                .straight-img{
+                    width: 16px;
+                    height: 14px;
+                    margin-left: -8px;
+                    margin-top: -7px;
+                }
                 .right-img{
-                    width: 20px;
-                    height: 18px;
-                    margin-left: -10px;
-                    margin-top: -9px;
+                    width: 18px;
+                    height: 14px;
+                    margin-left: -9px;
+                    margin-top: -7px;
                 }
             }
             .spat-detail-font{
-                letter-spacing: 4px;
+                letter-spacing: 0px;
                 color: #c8360f;
-                font-size: 24px;
+                font-size: 20px;
                 display: inline-block;
-                margin-left: 12px;
+                margin-left: 4px;
             }
             .spat-detail-color{
                 color: #23b318;

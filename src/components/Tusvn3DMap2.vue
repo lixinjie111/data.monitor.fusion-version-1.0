@@ -673,7 +673,7 @@ export default {
                     if(!tag)
                     {
                         // debugger
-                        console.log(dl.models);
+//                        console.log(dl.models);
                         let model = this.models[key];
                         // dl.removeModel(model,this.viewer);
                         model.position.set( 0, 0, 0 );
