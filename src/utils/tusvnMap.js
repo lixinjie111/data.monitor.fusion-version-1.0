@@ -5,6 +5,35 @@ export function getMap(map){
   map.addShape("lane_arrow","./static/map3d/dl_shcsq_zc/Direction_arrow.shp","#06c2ff")
   map.addShape("lane_boundary","./static/map3d/dl_shcsq_zc/Lane_boundary.shp","#6fb07d")
   map.addShape("lane_centerline","./static/map3d/dl_shcsq_zc/Lane_centerline.shp","#153641")
+  map.addShape("greenbelts","./static/map3d/dl_shcsq_zc/greenbelts.shp","#73b273")
+  // map.addShape("rcu_view","./static/map3d/dl_shcsq_zc/dl_shcsq_utm51_view.shp","rgba(182,255,0)")
+  // debugger
+  let area01 = new dl.Polygon({
+    name:"弱视区01",
+    color:"#666666",
+    outline:false,
+    outlineColor:"#ff0000",
+    opacity:0.5,
+    rotate:[0,0,0],
+    vertices:[[326279.075281233,3462320.47692938],[326308.053882088,3462332.29714815],[326320.83831105,3462308.89923099],[326358.700662673,3462248.13249382],[326308.217527175,3462235.74542816],[326279.075281233,3462320.47692938]]
+  });
+  area01.updateVertices();
+  area01.setOpacity(0.3);
+
+  let area02 = new dl.Polygon({
+    name:"弱视区02",
+    color:"#666666",
+    outline:false,
+    outlineColor:"#ff0000",
+    opacity:0.5,
+    rotate:[0,0,0],
+    vertices:[[326272.182589103,3462394.82532527],[326247.846439495,3462378.55322523],[326210.640170368,3462423.88859517],[326234.946865238,3462450.99990868],[326272.182589103,3462394.82532527]]
+  });
+  area02.updateVertices();
+  area02.setOpacity(0.3);
+  // debugger
+  map.addGeometry(area01);
+  map.addGeometry(area02);
 
   //添加路灯杆和信息牌
   let data = [[2340,5,326263.1536280000,3462381.9079600000,19.4429998472],
