@@ -187,6 +187,7 @@
                 let latitude=parseInt(this.$route.params.lat);
                 //设置地图的中心点
                 /*if(longitude||latitude){
+                    debugger
                     let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                     let x=utm[0];
                     let y=utm[1];
@@ -331,11 +332,11 @@
                 let y1 = utm1[1];
                 let x2 = utm2[0];
                 let y2 = utm2[1];
-               /* this.currentExtent.push([x2, y1]);
+                this.currentExtent.push([x2, y1]);
                 this.currentExtent.push([x1, y1]);
                 this.currentExtent.push([x1, y2]);
-                this.currentExtent.push([x2, y2]);*/
-                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
+                this.currentExtent.push([x2, y2]);
+//                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
 
             },
             getCenter(){
@@ -449,30 +450,35 @@
                         if(this.cameraParam.y<=this.$refs.perceptionMap.minY){
                             return;
                         }
-                        this.cameraParam.y=y-this.step;
+//                        this.cameraParam.y=y-this.step;
+                        this.$refs.perceptionMap.move(0,this.step,0);
                     }
                     //向下
                     if(direction=='2'){
                         if(this.cameraParam.y>=this.$refs.perceptionMap.maxY){
                             return;
                         }
-                        this.cameraParam.y=y+this.step;
+//                        this.cameraParam.y=y+this.step;
+                        this.$refs.perceptionMap.move(0,-this.step,0);
                     }
                     //向左
                     if(direction=='3'){
                         if(this.cameraParam.x>=this.$refs.perceptionMap.maxX){
                             return;
                         }
-                        this.cameraParam.x=x+this.step;
+//                        this.cameraParam.x=x+this.step;
+                        this.$refs.perceptionMap.move(-this.step,0,0);
                     }
                     //向右
                     if(direction=='4'){
                         if(this.cameraParam.x<=this.$refs.perceptionMap.minX){
                             return;
                         }
-                        this.cameraParam.x=x-this.step;
+//                        this.cameraParam.x=x-this.step;
+                        this.$refs.perceptionMap.move(this.step,0,0);
                     }
-                    this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+//                    this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+
                 }else{
 
                     this.isConMov=true;
@@ -488,8 +494,9 @@
                                 clearInterval(this.mapTime1);
                                 return;
                             }
-                            this.cameraParam.y=this.cameraParam.y-this.step1;
-                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                            this.$refs.perceptionMap.move(0,this.step1,0);
+//                            this.cameraParam.y=this.cameraParam.y-this.step1;
+//                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },100)
                     }
                     //向下
@@ -503,8 +510,9 @@
                                 clearInterval(this.mapTime2);
                                 return;
                             }
-                            this.cameraParam.y=this.cameraParam.y+this.step1;
-                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                            this.$refs.perceptionMap.move(0,-this.step1,0);
+//                            this.cameraParam.y=this.cameraParam.y+this.step1;
+//                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },100)
                     }
                     //向左
@@ -518,8 +526,10 @@
                                 clearInterval(this.mapTime3);
                                 return;
                             }
-                            this.cameraParam.x=this.cameraParam.x+this.step1;
-                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                            this.$refs.perceptionMap.move(-this.step,0,0);
+
+//                            this.cameraParam.x=this.cameraParam.x+this.step1;
+//                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },100)
                     }
                     //向右
@@ -533,8 +543,9 @@
                                 clearInterval(this.mapTime4);
                                 return;
                             }
-                            this.cameraParam.x=this.cameraParam.x-this.step1;
-                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
+                            this.$refs.perceptionMap.move(this.step,0,0);
+//                            this.cameraParam.x=this.cameraParam.x-this.step1;
+//                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
                         },100)
                     }
                 }
@@ -586,12 +597,13 @@
                 var light = {
                     "action": "road_real_data",
                     "data": {
-                        "polygon": [
+                        /*"polygon": [
                             [121.17979423666091, 31.279518991604288],
                             [121.16305725240798, 31.279518991604288],
                             [121.16305725240798, 31.289571910992105],
                             [121.17979423666091, 31.289571910992105]
-                        ]
+                        ]*/
+                        "polygon":this.currentExtent
                     }
                 }
                 var lightMsg = JSON.stringify(light);

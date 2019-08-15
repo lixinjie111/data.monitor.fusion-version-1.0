@@ -148,7 +148,7 @@ export default {
          * z,相对屏幕外方向移动距离,单位 米,可选,默认值 0.0
          */
         move:function(x,y,z){
-            dl.translate({viewer:this.viewer,x:x,y:y,z:z})
+            dl.translate({viewer:this.viewer,x:x,y:z,z:y})
         },
         onCameraChanged:function(){
             this.$emit("CameraChanged",this);

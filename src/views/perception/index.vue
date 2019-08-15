@@ -49,6 +49,16 @@
                 this.spatCount = spatCount;
                 this.signCount = signCount;
             },
+            initWebSocket1(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.socket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                }
+                _this.socket.onmessage = _this.onmessage1;
+                _this.socket.onclose = _this.onclose1;
+                _this.socket.onopen = _this.onopen1;
+                _this.socket.onerror = _this.onerror1;
+            },
             onmessage1(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
@@ -116,35 +126,11 @@
         components:{Left,Right},
         mounted() {
             let _this = this;
+            _this.socket.onmessage = _this.onmessage1;
+            _this.socket.onclose = _this.onclose1;
+            _this.socket.onopen = _this.onopen1;
+            _this.socket.onerror = _this.onerror1;
 
-            if(_this.socket.readyState==WebSocket.OPEN){
-                _this.socket.onmessage = _this.onmessage1;
-                _this.socket.onclose = _this.onclose1;
-                _this.socket.onopen = _this.onopen1;
-                _this.socket.onerror = _this.onerror1;
-            }else{
-                let i= 0;
-                _this.time=setInterval(()=>{
-                    i++;
-                    //尝试发送6次
-                    if(i==6){
-                        clearInterval(_this.time);
-                        return;
-                    }
-                    if(_this.socket.readyState==WebSocket.OPEN){
-                        _this.socket.onopen = _this.onopen1;
-                        _this.socket.onmessage = _this.onmessage1;
-                        _this.socket.onclose = _this.onclose1;
-                        _this.socket.onerror = _this.onerror1;
-                        clearInterval(_this.time);
-                        return;
-                    }
-                    _this.socket.onmessage = _this.onmessage1;
-                    _this.socket.onclose = _this.onclose1;
-                    _this.socket.onopen = _this.onopen1;
-                    _this.socket.onerror = _this.onerror1;
-                },1000);
-            }
         },
         destroyed(){
             //销毁Socket
