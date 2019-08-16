@@ -161,19 +161,19 @@ export default {
             finalFourPosition.push(southEast);
             southwest = [bounds.southwest.lng, bounds.southwest.lat];
             northeast = [bounds.northeast.lng, bounds.northeast.lat];
-            let mapBounds = new AMap.Bounds(southwest, northeast);
-            var rectangle = new AMap.Rectangle({
-                bounds: mapBounds,
-                strokeColor: 'red',
-                strokeWeight: 6,
-                strokeOpacity: 0.5,
-                strokeDasharray: [30, 10],
-                strokeStyle: 'dashed',
-                fillOpacity:0.5,
-                cursor:'pointer',
-                zIndex:50,
-            });
-            rectangle.setMap(mapOption.map);
+            // let mapBounds = new AMap.Bounds(southwest, northeast);
+            // var rectangle = new AMap.Rectangle({
+            //     bounds: mapBounds,
+            //     strokeColor: 'red',
+            //     strokeWeight: 6,
+            //     strokeOpacity: 0.5,
+            //     strokeDasharray: [30, 10],
+            //     strokeStyle: 'dashed',
+            //     fillOpacity:0.5,
+            //     cursor:'pointer',
+            //     zIndex:50,
+            // });
+            // rectangle.setMap(mapOption.map);
             mapOption.finalFourPosition = finalFourPosition;
             this.setWebsocketData(mapOption);
         },
