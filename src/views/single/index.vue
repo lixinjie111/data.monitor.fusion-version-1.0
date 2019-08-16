@@ -1,5 +1,5 @@
 <template>
-    <div class="fusion-style">
+    <div class="fusion-layout">
         <div class="fusion-left">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
@@ -7,9 +7,7 @@
                 </div>
             </div>
         </div>
-        <div class="fusion-right">
-            <right :realData="realData"></right>
-        </div>
+        <right :realData="realData"></right>
     </div>
 </template>
 <script>
@@ -163,27 +161,20 @@
     }
 </script>
 <style lang="scss" scoped>
-
-    .fusion-style{
+    .fusion-left{
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 270px;
+       /* background: #1a1a1a;*/
+        z-index:1;
+    }
+    .fusion-layout{
         position: fixed;
         top: 0;
-        left: 0;
         right: 0;
         bottom: 0;
-        .fusion-left{
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 270px;
-            background: #1a1a1a;;
-        }
-        .fusion-right{
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 270px;
-        }
+        left: 0;
     }
 </style>

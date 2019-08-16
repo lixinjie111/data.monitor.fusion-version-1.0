@@ -1,12 +1,5 @@
 <template>
     <div class="fusion-style">
-        <div class="fusion-left">
-            <div class="c-scroll-wrap">
-                <div class="c-scroll-inner">
-                    <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount"></left>
-                </div>
-            </div>
-        </div>
         <div class="base-info">
             <span class="base-time">{{$parent.formatTime || '--'}}</span>
             <span>
@@ -15,7 +8,14 @@
                     <em class="c-middle">{{$parent.weather.wendu || '--'}}°</em>
                 </span>
         </div>
-        <div class="fusion-right">
+        <div class="fusion-layout">
+            <div class="fusion-left">
+                <div class="c-scroll-wrap">
+                    <div class="c-scroll-inner">
+                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount"></left>
+                    </div>
+                </div>
+            </div>
             <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData"></right>
         </div>
     </div>
@@ -154,13 +154,14 @@
             bottom: 0;
             width: 270px;
             background: #1a1a1a;;
+            z-index:1;
         }
-        .fusion-right{
+        .fusion-layout{
             position: absolute;
             top: 0;
             right: 0;
             bottom: 0;
-            left: 270px;
+            left: 0;
         }
     }
 </style>

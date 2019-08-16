@@ -7,11 +7,19 @@
         <div class="fusion-left-main">
             <div class="single-info">
                 <div class="single-info-header">
-                    <span>车牌号：{{singleVehicle.platNo}}</span>
                     <span class="info-font">L{{singleVehicle.autoLevel}}</span>
+                    <span class="vehicle-number">车牌号：{{singleVehicle.platNo}}</span>
+                    <div class="real-content">
+                        <!--左-->
+                        <img src="@/assets/images/single/left.png"  class="turn-img" v-if="realData.turnLight=='left'">
+                        <img src="@/assets/images/single/right.png" class="turn-img director-left " v-else>
+                        <!--向右转 亮-->
+                        <img src="@/assets/images/single/left.png" class="director-right" v-if="realData.turnLight=='right'">
+                        <img src="@/assets/images/single/right.png" v-else >
+                    </div>
                 </div>
                 <div class="info-img">
-                    <img src="@/assets/images/single/car.png" />
+                    <img :src="singleVehicle.vehicleLogo"/>
                 </div>
             </div>
             <ul class="single-real clearfix">
@@ -356,46 +364,34 @@
         text-align: center;
         height: 150px;
         .single-info-header{
-            @include layoutMode(between);
-            padding:0px 20px ;
+           /* @include layoutMode(between);*/
+            padding:10px 10px ;
             font-size: 14px;
-            line-height: 40px;
+            line-height: 20px;
             letter-spacing: 0px;
             color: #ddd9d1;
+            text-align: left;
+            .vehicle-number{
+                padding:0 6px;
+            }
             .info-font{
-                color: #37ba7b;
-            }
-        }
-        .info-img{
-            display: block;
-            line-height: 110px;
-            height: 110px;
-            img{
-                height:80px;
-            }
-        }
-    }
-    .single-real{
-        padding-top: 20px;
-        padding-bottom: 20px;
-        li{
-            float: right;
-            width: 48%;
-            text-align: center;
-            margin-bottom: 6px;
-            border:1px solid rgba(211, 134, 0, 0.5);
-            p{
-                font-size: 14px;
-                line-height: 40px;
-                color: #ddd9d1;
+                color: #fff;
+                width: 20px;
+                height: 20px;
+                background:#0b5330;
+                border-radius: 2px;
+                letter-spacing: 2px;
+                padding-left: 2px;
             }
             .real-content{
                 position: relative;
                 color: #d38600;
-                @include layoutMode(both);
-                height: 60px;
+                /*@include layoutMode(both);*/
                 box-sizing: border-box;
-               /* padding-bottom: 20px;*/
+                display: inline-block;
+                img{
+                    height: 16px;
+                }
                 .real-img{
                     display: inline-block;
                     width: 46px;
@@ -438,12 +434,38 @@
                 }
 
                 .turn-img{
-                    margin-right: 4px;
+                   /* margin-right: 4px;*/
+
                 }
                 .director-right,.director-left{
                     transform: rotate(180deg);
                 }
             }
+        }
+        .info-img{
+            display: block;
+            line-height: 110px;
+            height: 110px;
+            img{
+                height:80px;
+            }
+        }
+    }
+    .single-real{
+        padding-top: 20px;
+        padding-bottom: 20px;
+        li{
+            float: right;
+            width: 48%;
+            text-align: center;
+            margin-bottom: 6px;
+            border:1px solid rgba(211, 134, 0, 0.5);
+            p{
+                font-size: 14px;
+                line-height: 40px;
+                color: #ddd9d1;
+            }
+
         }
         .real-li{
             float: left!important;

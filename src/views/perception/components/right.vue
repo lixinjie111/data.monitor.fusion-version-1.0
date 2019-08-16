@@ -50,7 +50,7 @@
                 </div>
         <div id="map" class="c-map">
             <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}" v-show="video1Show">
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer"></video-player>
+                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
@@ -184,6 +184,7 @@
             },
             onMapComplete(){
                 getMap(this.$refs.perceptionMap);
+                this.$refs.perceptionMap.addModel('tra_light00011111','./static/map3d/models/traffic_light.3ds',326279.672803747,3462360.84818288,12.68);
                 let longitude=parseFloat(this.$route.params.lon);
                 let latitude=parseFloat(this.$route.params.lat);
                 //设置地图的中心点
@@ -209,7 +210,7 @@
              },
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
-                this.$refs.map1.zoomTo(10);
+                this.$refs.map1.zoomTo(12);
                 this.$refs.map1.addWms("shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","gd_road_centerline",1,true,null); // 上海汽车城
 
             },
@@ -232,7 +233,7 @@
                 if(!this.isFirst){
                     if(this.video1Show||this.rtmp1!=''){
                         this.rtmp1="";
-                        this.$refs.videoPlayer.player.src("");
+                        this.$refs.videoPlayer1.player.src("");
                         this.video1Show=false;
                     }
                     this.lightWebsocket.close();
@@ -291,12 +292,10 @@
                     let count=0;
                     typicalList.forEach((item,index)=>{
                         if(index==0){
-
                             //球面坐标转成三维坐标
                             let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
                             //三维坐标转成平面像素
                             let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-
                             /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
                             this.left1 = parseInt(pixel[0]);
                             let ele = document.getElementById('fusionRight');
@@ -418,13 +417,13 @@
                             let item1 = spatObj[key];
                             if(item1.roadId){
                                 let obj = {};
-                                let longitude = parseFloat(item1.lightPos.split(",")[0]);
-                                let latitude = parseFloat(item1.lightPos.split(",")[1]);
-                                //球面坐标转成三维坐标
-                                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
-                                //三维坐标转成平面像素
-                                let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
                                 if(i==0){
+                                   let longitude = parseFloat(item1.lightPos.split(",")[0]);
+                                   let latitude = parseFloat(item1.lightPos.split(",")[1]);
+                                   //球面坐标转成三维坐标
+                                   let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
+                                   //三维坐标转成平面像素
+                                   let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
                                    obj.left = parseInt(pixel[0]);
                                    obj.top = parseInt(pixel[1]);
                                    top=obj.top;
