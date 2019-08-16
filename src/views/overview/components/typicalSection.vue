@@ -139,34 +139,92 @@ export default {
 
 
         // 获取四周的经纬度
+        getFourPosition(mapOption) {
+            let finalFourPosition = [];
+            let bounds;
+            let northEast = [];
+            let southWest = [];
+            let northWest = [];
+            let southEast = [];
+            let southwest;
+            let northeast;
+            let x = 0.0005;
+            let y = 0.0003;
+            bounds = mapOption.map.getBounds();
+            // 西南
+            southWest.push(bounds.southwest.lng - x);
+            southWest.push(bounds.southwest.lat - y);
+            finalFourPosition.push(southWest);
+            // 西北
+            northWest.push(bounds.southwest.lng - x);
+            northWest.push(bounds.northeast.lat + y);
+            finalFourPosition.push(northWest);
+            // 东北
+            northEast.push(bounds.northeast.lng + x);
+            northEast.push(bounds.northeast.lat + y);
+            finalFourPosition.push(northEast);
+            // 东南
+            southEast.push(bounds.northeast.lng + x);
+            southEast.push(bounds.southwest.lat - y);
+            finalFourPosition.push(southEast);
+            southwest = [bounds.southwest.lng, bounds.southwest.lat];
+            northeast = [bounds.northeast.lng, bounds.northeast.lat];
+            // let mapBounds = new AMap.Bounds(southwest, northeast);
+            // var rectangle = new AMap.Rectangle({
+            //     bounds: mapBounds,
+            //     strokeColor: 'red',
+            //     strokeWeight: 6,
+            //     strokeOpacity: 0.5,
+            //     strokeDasharray: [30, 10],
+            //     strokeStyle: 'dashed',
+            //     fillOpacity:0.5,
+            //     cursor:'pointer',
+            //     zIndex:50,
+            // });
+            // rectangle.setMap(mapOption.map);
+            mapOption.finalFourPosition = finalFourPosition;
+            // console.log('mapOption ---', mapOption);
+            this.setWebsocketData(mapOption);
+        },
         // getFourPosition(mapOption) {
         //     let finalFourPosition = [];
-        //     let bounds;
-        //     let northEast = [];
-        //     let southWest = [];
-        //     let northWest = [];
-        //     let southEast = [];
-        //     let southwest;
-        //     let northeast;
-        //     bounds = mapOption.map.getBounds();
+        //     let position1 = [];
+        //     let position2 = [];
+        //     let position3 = [];
+        //     let position4 = [];
+        //     let southwest = [];
+        //     let northeast = [];
         //     // 西南
-        //     southWest.push(bounds.southwest.lng);
-        //     southWest.push(bounds.southwest.lat);
-        //     finalFourPosition.push(southWest);
+        //     let  leftBottom = new AMap.Pixel(-100, 276);
+        //     leftBottom = mapOption.map.containerToLngLat(leftBottom);
+        //     position4.push(leftBottom.lng);
+        //     position4.push(leftBottom.lat);
+        //     finalFourPosition.push(position4);
         //     // 西北
-        //     northWest.push(bounds.southwest.lng);
-        //     northWest.push(bounds.northeast.lat);
-        //     finalFourPosition.push(northWest);
+        //     let  leftTop = new AMap.Pixel(-100, -100);
+        //     leftTop = mapOption.map.containerToLngLat(leftTop);
+        //     position1.push(leftTop.lng);
+        //     position1.push(leftTop.lat);
+        //     finalFourPosition.push(position1);
+
         //     // 东北
-        //     northEast.push(bounds.northeast.lng);
-        //     northEast.push(bounds.northeast.lat);
-        //     finalFourPosition.push(northEast);
+        //     let  rightTop = new AMap.Pixel(415, -100);
+        //     rightTop = mapOption.map.containerToLngLat(rightTop);
+        //     position2.push(rightTop.lng);
+        //     position2.push(rightTop.lat);
+        //     finalFourPosition.push(position2);
+
         //     // 东南
-        //     southEast.push(bounds.northeast.lng);
-        //     southEast.push(bounds.southwest.lat);
-        //     finalFourPosition.push(southEast);
-        //     southwest = [bounds.southwest.lng, bounds.southwest.lat];
-        //     northeast = [bounds.northeast.lng, bounds.northeast.lat];
+        //     let  rightBottom = new AMap.Pixel(415, 276);
+        //     rightBottom = mapOption.map.containerToLngLat(rightBottom);
+        //     position3.push(rightBottom.lng);
+        //     position3.push(rightBottom.lat);
+        //     finalFourPosition.push(position3);
+        //     mapOption.finalFourPosition = finalFourPosition;
+
+
+        //     southwest = [leftBottom.lng, leftBottom.lat];
+        //     northeast = [rightTop.lng, rightTop.lat];
         //     let mapBounds = new AMap.Bounds(southwest, northeast);
         //     var rectangle = new AMap.Rectangle({
         //         bounds: mapBounds,
@@ -180,47 +238,8 @@ export default {
         //         zIndex:50,
         //     });
         //     rectangle.setMap(mapOption.map);
-        //     mapOption.finalFourPosition = finalFourPosition;
-        //     this.setWebsocketData(mapOption);
+        //     this.setWebsocketData(mapOption);;
         // },
-        getFourPosition(mapOption) {
-            let finalFourPosition = [];
-            let position1 = [];
-            let position2 = [];
-            let position3 = [];
-            let position4 = [];
-            let southwest = [];
-            let northeast = [];
-
-            let  leftBottom = new AMap.Pixel(-100, 276);
-            leftBottom = mapOption.map.containerToLngLat(leftBottom);
-            position4.push(leftBottom.lng);
-            position4.push(leftBottom.lat);
-            finalFourPosition.push(position4);
-
-            let  leftTop = new AMap.Pixel(-100, -100);
-            leftTop = mapOption.map.containerToLngLat(leftTop);
-            position1.push(leftTop.lng);
-            position1.push(leftTop.lat);
-            finalFourPosition.push(position1);
-
-
-            let  rightTop = new AMap.Pixel(415, -100);
-            rightTop = mapOption.map.containerToLngLat(rightTop);
-            position2.push(rightTop.lng);
-            position2.push(rightTop.lat);
-            finalFourPosition.push(position2);
-
-
-            let  rightBottom = new AMap.Pixel(415, 276);
-            rightBottom = mapOption.map.containerToLngLat(rightBottom);
-            position3.push(rightBottom.lng);
-            position3.push(rightBottom.lat);
-            finalFourPosition.push(position3);
-            mapOption.finalFourPosition = finalFourPosition;
-            
-            this.setWebsocketData(mapOption);;
-        },
         // 设置websocket
         setWebsocketData(mapOption) {
             if (mapOption.type === 1) {
@@ -351,6 +370,8 @@ export default {
                 // 新建点
                 if ('vehDataDTO' in result === true) {
                     _this.mapOne.roadSenseCars = result.vehDataDTO;
+                    let time = jsonData.time;
+                    // console.log('路口1', _this.mapOne.roadSenseCars, _this.mapOne.roadSenseCars.length)
                     _this.mapOne.roadSenseCars = _this.mapOne.roadSenseCars.filter(x => x.targetType === 2 || x.targetType === 5);
                     if (_this.mapOne.roadSenseCars.length > 0) {
                         _this.mapOne.roadSenseCars.map((x, index) => {
@@ -380,8 +401,12 @@ export default {
                             if ( _this.mapOne.sideVehicleObj[subItem.vehicleId]) {
                                 let sideCar =  _this.mapOne.sideVehicleObj[subItem.vehicleId];
                                 if (sideCar.flag) {
+                                    // console.log('zhiqian', new Date().getTime());
                                     sideCar.marker.setAngle(subItem.heading);
                                     sideCar.marker.moveTo(subItem.position, subItem.speed);
+                                    // console.log('vehicleId', subItem.vehicleId);
+                                    // console.log('时间', time);
+                                    // console.log('当前时间', new Date().getTime());
                                 } else {
                                     sideCar.marker.setAngle(subItem.heading);
                                     sideCar.marker.setPosition(subItem.position);
@@ -1016,7 +1041,8 @@ export default {
         //   left: 0;
           height: 100%;
           width: 100%;
-          overflow: hidden;
+        //   overflow: hidden;
+          z-index: 555;
         //   z-index: 1;
         }
     }
