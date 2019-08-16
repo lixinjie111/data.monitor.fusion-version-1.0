@@ -192,60 +192,35 @@ export default {
             let southwest = [];
             let northeast = [];
 
-            let  leftBottom = new AMap.Pixel(0, 376);
+            let  leftBottom = new AMap.Pixel(-100, 276);
             leftBottom = mapOption.map.containerToLngLat(leftBottom);
-            console.log('leftBottom', leftBottom);
             position4.push(leftBottom.lng);
             position4.push(leftBottom.lat);
             finalFourPosition.push(position4);
 
-            let  leftTop = new AMap.Pixel(-100, 0);
+            let  leftTop = new AMap.Pixel(-100, -100);
             leftTop = mapOption.map.containerToLngLat(leftTop);
             position1.push(leftTop.lng);
             position1.push(leftTop.lat);
             finalFourPosition.push(position1);
 
 
-            let  rightTop = new AMap.Pixel(515, -100);
+            let  rightTop = new AMap.Pixel(415, -100);
             rightTop = mapOption.map.containerToLngLat(rightTop);
             position2.push(rightTop.lng);
             position2.push(rightTop.lat);
             finalFourPosition.push(position2);
 
 
-            let  rightBottom = new AMap.Pixel(515, 376);
+            let  rightBottom = new AMap.Pixel(415, 276);
             rightBottom = mapOption.map.containerToLngLat(rightBottom);
             position3.push(rightBottom.lng);
             position3.push(rightBottom.lat);
             finalFourPosition.push(position3);
-
             mapOption.finalFourPosition = finalFourPosition;
-            console.log('mapOption.finalFourPosition', mapOption.finalFourPosition);
-            // southwest = [mapOption.finalFourPosition[3][0].lng, mapOption.finalFourPosition[3][1].lat];
-            // northeast = [mapOption.finalFourPosition[1][0].lng, mapOption.finalFourPosition[1][1].lat];
-            // let mapBounds = new AMap.Bounds(southwest, northeast);
-            // var rectangle = new AMap.Rectangle({
-            //     bounds: mapBounds,
-            //     strokeColor: 'red',
-            //     strokeWeight: 6,
-            //     strokeOpacity: 0.5,
-            //     strokeDasharray: [30, 10],
-            //     strokeStyle: 'dashed',
-            //     fillOpacity:0.5,
-            //     cursor:'pointer',
-            //     zIndex:50,
-            // });
-            // rectangle.setMap(mapOption.map);
-            this.setWebsocketData(mapOption);
-            // console.log('leftTop', leftTop);
-            // console.log('rightTop', rightTop);
-            // console.log('rightBottom', rightBottom);
-            // console.log('leftBottom', leftBottom);
+            
+            this.setWebsocketData(mapOption);;
         },
-
-
-
-
         // 设置websocket
         setWebsocketData(mapOption) {
             if (mapOption.type === 1) {
@@ -376,8 +351,6 @@ export default {
                 // 新建点
                 if ('vehDataDTO' in result === true) {
                     _this.mapOne.roadSenseCars = result.vehDataDTO;
-                    console.log('路口4', _this.mapOne.roadSenseCars, _this.mapOne.roadSenseCars.length);
-                    // console.log('第一个路段车辆', _this.mapOne.roadSenseCars.length, _this.mapOne.roadSenseCars);
                     _this.mapOne.roadSenseCars = _this.mapOne.roadSenseCars.filter(x => x.targetType === 2 || x.targetType === 5);
                     if (_this.mapOne.roadSenseCars.length > 0) {
                         _this.mapOne.roadSenseCars.map((x, index) => {
@@ -409,7 +382,6 @@ export default {
                                 if (sideCar.flag) {
                                     sideCar.marker.setAngle(subItem.heading);
                                     sideCar.marker.moveTo(subItem.position, subItem.speed);
-                                    console.log('subItem.position', subItem.position);
                                 } else {
                                     sideCar.marker.setAngle(subItem.heading);
                                     sideCar.marker.setPosition(subItem.position);
