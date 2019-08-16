@@ -225,6 +225,9 @@ export default {
             this.scene.add(model);
             this.models[name]=model;
         },
+        addGeometry:function(geomModel){
+            this.scene.add(geomModel);
+        },
         getModel:function(id){
           return this.models[id];
         },
@@ -673,7 +676,7 @@ export default {
                     if(!tag)
                     {
                         // debugger
-//                        console.log(dl.models);
+                        // console.log(dl.models);
                         let model = this.models[key];
                         // dl.removeModel(model,this.viewer);
                         model.position.set( 0, 0, 0 );
