@@ -256,24 +256,49 @@ export default {
             let carPosition;
             if ('spatDataDTO' in result === true) {
                 _this.mapOne.roadLights = result.spatDataDTO;
-               _this.mapOne.roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
-                    _this.mapOne.roadLights[index].position = lightPosition;
-                });
-                for (let i = 0; i < _this.mapOne.roadLights.length; i++) {
-                    let _data = _this.mapOne.roadLights[i];
-                    if(_data.position) {
-                        let marker = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.map1,
-                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-2, -5),
-                            spatId: _data.spatId,
-                            zIndex: 100
-                        });
-                        _this.mapOne.map.add(marker);
-                        // _this.map1LightList.push(marker);
+                if ( _this.mapOne.roadLights.length > 0) {
+                    _this.mapOne.roadLights.map((x, index) => {
+                        lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
+                        _this.mapOne.roadLights[index].position = lightPosition;
+                    });
+                    for (let id in _this.mapOne.sideLight) {
+                        let flag = false;
+                        // 比对已经打点的id和返回的将要打点的车辆， 有，设置flag = true
+                        for (let i = 0; i <  _this.mapOne.roadLights.length; i++) {
+                            if (id ===  _this.mapOne.roadLights[i].spatId) {
+                                if (_this.mapOne.sideLight[id].flag) {
+                                    flag = true;
+                                    break;
+                                }
+                            }
+                        }
+                        // 不存在时，隐藏掉
+                        if (!flag) {
+                            _this.mapOne.sideLight[id].flag = false;
+                        }
                     }
+                    // 开始打点
+                    _this.mapOne.roadLights.forEach((subItem, subIndex, subArr) => {
+                        if (_this.mapOne.sideLight[subItem.spatId]) {
+                            let roadLig = _this.mapOne.sideLight[subItem.spatId];
+                            roadLig.marker.setIcon(this.dealLight(subItem));
+                        } else {
+                            // 新的
+                            _this.mapOne.sideLight[subItem.spatId] = {
+                                marker: null,
+                                flag: true
+                            };
+                            _this.mapOne.sideLight[subItem.spatId].marker = new AMap.Marker({
+                                position: subItem.position,
+                                map: _this.mapOne.map,
+                                icon: this.dealLight(subItem),
+                                spatId: subItem.spatId,
+                                offset: new AMap.Pixel(-2, -5),
+                                zIndex: 100
+                            });
+                            this.mapOne.map.add(_this.mapOne.sideLight[subItem.spatId].marker);
+                        }
+                    });
                 }
             }
             // 车辆
@@ -757,24 +782,49 @@ export default {
             let carPosition;
             if ('spatDataDTO' in result === true) {
                 _this.mapFour.roadLights = result.spatDataDTO;
-                 _this.mapFour.roadLights.map((x, index) => {
-                    lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
-                     _this.mapFour.roadLights[index].position = lightPosition;
-                });
-                for (let i = 0; i <  _this.mapFour.roadLights.length; i++) {
-                    let _data = _this.mapFour. roadLights[i];
-                    if(_data.position) {
-                        let marker = new AMap.Marker({
-                            position: _data.position,
-                            map: _this.mapFour.map,
-                            icon: this.dealLight(_data), // 添加 Icon 图标 URL
-                            offset: new AMap.Pixel(-2, -5),
-                            spatId: _data.spatId,
-                            zIndex: 100
-                        });
-                        _this.mapFour.map.add(marker);
-                        // _this.map4LightList.push(marker);
+                if ( _this.mapFour.roadLights.length > 0) {
+                    _this.mapFour.roadLights.map((x, index) => {
+                        lightPosition = new AMap.LngLat(x.position.longitude, x.position.latitude);
+                        _this.mapFour.roadLights[index].position = lightPosition;
+                    });
+                    for (let id in _this.mapFour.sideLight) {
+                        let flag = false;
+                        // 比对已经打点的id和返回的将要打点的车辆， 有，设置flag = true
+                        for (let i = 0; i <  _this.mapFour.roadLights.length; i++) {
+                            if (id ===  _this.mapFour.roadLights[i].spatId) {
+                                if (_this.mapFour.sideLight[id].flag) {
+                                    flag = true;
+                                    break;
+                                }
+                            }
+                        }
+                        // 不存在时，隐藏掉
+                        if (!flag) {
+                            _this.mapFour.sideLight[id].flag = false;
+                        }
                     }
+                    // 开始打点
+                    _this.mapFour.roadLights.forEach((subItem, subIndex, subArr) => {
+                        if (_this.mapFour.sideLight[subItem.spatId]) {
+                            let roadLig = _this.mapFour.sideLight[subItem.spatId];
+                            roadLig.marker.setIcon(this.dealLight(subItem));
+                        } else {
+                            // 新的
+                            _this.mapFour.sideLight[subItem.spatId] = {
+                                marker: null,
+                                flag: true
+                            };
+                            _this.mapFour.sideLight[subItem.spatId].marker = new AMap.Marker({
+                                position: subItem.position,
+                                map: _this.mapFour.map,
+                                icon: this.dealLight(subItem),
+                                spatId: subItem.spatId,
+                                offset: new AMap.Pixel(-2, -5),
+                                zIndex: 100
+                            });
+                            this.mapFour.map.add(_this.mapFour.sideLight[subItem.spatId].marker);
+                        }
+                    });
                 }
             }
             // 车辆
