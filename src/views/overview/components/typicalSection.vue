@@ -1030,7 +1030,7 @@ export default {
         .road-word {
             // position: relative;
             position: absolute;
-            z-index: 2;
+            z-index: 999;
             padding-left: 7px;
         }
         .cross-scan {

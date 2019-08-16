@@ -320,12 +320,7 @@
             },
             getVideo(camera,index){
                 let _this = this;
-                //播放20s移动到下方
-                let time1 = setTimeout(()=>{
-                    let ele = document.getElementById("message1");
-                    ele.className="style style1";
-                    clearTimeout(time1);
-                },20000)
+                let ele = document.getElementById("message1");
                 getVideoByNum({
                     "protocal": camera.protocol,
                     "serialNum": camera.serialNum
@@ -335,9 +330,14 @@
                         if(_this.rtmp1==""){
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                            ele.className="style style2";
                         }else{
-                            _this.option1.notSupportedMessage= '此视频暂无法播放，请稍候再试';
                             _this.option1.sources[0].src=_this.rtmp1;
+                            //播放20s移动到下方
+                            let time1 = setTimeout(()=>{
+                                ele.className="style style1";
+                                clearTimeout(time1);
+                            },20000)
                         }
                     }
                 })
@@ -714,7 +714,10 @@
     .style1{
         left: 20px!important;
         bottom: 0px!important;
-
+    }
+    .style2{
+        transition: all 2s ease-in-out;
+        opacity: 0!important;
     }
     /*@keyframes move {
         0%{transform:translate(0,0);}
