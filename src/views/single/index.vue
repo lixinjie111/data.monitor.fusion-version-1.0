@@ -166,7 +166,7 @@
         left: 0;
         top: 0;
         bottom: 0;
-        width: 270px;
+        width: 310px;
        /* background: #1a1a1a;*/
         z-index:1;
     }

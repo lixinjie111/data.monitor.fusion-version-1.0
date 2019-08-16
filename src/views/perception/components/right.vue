@@ -210,7 +210,7 @@
              },
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
-                this.$refs.map1.zoomTo(12);
+                this.$refs.map1.zoomTo(14);
                 this.$refs.map1.addWms("shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","gd_road_centerline",1,true,null); // 上海汽车城
 
             },
@@ -712,8 +712,8 @@
 
     }
     .style1{
-        left: 0!important;
-        bottom: 0!important;
+        left: 20px!important;
+        bottom: 0px!important;
 
     }
     /*@keyframes move {

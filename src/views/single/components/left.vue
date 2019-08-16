@@ -2,13 +2,13 @@
     <div class="fusion-left-style">
         <div class="fusion-header">
             <img src="@/assets/images/logo.png" class="header-img" @click="routeGo"/>
-            感知融合平台
+            融合感知平台
         </div>
         <div class="fusion-left-main">
             <div class="single-info">
                 <div class="single-info-header">
                     <span class="info-font">L{{singleVehicle.autoLevel}}</span>
-                    <span class="vehicle-number">车牌号：{{singleVehicle.platNo}}</span>
+                    <span class="vehicle-number">{{singleVehicle.platNo}}</span>
                     <div class="real-content">
                         <!--左-->
                         <img src="@/assets/images/single/left.png"  class="turn-img" v-if="realData.turnLight=='left'">
@@ -21,8 +21,16 @@
                 <div class="info-img">
                     <img :src="singleVehicle.vehicleLogo"/>
                 </div>
+                <div class="pedal-style">
+                    <div class="real-img-base oil-base">
+                        <span class="real-img-style oil-style" :style="{left:oilLeftWidth+ 'px'}"></span>
+                    </div>
+                    <div class="real-img-base brake-base">
+                        <span class="real-img-style brake-style" :style="{left:brakeLeftWidth+ 'px'}"></span>
+                    </div>
+                </div>
             </div>
-            <ul class="single-real clearfix">
+         <!--   <ul class="single-real clearfix">
                     <li class="real-li">
                         <p>方向盘转角</p>
                         <div class="real-content">
@@ -35,11 +43,11 @@
                     <li>
                         <p>转向灯</p>
                         <div class="real-content">
-                            <!--左-->
+                            &lt;!&ndash;左&ndash;&gt;
                             <img src="@/assets/images/single/left.png"  class="turn-img" v-if="realData.turnLight=='left'">
                             <img src="@/assets/images/single/right.png" class="turn-img director-left " v-else>
-                            <!--向右转 亮-->
-                            <!--<img src="@/assets/images/car/car-12.png" class="director-right" v-if="realData.turnLight=='right'">-->
+                            &lt;!&ndash;向右转 亮&ndash;&gt;
+                            &lt;!&ndash;<img src="@/assets/images/car/car-12.png" class="director-right" v-if="realData.turnLight=='right'">&ndash;&gt;
                             <img src="@/assets/images/single/left.png" class="director-right" v-if="realData.turnLight=='right'">
                             <img src="@/assets/images/single/right.png" v-else >
                         </div>
@@ -60,7 +68,7 @@
                             </div>
                         </div>
                     </li>
-                </ul>
+                </ul>-->
             <div class="fusion-left-map">
                 <div class="map-style" id="singleMap"></div>
             </div>
@@ -103,7 +111,6 @@
                 count:0
             }
         },
-
         computed:{
             oilLeftWidth(){
                 let oilData = parseFloat(this.realData.oilDoor/100);
@@ -362,12 +369,48 @@
     .single-info{
         border:1px solid rgba(211,134,0,0.5);
         text-align: center;
-        height: 150px;
+        height: 180px;
+        position: relative;
+        margin-bottom: 40px;
+        background: #00000082;
+        .pedal-style{
+            display: inline-block;
+            position: absolute;
+            bottom: 10px;
+            left: 30px;
+            width: 270px;
+            .oil-base{
+                border-top:2px solid #23b318;
+                .oil-style{
+                    border-left:4px solid #23b318;
+                }
+            }
+            .brake-base{
+                border-top:2px solid #c73610;
+                margin-left: 120px;
+                .brake-style{
+                    border-left:4px solid #c73610;
+                }
+            }
+            .real-img-base{
+                /*display: inline-block;*/
+                width: 80px;
+                height: 0px;
+                position: relative;
+                .real-img-style{
+                    display: inline-block;
+                    width: 0px;
+                    height: 16px;
+                    position: absolute;
+                    top: -8px;
+                }
+            }
+        }
         .single-info-header{
            /* @include layoutMode(between);*/
-            padding:10px 10px ;
-            font-size: 14px;
-            line-height: 20px;
+            padding:0px 10px ;
+            font-size: 16px;
+            line-height: 40px;
             letter-spacing: 0px;
             color: #ddd9d1;
             text-align: left;
@@ -388,9 +431,9 @@
                 color: #d38600;
                 /*@include layoutMode(both);*/
                 box-sizing: border-box;
-                display: inline-block;
+                float: right;
                 img{
-                    height: 16px;
+                    height: 18px;
                 }
                 .real-img{
                     display: inline-block;
@@ -447,7 +490,7 @@
             line-height: 110px;
             height: 110px;
             img{
-                height:80px;
+                height:110px;
             }
         }
     }
@@ -498,7 +541,7 @@
 
     }
     .fusion-left-map{
-        height:150px;
+        height:180px;
         border:1px solid rgba(211,134,0,0.5);
         .map-style{
             height: 100%;
