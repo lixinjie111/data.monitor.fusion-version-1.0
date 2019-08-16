@@ -44,9 +44,11 @@ export default {
                 roadSenseCars: [], // 车辆数据
                 roadWebSocket: {}, // websocket对象
                 finalFourPosition: [],
-                count: 0, // 计数
+                count: 0,
+                num: 0, // 计数
                 sideVehicleObj: {}, // 地图上画车辆
-                sideLight: {} // 地图上红绿灯
+                sideLight: {}, // 地图上红绿灯
+                interval: null
                 
             },
             mapTwo: {
@@ -60,7 +62,8 @@ export default {
                 finalFourPosition: [],
                 count: 0, // 计数
                 sideVehicleObj: {}, // 地图上画车辆
-                sideLight: {} // 地图上红绿灯
+                sideLight: {}, // 地图上红绿灯,
+                interval: null
             },
             mapThree: {
                 type: 3,
@@ -132,35 +135,94 @@ export default {
         //     this.dialogVisible = true;
         //     this.$emit("queryCrossDetail",item);
         // },
+
+
+
         // 获取四周的经纬度
+        // getFourPosition(mapOption) {
+        //     let finalFourPosition = [];
+        //     let bounds;
+        //     let northEast = [];
+        //     let southWest = [];
+        //     let northWest = [];
+        //     let southEast = [];
+        //     let southwest;
+        //     let northeast;
+        //     bounds = mapOption.map.getBounds();
+        //     // 西南
+        //     southWest.push(bounds.southwest.lng);
+        //     southWest.push(bounds.southwest.lat);
+        //     finalFourPosition.push(southWest);
+        //     // 西北
+        //     northWest.push(bounds.southwest.lng);
+        //     northWest.push(bounds.northeast.lat);
+        //     finalFourPosition.push(northWest);
+        //     // 东北
+        //     northEast.push(bounds.northeast.lng);
+        //     northEast.push(bounds.northeast.lat);
+        //     finalFourPosition.push(northEast);
+        //     // 东南
+        //     southEast.push(bounds.northeast.lng);
+        //     southEast.push(bounds.southwest.lat);
+        //     finalFourPosition.push(southEast);
+        //     southwest = [bounds.southwest.lng, bounds.southwest.lat];
+        //     northeast = [bounds.northeast.lng, bounds.northeast.lat];
+        //     let mapBounds = new AMap.Bounds(southwest, northeast);
+        //     var rectangle = new AMap.Rectangle({
+        //         bounds: mapBounds,
+        //         strokeColor: 'red',
+        //         strokeWeight: 6,
+        //         strokeOpacity: 0.5,
+        //         strokeDasharray: [30, 10],
+        //         strokeStyle: 'dashed',
+        //         fillOpacity:0.5,
+        //         cursor:'pointer',
+        //         zIndex:50,
+        //     });
+        //     rectangle.setMap(mapOption.map);
+        //     mapOption.finalFourPosition = finalFourPosition;
+        //     this.setWebsocketData(mapOption);
+        // },
         getFourPosition(mapOption) {
             let finalFourPosition = [];
-            let bounds;
-            let northEast = [];
-            let southWest = [];
-            let northWest = [];
-            let southEast = [];
-            let southwest;
-            let northeast;
-            bounds = mapOption.map.getBounds();
-            // 西南
-            southWest.push(bounds.southwest.lng);
-            southWest.push(bounds.southwest.lat);
-            finalFourPosition.push(southWest);
-            // 西北
-            northWest.push(bounds.southwest.lng);
-            northWest.push(bounds.northeast.lat);
-            finalFourPosition.push(northWest);
-            // 东北
-            northEast.push(bounds.northeast.lng);
-            northEast.push(bounds.northeast.lat);
-            finalFourPosition.push(northEast);
-            // 东南
-            southEast.push(bounds.northeast.lng);
-            southEast.push(bounds.southwest.lat);
-            finalFourPosition.push(southEast);
-            southwest = [bounds.southwest.lng, bounds.southwest.lat];
-            northeast = [bounds.northeast.lng, bounds.northeast.lat];
+            let position1 = [];
+            let position2 = [];
+            let position3 = [];
+            let position4 = [];
+            let southwest = [];
+            let northeast = [];
+
+            let  leftBottom = new AMap.Pixel(0, 376);
+            leftBottom = mapOption.map.containerToLngLat(leftBottom);
+            console.log('leftBottom', leftBottom);
+            position4.push(leftBottom.lng);
+            position4.push(leftBottom.lat);
+            finalFourPosition.push(position4);
+
+            let  leftTop = new AMap.Pixel(-100, 0);
+            leftTop = mapOption.map.containerToLngLat(leftTop);
+            position1.push(leftTop.lng);
+            position1.push(leftTop.lat);
+            finalFourPosition.push(position1);
+
+
+            let  rightTop = new AMap.Pixel(515, -100);
+            rightTop = mapOption.map.containerToLngLat(rightTop);
+            position2.push(rightTop.lng);
+            position2.push(rightTop.lat);
+            finalFourPosition.push(position2);
+
+
+            let  rightBottom = new AMap.Pixel(515, 376);
+            rightBottom = mapOption.map.containerToLngLat(rightBottom);
+            position3.push(rightBottom.lng);
+            position3.push(rightBottom.lat);
+            finalFourPosition.push(position3);
+
+            mapOption.finalFourPosition = finalFourPosition;
+            console.log('mapOption.finalFourPosition', mapOption.finalFourPosition);
+            // southwest = [mapOption.finalFourPosition[3][0].lng, mapOption.finalFourPosition[3][1].lat];
+            // northeast = [mapOption.finalFourPosition[1][0].lng, mapOption.finalFourPosition[1][1].lat];
             // let mapBounds = new AMap.Bounds(southwest, northeast);
             // var rectangle = new AMap.Rectangle({
             //     bounds: mapBounds,
@@ -174,9 +236,16 @@ export default {
             //     zIndex:50,
             // });
             // rectangle.setMap(mapOption.map);
-            mapOption.finalFourPosition = finalFourPosition;
             this.setWebsocketData(mapOption);
+            // console.log('leftTop', leftTop);
+            // console.log('rightTop', rightTop);
+            // console.log('rightBottom', rightBottom);
+            // console.log('leftBottom', leftBottom);
         },
+
+
+
+
         // 设置websocket
         setWebsocketData(mapOption) {
             if (mapOption.type === 1) {
@@ -307,6 +376,8 @@ export default {
                 // 新建点
                 if ('vehDataDTO' in result === true) {
                     _this.mapOne.roadSenseCars = result.vehDataDTO;
+                    console.log('路口4', _this.mapOne.roadSenseCars, _this.mapOne.roadSenseCars.length);
+                    // console.log('第一个路段车辆', _this.mapOne.roadSenseCars.length, _this.mapOne.roadSenseCars);
                     _this.mapOne.roadSenseCars = _this.mapOne.roadSenseCars.filter(x => x.targetType === 2 || x.targetType === 5);
                     if (_this.mapOne.roadSenseCars.length > 0) {
                         _this.mapOne.roadSenseCars.map((x, index) => {
@@ -326,22 +397,24 @@ export default {
                             }
                             // 不存在时，隐藏掉
                             if (!flag) {
-                                 _this.mapOne.sideVehicleObj[id].marker.hide();
-                                 _this.mapOne.sideVehicleObj[id].flag = false;
+                                _this.mapOne.sideVehicleObj[id].marker.hide();
+                                _this.mapOne.sideVehicleObj[id].flag = false;
                             }
                         }
                         // 开始打点
                         _this.mapOne.roadSenseCars.forEach((subItem, subIndex, subArr) => {
+                            _this.mapOne.count ++;
                             if ( _this.mapOne.sideVehicleObj[subItem.vehicleId]) {
                                 let sideCar =  _this.mapOne.sideVehicleObj[subItem.vehicleId];
                                 if (sideCar.flag) {
                                     sideCar.marker.setAngle(subItem.heading);
                                     sideCar.marker.moveTo(subItem.position, subItem.speed);
+                                    console.log('subItem.position', subItem.position);
                                 } else {
                                     sideCar.marker.setAngle(subItem.heading);
                                     sideCar.marker.setPosition(subItem.position);
                                     sideCar.marker.show();
-                                     _this.mapOne.sideVehicleObj[subItem.vehicleId].flag = true;
+                                    _this.mapOne.sideVehicleObj[subItem.vehicleId].flag = true;
                                 }
                             } else {
                                 // 新的
@@ -392,6 +465,7 @@ export default {
                 }
             }
             var roadStr = JSON.stringify(roadLight);
+            console.log('this.mapOne.finalFourPosition  ---', this.mapOne.finalFourPosition);
             this.sendRoadMsg1(roadStr);
         },
         sendRoadMsg1(msg) {
@@ -419,8 +493,6 @@ export default {
             let _this = this;
             let jsonData = JSON.parse(message.data);
             let result = jsonData.result;
-            // let roadLights;
-            // let roadSenseCars;
             let lightPosition;
             let carPosition;
             // 红绿灯
@@ -495,7 +567,7 @@ export default {
                             }
                             // 不存在时，隐藏掉
                             if (!flag) {
-                                _this.mapTwo.sideVehicleObj[id].marker.hide();
+                                 _this.mapTwo.sideVehicleObj[id].marker.hide();
                                 _this.mapTwo.sideVehicleObj[id].flag = false;
                             }
                         }
@@ -605,7 +677,7 @@ export default {
             let result = jsonData.result;
             let lightPosition;
             let carPosition;
-             if ('spatDataDTO' in result === true) {
+            if ('spatDataDTO' in result === true) {
                 _this.mapThree.roadLights = result.spatDataDTO;
                 if ( _this.mapThree.roadLights.length > 0) {
                     _this.mapThree.roadLights.map((x, index) => {
@@ -936,7 +1008,7 @@ export default {
             } else {
                 return;
             }
-        },
+        }
     },
     destroyed(){
         //销毁Socket
@@ -944,6 +1016,7 @@ export default {
         this.mapTwo.roadWebSocket.close();
         this.mapThree.roadWebSocket.close();
         this.mapFour.roadWebSocket.close();
+        clearInterval(this.mapOne.interval);
         }
     }
 </script>
@@ -956,6 +1029,7 @@ export default {
         padding: 5px 6px 6px 6px;
         margin-bottom: 20px;
         top:33px;
+        overflow: hidden;
         .road-word {
             // position: relative;
             position: absolute;
