@@ -28,6 +28,7 @@ export default {
 
             ,shps:{}
             ,models:{}
+            ,staticmodels:{}
             ,infoLabels:{gan:{},label:{}}
             ,deviceModels:{
             }
@@ -230,6 +231,17 @@ export default {
         },
         getModel:function(id){
           return this.models[id];
+        },
+        addStaticModel:function(name,url,x,y,z){
+            let model = new dl.Model({url: url});
+            model.position.x = x;
+            model.position.y = y;
+            model.position.z = z;
+            this.scene.add(model);
+            this.staticmodels[name]=model;
+        },
+        getStaticModel:function(id){
+          return this.staticmodels[id];
         },
         remove3DInforLabel:function(name){
             let gan = this.infoLabels["gan"][name];
