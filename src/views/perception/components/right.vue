@@ -192,7 +192,12 @@
                     let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                     let x=utm[0];
                     let y=utm[1];
-                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+//                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                    /*setInterval(()=>{
+                        let camera = this.$refs.perceptionMap.getCamera();
+                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
+                    },500)*/
+                    this.$refs.perceptionMap.updateCameraPosition(x,y,217.16763677929166,205.99746133369624,-1.5707963267948966,-0.16236538804906267);
                     return;
                 }else{
                     this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
@@ -286,34 +291,35 @@
                     }
                 }).then(res=>{
                     let data = res.data;
-                    let typicalList=[{"rsPtId":"310114_002","rsPtName":"路侧点1","ptLon":121.1750307,"ptLat":31.2826193,"rspDistcodeProvince":"310000","rspDistcodeCity":"310100","rspDistcodeDistrict":"310114","rspRoadName":"博园路","mecId":"","regionId":"","rsPtPic":"1563762896617.jpg","rspRoadId":"478","rsPtIds":"","distName":"","specialInstructions":"","count":"","cloudName":"","cameraList":[{"deviceId":"N-NJ-0004","type":"N","model":"NJ01","commMode":"5","serialNum":"3402000000132000003001","factory":"NJ","workTemperature":"","voltage":"","outInterface":"","status":0,"ptLon":121.1750307,"ptLat":31.2826193,"scrappedTime":"2019-08-01 21:01:00","appVersion":"","isBind":"2","bindId":"310114_002","videoSvrUrl":"http://140.206.154.130/","protocol":"1","toward":"向前","rsPtId":"310114_002","cloudId":"1022","cloudName":"","rsPtName":"路侧点1","rspDistcode":"310114","rspDistname":"嘉定区","rspRoadName":"博园路","rspRoadId":"478","bindTime":"2019-08-01 15:04:01","cameraRunStatus":"2","cameraMonitorStatus":"0"}]}];
+//                    let typicalList=[{"rsPtId":"310114_002","rsPtName":"路侧点1","ptLon":121.1750307,"ptLat":31.2826193,"rspDistcodeProvince":"310000","rspDistcodeCity":"310100","rspDistcodeDistrict":"310114","rspRoadName":"博园路","mecId":"","regionId":"","rsPtPic":"1563762896617.jpg","rspRoadId":"478","rsPtIds":"","distName":"","specialInstructions":"","count":"","cloudName":"","cameraList":[{"deviceId":"N-NJ-0004","type":"N","model":"NJ01","commMode":"5","serialNum":"3402000000132000003001","factory":"NJ","workTemperature":"","voltage":"","outInterface":"","status":0,"ptLon":121.1750307,"ptLat":31.2826193,"scrappedTime":"2019-08-01 21:01:00","appVersion":"","isBind":"2","bindId":"310114_002","videoSvrUrl":"http://140.206.154.130/","protocol":"1","toward":"向前","rsPtId":"310114_002","cloudId":"1022","cloudName":"","rsPtName":"路侧点1","rspDistcode":"310114","rspDistname":"嘉定区","rspRoadName":"博园路","rspRoadId":"478","bindTime":"2019-08-01 15:04:01","cameraRunStatus":"2","cameraMonitorStatus":"0"}]}];
                     let sideList = [];
-                    /*let typicalList = data.shortList;*/
+                    let typicalList = data.shortList;
                     let count=0;
                     typicalList.forEach((item,index)=>{
-                        if(index==0){
-                            //球面坐标转成三维坐标
-                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
-                            //三维坐标转成平面像素
-                            let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                            /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
-                            this.left1 = parseInt(pixel[0]);
-                            let ele = document.getElementById('fusionRight');
-                            let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
-                            this.bottom1=topPosition-parseInt(pixel[1]);
-                            this.opacity=1;
-                            let camera = item.cameraList[0];
-                            //地图移动停止10s
-                            let time = setTimeout(()=>{
-                                this.video1Show=true;
-                                this.getVideo(camera,index);
-                                clearTimeout(time);
-                            },10000)
-                        }
-                        count++;
+                        let cameraList = item.cameraList;
+                        //球面坐标转成三维坐标
+                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
+                        //三维坐标转成平面像素
+                        let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                        /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
+                        this.left1 = parseInt(pixel[0]);
+                        let ele = document.getElementById('fusionRight');
+                        let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
+                        this.bottom1=topPosition-parseInt(pixel[1]);
+                        this.opacity=1;
+                        cameraList.forEach(cameraItem=>{
+                            if(cameraItem.priority==1){
+                                //地图移动停止10s
+                                let time = setTimeout(()=>{
+                                    this.video1Show=true;
+                                    this.getVideo(cameraItem,index);
+                                    clearTimeout(time);
+                                },10000)
+                            }
+                        })
                     })
-                    /*let sideList = data.sideList;*/
                     sideList.forEach(item=>{
+                        count++;
                         this.$refs.perceptionMap.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
                     })
                 });
@@ -712,7 +718,7 @@
 
     }
     .style1{
-        left: 20px!important;
+        left: 310px!important;
         bottom: 0px!important;
     }
     .style2{
