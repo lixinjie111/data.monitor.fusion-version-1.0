@@ -32,8 +32,7 @@ export default new Router({
     }
   },{
     path: '/',
-    name: 'index',
-    redirect: 'Overview'
+    redirect: 'login'
   },{ 
     path: '/refresh', 
     name: 'Refresh', 
