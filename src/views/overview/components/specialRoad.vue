@@ -27,6 +27,11 @@ export default {
         this.fetchTypicalRoad();
     },
     methods: {
+        showRoadDetail(item) {
+            this.$router.push({
+                path: '/perception/' + item.longitude + "/" + item.latitude,
+            });
+        },
         // 路段中心点位置
         fetchTypicalRoad() {
             getTypicalRoadData().then(res => {
