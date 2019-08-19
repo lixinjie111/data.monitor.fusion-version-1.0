@@ -1,11 +1,10 @@
-import Vue from 'vue'
+/*import Vue from 'vue'*/
 import axios from 'axios'
 import Qs from 'qs'
 // Element-ui
 // import ElementUI from 'element-ui'
 
 // axios.defaults.withCredentials = true;
-Vue.prototype.$http = axios;
 
 // 避免在账号登录失效后提示多次
 let isOutLogin = true;
