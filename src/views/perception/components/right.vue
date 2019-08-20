@@ -50,7 +50,7 @@
                 </div>
         <div id="map" class="c-map">
             <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}" v-show="video1Show">
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer"></video-player>
+                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
@@ -108,7 +108,8 @@
                 mapTime4:0,
                 isConMov:false,
                 lightWebsocket:{},
-                isFirst:true
+                isFirst:true,
+                time:0
             }
         },
         props:{
@@ -183,20 +184,25 @@
             },
             onMapComplete(){
                 getMap(this.$refs.perceptionMap);
-                let longitude=parseInt(this.$route.params.lon);
-                let latitude=parseInt(this.$route.params.lat);
+                this.$refs.perceptionMap.addModel('tra_light00011111','./static/map3d/models/traffic_light.3ds',326279.672803747,3462360.84818288,12.68);
+                let longitude=parseFloat(this.$route.params.lon);
+                let latitude=parseFloat(this.$route.params.lat);
                 //设置地图的中心点
-                /*if(longitude||latitude){
-                    debugger
+                if(longitude||latitude){
                     let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                     let x=utm[0];
                     let y=utm[1];
-                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+//                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                    /*setInterval(()=>{
+                        let camera = this.$refs.perceptionMap.getCamera();
+                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
+                    },500)*/
+                    this.$refs.perceptionMap.updateCameraPosition(x,y,217.16763677929166,205.99746133369624,-1.5707963267948966,-0.16236538804906267);
                     return;
                 }else{
                     this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                }*/
-                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                }
+//                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 
                 //向左移5米
@@ -209,28 +215,41 @@
              },
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
-                this.$refs.map1.zoomTo(10);
+                this.$refs.map1.zoomTo(14);
                 this.$refs.map1.addWms("shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","gd_road_centerline",1,true,null); // 上海汽车城
 
             },
             cameraChanged(){
                 console.log("窗口发生变化")
+                if(this.isFirst){
+                    this.time = setTimeout(()=>{
+                        let ele = document.getElementById("message1");
+                        ele.className="style";
+                        this.getCurrentExtent();
+                        this.getCenter();
+                        this.$emit('getCurrentExtent', this.currentExtent);
+                        this.getPerceptionAreaInfo();
+                        this.typeRoadData();
+                        this.getMap();
+                        clearTimeout(this.time);
+                    },500)
+                }
                 //地图不是第一次初始化
                 if(!this.isFirst){
                     if(this.video1Show||this.rtmp1!=''){
                         this.rtmp1="";
-                        this.$refs.videoPlayer.player.src("");
+                        this.$refs.videoPlayer1.player.src("");
                         this.video1Show=false;
                     }
                     this.lightWebsocket.close();
                     this.$refs.perceptionMap.resetModels();
 
                 }
-                this.isFirst=false;
+
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
-                if(!this.isConMov){
+                if(!this.isConMov&&!this.isFirst){
                     let ele = document.getElementById("message1");
                     ele.className="style";
                     this.getCurrentExtent();
@@ -239,8 +258,15 @@
                     this.getPerceptionAreaInfo();
                     this.typeRoadData();
                 }
+                //不是第一次
+                if(!this.isFirst){
+                   this.getMap();
+                }
+                this.isFirst=false;
+            },
+            getMap(){
                 let overviewMap = this.$refs.map1;
-                let overviewLayerId = "overviewLayer"
+                let overviewLayerId = "overviewLayer";
                 let overviewLayer = overviewMap.getLayerById(overviewLayerId);
                 if(overviewLayer!=null){
                     overviewMap.removeAllFeature(overviewLayerId);
@@ -265,48 +291,42 @@
                     }
                 }).then(res=>{
                     let data = res.data;
-                    let typicalList=[{"rsPtId":"310114_002","rsPtName":"路侧点1","ptLon":121.1750307,"ptLat":31.2826193,"rspDistcodeProvince":"310000","rspDistcodeCity":"310100","rspDistcodeDistrict":"310114","rspRoadName":"博园路","mecId":"","regionId":"","rsPtPic":"1563762896617.jpg","rspRoadId":"478","rsPtIds":"","distName":"","specialInstructions":"","count":"","cloudName":"","cameraList":[{"deviceId":"N-NJ-0004","type":"N","model":"NJ01","commMode":"5","serialNum":"3402000000132000003001","factory":"NJ","workTemperature":"","voltage":"","outInterface":"","status":0,"ptLon":121.1750307,"ptLat":31.2826193,"scrappedTime":"2019-08-01 21:01:00","appVersion":"","isBind":"2","bindId":"310114_002","videoSvrUrl":"http://140.206.154.130/","protocol":"1","toward":"向前","rsPtId":"310114_002","cloudId":"1022","cloudName":"","rsPtName":"路侧点1","rspDistcode":"310114","rspDistname":"嘉定区","rspRoadName":"博园路","rspRoadId":"478","bindTime":"2019-08-01 15:04:01","cameraRunStatus":"2","cameraMonitorStatus":"0"}]}];
+//                    let typicalList=[{"rsPtId":"310114_002","rsPtName":"路侧点1","ptLon":121.1750307,"ptLat":31.2826193,"rspDistcodeProvince":"310000","rspDistcodeCity":"310100","rspDistcodeDistrict":"310114","rspRoadName":"博园路","mecId":"","regionId":"","rsPtPic":"1563762896617.jpg","rspRoadId":"478","rsPtIds":"","distName":"","specialInstructions":"","count":"","cloudName":"","cameraList":[{"deviceId":"N-NJ-0004","type":"N","model":"NJ01","commMode":"5","serialNum":"3402000000132000003001","factory":"NJ","workTemperature":"","voltage":"","outInterface":"","status":0,"ptLon":121.1750307,"ptLat":31.2826193,"scrappedTime":"2019-08-01 21:01:00","appVersion":"","isBind":"2","bindId":"310114_002","videoSvrUrl":"http://140.206.154.130/","protocol":"1","toward":"向前","rsPtId":"310114_002","cloudId":"1022","cloudName":"","rsPtName":"路侧点1","rspDistcode":"310114","rspDistname":"嘉定区","rspRoadName":"博园路","rspRoadId":"478","bindTime":"2019-08-01 15:04:01","cameraRunStatus":"2","cameraMonitorStatus":"0"}]}];
                     let sideList = [];
-                    /*let typicalList = data.shortList;*/
+                    let typicalList = data.shortList;
                     let count=0;
                     typicalList.forEach((item,index)=>{
-                        if(index==0){
-
-                            //球面坐标转成三维坐标
-                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
-                            //三维坐标转成平面像素
-                            let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-
-                            /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
-                            this.left1 = parseInt(pixel[0]);
-                            let ele = document.getElementById('fusionRight');
-                            let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
-                            this.bottom1=topPosition-parseInt(pixel[1]);
-                            this.opacity=1;
-                            let camera = item.cameraList[0];
-                            //地图移动停止10s
-                            let time = setTimeout(()=>{
-                                this.video1Show=true;
-                                this.getVideo(camera,index);
-                                clearTimeout(time);
-                            },10000)
-                        }
-                        count++;
+                        let cameraList = item.cameraList;
+                        //球面坐标转成三维坐标
+                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
+                        //三维坐标转成平面像素
+                        let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                        /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
+                        this.left1 = parseInt(pixel[0]);
+                        let ele = document.getElementById('fusionRight');
+                        let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
+                        this.bottom1=topPosition-parseInt(pixel[1]);
+                        this.opacity=1;
+                        cameraList.forEach(cameraItem=>{
+                            if(cameraItem.priority==1){
+                                //地图移动停止10s
+                                let time = setTimeout(()=>{
+                                    this.video1Show=true;
+                                    this.getVideo(cameraItem,index);
+                                    clearTimeout(time);
+                                },10000)
+                            }
+                        })
                     })
-                    /*let sideList = data.sideList;*/
                     sideList.forEach(item=>{
+                        count++;
                         this.$refs.perceptionMap.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
                     })
                 });
             },
             getVideo(camera,index){
                 let _this = this;
-                //播放20s移动到下方
-                let time1 = setTimeout(()=>{
-                    let ele = document.getElementById("message1");
-                    ele.className="style style1";
-                    clearTimeout(time1);
-                },20000)
+                let ele = document.getElementById("message1");
                 getVideoByNum({
                     "protocal": camera.protocol,
                     "serialNum": camera.serialNum
@@ -316,9 +336,14 @@
                         if(_this.rtmp1==""){
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                            ele.className="style style2";
                         }else{
-                            _this.option1.notSupportedMessage= '此视频暂无法播放，请稍候再试';
                             _this.option1.sources[0].src=_this.rtmp1;
+                            //播放20s移动到下方
+                            let time1 = setTimeout(()=>{
+                                ele.className="style style1";
+                                clearTimeout(time1);
+                            },20000)
                         }
                     }
                 })
@@ -337,7 +362,6 @@
                 this.currentExtent.push([x1, y2]);
                 this.currentExtent.push([x2, y2]);
 //                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
-
             },
             getCenter(){
                 this.center= [];
@@ -393,20 +417,27 @@
                             }
                         });
                         let i=0;
+                        let top;
+                        let left;
                         for(let key in spatObj){
                             let item1 = spatObj[key];
                             if(item1.roadId){
                                 let obj = {};
-                                let longitude = parseFloat(item1.lightPos.split(",")[0]);
-                                let latitude = parseFloat(item1.lightPos.split(",")[1]);
-                                //球面坐标转成三维坐标
-                                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
-                                //三维坐标转成平面像素
-                                let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                                obj.left = parseInt(pixel[0]);
-                                obj.top = parseInt(pixel[1]);
+                                if(i==0){
+                                   let longitude = parseFloat(item1.lightPos.split(",")[0]);
+                                   let latitude = parseFloat(item1.lightPos.split(",")[1]);
+                                   //球面坐标转成三维坐标
+                                   let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
+                                   //三维坐标转成平面像素
+                                   let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                                   obj.left = parseInt(pixel[0]);
+                                   obj.top = parseInt(pixel[1]);
+                                   top=obj.top;
+                                   left=obj.left;
+                                }
                                 if(i>0){
-                                    obj.left = obj.left+120*i;
+                                    obj.left = left+56*i;
+                                    obj.top=top;
                                 }
                                 let spatId = "light_"+item1.spatId;
                                 obj.spatId = spatId;
@@ -628,6 +659,7 @@
             clearInterval(this.mapTime2);
             clearInterval(this.mapTime3);
             clearInterval(this.mapTime4);
+            clearTimeout(this.time);
             this.lightWebsocket.close();
             if(this.$refs.perceptionMap){
                 this.$refs.perceptionMap.reset3DMap();
@@ -686,9 +718,12 @@
 
     }
     .style1{
-        left: 0!important;
-        bottom: 0!important;
-
+        left: 310px!important;
+        bottom: 0px!important;
+    }
+    .style2{
+        transition: all 2s ease-in-out;
+        opacity: 0!important;
     }
     /*@keyframes move {
         0%{transform:translate(0,0);}
@@ -708,25 +743,25 @@
     .spat-detail{
         position: absolute;
         z-index: 2;
+        padding:4px;
+        background: #333333;
+        border-radius: 4px;
         .spat-layout{
             float: left;
             margin-left: 8px;
         }
         .spat-detail-style{
-            width: 86px;
-            height: 40px;
+            width: 54px;
+            height: 30px;
             border-radius: 20px;
-            background-color:rgba(0,0,0,0.5);
+            background-color:#333333;
             box-sizing: border-box;
-            padding:6px 2px;
-            /*float: left;
-            margin-left: 20px;*/
             @include layoutMode(align);
 
             .spat-detail-img{
-                width: 32px;
-                height: 32px;
-                background-color: rgba(0,0,0,0.8);
+                width: 24px;
+                height: 24px;
+                background-color: #4e4d4d;
                 border-radius: 50%;
                 display: inline-block;
                 position: relative;
@@ -742,30 +777,30 @@
                     margin-top: -9px;
                 }
                 .left-img{
-                    width: 20px;
-                    height: 18px;
-                    margin-left: -10px;
-                    margin-top: -9px;
-                }
-                .straight-img{
-                    width: 20px;
-                    height: 16px;
+                    width: 18px;
+                    height: 14px;
                     margin-left: -10px;
                     margin-top: -8px;
                 }
+                .straight-img{
+                    width: 16px;
+                    height: 14px;
+                    margin-left: -8px;
+                    margin-top: -7px;
+                }
                 .right-img{
-                    width: 20px;
-                    height: 18px;
-                    margin-left: -10px;
-                    margin-top: -9px;
+                    width: 18px;
+                    height: 14px;
+                    margin-left: -9px;
+                    margin-top: -7px;
                 }
             }
             .spat-detail-font{
-                letter-spacing: 4px;
+                letter-spacing: 0px;
                 color: #c8360f;
-                font-size: 24px;
+                font-size: 20px;
                 display: inline-block;
-                margin-left: 12px;
+                margin-left: 4px;
             }
             .spat-detail-color{
                 color: #23b318;

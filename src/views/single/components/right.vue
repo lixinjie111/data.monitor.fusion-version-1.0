@@ -84,76 +84,8 @@
     export default {
         data() {
             return {
-                option1:{
-                    overNative: true,
-                    autoplay: false,
-                    controls: true,
-                    fluid: true,
-                    techOrder: ['flash', 'html5'],
-                    sourceOrder: true,
-                    flash: {
-                        swf: isProduction ? '/fusionMonitor/static/media/video-js.swf' : '/static/media/video-js.swf'
-                    },
-                    sources: [
-                        {
-                            type: 'rtmp/mp4',
-                            src: ''
-                        }
-                    ],
-                    muted:true,
-                    width:'100%',
-                    height:'100%',
-                    notSupportedMessage: '视频无法播放，请稍候再试!',
-                    bigPlayButton : false,
-                    /*errorDisplay : false,*/
-                    controlBar: {
-                        timeDivider: false,
-                        durationDisplay: false,
-                        remainingTimeDisplay: false,
-                        currentTimeDisplay:false,
-                        fullscreenToggle: true, //全屏按钮
-                        captionsButton : false,
-                        chaptersButton: false,
-                        subtitlesButton:false,
-                        liveDisplay:false,
-                        playbackRateMenuButton:false
-                    }
-                },
-                option2:{
-                    overNative: true,
-                    autoplay: true,
-                    controls: true,
-                    /*fluid: true,*/
-                    techOrder: ['flash', 'html5'],
-                    sourceOrder: true,
-                    flash: {
-                        swf: isProduction ? '/fusionMonitor/static/media/video-js.swf' : '/static/media/video-js.swf'
-                    },
-                    sources: [
-                        {
-                            type: 'rtmp/mp4',
-                            src: ''
-                        }
-                    ],
-                    muted:true,
-                    width:'100%',
-                    height:'100%',
-                    notSupportedMessage: '视频无法播放，请稍候再试!',
-                    bigPlayButton : false,
-                    /* errorDisplay : false,*/
-                    controlBar: {
-                        timeDivider: false,
-                        durationDisplay: false,
-                        remainingTimeDisplay: false,
-                        currentTimeDisplay:false,
-                        fullscreenToggle: true, //全屏按钮
-                        captionsButton : false,
-                        chaptersButton: false,
-                        subtitlesButton:false,
-                        liveDisplay:false,
-                        playbackRateMenuButton:false
-                    }
-                },
+                option1:{},
+                option2:{},
                 lightData:{
                      /*'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
                      'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},
@@ -198,6 +130,44 @@
             }
         },
         methods: {
+            getOption(){
+                let option={
+                    overNative: true,
+                        autoplay: true,
+                        controls: true,
+                        fluid: true,
+                        techOrder: ['flash', 'html5'],
+                        sourceOrder: true,
+                        flash: {
+                        swf: isProduction ? '/fusionMonitor/static/media/video-js.swf' : '/static/media/video-js.swf'
+                    },
+                    sources: [
+                        {
+                            type: 'rtmp/flv',
+                            src: ''
+                        }
+                    ],
+                        muted:true,
+                        width:'100%',
+                        height:'100%',
+                        notSupportedMessage: '视频无法播放，请稍候再试!',
+                        bigPlayButton : false,
+                        /*errorDisplay : false,*/
+                        controlBar: {
+                        timeDivider: false,
+                            durationDisplay: false,
+                            remainingTimeDisplay: false,
+                            currentTimeDisplay:false,
+                            fullscreenToggle: true, //全屏按钮
+                            captionsButton : false,
+                            chaptersButton: false,
+                            subtitlesButton:false,
+                            liveDisplay:false,
+                            playbackRateMenuButton:false
+                    }
+                }
+                return option;
+            },
             //视频报错的方法
             playerError1(e) {
                 console.log("playerError");
@@ -255,12 +225,12 @@
                     let rtmp = streamInfo.rtmp;
                     if(rtmp&&rtmp!=''){
                         option.sources[0].src = rtmp;
-                        option.bigPlayButton=true;
+//                        option.bigPlayButton=true;
                         //直播报活调用
                         this.repeatFn(item);//拉取流后，保活
                     }else {
                         option.notSupportedMessage='视频流不存在，请稍候再试！';
-                        option.bigPlayButton=false;
+//                        option.bigPlayButton=false;
                     }
                 });
             },
@@ -362,6 +332,8 @@
             },
         },
         mounted(){
+            this.option1 = this.getOption();
+            this.option2 = this.getOption();
             this.getDeviceInfo();
             this.initLightWebSocket();
         },
@@ -406,78 +378,14 @@
         box-sizing: border-box;
        /* padding-top: 10px;*/
     }
-    /*.spat-detail{
-        position: absolute;
-        top: 30px;
-        !*left: 0;
-        text-align: center;*!
-        z-index: 1;
-        left:-300px;
-        margin-left:40%;
-        .spat-layout{
-            float: left;
-            margin-left: 20px;
-        }
-        .spat-detail-style{
-            width: 130px;
-            height: 60px;
-            border-radius: 30px;
-            background-color: #313131;
-            box-sizing: border-box;
-            padding:6px 2px;
-            !*float: left;
-            margin-left: 20px;*!
-            @include layoutMode(align);
-            .spat-detail-img{
-                width: 48px;
-                height: 48px;
-                background-color: #454545;
-                border-radius: 50%;
-                display: inline-block;
-                position: relative;
-                img{
-                    position: absolute;
-                    top: 50%;
-                    margin-top:-15px;
-                    left: 50%;
-                    margin-left: -14px;
-                }
-            }
-            .spat-detail-font{
-                letter-spacing: 4px;
-                color: #c8360f;
-                font-size: 36px;
-                display: inline-block;
-                margin-left: 12px;
-            }
-            .spat-detail-color{
-                color: #23b318;
-            }
-            .spat-straight{
-                transform: rotate(90deg);
-            }
-            .spat-right{
-                transform: rotate(180deg);
-            }
-            .light-yellow{
-                color: #d99f04;
-            }
-            .light-red{
-                color: #c93710;
-            }
-            .light-green{
-                color: #28b51d;
-            }
-        }
-    }*/
     .spat-detail{
         position: absolute;
         top: 30px;
         /*left: 0;
         text-align: center;*/
         z-index: 1;
-        left:-240px;
-        margin-left:40%;
+        left:-190px;
+        margin-left:50%;
         .spat-layout{
             float: left;
             margin-left: 8px;
@@ -559,12 +467,11 @@
     }
     .travel-detail{
         position: absolute;
-        left: -400px;
-        margin-left:40%;
+        left: -350px;
+        margin-left:50%;
         bottom: 10px;
         font-size: 16px;
         letter-spacing: 0px;
-       /* background: #24212c;*/
         z-index:1;
         .detail1{
             display: inline-block;

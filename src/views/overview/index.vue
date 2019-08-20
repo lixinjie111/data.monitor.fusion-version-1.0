@@ -20,7 +20,7 @@
             </span>
         </div>
         <div class="fusion-right">
-            <typical-section ></typical-section>
+            <special-road></special-road>
         </div>
         <div class="fusion-bottom">
             <!-- 底部车辆信息 -->
@@ -32,13 +32,13 @@
 import LeftOverview from './components/leftOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
-import TypicalSection from './components/typicalSection.vue';
+import SpecialRoad from './components/specialRoad';
 export default {
     components: {
         LeftOverview,
         MapContainer,
         BottomOverview,
-        TypicalSection
+        SpecialRoad
     },
     data() {
         return {

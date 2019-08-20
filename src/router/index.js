@@ -1,5 +1,5 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+/*import Vue from 'vue'
+import Router from 'vue-router'*/
 
 
 /* 默认路由，不要删除 */
@@ -13,9 +13,9 @@ const Single = resolve => require(['@/views/single'], resolve)
 const Perception = resolve => require(['@/views/perception'], resolve)
 const Overview = resolve => require(['@/views/overview'], resolve)
 const Test = resolve => require(['@/views/perception/components/test'], resolve)
-Vue.use(Router)
+/*Vue.use(Router)*/
 
-export default new Router({
+export default new VueRouter({
   // mode: 'history',
   linkActiveClass:'is-active',
   routes: [{

@@ -2,7 +2,7 @@
     <div class="fusion-left-style">
         <div class="fusion-header">
             <img src="@/assets/images/logo.png" class="header-img" @click="routeGo"/>
-            感知融合平台
+            融合感知平台
         </div>
         <div class="fusion-left-main">
             <p class="c-title">融合结果</p>
@@ -222,9 +222,12 @@
 <style lang="scss" scoped>
    /* @import '@/assets/scss/theme.scss';*/
     .perception-style{
-        padding: 20px 0px;
+        padding: 20px 10px;
         line-height: 28px;
         font-size: 14px;
+        margin:20px 0px;
+        border: 1px solid rgba(211, 134, 0, 0.5);
+        background: #00000082;
         li{
             letter-spacing: 1px;
             color: #cccccc;
