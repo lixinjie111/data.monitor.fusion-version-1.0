@@ -5,19 +5,19 @@ let TESTHTTPURL = '';
 
 
 if(process.env.NODE_ENV == 'development') { // 开发环境
-    HTTPURL = window.cfg.url;
-    DLURL = window.cfg.dlUrl;
+    HTTPURL = window.config.url;
+    DLURL = window.config.dlUrl;
     // DLURL = '/apiUrl/';
-    ROADURL = window.cfg.roadUrl;
-    TESTHTTPURL = window.cfg.testUrl;
-    console.log("----------"+ROADURL);
+    ROADURL = window.config.roadUrl;
+    TESTHTTPURL = window.config.testUrl;
+    // console.log("----------"+ROADURL);
 }else {
-    HTTPURL = window.cfg.url;
-    DLURL = window.cfg.dlUrl;
+    HTTPURL = window.config.url;
+    DLURL = window.config.dlUrl;
     // DLURL = '/apiUrl/';
-    ROADURL = window.cfg.roadUrl;
-    TESTHTTPURL = window.cfg.testUrl;
-    console.log("----------"+ROADURL);
+    ROADURL = window.config.roadUrl;
+    TESTHTTPURL = window.config.testUrl;
+    // console.log("----------"+ROADURL);
 }
 
 export {
