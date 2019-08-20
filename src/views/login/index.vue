@@ -18,7 +18,7 @@
                             <el-input type="password" v-model.trim="loginForm.password" :maxlength="20" placeholder="请输入密码" @keyup.enter="handleLogin"></el-input>
                         </el-form-item>
                     </el-form>
-                    <el-button class="login-button" type="primary" :loading="loading" @click.native.prevent="handleLogin">登录</el-button>
+                    <el-button class="login-button" type="primary" :loading="loading" @click.native.prevent="handleLogin">登 录</el-button>
                 </div>
             </div>
         </div>
@@ -55,7 +55,7 @@ export default {
             loginForm: {
                 userNo: '',
                 password: '',
-                platform: this.$store.state.admin.platform
+                //platform: this.$store.state.admin.platform
             },
             loginRules: {
                 userNo: [
@@ -176,7 +176,7 @@ export default {
         background-color: #3293bd;
         border-radius: 10px;
         font-size: 18px;
-        letter-spacing: 7px;
+        //letter-spacing: 7px;
         color: #fff;
         border: none;
         margin-top: 30px;
