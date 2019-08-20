@@ -15,8 +15,8 @@
                     <el-input type="password" v-model.trim="loginForm.password" :maxlength="20" placeholder="请输入密码"></el-input>
                 </el-form-item>
             </el-form>
+            <el-button class="login-button" type="primary" :loading="loading" @click.native.prevent="handleLogin">登 录</el-button>
         </div>
-        <el-button class="login-button" type="primary" :loading="loading" @click.native.prevent="handleLogin">登录</el-button>
     </div>
 </div>
 </template>
