@@ -292,7 +292,7 @@
                     this.markers.markerStart = new AMap.Marker({
                         position: _this.carStartPoint,   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
                         icon:'static/images/single/start.png',
-                        offset: new AMap.Pixel(-8, -20)
+                        offset: new AMap.Pixel(-10, -10)
                     });
                     // 将创建的点标记添加到已有的地图实例：
                     this.distanceMap.add(_this.markers.markerStart);
