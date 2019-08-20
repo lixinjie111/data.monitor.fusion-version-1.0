@@ -13,7 +13,7 @@
             </div>
         </div>
         <div class="map-left"></div>
-        <div class="spat-detail " v-for="(item,key) in lightList" :style="{left:item.left+'px',top:item.top+'px'}" >
+        <div class="spat-detail " v-for="(item,key) in lightList" :style="{left:item.left+'px',top:item.top+'px'}"  v-if="item.flag">
                <!-- <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">-->
                     <div v-show="item.key=='turn'" class="spat-detail-style">
                         <div class="spat-detail-img" >
@@ -58,6 +58,10 @@
             @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' >
             </tusvn-map>
         </div>
+        <div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
+        <div class="point-style" :style="{left:pointLeft1+'px',top:pointTop1+'px'}"></div>
+        <div class="point-style" :style="{left:pointLeft2+'px',top:pointTop2+'px'}"></div>
+        <div class="point-style" :style="{left:pointLeft3+'px',top:pointTop3+'px'}"></div>
     </div>
 </template>
 <script>
@@ -109,7 +113,15 @@
                 isConMov:false,
                 lightWebsocket:{},
                 isFirst:true,
-                time:0
+                time:0,
+                pointLeft:10,
+                pointTop:10,
+                pointLeft1:10,
+                pointTop1:10,
+                pointLeft2:10,
+                pointTop2:10,
+                pointLeft3:10,
+                pointTop3:10,
             }
         },
         props:{
@@ -256,6 +268,13 @@
                     this.getCenter();
                     this.$emit('getCurrentExtent', this.currentExtent);
                     this.getPerceptionAreaInfo();
+                    /*//地图不连续移动，判断红绿灯的位置受否再可视区
+                    this.lightList.forEach(item=>{
+                        let flag = this.getPointRange(item.lon,item.lat);
+                        if(!flag){
+                            item.flag=false;
+                        }
+                    })*/
                     this.typeRoadData();
                 }
                 //不是第一次
@@ -353,14 +372,17 @@
                 let result = this.$refs.perceptionMap.getExtent();
                 let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
                 let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+
                 let x1 = utm1[0];
                 let y1 = utm1[1];
                 let x2 = utm2[0];
                 let y2 = utm2[1];
+                this.getNewCurrentExtent(x1,y1,x2,y2);
                 this.currentExtent.push([x2, y1]);
                 this.currentExtent.push([x1, y1]);
                 this.currentExtent.push([x1, y2]);
                 this.currentExtent.push([x2, y2]);
+                console.log("边界值："+this.currentExtent);
 //                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
             },
             getCenter(){
@@ -377,6 +399,7 @@
                 let x0 = (x1+x2)/2;
                 let y0 = (y1+y2)/2;
                 this.center.push([x0,y0]);
+                console.log("中心点："+this.center)
 //                console.log("中心点："+this.center);
             },
             typeRoadData(){
@@ -423,9 +446,9 @@
                             let item1 = spatObj[key];
                             if(item1.roadId){
                                 let obj = {};
+                                let longitude = parseFloat(item1.lightPos.split(",")[0]);
+                                let latitude = parseFloat(item1.lightPos.split(",")[1]);
                                 if(i==0){
-                                   let longitude = parseFloat(item1.lightPos.split(",")[0]);
-                                   let latitude = parseFloat(item1.lightPos.split(",")[1]);
                                    //球面坐标转成三维坐标
                                    let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                                    //三维坐标转成平面像素
@@ -444,6 +467,9 @@
                                 obj.key = key;
                                 obj.spareTime = '';
                                 obj.lightColor='';
+                                obj.flag=true;
+                                obj.lon=longitude;
+                                obj.lat=latitude;
                                 this.spatCount++;
                                 this.lightList.push(obj);
                                 i++;
@@ -649,6 +675,57 @@
                 }else{
                     return;
                 }
+            },
+            getNewCurrentExtent(x1,y1,x2,y2){
+                let x0 = (x1+x2)/2;
+                let y0 = (y1+y2)/2;
+                let x = x1-x2;
+                let y = y1-y2;
+                let newX2 = x2;
+//                let newY2 = y2+y*0.1;
+                let newY2 = y2;
+                let newX1 = x1;
+//                let newY1 = y1-y*0.1;
+                let newY1 = y1;
+                //左下角
+                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",newX2,newY2);
+                //三维坐标转成平面像素
+                let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                this.pointLeft = parseInt(pixel[0]);
+                this.pointTop = parseInt(pixel[1]);
+                console.log(this.pointLeft,this.pointTop)
+                //右上角
+                let utm1 = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",newX1,newY1);
+                //三维坐标转成平面像素
+                let pixel1 = this.$refs.perceptionMap.worldToScreen(utm1[0],utm1[1],12.86);
+                this.pointLeft1 = parseInt(pixel1[0]);
+                this.pointTop1 = parseInt(pixel1[1]);
+                console.log(this.pointLeft1,this.pointTop1)
+                //左上角
+                let utm3 = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",newX2,newY1);
+                //三维坐标转成平面像素
+                let pixel3 = this.$refs.perceptionMap.worldToScreen(utm3[0],utm3[1],12.86);
+                this.pointLeft2 = parseInt(pixel3[0]);
+                this.pointTop2 = parseInt(pixel3[1]);
+                console.log(this.pointLeft2,this.pointTop2)
+                //右下角
+                let utm4 = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",newX1,newY2);
+                //三维坐标转成平面像素
+                let pixel4 = this.$refs.perceptionMap.worldToScreen(utm4[0],utm4[1],12.86);
+                this.pointLeft3 = parseInt(pixel4[0]);
+                this.pointTop3 = parseInt(pixel4[1]);
+                console.log(this.pointLeft3,this.pointTop43)
+            },
+            getPointRange(lon,lat){
+                let x1 = this.currentExtent[1][0];
+                let y1 = this.currentExtent[1][1];
+                let x0 = this.currentExtent[3][0];
+                let y0 = this.currentExtent[3][1];
+                if(lon>x0&&lon>y0&&lat<x1&&lat<y1){
+                    return true;
+                }else {
+                    return false;
+                }
             }
         },
         mounted() {
@@ -683,6 +760,15 @@
 </style>
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
+    .point-style{
+        width: 10px;
+        height: 10px;
+        background: red;
+        z-index:1;
+        position: absolute;
+        /*left: 10px;
+        top: 10px;*/
+    }
     .perception-road{
         height: 150px;
         width: 250px;
