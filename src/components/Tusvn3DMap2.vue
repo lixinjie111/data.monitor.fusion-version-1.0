@@ -30,8 +30,8 @@ export default {
             ,models:{}
             ,staticmodels:{}
             ,infoLabels:{gan:{},label:{}}
-            ,deviceModels:{
-            }
+            ,deviceModels:{}
+            ,mixCars:{}
 
             ,modelPersonArr:[]
             ,cacheModelNum:200
@@ -77,6 +77,7 @@ export default {
             ,pCacheModelNum:100
 
             ,matStdObjects : new THREE.MeshStandardMaterial( { color: 0x7337E3, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
+            ,matStdObjects_in : new THREE.MeshStandardMaterial( { color: 0x7337E3, roughness: 1, metalness: 0, opacity: 0.5, transparent: true } )
             ,person : new THREE.MeshStandardMaterial( { color: 0xC4B17A, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
             ,fontface:"宋体"
             ,fontSize:60
@@ -721,79 +722,64 @@ export default {
             // var deviceid = null;
             if(fusionList.length>0)
             {
-                // var time = this.timetrans(rsuDatas.result[0].timestamp);
-                // this.$emit('showTimeStamp',time);
-
-                // for(let n=0;n<fusionList.length;n++)
-                // {
-                //     var fusionData = fusionList[n];
-                    // var deviceid = fusionData.devId;
-                    var deviceid ="0";
-                    if(this.deviceModels[deviceid]==null)
+                var deviceid ="0";
+                if(this.deviceModels[deviceid]==null)
+                {
+                    this.deviceModels[deviceid]={cars:[],persons:[],texts:[]};
+                    this.mixCars[deviceid]={cars:[]};
+                    for(let m = 0;m<this.cacheModelNum;m++)
                     {
-                        this.deviceModels[deviceid]={cars:[],persons:[],texts:[]};
-                        for(let m = 0;m<this.cacheModelNum;m++)
-                        {
-                            //车
-                            var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
-                            var model1 = new THREE.Mesh( geoBox1, this.matStdObjects );
-                            model1.position.set( 0, 0, 0 );
-                            model1.rotation.set( this.pitch,this.yaw,this.roll );
-                            model1.castShadow = true;
-                            model1.receiveShadow = true;
+                        //车
+                        var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+                        var model1 = new THREE.Mesh( geoBox1, this.matStdObjects );
+                        model1.position.set( 0, 0, 0 );
+                        model1.rotation.set( this.pitch,this.yaw,this.roll );
+                        model1.castShadow = true;
+                        model1.receiveShadow = true;
 
-                            this.scene.add(model1);
-                            this.deviceModels[deviceid].cars[m] = model1;
+                        this.scene.add(model1);
+                        this.deviceModels[deviceid].cars[m] = model1;
 
-                            // var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
-                            // var pmodel1 = new THREE.Mesh( pBox1, this.person );
-                            // pmodel1.position.set( 0, 0, 0 );
-                            // pmodel1.rotation.set( 0, 0, 0 );
-                            // pmodel1.castShadow = true;
-                            // pmodel1.receiveShadow = true;
+                        //融合车辆
+                        var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+                        var model_out = new THREE.Mesh( geoBox_out, this.matStdObjects );
 
-                            // this.deviceModels[deviceid].persons[m]= pmodel1;
-                            // this.scene.add(pmodel1);
+                        var geoBox_in = new THREE.BoxBufferGeometry(0.85, 2.3, 0.7);
+                        var model_in = new THREE.Mesh( geoBox_in, this.matStdObjects_in );
 
+                        model_out.position.set( 0, 0, 0 );
+                        model_out.rotation.set( this.pitch,this.yaw,this.roll );
+                        model_out.castShadow = true;
+                        model_out.receiveShadow = true;
 
-                            // var text1 = new dl.Text({
-                            //     text:"",
-                            //     fontsize:this.fontSize,
-                            //     borderThickness:0,
-                            //     textColor:{r: 0, g: 0, b: 0, a: 1.0}
-                            // });
+                        model_in.position.set( 0, 0, 0 );
+                        model_in.rotation.set( this.pitch,this.yaw,this.roll );
+                        model_in.castShadow = true;
+                        model_in.receiveShadow = true;
 
-                            // this.deviceModels[deviceid].texts[m]=text1;
-                            // this.scene.add(text1);
-                            // text1.setPositon([0,0,0]);
-                            // text1.fontface=this.fontface;
-                            // text1.update();
-                        }
-                    }else{
-                        for(let p=0;p<this.deviceModels[deviceid].cars.length;p++)
-                        {
-                            let car = this.deviceModels[deviceid].cars[p];
-                            car.position.x = 0;
-                            car.position.y = 0;
-                            car.position.z = 0;
+                        var mixCar = new THREE.Group();
+                        mixCar.add( model_out );
+                        mixCar.add( model_in );
 
-                        }
-
-                        // for(let p=0;p<this.deviceModels[deviceid].persons.length;p++)
-                        // {
-                        //     let person = this.deviceModels[deviceid].persons[p];
-                        //     person.position.x = 0;
-                        //     person.position.y = 0;
-                        //     person.position.z = 0;
-                        // }
-
-                        // for(let p=0;p<this.deviceModels[deviceid].texts.length;p++){
-                        //     var text1 = this.deviceModels[deviceid].texts[p];
-                        //     text1.setPositon([0,0,0]);
-                        //     text1.update();
-                        // }
+                        this.scene.add(mixCar);
+                        this.mixCars[deviceid].cars[m] = mixCar;
                     }
-                // }
+                }else{
+                    for(let p=0;p<this.deviceModels[deviceid].cars.length;p++)
+                    {
+                        let car = this.deviceModels[deviceid].cars[p];
+                        car.position.x = 0;
+                        car.position.y = 0;
+                        car.position.z = 0;
+                    }
+                    for(let q=0;q<this.mixCars[deviceid].cars.length;q++)
+                    {
+                        let mixCar = this.mixCars[deviceid].cars[q];
+                        mixCar.position.x = 0;
+                        mixCar.position.y = 0;
+                        mixCar.position.z = 0;
+                    }
+                }
             }
             for(let i = 0;i<fusionList.length;i++)
             {
@@ -821,16 +807,27 @@ export default {
                 }else{
                     if(i<this.deviceModels[deviceid].cars.length)
                     {
-                        let mdl = this.deviceModels[deviceid].cars[i];
-                        mdl.position.x = dUTM[0];
-                        mdl.position.y = dUTM[1];
-                        mdl.position.z = this.defualtZ+4;
+                        if(d.fuselStatus == 0)
+                        {
+                            let mdl = this.deviceModels[deviceid].cars[i];
+                            mdl.position.x = dUTM[0];
+                            mdl.position.y = dUTM[1];
+                            mdl.position.z = this.defualtZ+4;
 
-                        this.changeModelColor(d,mdl);
-
+                            this.changeModelColor(d,mdl);
+                        }
                         // let text = this.deviceModels[deviceid].texts[i];
                         // text.setText(d.vehicleId.substr(0,8));
                         // text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
+                    }
+                    if(i<this.mixCars[deviceid].cars.length)
+                    {
+                        if(d.fuselStatus == 1){
+                            let mixCar = this.mixCars[deviceid].cars[i];
+                            mixCar.position.x = dUTM[0];
+                            mixCar.position.y = dUTM[1];
+                            mixCar.position.z = this.defualtZ+4;
+                        }
                     }
                 }
             }
