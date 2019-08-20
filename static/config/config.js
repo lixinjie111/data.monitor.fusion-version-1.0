@@ -7,7 +7,6 @@ window.config = {
     // dlUrl: 'http://10.0.1.22:8085/', //迪路
     // dlWmsUrl: 'http://10.0.1.22:8080/', //迪路
     // roadUrl:'http://172.17.1.13:28080/rCUDataApp/', //临时演示地址
-    // monitorWebsocket:'ws://172.17.1.13:29998/ws',
 
     //外网
     url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台
