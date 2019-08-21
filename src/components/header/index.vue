@@ -22,7 +22,7 @@
 </template>
 <script>
 // import { getTopHead, getTopWeather } from '@/api/header';
-import { mapActions } from 'vuex';
+// import { mapActions } from 'vuex';
 export default {
 	name: "Header",
     props: {

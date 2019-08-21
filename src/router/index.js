@@ -32,8 +32,7 @@ export default new VueRouter({
     }
   },{
     path: '/',
-    name: 'index',
-    redirect: 'Overview'
+    redirect: '/login'
   },{ 
     path: '/refresh', 
     name: 'Refresh', 

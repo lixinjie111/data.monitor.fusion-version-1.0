@@ -49,7 +49,7 @@ export default {
         initWebSocket1(){
             let _this=this;
             if ('WebSocket' in window) {
-                _this.socket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
+                _this.socket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
                 _this.socket.onmessage = this.onmessage1;
                 _this.socket.onclose = this.onclose1;
                 _this.socket.onopen = this.onopen1;
