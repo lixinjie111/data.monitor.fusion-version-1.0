@@ -49,12 +49,12 @@
                     </div>
                 </div>
         <div id="map" class="c-map">
-            <div class="style" id="message1" :style="{left:videoItem1.left1+'px',bottom:videoItem1.bottom1+'px',opacity:videoItem1.opacity}" v-show="videoItem1.video1Show">
+            <div class="style" id="message1" :style="{left:videoItem1.left+'px',bottom:videoItem1.bottom+'px',opacity:videoItem1.opacity}" v-show="videoItem1.videoShow">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
-           <!-- <div class="style" id="message2" :style="{left:left2+'px',bottom:bottom2+'px',opacity:opacity}" v-show="video2Show">
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
-            </div>-->
+            <div class="style" id="message2" :style="{left:videoItem2.left+'px',bottom:videoItem2.bottom+'px',opacity:videoItem2.opacity}" v-show="videoItem2.videoShow">
+                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
+            </div>
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
@@ -77,7 +77,6 @@
         data() {
             return {
                 option1:{},
-                rtmp1:'',
                 option2:{},
                 lightList:[
                     /*{
@@ -90,10 +89,18 @@
                     }*/
                 ],
                 videoItem1:{
-                    left1:'',
-                    bottom1:'',
+                    left:'',
+                    bottom:'',
                     opacity:0,
-                    video1Show:false,
+                    videoShow:false,
+                    rtmp:''
+                },
+                videoItem2:{
+                    left:'',
+                    bottom:'',
+                    opacity:0,
+                    videoShow:false,
+                    rtmp:''
                 },
                 option1:{},
                 topPosition:0,
@@ -246,8 +253,8 @@
                 }
                 //地图不是第一次初始化
                 if(!this.isFirst){
-                    if(this.video1Show||this.rtmp1!=''){
-                        this.rtmp1="";
+                    if(this.video1Show||this.videoItem1.rtmp!=''){
+                        this.videoItem1.rtmp="";
                         this.$refs.videoPlayer1.player.src("");
                         this.video1Show=false;
                     }
@@ -306,30 +313,74 @@
                     let sideList = [];
                     let typicalList = data.shortList;
                     let count=0;
-                    if(typicalList.length>0){
-                        typicalList.forEach((item,index)=>{
+                    //记录取了几个摄像头
+                    let cameraCount=0;
+                    let camera1={};
+                    let camera2={};
+                    let ele = document.getElementById('fusionRight');
+                    let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
+                    if(typicalList&&typicalList.length>0){
+                        for(let i=0;i<typicalList.length;i++){
+                            let item = typicalList[i];
                             let cameraList = item.cameraList;
                             //球面坐标转成三维坐标
                             let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
                             //三维坐标转成平面像素
                             let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                            /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
-                            this.videoItem1.left1 = parseInt(pixel[0]);
-                            let ele = document.getElementById('fusionRight');
-                            let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
-                            this.videoItem1.bottom1=topPosition-parseInt(pixel[1]);
-                            this.videoItem1.opacity=1;
-                            cameraList.forEach(cameraItem=>{
-                                if(cameraItem.priority==1){
-                                    //地图移动停止10s
-                                    let time = setTimeout(()=>{
-                                        this.videoItem1.video1Show=true;
-                                        this.getVideo(cameraItem,index);
-                                        clearTimeout(time);
-                                    },10000)
+                            //在同一个杆上找
+                            for(let j=0;j<cameraList.length;j++){
+                                if(cameraList[j].priority==1){
+                                    if(!camera1.serialNum){
+                                        camera1=cameraList[j];
+                                        this.videoItem1.left = parseInt(pixel[0]);
+                                        this.videoItem1.bottom=topPosition-parseInt(pixel[1]);
+                                        this.videoItem1.opacity=1;
+                                        cameraCount++;
+                                    }
+                                    if(!camera2.serialNum){
+                                        camera2=cameraList[j];
+                                        this.videoItem2.left = parseInt(pixel[0]);
+                                        this.videoItem2.bottom=topPosition-parseInt(pixel[1]);
+                                        this.videoItem2.opacity=1;
+                                        cameraCount++;
+                                    }
+                                    if(cameraCount>=2){
+                                        break;
+                                    }
                                 }
-                            })
-                        })
+                            }
+                            //在不同杆找
+                            if(cameraCount>=2){
+                                break;
+                            }
+                        }
+                        if(cameraCount<2){
+                            let item = typicalList[0];
+                            //球面坐标转成三维坐标
+                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
+                            //三维坐标转成平面像素
+                            let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                            if(!camera1.serialNum){
+                                this.videoItem1.left = parseInt(pixel[0]);
+                                this.videoItem1.bottom=topPosition-parseInt(pixel[1]);
+                                this.videoItem1.opacity=1;
+                                camera1=typicalList[0].cameraList[0];
+                            }
+                            if(!camera2.serialNum){
+                                this.videoItem2.left = parseInt(pixel[0]);
+                                this.videoItem2.bottom=topPosition-parseInt(pixel[1]);
+                                this.videoItem2.opacity=1;
+                                camera2=typicalList[0].cameraList[1];
+                            }
+                        }
+                        //地图移动停止10s
+                        let time = setTimeout(()=>{
+                            this.videoItem1.videoShow=true;
+                            this.videoItem2.videoShow=true;
+                            this.getVideo(camera1,0);
+                            this.getVideo(camera2,1);
+                            clearTimeout(time);
+                        },10000)
                     }
                     if(sideList.length>0){
                         sideList.forEach(item=>{
@@ -347,13 +398,13 @@
                     "serialNum": camera.serialNum
                 }).then(res => {
                     if(index==0){
-                        _this.rtmp1 = res.data.rtmp;
-                        if(_this.rtmp1==""){
+                        _this.videoItem1.rtmp = res.data.rtmp;
+                        if(_this.videoItem1.rtmp==""){
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
                             ele.className="style style2";
                         }else{
-                            _this.option1.sources[0].src=_this.rtmp1;
+                            _this.option1.sources[0].src=_this.videoItem1.rtmp;
                             //播放20s移动到下方
                             let time1 = setTimeout(()=>{
                                 ele.className="style style1";
