@@ -1,5 +1,5 @@
 /*import Vue from 'vue'*/
-import axios from 'axios'
+//import axios from 'axios'
 import Qs from 'qs'
 // Element-ui
 // import ElementUI from 'element-ui'
