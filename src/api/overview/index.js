@@ -1,4 +1,4 @@
-import axios from 'axios';
+//import axios from 'axios';
 import {HTTPURL} from '../requestUrl';
 /**
  * 获取概览左侧的车辆数据
