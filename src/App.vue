@@ -89,7 +89,7 @@ export default {
             }
         },
         socket (){
-            let socket = new WebSocket(window.cfg.websocketUrl);
+            let socket = new WebSocket(window.config.websocketUrl);
             /*if(socket.readyState!=WebSocket.OPEN){
                 let i=0;
                 this.time = setInterval(()=>{
@@ -104,7 +104,7 @@ export default {
                         return;
                     }
                     console.log("i:"+i)
-                    socket = new WebSocket(window.cfg.websocketUrl);
+                    socket = new WebSocket(window.config.websocketUrl);
                     return socket;
                 },1000)
             }*/

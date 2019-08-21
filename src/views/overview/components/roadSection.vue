@@ -106,7 +106,7 @@ export default {
     initWebsocket() {
       let _this = this;
       if ("WebSocket" in window) {
-        _this.roadWebSocket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
+        _this.roadWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
       }
       _this.roadWebSocket.onmessage = _this.onMessage;
       _this.roadWebSocket.onclose = _this.onClose;

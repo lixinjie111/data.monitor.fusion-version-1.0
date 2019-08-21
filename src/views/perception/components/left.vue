@@ -103,7 +103,7 @@
             initWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+                    _this.webSocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                 }
                 _this.webSocket.onmessage = _this.onmessage;
                 _this.webSocket.onclose = _this.onclose;
@@ -156,7 +156,7 @@
             initWarningWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.warningWebsocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                    _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                 }
                 _this.warningWebsocket.onmessage = _this.onWarningMessage;
                 _this.warningWebsocket.onclose = _this.onWarningClose;

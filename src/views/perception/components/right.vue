@@ -607,7 +607,7 @@
             initLightWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.lightWebsocket = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+                    _this.lightWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                 }
                 _this.lightWebsocket.onmessage = _this.onLightMessage;
                 _this.lightWebsocket.onclose = _this.onLightClose;
