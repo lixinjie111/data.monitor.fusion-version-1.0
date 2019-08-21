@@ -13,7 +13,7 @@
             </div>
         </div>
         <div class="map-left"></div>
-        <div class="spat-detail " v-for="(item,key) in lightList" :style="{left:item.left+'px',top:item.top+'px'}"  v-if="item.flag">
+        <div class="spat-detail " v-for="(item,key) in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
                <!-- <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">-->
                     <div v-show="item.key=='turn'" class="spat-detail-style">
                         <div class="spat-detail-img" >
@@ -49,9 +49,12 @@
                     </div>
                 </div>
         <div id="map" class="c-map">
-            <div class="style" id="message1" :style="{left:left1+'px',bottom:bottom1+'px',opacity:opacity}" v-show="video1Show">
+            <div class="style" id="message1" :style="{left:videoItem1.left1+'px',bottom:videoItem1.bottom1+'px',opacity:videoItem1.opacity}" v-show="videoItem1.video1Show">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
+           <!-- <div class="style" id="message2" :style="{left:left2+'px',bottom:bottom2+'px',opacity:opacity}" v-show="video2Show">
+                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
+            </div>-->
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
@@ -86,14 +89,16 @@
 
                     }*/
                 ],
-                left1:'',
-                bottom1:'',
-                video1Show:false,
+                videoItem1:{
+                    left1:'',
+                    bottom1:'',
+                    opacity:0,
+                    video1Show:false,
+                },
                 option1:{},
                 topPosition:0,
                 leftPosition:0,
                 count:0,
-                opacity:0,
                 spatCount:0,
                 signCount:0,
                 center:[],
@@ -209,21 +214,14 @@
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
-                    this.$refs.perceptionMap.updateCameraPosition(x,y,217.16763677929166,205.99746133369624,-1.5707963267948966,-0.16236538804906267);
+                    this.$refs.perceptionMap.updateCameraPosition(x,y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                     return;
                 }else{
-                    this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                    this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,0,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 }
 //                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 
-                //向左移5米
-                /*let x = obj.x;
-                let y = obj.y;
-                let z = obj.z;
-                let radius = obj.radius;
-                let pitch = obj.pitch;
-                let yaw = obj.yaw;*/
              },
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
@@ -253,11 +251,11 @@
                         this.$refs.videoPlayer1.player.src("");
                         this.video1Show=false;
                     }
-                    this.lightWebsocket.close();
+                    if(this.lightWebsocket){
+                        this.lightWebsocket.close();
+                    }
                     this.$refs.perceptionMap.resetModels();
-
                 }
-
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
@@ -268,13 +266,7 @@
                     this.getCenter();
                     this.$emit('getCurrentExtent', this.currentExtent);
                     this.getPerceptionAreaInfo();
-                    /*//地图不连续移动，判断红绿灯的位置受否再可视区
-                    this.lightList.forEach(item=>{
-                        let flag = this.getPointRange(item.lon,item.lat);
-                        if(!flag){
-                            item.flag=false;
-                        }
-                    })*/
+                    //地图不连续移动，判断红绿灯的位置受否再可视区
                     this.typeRoadData();
                 }
                 //不是第一次
@@ -314,33 +306,37 @@
                     let sideList = [];
                     let typicalList = data.shortList;
                     let count=0;
-                    typicalList.forEach((item,index)=>{
-                        let cameraList = item.cameraList;
-                        //球面坐标转成三维坐标
-                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
-                        //三维坐标转成平面像素
-                        let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                        /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
-                        this.left1 = parseInt(pixel[0]);
-                        let ele = document.getElementById('fusionRight');
-                        let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
-                        this.bottom1=topPosition-parseInt(pixel[1]);
-                        this.opacity=1;
-                        cameraList.forEach(cameraItem=>{
-                            if(cameraItem.priority==1){
-                                //地图移动停止10s
-                                let time = setTimeout(()=>{
-                                    this.video1Show=true;
-                                    this.getVideo(cameraItem,index);
-                                    clearTimeout(time);
-                                },10000)
-                            }
+                    if(typicalList.length>0){
+                        typicalList.forEach((item,index)=>{
+                            let cameraList = item.cameraList;
+                            //球面坐标转成三维坐标
+                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
+                            //三维坐标转成平面像素
+                            let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                            /*let pixel = this.$refs.map.getPixelFromCoordinate([item.ptLon, item.ptLat]);*/
+                            this.videoItem1.left1 = parseInt(pixel[0]);
+                            let ele = document.getElementById('fusionRight');
+                            let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
+                            this.videoItem1.bottom1=topPosition-parseInt(pixel[1]);
+                            this.videoItem1.opacity=1;
+                            cameraList.forEach(cameraItem=>{
+                                if(cameraItem.priority==1){
+                                    //地图移动停止10s
+                                    let time = setTimeout(()=>{
+                                        this.videoItem1.video1Show=true;
+                                        this.getVideo(cameraItem,index);
+                                        clearTimeout(time);
+                                    },10000)
+                                }
+                            })
                         })
-                    })
-                    sideList.forEach(item=>{
-                        count++;
-                        this.$refs.perceptionMap.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
-                    })
+                    }
+                    if(sideList.length>0){
+                        sideList.forEach(item=>{
+                            count++;
+                            this.$refs.perceptionMap.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
+                        })
+                    }
                 });
             },
             getVideo(camera,index){
@@ -415,69 +411,70 @@
                     let spats = res.data[0].baseData.spats;
                     this.signCount=0;
                     this.spatCount=0;
-                    signs.forEach(item=>{
-                        this.signCount++;
-                        //将小的转成大的
-                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
-                        this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],12.68);
-                    })
-                    spats.forEach(item=>{
-                        let spatList = item.spats;
-                        let spatObj={"turn":{},"left":{},"cross":{},"right":{}};
-                        spatList.forEach(spat=>{
-                            let lightDirection = spat.lightDirection;
-                            if(lightDirection==1){
-                                spatObj["cross"]=spat;
-                            }
-                            if(lightDirection==2){
-                                spatObj["left"]=spat;
-                            }
-                            if(lightDirection==3){
-                                spatObj["turn"]=spat;
-                            }
-                            if(lightDirection==4){
-                                spatObj["right"]=spat;
-                            }
-                        });
-                        let i=0;
-                        let top;
-                        let left;
-                        for(let key in spatObj){
-                            let item1 = spatObj[key];
-                            if(item1.roadId){
-                                let obj = {};
-                                let longitude = parseFloat(item1.lightPos.split(",")[0]);
-                                let latitude = parseFloat(item1.lightPos.split(",")[1]);
-                                if(i==0){
-                                   //球面坐标转成三维坐标
-                                   let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
-                                   //三维坐标转成平面像素
-                                   let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                                   obj.left = parseInt(pixel[0]);
-                                   obj.top = parseInt(pixel[1]);
-                                   top=obj.top;
-                                   left=obj.left;
+                    if(signs.length>0){
+                        signs.forEach(item=>{
+                            this.signCount++;
+                            //将小的转成大的3
+                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
+                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],12.68);
+                        })
+                    }
+                    if(spats.length>0){
+                        spats.forEach(item=>{
+                            let spatList = item.spats;
+                            let spatObj={"turn":{},"left":{},"cross":{},"right":{}};
+                            spatList.forEach(spat=>{
+                                let lightDirection = spat.lightDirection;
+                                if(lightDirection==1){
+                                    spatObj["cross"]=spat;
                                 }
-                                if(i>0){
-                                    obj.left = left+56*i;
-                                    obj.top=top;
+                                if(lightDirection==2){
+                                    spatObj["left"]=spat;
                                 }
-                                let spatId = "light_"+item1.spatId;
-                                obj.spatId = spatId;
-                                obj.key = key;
-                                obj.spareTime = '';
-                                obj.lightColor='';
-                                obj.flag=true;
-                                obj.lon=longitude;
-                                obj.lat=latitude;
-                                this.spatCount++;
-                                this.lightList.push(obj);
-                                i++;
+                                if(lightDirection==3){
+                                    spatObj["turn"]=spat;
+                                }
+                                if(lightDirection==4){
+                                    spatObj["right"]=spat;
+                                }
+                            });
+                            let i=0;
+                            let top;
+                            let left;
+                            for(let key in spatObj){
+                                let item1 = spatObj[key];
+                                if(item1.roadId){
+                                    let obj = {};
+                                    let longitude = parseFloat(item1.lightPos.split(",")[0]);
+                                    let latitude = parseFloat(item1.lightPos.split(",")[1]);
+                                    if(i==0){
+                                        //球面坐标转成三维坐标
+                                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
+                                        //三维坐标转成平面像素
+                                        let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                                        obj.left = parseInt(pixel[0]);
+                                        obj.top = parseInt(pixel[1]);
+                                        top=obj.top;
+                                        left=obj.left;
+                                    }
+                                    if(i>0){
+                                        obj.left = left+56*i;
+                                        obj.top=top;
+                                    }
+                                    let spatId = "light_"+item1.spatId;
+                                    obj.spatId = spatId;
+                                    obj.key = key;
+                                    obj.spareTime = '';
+                                    obj.lightColor='';
+                                    this.spatCount++;
+                                    this.lightList.push(obj);
+                                    i++;
+                                }
                             }
-                        }
-                    })
-                    this.$emit("count",this.signCount,this.spatCount);
-                    this.initLightWebSocket();
+                        })
+                        this.$emit("count",this.signCount,this.spatCount);
+                        this.initLightWebSocket();
+                    }
                 })
             },
             moveMap(){
@@ -682,11 +679,11 @@
                 let x = x1-x2;
                 let y = y1-y2;
                 let newX2 = x2;
-//                let newY2 = y2+y*0.1;
-                let newY2 = y2;
+               let newY2 = y2+y*0.1;
+               /* let newY2 = y2;*/
                 let newX1 = x1;
-//                let newY1 = y1-y*0.1;
-                let newY1 = y1;
+                let newY1 = y1-y*0.1;
+               /* let newY1 = y1;*/
                 //左下角
                 let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",newX2,newY2);
                 //三维坐标转成平面像素
