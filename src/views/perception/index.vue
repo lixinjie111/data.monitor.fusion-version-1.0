@@ -45,7 +45,7 @@
                 this.currentExtent = currentExtent;
 //                console.log("边界值："+this.currentExtent);
             },
-            count(spatCount,signCount){
+            count(signCount,spatCount){
                 this.spatCount = spatCount;
                 this.signCount = signCount;
             },
