@@ -53,7 +53,7 @@
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
             <div class="style" id="message2" :style="{left:videoItem2.left+'px',bottom:videoItem2.bottom+'px',opacity:videoItem2.opacity}" v-show="videoItem2.videoShow">
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
+                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
             </div>
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
@@ -103,6 +103,7 @@
                     rtmp:''
                 },
                 option1:{},
+                option2:{},
                 topPosition:0,
                 leftPosition:0,
                 count:0,
@@ -203,6 +204,16 @@
                     this.option1.sources[0].src = '';
                     setTimeout(() => {
                         this.option1.sources[0].src = _videoUrl;
+                    }, 2000);
+                }
+            },
+            playerError2(e) {
+                console.log("playerError");
+                if(this.option2.sources[0].src != '') {
+                    let _videoUrl = this.option2.sources[0].src;
+                    this.option2.sources[0].src = '';
+                    setTimeout(() => {
+                        this.option2.sources[0].src = _videoUrl;
                     }, 2000);
                 }
             },
@@ -329,13 +340,14 @@
                             let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
                             //在同一个杆上找
                             for(let j=0;j<cameraList.length;j++){
-                                if(cameraList[j].priority==1){
+                                if(cameraList[j].priority!=0){
                                     if(!camera1.serialNum){
                                         camera1=cameraList[j];
                                         this.videoItem1.left = parseInt(pixel[0]);
                                         this.videoItem1.bottom=topPosition-parseInt(pixel[1]);
                                         this.videoItem1.opacity=1;
                                         cameraCount++;
+                                        continue;
                                     }
                                     if(!camera2.serialNum){
                                         camera2=cameraList[j];
@@ -365,7 +377,9 @@
                                 this.videoItem1.bottom=topPosition-parseInt(pixel[1]);
                                 this.videoItem1.opacity=1;
                                 camera1=typicalList[0].cameraList[0];
+
                             }
+
                             if(!camera2.serialNum){
                                 this.videoItem2.left = parseInt(pixel[0]);
                                 this.videoItem2.bottom=topPosition-parseInt(pixel[1]);
@@ -374,13 +388,14 @@
                             }
                         }
                         //地图移动停止10s
-                        let time = setTimeout(()=>{
+                        let time1 = setTimeout(()=>{
+                            console.log("camera1");
                             this.videoItem1.videoShow=true;
                             this.videoItem2.videoShow=true;
                             this.getVideo(camera1,0);
                             this.getVideo(camera2,1);
-                            clearTimeout(time);
-                        },10000)
+                            clearTimeout(time1);
+                        },5000)
                     }
                     if(sideList.length>0){
                         sideList.forEach(item=>{
@@ -392,7 +407,8 @@
             },
             getVideo(camera,index){
                 let _this = this;
-                let ele = document.getElementById("message1");
+                let ele1 = document.getElementById("message1");
+                let ele2 = document.getElementById("message2");
                 getVideoByNum({
                     "protocal": camera.protocol,
                     "serialNum": camera.serialNum
@@ -402,14 +418,33 @@
                         if(_this.videoItem1.rtmp==""){
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
-                            ele.className="style style2";
+                            ele1.className="style style2";
                         }else{
                             _this.option1.sources[0].src=_this.videoItem1.rtmp;
+                            //播放2s移动到下方
+                            let time1 = setTimeout(()=>{
+                                ele1.className="style style1";
+                                clearTimeout(time1);
+                            },2000)
+                        }
+                    }
+                    if(index==1){
+                        _this.videoItem2.rtmp = res.data.rtmp;
+                        if(_this.videoItem2.rtmp==""){
+                            _this.option2.notSupportedMessage="";
+                            _this.option2.notSupportedMessage='视频流不存在，请稍候重试';
+                            ele2.className="style style2";
+                        }else{
+                            _this.option2.sources[0].src=_this.videoItem2.rtmp;
                             //播放20s移动到下方
                             let time1 = setTimeout(()=>{
-                                ele.className="style style1";
+                                if(_this.videoItem1.rtmp==""){
+                                    ele2.className="style style1";
+                                }else{
+                                    ele2.className="style style11";
+                                }
                                 clearTimeout(time1);
-                            },20000)
+                            },2000)
                         }
                     }
                 })
@@ -778,6 +813,7 @@
         },
         mounted() {
             this.option1 = this.getOption();
+            this.option2 = this.getOption();
         },
         destroyed(){
             clearInterval(this.mapTime1);
@@ -853,6 +889,10 @@
     }
     .style1{
         left: 310px!important;
+        bottom: 0px!important;
+    }
+    .style11{
+        left: 580px!important;
         bottom: 0px!important;
     }
     .style2{
