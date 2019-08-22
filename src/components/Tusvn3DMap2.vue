@@ -66,6 +66,10 @@ export default {
             ,cacheTrackCarData:null
             ,lasttime:0
             ,cacheMainCarTrackData:new Array()
+            ,lastMainCarData:null
+            ,lastMainCarData2:null
+            ,stepTime:50.0
+            ,monitorTag:true
 
             //车辆监控
             ,cartrackwebsocketUrl:"ws://120.133.21.14:49982/mon"
@@ -92,6 +96,7 @@ export default {
             // ,lastUtmPosition: null
             // ,nowUtmPosition: null
             // ,utmposition: null
+            ,tag:true
 
             ,sourceProject:"EPSG:4326"
             // ,destinatePorject:"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//北京
@@ -150,9 +155,30 @@ export default {
                this.processPlatformCars();
             }, 200);
 
+            // setInterval(()=>{
+            //     this.processCarTrackMessage();
+            // },50);
+
             setInterval(() => {
-                this.processCarTrackMessage();
-            }, 50);
+                if(this.monitorTag)
+                {
+                    console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
+                    let d = this.cacheMainCarTrackData.shift();
+                    // this.lastMainCarData2=d;
+                    this.moveMainCar(d);
+                }
+                
+            }, 3000);
+            // setInterval(() => {
+            //     if(this.cacheMainCarTrackData.length>0&&this.tag)
+            //     {
+            //         console.log("开始播放动画");
+            //         let d = this.cacheMainCarTrackData.shift();
+            //         this.animateCar3(d);
+            //         this.tag = false;
+            //     }
+                
+            // }, 5000);
         },
         /**
          * 地图沿屏幕x,y,z方向移动
@@ -1024,7 +1050,7 @@ export default {
             // console.log(nowtime-this.lasttime);
             // this.lasttime = nowtime;
             this.cacheTrackCarData = data;
-            // this.processCarTrackMessage();
+            this.processCarTrackMessage();
         },
         processCarTrackMessage:function(){
             // console.log("processCarTrackMessage:================>"+this.cacheMainCarTrackData.length);
@@ -1086,7 +1112,7 @@ export default {
             //处理自车信息
             let data2 = json.result.selfVehInfo;
             
-            if(data2!=undefined)
+            if(data2!=null)
             {
                 // console.log(data2);
                 // data2.gpsTime = new Date().getTime();
@@ -1094,18 +1120,105 @@ export default {
                 if(data2.vehicleId == this.mainCarVID)
                 {
                     // console.log(this.cacheMainCarTrackData.length);
-                    this.cacheMainCarTrackData.push(data2);
-                    if(this.cacheMainCarTrackData.length<=1)
+                    // this.cacheMainCarTrackData.push(data2);
+                    // if(this.cacheMainCarTrackData.length<=2)
+                    // {
+                    //     let data3 = this.cacheMainCarTrackData.shift();
+                    //     this.animateCar3(data3);
+                    // }
+                    // debugger
+                    if(this.cacheMainCarTrackData.length==0)
                     {
-                        let data3 = this.cacheMainCarTrackData.shift();
-                        this.animateCar3(data3);
+                        this.cacheMainCarTrackData.push(data2);
+                    }else{
+                        if(data2.gpsTime<=this.lastMainCarData.gpsTime)
+                        {
+                            return;
+                        }
+                        let deltaTime = data2.gpsTime-this.lastMainCarData.gpsTime;
+                        if(deltaTime<=this.stepTime)
+                        {
+                            this.cacheMainCarTrackData.push(data2);
+                        }else{//插值处理
+                            let deltaLon = data2.longitude-this.lastMainCarData.longitude;
+                            let deltaLat = data2.latitude-this.lastMainCarData.latitude;
+                            let steps = Math.ceil(deltaTime/this.stepTime);
+                            let timeStep = deltaTime/steps;
+                            let lonStep = deltaLon/steps;
+                            let latStep = deltaLat/steps;
+                            for(let i=1;i<=steps;i++)
+                            {
+                                let d = {};
+                                d.longitude = this.lastMainCarData.longitude+lonStep*i;
+                                d.latitude = this.lastMainCarData.latitude+latStep*i;
+                                d.gpsTime = this.lastMainCarData.gpsTime + timeStep*i;
+                                d.heading = data2.heading;
+                                d.vehicleId = data2.vehicleId;
+
+                                this.cacheMainCarTrackData.push(d);
+                            }
+                        }
+
                     }
-                    
+                    this.lastMainCarData=data2;
                 }else{
                     this.animateCar(data2);
                 }
                 
             }           
+        },
+        moveMainCar:function(data){
+            console.log("当前缓存数据量moveMainCar："+this.cacheMainCarTrackData.length);
+            if(data==null)
+            {
+                return;
+            }
+            if(this.lastMainCarData2==null)
+            {
+                this.lastMainCarData2 = data;
+                return;
+            }else{
+                let time = data.gpsTime - this.lastMainCarData2.gpsTime;
+                setTimeout(() => {
+                    let a = new Date().getTime();
+                    this.moveCar(data);
+                    this.lastMainCarData2 = data;
+                    let d = this.cacheMainCarTrackData.shift();
+                    if(d!=null)
+                    {
+                        this.moveMainCar(d);
+                    }
+                    if(this.cacheMainCarTrackData.length>0)
+                    {
+                        this.monitorTag=false;
+                    }else{
+                        this.monitorTag=true;
+                    }
+                    let b = new Date().getTime();
+                    console.log(b-a+"=====time:"+time);
+                }, time);
+            }
+
+        },
+        moveCar:function(data){
+            let vid = data.vehicleId;
+            let carModel = this.models[vid];
+            let position = proj4(this.sourceProject,this.destinatePorject,[data.longitude,data.latitude]);
+            if(carModel==null)
+            {
+                this.addModel(vid,"./static/map3d/map_photo/car.3DS",position[0],position[1],this.defualtZ);
+            }else{
+                this.models[vid].position.set(position[0],position[1], this.defualtZ );
+                this.models[vid].rotation.set( this.pitch,this.yaw,(-Math.PI / 180) * data.heading);
+            }
+
+            dl.moveTo({
+                position: [position[0],position[1], this.cameraDefualtZ],
+                radius: this.cameraDefualtRadius+10,
+                yaw: -Math.PI / 180 * (data.heading),
+                pitch: this.cameraDefualtPitch
+
+            });
         },
         changeModelColor:function(data,model)
         {
@@ -1570,7 +1683,7 @@ export default {
                                 }
                             }
                         ).onComplete((d)=>{
-                            // console.log("onComplete1");
+                            console.log("onComplete1");
                             if(this.cacheMainCarTrackData.length>1)
                             {
                                 // console.log("onComplete1=========>"+this.cacheMainCarTrackData.length);
@@ -1605,7 +1718,7 @@ export default {
                                         }
                                     )
                                     .onComplete((d)=>{
-                                        // console.log("onComplete2");
+                                        console.log("onComplete2");
                                         if(this.cacheMainCarTrackData.length>1)
                                         {
                                             // console.log("onComplete2=========>"+this.cacheMainCarTrackData.length);
