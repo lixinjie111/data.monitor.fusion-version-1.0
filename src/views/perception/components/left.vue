@@ -28,17 +28,17 @@
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
-                    <!--<span class="fusion-font">车辆感知：车辆 </span>-->
-                </li>
-                <li>
-                    <span class="overview-sign perception-sign"></span>
                     <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{sideData.noMotor || 0}}</span>
                     <!--<span class="fusion-font">路侧识别：车辆 </span>-->
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
                     <span>V2X通讯：车辆 {{v2xData.veh|| 0}}</span>
+                </li>
+                <li>
+                    <span class="overview-sign perception-sign"></span>
+                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
+                    <!--<span class="fusion-font">车辆感知：车辆 </span>-->
                 </li>
             </ul>
             <p class="c-title">交通数据</p>

@@ -150,7 +150,7 @@
                         muted:true,
                         width:'100%',
                         height:'100%',
-                        notSupportedMessage: '视频无法播放，请稍候再试!',
+                        notSupportedMessage: '数据正在加载，请稍候...',
                         bigPlayButton : false,
                         /*errorDisplay : false,*/
                         controlBar: {
