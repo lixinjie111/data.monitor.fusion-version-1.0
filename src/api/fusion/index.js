@@ -1,5 +1,5 @@
 
-import axios from 'axios';
+//import axios from 'axios';
 import {HTTPURL} from '../requestUrl';
 /**
  * 获取单车基本数据

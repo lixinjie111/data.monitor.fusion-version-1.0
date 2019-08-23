@@ -1,5 +1,5 @@
 <template>
-    <div class="fusion-style">
+    <div class="fusion-layout">
         <div class="fusion-left">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
@@ -7,9 +7,7 @@
                 </div>
             </div>
         </div>
-        <div class="fusion-right">
-            <right :realData="realData"></right>
-        </div>
+        <right :realData="realData"></right>
     </div>
 </template>
 <script>
@@ -27,14 +25,19 @@
                     turnLight:'',
                     gpsTime:''
                 },
-                vehicleId:'B21E-00-021',
+                vehicleId:this.$route.params.vehicleId
+            }
+        },
+        watch:{
+            '$route.params.vehicleId':function () {
+                this.$router.replace("/refresh");
             }
         },
         methods: {
             initWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                    _this.webSocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                 }
                 _this.webSocket.onmessage = _this.onmessage;
                 _this.webSocket.onclose = _this.onclose;
@@ -60,7 +63,6 @@
             onopen(data){
                 var real = {
                     'action':'can_real_data',
-                    /*'vid':this.vehicleID,*/
                     'vehicleIds':this.vehicleId
                 }
                 var realMsg = JSON.stringify(real);
@@ -79,16 +81,6 @@
             onerror(event){
                 console.error("WebSocket error observed:", event);
             },
-            initWebSocket1(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.socket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
-                    _this.socket.onmessage = this.onmessage1;
-                    _this.socket.onclose = this.onclose1;
-                    _this.socket.onopen = this.onopen1;
-                    _this.socket.onerror = this.onerror1;
-                }
-            },
             onmessage1(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
@@ -98,21 +90,20 @@
                 let path;
                 if(type=='home'){
                     path = '/overview';
-                    if(path==currentRoute){
+                    /*if(path==currentRoute){
                         return;
-                    }
+                    }*/
                     this.$router.push({
                         path: path
                     });
                 }
                 if(type=='vehicle'){
                     path = '/single';
-                    if(path==currentRoute){
+                    /*if(path==currentRoute){
                         return;
-                    }
+                    }*/
                     this.$router.push({
-                        path: path,
-                        query:{vehicleId:data.id}
+                        path: path+"/"+data.id
                     });
                 }
                 if(type=='road'){
@@ -121,8 +112,7 @@
                          return;
                      }*/
                     this.$router.push({
-                        path: path,
-                        query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
+                        path: path+"/"+data.position.longitude+"/"+data.position.latitude
                     });
                 }
                 if(type=='map'){
@@ -155,8 +145,8 @@
         },
         components:{Left,Right},
         mounted() {
+//            console.log("切换车")
             this.initWebSocket();
-//            this.initWebSocket1();
             this.socket.onmessage = this.onmessage1;
             this.socket.onclose = this.onclose1;
             this.socket.onopen = this.onopen1;
@@ -171,27 +161,20 @@
     }
 </script>
 <style lang="scss" scoped>
-
-    .fusion-style{
+    .fusion-left{
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 310px;
+       /* background: #1a1a1a;*/
+        z-index:1;
+    }
+    .fusion-layout{
         position: fixed;
         top: 0;
-        left: 0;
         right: 0;
         bottom: 0;
-        .fusion-left{
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 270px;
-            background: #1a1a1a;;
-        }
-        .fusion-right{
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 270px;
-        }
+        left: 0;
     }
 </style>

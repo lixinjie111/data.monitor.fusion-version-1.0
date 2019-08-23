@@ -1,4 +1,4 @@
-import Vue from 'vue'
+/*import Vue from 'vue'*/
 import App from './App'
 import router from './router'
 import store from './store';
@@ -9,14 +9,9 @@ Vue.prototype.$dateUtil = TDate;
 // 全局静态资源
 import './assets/css/reset.css';
 import './assets/scss/public.scss';
-import './assets/scss/element-ui-reset.scss';
-// Element-ui
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
 
-Vue.use(ElementUI)
+
 //导入video.js
-
 import VideoPlayer  from 'vue-video-player'
 import 'video.js/dist/video-js.css'
 import 'vue-video-player/src/custom-theme.css'
@@ -33,11 +28,6 @@ NProgress.inc(0.2)
 NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false })
 
 Vue.config.productionTip = false;
-
-//echarts
-import echarts from 'echarts'
-Vue.prototype.$echarts = echarts
-
 
 // 权限
 import { setAuthInfo, getAdminId, getAuthInfo, removeAuthInfo } from '@/session/index';

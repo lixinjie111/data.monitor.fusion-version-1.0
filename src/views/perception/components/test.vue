@@ -1,12 +1,14 @@
 <template>
-
-    <div class="map">
+    <div @click="go">
+        点击跳转
+    </div>
+    <!--<div class="map">
         <tusvn-map :target-id="'mapFusion'"  ref="map"
                    background="black" minX=325295.155400   minY=3461941.703700  minZ=50
         maxX=326681.125700  maxY=3462723.022400  maxZ=80
         @mapcomplete="onMapComplete" @CameraChanged='cameraChanged'>
         </tusvn-map>
-    </div>
+    </div>-->
 </template>
 
 <script>
@@ -20,7 +22,7 @@
         },
         components: {TusvnMap},
         methods: {
-            onMapComplete(){
+           /* onMapComplete(){
                 getMap(this.$refs.map);
                 this.$refs.map.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 setTimeout(()=>{
@@ -36,8 +38,13 @@
                     this.$refs.map.updateCameraPosition(x,y,z,radius,pitch,yaw);
                 },5000)
                 },
-            cameraChanged(){
-            }
+            cameraChanged(){}*/
+          /* go(){
+               this.$router.push({
+                   path: "/routeTest",
+                   query:{vehicleId:"t120"}
+               });
+           }*/
         },
         mounted() {
 

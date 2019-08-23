@@ -29,9 +29,11 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
+      //definePlugin定义全局的环境变量
     new webpack.DefinePlugin({
       'process.env': env
     }),
+      //压缩
     new UglifyJsPlugin({
       uglifyOptions: {
         compress: {
@@ -44,6 +46,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       parallel: true
     }),
     // extract css into its own file
+      //防止打包过后css以字符串插入到html中
     new ExtractTextPlugin({
       filename: utils.assetsPath('css/[name].[contenthash].css'),
       // Setting the following option to `false` will not extract CSS from codesplit chunks.
@@ -83,7 +86,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      minChunks (module) {
+      minChunks (module){
         // any required modules inside node_modules are extracted to vendor
         return (
           module.resource &&
@@ -121,6 +124,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   ]
 })
 
+//是否压缩gzip
 if (config.build.productionGzip) {
   const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
@@ -138,7 +142,7 @@ if (config.build.productionGzip) {
     })
   )
 }
-
+//打包过后文件大小的解析器
 if (config.build.bundleAnalyzerReport) {
   const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
   webpackConfig.plugins.push(new BundleAnalyzerPlugin())

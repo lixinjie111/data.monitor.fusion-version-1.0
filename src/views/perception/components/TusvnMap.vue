@@ -48,7 +48,7 @@ import * as mapInit from './MapUtils.js';
 
 /*import TDate from '@/common/date.js'*/
 
-import axios from 'axios'
+//import axios from 'axios'
 
 export default {
     name:"TusvnMap",

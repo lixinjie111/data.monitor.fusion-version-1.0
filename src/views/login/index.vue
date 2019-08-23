@@ -8,7 +8,7 @@
                 <p class="login-left-title">智慧互联 启迪云控</p>
             </div>
             <div class="login-card">
-                <div class="login-title">监控管理平台</div>
+                <div class="login-title">感知融合平台</div>
                 <div class="login-item-box">
                     <el-form :model="loginForm" :rules="loginRules" ref="loginForm" label-position="right" label-width="105px" class="login-form">
                         <el-form-item prop="userNo" label="用户名" class="login-item">
@@ -24,7 +24,7 @@
         </div>
     </div>
     <!-- 登录 -->
-    
+
     <div class="login-bottom">
         <span>建议浏览器：Chrome</span>
         <span>建议分辨率：1920x1080</span>
@@ -55,7 +55,7 @@ export default {
             loginForm: {
                 userNo: '',
                 password: '',
-                //platform: this.$store.state.admin.platform
+                platform: this.$store.state.admin.platform
             },
             loginRules: {
                 userNo: [
@@ -160,7 +160,6 @@ export default {
         height: 80px;
         letter-spacing: 3px;
         background-color: #f2f2f2;
-        color: #000;
         @include layoutMode();
     }
     .login-item-box {
@@ -176,7 +175,7 @@ export default {
         background-color: #3293bd;
         border-radius: 10px;
         font-size: 18px;
-        //letter-spacing: 7px;
+        // letter-spacing: 7px;
         color: #fff;
         border: none;
         margin-top: 30px;

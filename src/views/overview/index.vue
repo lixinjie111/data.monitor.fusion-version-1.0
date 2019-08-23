@@ -20,7 +20,7 @@
             </span>
         </div>
         <div class="fusion-right">
-            <typical-section ></typical-section>
+            <special-road></special-road>
         </div>
         <div class="fusion-bottom">
             <!-- 底部车辆信息 -->
@@ -32,13 +32,13 @@
 import LeftOverview from './components/leftOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
-import TypicalSection from './components/typicalSection.vue';
+import SpecialRoad from './components/specialRoad';
 export default {
     components: {
         LeftOverview,
         MapContainer,
         BottomOverview,
-        TypicalSection
+        SpecialRoad
     },
     data() {
         return {
@@ -49,7 +49,7 @@ export default {
         initWebSocket1(){
             let _this=this;
             if ('WebSocket' in window) {
-                _this.socket = new WebSocket(window.cfg.websocketUrl); //获得WebSocket对象
+                _this.socket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
                 _this.socket.onmessage = this.onmessage1;
                 _this.socket.onclose = this.onclose1;
                 _this.socket.onopen = this.onopen1;
@@ -65,21 +65,20 @@ export default {
             let path;
             if(type=='home'){
                 path = '/overview';
-                if(path==currentRoute){
+                /*if(path==currentRoute){
                     return;
-                }
+                }*/
                 this.$router.push({
                     path: path
                 });
             }
             if(type=='vehicle'){
                 path = '/single';
-                if(path==currentRoute){
+                /*if(path==currentRoute){
                     return;
-                }
+                }*/
                 this.$router.push({
-                    path: path,
-                    query:{vehicleId:data.id}
+                    path: path+"/"+data.id
                 });
             }
             if(type=='road'){
@@ -88,8 +87,7 @@ export default {
                      return;
                  }*/
                 this.$router.push({
-                    path: path,
-                    query:{id:data.id,longitude:data.position.longitude,latitude:data.position.latitude}
+                    path: path+"/"+data.position.longitude+"/"+data.position.latitude
                 });
             }
             if(type=='map'){
@@ -121,7 +119,6 @@ export default {
         }
     },
     mounted() {
-        console.log("......");
         this.socket.onmessage = this.onmessage1;
         this.socket.onclose = this.onclose1;
         this.socket.onopen = this.onopen1;

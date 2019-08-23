@@ -2,7 +2,7 @@
     <div class="fusion-left-style">
         <div class="fusion-header">
             <img src="@/assets/images/logo.png" class="header-img" @click="routeGo"/>
-            感知融合平台
+            融合感知平台
         </div>
         <div class="fusion-left-main">
             <p class="c-title">融合结果</p>
@@ -28,17 +28,17 @@
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
-                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
-                    <!--<span class="fusion-font">车辆感知：车辆 </span>-->
-                </li>
-                <li>
-                    <span class="overview-sign perception-sign"></span>
                     <span class="fusion-font">路侧识别：车辆 {{sideData.veh || 0}}，行人 {{sideData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{sideData.noMotor || 0}}</span>
                     <!--<span class="fusion-font">路侧识别：车辆 </span>-->
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
                     <span>V2X通讯：车辆 {{v2xData.veh|| 0}}</span>
+                </li>
+                <li>
+                    <span class="overview-sign perception-sign"></span>
+                    <span class="fusion-font">车辆感知：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
+                    <!--<span class="fusion-font">车辆感知：车辆 </span>-->
                 </li>
             </ul>
             <p class="c-title">交通数据</p>
@@ -103,7 +103,7 @@
             initWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.cfg.websocketUrl);  //获得WebSocket对象
+                    _this.webSocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                 }
                 _this.webSocket.onmessage = _this.onmessage;
                 _this.webSocket.onclose = _this.onclose;
@@ -156,7 +156,7 @@
             initWarningWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
-                    _this.warningWebsocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                    _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                 }
                 _this.warningWebsocket.onmessage = _this.onWarningMessage;
                 _this.warningWebsocket.onclose = _this.onWarningClose;
@@ -173,8 +173,8 @@
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
                         if(_this.warningIdList.indexOf(warningId)==-1){
-                            console.log("warningId:"+warningId);
-                            console.log("索引:"+_this.warningIdList.indexOf(warningId));
+                           /* console.log("warningId:"+warningId);
+                            console.log("索引:"+_this.warningIdList.indexOf(warningId));*/
                             _this.warningIdList.push(warningId);
                             _this.warningCount++;
                         }
@@ -222,9 +222,12 @@
 <style lang="scss" scoped>
    /* @import '@/assets/scss/theme.scss';*/
     .perception-style{
-        padding: 20px 0px;
+        padding: 20px 10px;
         line-height: 28px;
         font-size: 14px;
+        margin:20px 0px;
+        border: 1px solid rgba(211, 134, 0, 0.5);
+        background: #00000082;
         li{
             letter-spacing: 1px;
             color: #cccccc;

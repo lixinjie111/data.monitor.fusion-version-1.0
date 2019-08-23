@@ -7,28 +7,43 @@
     <meta name="format-detection" content="telephone=no,email=no,address=no">
     <link rel="icon" href="favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <title>感知融合平台</title>
 
 
     <script src="./static/config/config.js"></script>
-    <script src="https://webapi.amap.com/maps?v=1.4.14&key=8bf04484a44d846096c9ab84730e88b8&plugin=ElasticMarker,AMap.Geocoder,AMap.Geolocation"></script>
-
+    <script src="https://webapi.amap.com/maps?v=1.4.14&key=8bf04484a44d846096c9ab84730e88b8&plugin=AMap.Geocoder"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.1.0/vuex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>  
+    
   </head>
   <body>
-  <script src="./static/map3d/libs/browser-polyfill.js"></script>
-  <script src="./static/map3d/libs/jquery-3.1.1.min.js"></script>
-  <script src="./static/map3d/libs/three.min.js"></script>
-  <script src="./static/map3d/libs/earcut.js"></script>
-  <script src="./static/map3d/libs/TDSLoader.js"></script>
-  <script src="./static/map3d/libs/BinaryHeap.js"></script>
-  <script src="./static/map3d/libs/tween.min.js"></script>
-  <script src="./static/map3d/libs/pt/pt.min.js"></script>
-  <script src="./static/map3d/libs/laslaz.js"></script>
-  <script src="./static/map3d/libs/shapefile.min.js"></script>
-  <script src="./static/map3d/libs/proj4.js"></script>
-  <script src="./static/map3d/libs/core.min.js"></script>
+
     <div id="app"></div>
 
     <!-- built files will be auto injected -->
   </body>
+  <script src="static/map3d/libs/browser-polyfill.js"></script>
+  <script src="static/map3d/libs/jquery-3.1.1.min.js"></script>
+  <script src="static/map3d/libs/three.min.js"></script>
+
+  <script src="static/map3d/libs/lines/LineSegmentsGeometry.js"></script>
+  <script src="static/map3d/libs/lines/LineGeometry.js"></script>
+  <script src="static/map3d/libs/lines/LineMaterial.js"></script>
+  <script src="static/map3d/libs/lines/LineSegments2.js"></script>
+  <script src="static/map3d/libs/lines/Line2.js"></script>
+
+  <script src="static/map3d/libs/earcut.js"></script>
+  <script src="static/map3d/libs/TDSLoader.js"></script>
+  <script src="static/map3d/libs/BinaryHeap.js"></script>
+  <script src="static/map3d/libs/tween.min.js"></script>
+  <script src="static/map3d/libs/pt/pt.min.js"></script>
+  <script src="static/map3d/libs/laslaz.js"></script>
+  <script src="static/map3d/libs/shapefile.min.js"></script>
+  <script src="static/map3d/libs/proj4.js"></script>
+  <script src="static/map3d/libs/core.min.js"></script>
+  
 </html>

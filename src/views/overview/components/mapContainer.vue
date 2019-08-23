@@ -32,7 +32,7 @@ export default {
         initWebSocket(){
             // console.log('websocket获取地图行驶车辆展示');
             if ('WebSocket' in window) {
-                this.webSocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
             }
             this.webSocket.onmessage = this.onmessage;
             this.webSocket.onclose = this.onclose;
@@ -149,13 +149,9 @@ export default {
             }
         },
         showView(e) {
-            const { href } = this.$router.resolve({
-                name: 'Single',
-                params: {
-                    vehicleId: e.target.get("vehicleId")
-                }
-            })
-            window.open(href, '_blank')
+            this.$router.push({
+                path: '/single/'+e.target.get("vehicleId"),
+            });
         },
         onclose(data){
             // console.log("结束--vehicleOnline--连接");
@@ -211,7 +207,7 @@ export default {
 //         // websocket获取地图行驶车辆展示
 //         initWebSocket() {
 //             if ('WebSocket' in window) {
-//                 this.webSocket = new WebSocket(window.cfg.socketUrl); // 获取websocket对象
+//                 this.webSocket = new WebSocket(window.config.socketUrl); // 获取websocket对象
 //             };
 //             this.webSocket.onmessage = this.onmessage;
 //             this.webSocket.onclose = this.onclose;

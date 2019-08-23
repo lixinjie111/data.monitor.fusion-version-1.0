@@ -9,8 +9,6 @@ function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
-
-
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
@@ -80,8 +78,13 @@ module.exports = {
       }
     ]
   },
-  externals: {
-    'AMap': 'AMap'
+  externals:{
+    'AMap': 'AMap',
+    'vue':'Vue',
+    'element-ui':'ELEMENT',
+    'vuex':'Vuex',
+    'axios':'axios',
+    'vue-router':'VueRouter',
   },
   node: {
     // prevent webpack from injecting useless setImmediate polyfill because Vue
