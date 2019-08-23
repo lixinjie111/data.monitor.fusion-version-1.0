@@ -127,11 +127,14 @@
                 mapTime2:0,
                 mapTime3:0,
                 mapTime4:0,
+                viewTime:0,
                 isConMov:false,
                 source:'',
                 lightWebsocket:{},
                 isFirst:true,
                 time:0,
+                ele1:{},
+                ele2:{},
                /* pointLeft:10,
                 pointTop:10,
                 pointLeft1:10,
@@ -254,11 +257,10 @@
             },
             mouseUpChanged(){
                 console.log("监听鼠标移动地图")
+                clearTimeout(this.viewTime);
                 this.source='mouseMove';
                 let flag1 = this.getPointRange(this.videoItem1.lon,this.videoItem1.lat);
                 let flag2 = this.getPointRange(this.videoItem2.lon,this.videoItem2.lat);
-                let ele1 = document.getElementById("message1");
-                let ele2 = document.getElementById("message2");
                 this.getCurrentExtent();
                 this.getCenter();
                 this.$emit('getCurrentExtent', this.currentExtent);
@@ -272,7 +274,7 @@
                 }else{
                     this.videoItem1.rtmp="";
                     this.$refs.videoPlayer1.player.src("");
-                    ele1.className="style";
+                    this.ele1.className="style";
                     this.getPerceptionAreaInfo();
                 }
                /* this.$refs.videoPlayer1.player.load(this.videoItem1.rtmp);
@@ -283,7 +285,7 @@
                 }else{
                     this.videoItem2.rtmp="";
                     this.$refs.videoPlayer2.player.src("");
-                    ele2.className="style";
+                    this.ele2.className="style";
                     this.getPerceptionAreaInfo();
                 }
                 /*this.$refs.videoPlayer2.player.load(this.videoItem2.rtmp);
@@ -324,36 +326,44 @@
                     }
                     this.$refs.perceptionMap.resetModels();
                     console.log("-----")
+                    //判断地图缩放、全屏，调试等
+                    this.viewTime = setTimeout(()=>{
+                        this.getData();
+                        clearTimeout(this.viewTime);
+                    },1000)
+
                 }
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
                 if(this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
-                    this.$refs.videoPlayer1.initialize();
-                    this.$refs.videoPlayer1.player.options(this.option1);
-                    this.videoItem1.rtmp="";
-                    this.$refs.videoPlayer1.player.src("");
-                    this.$refs.videoPlayer2.initialize();
-                    this.$refs.videoPlayer2.player.options(this.option1);
-                    this.videoItem2.rtmp="";
-                    this.$refs.videoPlayer2.player.src("");
-
-                    let ele1 = document.getElementById("message1");
-                    let ele2 = document.getElementById("message2");
-                    ele1.className="style";
-                    ele2.className="style";
-                    this.getCurrentExtent();
-                    this.getCenter();
-                    this.$emit('getCurrentExtent', this.currentExtent);
-                    this.getPerceptionAreaInfo();
-                    //地图不连续移动，判断红绿灯的位置受否再可视区
-                    this.typeRoadData();
+                    clearTimeout(this.viewTime);
+                    this.getData();
                 }
                 //不是第一次
                 if(!this.isFirst){
                    this.getMap();
                 }
                 this.isFirst=false;
+            },
+            getData(){
+                this.$refs.videoPlayer1.initialize();
+                this.$refs.videoPlayer1.player.options(this.option1);
+                this.videoItem1.rtmp="";
+                this.$refs.videoPlayer1.player.src("");
+                this.$refs.videoPlayer2.initialize();
+                this.$refs.videoPlayer2.player.options(this.option1);
+                this.videoItem2.rtmp="";
+                this.$refs.videoPlayer2.player.src("");
+
+                this.ele1.className="style";
+                this.ele2.className="style";
+                this.getCurrentExtent();
+                this.getCenter();
+                this.$emit('getCurrentExtent', this.currentExtent);
+                this.getPerceptionAreaInfo();
+                //地图不连续移动，判断红绿灯的位置受否再可视区
+                this.typeRoadData();
             },
             getMap(){
                 let overviewMap = this.$refs.map1;
@@ -476,8 +486,15 @@
             },
             getVideo(camera,index){
                 let _this = this;
-                let ele1 = document.getElementById("message1");
-                let ele2 = document.getElementById("message2");
+                let time = setTimeout(()=>{
+                    if(_this.videoItem1.rtmp==''){
+                        _this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
+                    }
+                    if(_this.videoItem1.rtmp==''){
+                        _this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
+                    }
+                    clearTimeout(time);
+                },1000)
                 getVideoByNum({
                     "protocal": camera.protocol,
                     "serialNum": camera.serialNum
@@ -487,12 +504,12 @@
                         if(_this.videoItem1.rtmp==""){
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
-                            ele1.className="style style2";
+                            _this.ele1.className="style style2";
                         }else{
                             _this.option1.sources[0].src=_this.videoItem1.rtmp;
                             //播放2s移动到下方
                             let time1 = setTimeout(()=>{
-                                ele1.className="style style1";
+                                _this.ele1.className="style style1";
                                 clearTimeout(time1);
                             },2000)
                         }
@@ -502,15 +519,15 @@
                         if(_this.videoItem2.rtmp==""){
                             _this.option2.notSupportedMessage="";
                             _this.option2.notSupportedMessage='视频流不存在，请稍候重试';
-                            ele2.className="style style2";
+                            _this.ele2.className="style style2";
                         }else{
                             _this.option2.sources[0].src=_this.videoItem2.rtmp;
                             //播放20s移动到下方
                             let time1 = setTimeout(()=>{
                                 if(_this.videoItem1.rtmp==""){
-                                    ele2.className="style style1";
+                                    _this.ele2.className="style style1";
                                 }else{
-                                    ele2.className="style style11";
+                                    _this.ele2.className="style style11";
                                 }
                                 clearTimeout(time1);
                             },2000)
@@ -885,6 +902,8 @@
         mounted() {
             this.option1 = this.getOption();
             this.option2 = this.getOption();
+            this.ele1 = document.getElementById("message1");
+            this.ele2 = document.getElementById("message2");
         },
         destroyed(){
             clearInterval(this.mapTime1);
@@ -896,8 +915,6 @@
             if(this.$refs.perceptionMap){
                 this.$refs.perceptionMap.reset3DMap();
             }
-            this.$refs.videoPlayer1.dispose();  //销毁video实例，避免出现节点不存在 但是flash一直在执行，报 this.el.......is not function
-            this.$refs.videoPlayer2.dispose();  //销毁video实例，避免出现节点不存在 但是flash一直在执行，报 this.el.......is not function
         }
 }
 </script>
@@ -969,7 +986,7 @@
         bottom: 0px!important;
     }
     .style2{
-        transition: all 2s ease-in-out;
+        transition: all 1s ease-in-out;
         opacity: 0!important;
     }
     /*@keyframes move {

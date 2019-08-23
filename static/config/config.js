@@ -16,7 +16,6 @@ window.config = {
     dlWmsUrl: 'http://113.208.118.62:8080/', //迪路
     roadUrl:'http://120.133.21.14:28080/rCUDataApp/', //临时演示地址
     monitorWebsocket:'ws://120.133.21.14:29998/ws',
-
     version: 1.0,       // 版本号
 }
 
