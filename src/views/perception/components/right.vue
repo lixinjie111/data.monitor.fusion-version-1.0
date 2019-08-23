@@ -132,6 +132,8 @@
                 lightWebsocket:{},
                 isFirst:true,
                 time:0,
+                ele1:{},
+                ele2:{},
                /* pointLeft:10,
                 pointTop:10,
                 pointLeft1:10,
@@ -257,8 +259,6 @@
                 this.source='mouseMove';
                 let flag1 = this.getPointRange(this.videoItem1.lon,this.videoItem1.lat);
                 let flag2 = this.getPointRange(this.videoItem2.lon,this.videoItem2.lat);
-                let ele1 = document.getElementById("message1");
-                let ele2 = document.getElementById("message2");
                 this.getCurrentExtent();
                 this.getCenter();
                 this.$emit('getCurrentExtent', this.currentExtent);
@@ -272,7 +272,7 @@
                 }else{
                     this.videoItem1.rtmp="";
                     this.$refs.videoPlayer1.player.src("");
-                    ele1.className="style";
+                    this.ele1.className="style";
                     this.getPerceptionAreaInfo();
                 }
                /* this.$refs.videoPlayer1.player.load(this.videoItem1.rtmp);
@@ -283,7 +283,7 @@
                 }else{
                     this.videoItem2.rtmp="";
                     this.$refs.videoPlayer2.player.src("");
-                    ele2.className="style";
+                    this.ele2.className="style";
                     this.getPerceptionAreaInfo();
                 }
                 /*this.$refs.videoPlayer2.player.load(this.videoItem2.rtmp);
@@ -338,10 +338,8 @@
                     this.videoItem2.rtmp="";
                     this.$refs.videoPlayer2.player.src("");
 
-                    let ele1 = document.getElementById("message1");
-                    let ele2 = document.getElementById("message2");
-                    ele1.className="style";
-                    ele2.className="style";
+                    this.ele1.className="style";
+                    this.ele2.className="style";
                     this.getCurrentExtent();
                     this.getCenter();
                     this.$emit('getCurrentExtent', this.currentExtent);
@@ -476,8 +474,15 @@
             },
             getVideo(camera,index){
                 let _this = this;
-                let ele1 = document.getElementById("message1");
-                let ele2 = document.getElementById("message2");
+                let time = setTimeout(()=>{
+                    if(_this.videoItem1.rtmp==''){
+                        _this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
+                    }
+                    if(_this.videoItem1.rtmp==''){
+                        _this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
+                    }
+                    clearTimeout(time);
+                },1000)
                 getVideoByNum({
                     "protocal": camera.protocol,
                     "serialNum": camera.serialNum
@@ -487,12 +492,12 @@
                         if(_this.videoItem1.rtmp==""){
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
-                            ele1.className="style style2";
+                            _this.ele1.className="style style2";
                         }else{
                             _this.option1.sources[0].src=_this.videoItem1.rtmp;
                             //播放2s移动到下方
                             let time1 = setTimeout(()=>{
-                                ele1.className="style style1";
+                                _this.ele1.className="style style1";
                                 clearTimeout(time1);
                             },2000)
                         }
@@ -502,15 +507,15 @@
                         if(_this.videoItem2.rtmp==""){
                             _this.option2.notSupportedMessage="";
                             _this.option2.notSupportedMessage='视频流不存在，请稍候重试';
-                            ele2.className="style style2";
+                            _this.ele2.className="style style2";
                         }else{
                             _this.option2.sources[0].src=_this.videoItem2.rtmp;
                             //播放20s移动到下方
                             let time1 = setTimeout(()=>{
                                 if(_this.videoItem1.rtmp==""){
-                                    ele2.className="style style1";
+                                    _this.ele2.className="style style1";
                                 }else{
-                                    ele2.className="style style11";
+                                    _this.ele2.className="style style11";
                                 }
                                 clearTimeout(time1);
                             },2000)
@@ -885,6 +890,8 @@
         mounted() {
             this.option1 = this.getOption();
             this.option2 = this.getOption();
+            this.ele1 = document.getElementById("message1");
+            this.ele2 = document.getElementById("message2");
         },
         destroyed(){
             clearInterval(this.mapTime1);

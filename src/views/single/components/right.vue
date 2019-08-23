@@ -99,7 +99,9 @@
                 timer1:0,
                 timer2:0,
                 vehicleId:this.$route.params.vehicleId,
-                lightWebsocket:{}
+                lightWebsocket:{},
+                rtmp1:'',
+                rtmp2:''
             }
 
         },
@@ -190,6 +192,15 @@
                 }
             },
             getDeviceInfo(){
+               let time = setTimeout(()=>{
+                    if(this.rtmp1==''){
+                        this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
+                    }
+                    if(this.rtmp2==''){
+                        this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
+                    }
+                    clearTimeout(time);
+                },1000)
                 getLiveDeviceInfo({
                     'vehicleId': this.vehicleId,
                 }).then(res => {
@@ -200,7 +211,7 @@
                             if(item.serialNum==''){
                                 this.option1.sources[0].src='';
                             }else{
-                                this.getStream(this.option1,item);
+                                this.getStream(this.option1,item,0);
                             }
                         }
                         //车内摄像头
@@ -208,19 +219,24 @@
                             if(item.serialNum==''){
                                 this.option2.sources[0].src='';
                             }else{
-                                this.getStream(this.option2,item);
+                                this.getStream(this.option2,item,1);
                             }
                         }
                     })
                 });
             },
-            getStream(option,item){
+            getStream(option,item,index){
                 startStream({
                     'vehicleId': this.vehicleId,
                     'camId':item.serialNum,
                     'protocal':item.protocol
                 }).then(res => {
                     let streamInfo = res.streamInfoRes;
+                    if(index==0){
+                        this.rtmp1=streamInfo.rtmp;
+                    }else{
+                        this.rtmp2=streamInfo.rtmp;
+                    }
                     //获取视频地址并赋值
                     let rtmp = streamInfo.rtmp;
                     if(rtmp&&rtmp!=''){
