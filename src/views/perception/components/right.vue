@@ -127,6 +127,7 @@
                 mapTime2:0,
                 mapTime3:0,
                 mapTime4:0,
+                viewTime:0,
                 isConMov:false,
                 source:'',
                 lightWebsocket:{},
@@ -256,6 +257,7 @@
             },
             mouseUpChanged(){
                 console.log("监听鼠标移动地图")
+                clearTimeout(this.viewTime);
                 this.source='mouseMove';
                 let flag1 = this.getPointRange(this.videoItem1.lon,this.videoItem1.lat);
                 let flag2 = this.getPointRange(this.videoItem2.lon,this.videoItem2.lat);
@@ -324,34 +326,44 @@
                     }
                     this.$refs.perceptionMap.resetModels();
                     console.log("-----")
+                    //判断地图缩放、全屏，调试等
+                    this.viewTime = setTimeout(()=>{
+                        this.getData();
+                        clearTimeout(this.viewTime);
+                    },1000)
+
                 }
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
                 if(this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
-                    this.$refs.videoPlayer1.initialize();
-                    this.$refs.videoPlayer1.player.options(this.option1);
-                    this.videoItem1.rtmp="";
-                    this.$refs.videoPlayer1.player.src("");
-                    this.$refs.videoPlayer2.initialize();
-                    this.$refs.videoPlayer2.player.options(this.option1);
-                    this.videoItem2.rtmp="";
-                    this.$refs.videoPlayer2.player.src("");
-
-                    this.ele1.className="style";
-                    this.ele2.className="style";
-                    this.getCurrentExtent();
-                    this.getCenter();
-                    this.$emit('getCurrentExtent', this.currentExtent);
-                    this.getPerceptionAreaInfo();
-                    //地图不连续移动，判断红绿灯的位置受否再可视区
-                    this.typeRoadData();
+                    clearTimeout(this.viewTime);
+                    this.getData();
                 }
                 //不是第一次
                 if(!this.isFirst){
                    this.getMap();
                 }
                 this.isFirst=false;
+            },
+            getData(){
+                this.$refs.videoPlayer1.initialize();
+                this.$refs.videoPlayer1.player.options(this.option1);
+                this.videoItem1.rtmp="";
+                this.$refs.videoPlayer1.player.src("");
+                this.$refs.videoPlayer2.initialize();
+                this.$refs.videoPlayer2.player.options(this.option1);
+                this.videoItem2.rtmp="";
+                this.$refs.videoPlayer2.player.src("");
+
+                this.ele1.className="style";
+                this.ele2.className="style";
+                this.getCurrentExtent();
+                this.getCenter();
+                this.$emit('getCurrentExtent', this.currentExtent);
+                this.getPerceptionAreaInfo();
+                //地图不连续移动，判断红绿灯的位置受否再可视区
+                this.typeRoadData();
             },
             getMap(){
                 let overviewMap = this.$refs.map1;
@@ -903,8 +915,6 @@
             if(this.$refs.perceptionMap){
                 this.$refs.perceptionMap.reset3DMap();
             }
-            this.$refs.videoPlayer1.dispose();  //销毁video实例，避免出现节点不存在 但是flash一直在执行，报 this.el.......is not function
-            this.$refs.videoPlayer2.dispose();  //销毁video实例，避免出现节点不存在 但是flash一直在执行，报 this.el.......is not function
         }
 }
 </script>
@@ -976,7 +986,7 @@
         bottom: 0px!important;
     }
     .style2{
-        transition: all 2s ease-in-out;
+        transition: all 1s ease-in-out;
         opacity: 0!important;
     }
     /*@keyframes move {

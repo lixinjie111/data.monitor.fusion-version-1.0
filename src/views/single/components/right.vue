@@ -67,7 +67,8 @@
                 <span class="detail2">km/h</span>
             </div>
             <div class="detail1">
-                <span>航向角{{realData.headingAngle?realData.headingAngle.toFixed(1):'--'}}°</span>
+                <span>{{realData.headingAngle?realData.headingAngle.toFixed(1):'--'}}</span>
+                <span class="detail2">°</span>
             </div>
             <div class="detail1">
                 <span>{{nowYear}}</span>
