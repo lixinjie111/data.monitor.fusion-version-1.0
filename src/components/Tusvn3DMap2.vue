@@ -68,7 +68,7 @@ export default {
             ,cacheMainCarTrackData:new Array()
             ,lastMainCarData:null
             ,lastMainCarData2:null
-            ,stepTime:50.0
+            ,stepTime:150.0
             ,monitorTag:true
             ,time2:0//微调移动车的时间间隔
             ,intervalIds:new Array()
@@ -1173,6 +1173,7 @@ export default {
             }           
         },
         moveMainCar:function(data){
+            let a = new Date().getTime();
             console.log("当前缓存数据量moveMainCar："+this.cacheMainCarTrackData.length);
             if(data==null)
             {
@@ -1183,12 +1184,17 @@ export default {
                 this.lastMainCarData2 = data;
                 return;
             }else{
-                let time = data.gpsTime - this.lastMainCarData2.gpsTime;
+                let time = Math.floor(data.gpsTime - this.lastMainCarData2.gpsTime);
                
                 setTimeout(() => {
-                    let a = new Date().getTime();
+                    
                     this.moveCar(data);
                     this.lastMainCarData2 = data;
+
+                    let b = new Date().getTime();
+                    // temptime = temptime - (b-a);
+                    this.time2 = b-a;
+
                     let d = this.cacheMainCarTrackData.shift();
                     if(d!=null)
                     {
@@ -1200,11 +1206,12 @@ export default {
                     }else{
                         this.monitorTag=true;
                     }
-                    let b = new Date().getTime();
-                    // temptime = temptime - (b-a);
-                    this.time2 = (b-a);
-                    console.log(b-a+"=====time:"+time-this.time2);
-                }, time-this.time2);
+                    
+
+                    console.log("time:"+time);
+                    console.log("time2:"+this.time2);
+                    console.log(time-this.time2);
+                }, time-this.time2<=0?1:time-this.time2);//time-this.time2
             }
 
         },
