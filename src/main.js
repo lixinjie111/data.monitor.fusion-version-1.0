@@ -43,7 +43,7 @@ router.beforeEach((to,from,next) => {
     NProgress.start()
     // _hmt.push(['_trackPageview', to.fullPath]);
     const ADMINID = getAdminId();
-    if(ADMINID) {
+   /* if(ADMINID) {
         // 回填用户信息
         store.dispatch('setAuthInfo', getAuthInfo());
         if(to.path === '/login') {
@@ -58,7 +58,7 @@ router.beforeEach((to,from,next) => {
             next('/login'); // 否则全部重定向到登录页
         }
         NProgress.done()
-    }
+    }*/
 })
 
 router.afterEach(() => {
