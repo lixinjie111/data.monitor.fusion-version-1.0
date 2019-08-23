@@ -70,6 +70,8 @@ export default {
             ,lastMainCarData2:null
             ,stepTime:50.0
             ,monitorTag:true
+            ,time2:0//微调移动车的时间间隔
+            ,intervalIds:new Array()
 
             //车辆监控
             ,cartrackwebsocketUrl:"ws://120.133.21.14:49982/mon"
@@ -147,19 +149,22 @@ export default {
                 // this.changeRcuId2("ws://120.133.21.14:49982/mon","{\"action\": \"road_real_data\",\"data\": {\"polygon\": [[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]]}}");
 
             },500);
-            setInterval(() => {
+            let id1 = setInterval(() => {
                 this.processPerceptionMesage();
             }, 200);
+            this.intervalIds.push(id1);
 
-            setInterval(() => {
+            let id2=setInterval(() => {
                this.processPlatformCars();
             }, 200);
+            this.intervalIds.push(id2);
 
             // setInterval(()=>{
             //     this.processCarTrackMessage();
             // },50);
 
-            setInterval(() => {
+            let id3=setInterval(() => {
+
                 if(this.monitorTag)
                 {
                     console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
@@ -167,8 +172,8 @@ export default {
                     // this.lastMainCarData2=d;
                     this.moveMainCar(d);
                 }
-                
             }, 3000);
+            this.intervalIds.push(id3);
             // setInterval(() => {
             //     if(this.cacheMainCarTrackData.length>0&&this.tag)
             //     {
@@ -1179,6 +1184,7 @@ export default {
                 return;
             }else{
                 let time = data.gpsTime - this.lastMainCarData2.gpsTime;
+               
                 setTimeout(() => {
                     let a = new Date().getTime();
                     this.moveCar(data);
@@ -1195,8 +1201,10 @@ export default {
                         this.monitorTag=true;
                     }
                     let b = new Date().getTime();
-                    console.log(b-a+"=====time:"+time);
-                }, time);
+                    // temptime = temptime - (b-a);
+                    this.time2 = (b-a);
+                    console.log(b-a+"=====time:"+time-this.time2);
+                }, time-this.time2);
             }
 
         },
@@ -1780,6 +1788,13 @@ export default {
         }else{
             console.log("该浏览器不支持websocket");
         }
+        this.cacheMainCarTrackData=new Array();
+        for(let i=0;i<this.intervalIds.length;i++)
+        {
+            clearInterval(this.intervalIds[i]);
+        }
+        this.intervalIds=new Array();
+
     }
 }
 </script>
