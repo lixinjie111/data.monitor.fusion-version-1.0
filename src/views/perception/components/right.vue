@@ -2,6 +2,7 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('4')" v-if="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
+        <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
         <div class="video-style">
             <div class="style video1-position" id="message1">
                 <div class="video-num" @click="changeMap('1')">编号:{{videoItem1.serialNum}}</div>
@@ -14,10 +15,6 @@
         </div>
         <div class="map-right">
             <div class="perception-road" id="mapRoad">
-                <div class="map-type" @click="changeMap">
-                    <img src="@/assets/images/perception/3d.png" @click="changeMap('4')" v-if="param==3"/>
-                    <img src="@/assets/images/perception/2d.png" @click="changeMap('3')" v-else/>
-                </div>
                 <tusvn-map1
                         ref="map1"
                         targetId="map1"
@@ -68,7 +65,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' @mousedrop="mouseUpChanged" >
+            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' @mousedrop="mouseUpChanged">
             </tusvn-map>
         </div>
         <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
@@ -82,6 +79,7 @@
     import TusvnMap1 from './TusvnMap.vue';
     import {getMap} from '@/utils/tusvnMap.js';
     import TusvnMap from '@/components/Tusvn3DMap2'
+    import DateFormat from '@/utils/date.js'
     import {getPerceptionAreaInfo,getVideoByNum,typeRoadData} from '@/api/fusion'
     export default {
         data() {
@@ -135,8 +133,10 @@
                 lightWebsocket:null,
                 isFirst:true,
                 time:0,
-                initCameraParam:{},
-                param:3, //平面 俯视
+                param:4, //平面 俯视
+                time:'',
+                x:0,
+                y:0
 
                /* pointLeft:10,
                 pointTop:10,
@@ -167,6 +167,15 @@
 //                immediate: true,
                 deep: true
 
+            }
+        },
+        filters: {
+            dateFormat: function (value) {
+                if(value!=''){
+                    let ms = value%1000;
+                    let time = DateFormat.formatTime(value);
+                    return time+":"+ms;
+                }
             }
         },
         methods: {
@@ -236,19 +245,24 @@
                 //设置地图的中心点
                 if(longitude||latitude){
                     let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
-                    let x=utm[0];
-                    let y=utm[1];
+                    this.x=utm[0];
+                    this.y=utm[1];
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                    /*setInterval(()=>{
+                   /* setInterval(()=>{
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
-                    this.$refs.perceptionMap.updateCameraPosition(x,y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
+                    let param = this.$route.query.crossId;
+                    if(param==5){
+                        this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
+                    }
+                    if(param==6){
+                        this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
+                    }
                     return;
                 }else{
-                    this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,0,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
+                    this.$refs.perceptionMap.updateCameraPosition(325827.67761071684,3462548.5166341495,49.58125062491973,71.34607858022329,-0.4587365615867862,-1.4305945547157297);
                 }
-//                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
              },
             map1InitComplete(){
@@ -271,8 +285,7 @@
             },
             cameraChanged(){
                 console.log("窗口发生变化")
-                if(this.isFirst){
-                    this.initCameraParam = this.$refs.perceptionMap.getCamera();
+                /*if(this.isFirst){
                     this.time = setTimeout(()=>{
                         this.getCurrentExtent();
                         this.getCenter();
@@ -282,9 +295,9 @@
                         this.getMap();
                         clearTimeout(this.time);
                     },500)
-                }
+                }*/
                 //地图不是第一次初始化
-                if(this.param==3&&!this.isFirst){
+                if(this.param==3){
                     this.lightWebsocket&&this.lightWebsocket.close();
                     this.$refs.perceptionMap.resetModels();
                     //判断地图缩放、全屏，调试等
@@ -297,7 +310,7 @@
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
-                if(this.param==3&&this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
+                if(this.param==3&&this.source=='mapMove'&&!this.isConMov){
                     clearTimeout(this.viewTime);
                     this.getData();
                 }
@@ -701,9 +714,10 @@
             },
             onLightMessage(mesasge){
                 let _this=this;
-                _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
+                _this.time=json.time;
                 let resultData=[];
                 if(data&&data.length>0){
                     data.forEach(item=>{
@@ -824,14 +838,16 @@
                     this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==3){
+                    debugger
                     this.param=3;
-                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
+//                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
+                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }
                 if(param==4){
                     this.param=4;
                     this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
                 }
-            }
+            },
         },
         mounted() {
             this.option1 = this.getOption();
@@ -872,6 +888,17 @@
         position: absolute;
         /*left: 10px;
         top: 10px;*/
+    }
+    .map-time{
+        position: absolute;
+        top: 10px;
+        left:50%;
+        margin-left: -125px;
+        width: 250px;
+        text-align: left;
+        display: block;
+        font-size: 12px;
+        z-index:2;
     }
     .perception-road{
         height: 120px;

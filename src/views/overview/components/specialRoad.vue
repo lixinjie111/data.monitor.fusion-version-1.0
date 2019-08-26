@@ -30,6 +30,7 @@ export default {
         showRoadDetail(item) {
             this.$router.push({
                 path: '/perception/' + item.longitude + "/" + item.latitude,
+                query:{crossId:item.id}
             });
         },
         // 路段中心点位置

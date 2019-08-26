@@ -216,7 +216,9 @@ img {
   height: 60px;
   letter-spacing: 3px;
   font-size: 22px;
-  @include layoutMode(both);
+  line-height: 60px;
+  margin-left: 24px;
+ /* @include layoutMode(both);*/
   .header-img{
     vertical-align: middle;
     padding-right: 8px;
