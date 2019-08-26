@@ -62,6 +62,10 @@ export default {
             ,perceptionParams:null
             ,lastPerceptionMessage:null
             ,platformCars:null
+            ,cachePerceptionQueue:new Array()//缓存感知数据
+            ,processPerceptionInterval:200//处理缓存数据的间隔
+            ,waitingProcessPerceptionTime:3000
+
 
             ,cacheTrackCarData:null
             ,lasttime:0
@@ -149,15 +153,21 @@ export default {
                 // this.changeRcuId2("ws://120.133.21.14:49982/mon","{\"action\": \"road_real_data\",\"data\": {\"polygon\": [[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]]}}");
 
             },500);
-            let id1 = setInterval(() => {
-                this.processPerceptionMesage();
-            }, 200);
-            this.intervalIds.push(id1);
 
-            let id2=setInterval(() => {
-               this.processPlatformCars();
-            }, 200);
-            this.intervalIds.push(id2);
+            //处理缓存队列的数据
+            setTimeout(() => {
+                this.processPerceptionData();
+            }, this.waitingProcessPerceptionTime);
+
+            // let id1 = setInterval(() => {
+            //     this.processPerceptionMesage();
+            // }, 200);
+            // this.intervalIds.push(id1);
+
+            // let id2=setInterval(() => {
+            //    this.processPlatformCars();
+            // }, 200);
+            // this.intervalIds.push(id2);
 
             // setInterval(()=>{
             //     this.processCarTrackMessage();
@@ -695,12 +705,28 @@ export default {
         {
         //     console.log("===========addPerceptionData=============");
         //     console.log(new Date().getTime());
-            this.lastPerceptionMessage = data;
-            var data2 = JSON.parse(data.data);
-            if(data2.result.dataFlag == 1)
-            {
-                this.platformCars=data2.result.vehDataDTO;
-            }
+            this.cachePerceptionQueue.push(data);            
+        },
+        processPerceptionData:function(){
+            setTimeout(() => {
+                if(this.cachePerceptionQueue.length>0)
+                {
+                    let data = this.cachePerceptionQueue.shift();
+                    if(data!=null)
+                    {
+                        this.lastPerceptionMessage = data;
+                        var data2 = JSON.parse(data.data);
+                        if(data2.result.dataFlag == 1)
+                        {
+                            this.platformCars=data2.result.vehDataDTO;
+                        }
+                        //不丢包
+                        this.processPerceptionMesage();
+                        this.processPlatformCars();
+                    }
+                }
+                this.processPerceptionData();
+            }, this.processPerceptionInterval);
         },
         resetModels:function(){
             this.lastPerceptionMessage=null;
@@ -753,7 +779,7 @@ export default {
                 {
                     // debugger;
                     let d = this.platformCars[i];
-                    if(d.type == 1)
+                    if(d.type == 1)//平台车
                     {
                         this.animateCar2(d);
                     }
@@ -836,7 +862,7 @@ export default {
             {
                 let d = fusionList[i];
 
-                if(d.type==1)
+                if(d.type==1)//平台车
                 {
                     continue;
                 }
@@ -863,7 +889,8 @@ export default {
                             let mdl = this.deviceModels[deviceid].cars[i];
                             mdl.position.x = dUTM[0];
                             mdl.position.y = dUTM[1];
-                            mdl.position.z = this.defualtZ+4;
+                            mdl.position.z = this.defualtZ;
+                            mdl.rotation.set( this.pitch,this.yaw,(Math.PI/180.0)*d.heading);
 
                             this.changeModelColor(d,mdl);
                         }
@@ -877,7 +904,8 @@ export default {
                             let mixCar = this.mixCars[deviceid].cars[i];
                             mixCar.position.x = dUTM[0];
                             mixCar.position.y = dUTM[1];
-                            mixCar.position.z = this.defualtZ+4;
+                            mixCar.position.z = this.defualtZ;
+                            mixCar.rotation.set( this.pitch,this.yaw,(Math.PI/180.0)*d.heading);
                         }
                     }
                 }
