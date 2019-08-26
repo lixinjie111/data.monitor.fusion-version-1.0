@@ -5,12 +5,18 @@
         <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
         <div class="video-style">
             <div class="style video1-position" id="message1">
-                <div class="video-num" @click="changeMap('1')">编号:{{videoItem1.serialNum}}</div>
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
+                <div class="video-num" @click="changeMap('1')">
+                    <span>摄像头编号:{{videoItem1.deviceId}}</span>
+                    <span>{{videoItem1.rsPtName}}</span>
+                </div>
+                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" @fullscreenchange="fullScreen($event)" ref="videoPlayer1"></video-player>
             </div>
             <div class="style video2-position" id="message2">
-                <div class="video-num" @click="changeMap('2')">编号:{{videoItem2.serialNum}}</div>
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
+                <div class="video-num" @click="changeMap('2')">
+                    <span>摄像头编号:{{videoItem2.deviceId}}</span>
+                    <span>{{videoItem2.rsPtName}}</span>
+                </div>
+                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" :events="events" @fullscreenchange="fullScreen($event)" ref="videoPlayer2"></video-player>
             </div>
         </div>
         <div class="map-right">
@@ -86,6 +92,7 @@
             return {
                 option1:{},
                 option2:{},
+                events: ['fullscreenchange'],
                 lightList:[
                     /*{
                         left:250,
@@ -99,12 +106,16 @@
                 videoItem1:{
                     rtmp:'',
                     serialNum:'',
-                    cameraParam:''
+                    cameraParam:'',
+                    rsPtName:'',
+                    deviceId:''
                 },
                 videoItem2:{
                     rtmp:'',
                     serialNum:'',
-                    cameraParam:''
+                    cameraParam:'',
+                    rsPtName:'',
+                    deviceId:''
                 },
                 option1:{},
                 option2:{},
@@ -171,6 +182,7 @@
         },
         filters: {
             dateFormat: function (value) {
+                /*debugger*/
                 if(value!=''){
                     let ms = value%1000;
                     let time = DateFormat.formatTime(value);
@@ -255,10 +267,18 @@
                     let param = this.$route.query.crossId;
                     if(param==5){
                         this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
+                        this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
+                        this.center=[[121.17548002587952,76.2279931281073]];
                     }
                     if(param==6){
                         this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
+                        this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
+                        this.center=[[121.1709654293097,76.22695122794798]];
                     }
+                    this.getPerceptionAreaInfo();
+                    //地图不连续移动，判断红绿灯的位置受否再可视区
+                    this.typeRoadData();
+                    this.$emit('getCurrentExtent', this.currentExtent);
                     return;
                 }else{
                     this.$refs.perceptionMap.updateCameraPosition(325827.67761071684,3462548.5166341495,49.58125062491973,71.34607858022329,-0.4587365615867862,-1.4305945547157297);
@@ -285,7 +305,7 @@
             },
             cameraChanged(){
                 console.log("窗口发生变化")
-                /*if(this.isFirst){
+               /* if(this.param==3&&this.isFirst){
                     this.time = setTimeout(()=>{
                         this.getCurrentExtent();
                         this.getCenter();
@@ -296,8 +316,11 @@
                         clearTimeout(this.time);
                     },500)
                 }*/
+                if(this.param==3&&this.isFirst){
+                    this.typeRoadData();
+                }
                 //地图不是第一次初始化
-                if(this.param==3){
+                if(this.param==3&&!this.isFirst){
                     this.lightWebsocket&&this.lightWebsocket.close();
                     this.$refs.perceptionMap.resetModels();
                     //判断地图缩放、全屏，调试等
@@ -310,14 +333,14 @@
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
-                if(this.param==3&&this.source=='mapMove'&&!this.isConMov){
+                if(this.param==3&&this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
                     clearTimeout(this.viewTime);
                     this.getData();
                 }
-                //不是第一次
-                if(!this.isFirst){
+                /*//不是第一次
+                if(!this.isFirst){*/
                    this.getMap();
-                }
+                /*}*/
                 this.isFirst=false;
             },
             getData(){
@@ -347,6 +370,15 @@
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
             getPerceptionAreaInfo(){
+                let time = setTimeout(()=>{
+                    if(this.videoItem1.rtmp==''){
+                        this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
+                    }
+                    if(this.videoItem1.rtmp==''){
+                        this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
+                    }
+                    clearTimeout(time);
+                },1000)
                 getPerceptionAreaInfo({
                     "areaPoints":this.currentExtent,
                     "centerPoint": {
@@ -410,9 +442,11 @@
                                 camera2=typicalList[0].cameraList[1];
                             }
                         }
-                        this.videoItem1.serialNum=camera1.serialNum;
+                        this.videoItem1.deviceId=camera1.deviceId;
+                        this.videoItem1.rsPtName=camera1.rsPtName;
                         this.videoItem1.cameraParam=camera1.cameraParam;
-                        this.videoItem2.serialNum=camera2.serialNum;
+                        this.videoItem2.deviceId=camera2.deviceId;
+                        this.videoItem2.rsPtName=camera2.rsPtName;
                         this.videoItem2.cameraParam=camera2.cameraParam;
                         this.getVideo(camera1,0);
                         this.getVideo(camera2,1);
@@ -427,15 +461,6 @@
             },
             getVideo(camera,index){
                 let _this = this;
-                let time = setTimeout(()=>{
-                    if(_this.videoItem1.rtmp==''){
-                        _this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
-                    }
-                    if(_this.videoItem1.rtmp==''){
-                        _this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
-                    }
-                    clearTimeout(time);
-                },1000)
                 getVideoByNum({
                     "protocal": camera.protocol,
                     "serialNum": camera.serialNum
@@ -838,8 +863,8 @@
                     this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==3){
-                    debugger
                     this.param=3;
+                    this.isFirst=true;
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }
@@ -848,6 +873,9 @@
                     this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
                 }
             },
+            fullScreen(e){
+                debugger
+            }
         },
         mounted() {
             this.option1 = this.getOption();
@@ -901,8 +929,8 @@
         z-index:2;
     }
     .perception-road{
-        height: 120px;
-        width: 120px;
+        height: 130px;
+        width: 220px;
         border:1px solid rgba(211, 134, 0, 0.3);
         position: absolute;
         bottom: 10px;
@@ -942,6 +970,7 @@
             padding: 0px 10px;
             box-sizing: border-box;
             cursor: pointer;
+            @include layoutMode(between);
         }
 
     }
