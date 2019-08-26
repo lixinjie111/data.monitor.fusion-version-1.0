@@ -6,33 +6,37 @@
         <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
         <div class="video-style">
             <div class="style video1-position" id="message1">
+                <div class="video-mask" @click="screenMagnify('1')"></div>
                 <div class="video-num" @click="changeMap('1')">
                     <span>摄像头编号:{{videoItem1.deviceId}}</span>
                     <span>{{videoItem1.rsPtName}}</span>
                 </div>
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" :events="events" @fullscreenchange="fullScreen($event)" ref="videoPlayer1"></video-player>
+                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
             <div class="style video2-position" id="message2">
+                <div class="video-mask" @click="screenMagnify('2')"></div>
                 <div class="video-num" @click="changeMap('2')">
                     <span>摄像头编号:{{videoItem2.deviceId}}</span>
                     <span>{{videoItem2.rsPtName}}</span>
                 </div>
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" :events="events1" @fullscreenchange="fullScreen1($event)" ref="videoPlayer2"></video-player>
+                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
             </div>
         </div>
         <div class="big-video" v-show="video1Show">
+            <div class="video-mask" @click="screenShrink('1')"></div>
             <div class="video-num" @click="changeMap('1')">
                 <span>摄像头编号:{{videoItem1.deviceId}}</span>
                 <span>{{videoItem1.rsPtName}}</span>
             </div>
-            <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ></video-player>
+            <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer3"></video-player>
         </div>
         <div class="big-video" v-show="video2Show">
+            <div class="video-mask" @click="screenShrink('2')"></div>
             <div class="video-num" @click="changeMap('1')">
                 <span>摄像头编号:{{videoItem1.deviceId}}</span>
                 <span>{{videoItem1.rsPtName}}</span>
             </div>
-            <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"  ></video-player>
+            <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer4"></video-player>
         </div>
         <div class="map-right">
             <div class="perception-road" id="mapRoad">
@@ -901,27 +905,46 @@
                     this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
                 }
             },
-            fullScreen(player){
-                this.video1Show=!this.video1Show;
-                if(this.videoItem1.rtmp==""){
-                    this.option1.notSupportedMessage="";
-                    this.option1.notSupportedMessage='视频流不存在，请稍候重试';
-                }else{
-                    this.option1.sources[0].src=this.videoItem1.rtmp;
-                }
-                player.exitFullscreen() //强制退出全屏，恢复正常大小
+            screenMagnify(param){
+                if(param==1){
+                    this.video1Show=true;
+                    if(!this.$refs.videoPlayer3){
+                        this.$refs.videoPlayer3.player.initialize();
+                        this.$refs.videoPlayer3.player.setOption(this.option1);
 
-            },
-            fullScreen1(player){
-                this.video2Show=!this.video2Show;
-                if(this.videoItem2.rtmp==""){
-                    this.option2.notSupportedMessage="";
-                    this.option2.notSupportedMessage='视频流不存在，请稍候重试';
-                }else{
-                    this.option2.sources[0].src=this.videoItem2.rtmp;
+                    }
+                    if(this.videoItem1.rtmp==""){
+                        this.option1.notSupportedMessage="";
+                        this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                    }else{
+                        this.option1.sources[0].src=this.videoItem1.rtmp;
+                    }
                 }
-                player.exitFullscreen() //强制退出全屏，恢复正常大小
+                if(param==2){
+                    this.video2Show=true;
+                    if(!this.$refs.videoPlayer4){
+                        this.$refs.videoPlayer4.player.initialize();
+                        this.$refs.videoPlayer4.player.setOption(this.option2);
+
+                    }
+                    if(this.videoItem2.rtmp==""){
+                        this.option2.notSupportedMessage="";
+                        this.option2.notSupportedMessage='视频流不存在，请稍候重试';
+                    }else{
+                        this.option2.sources[0].src=this.videoItem2.rtmp;
+                    }
+                }
             },
+            screenShrink(param){
+                if(param==1){
+                    this.video1Show=false;
+                    this.$refs.videoPlayer3.player.dispose();
+                }
+                if(param==2){
+                    this.video2Show=false;
+                    this.$refs.videoPlayer4.player.dispose();
+                }
+            }
         },
         mounted() {
             this.option1 = this.getOption();
@@ -971,8 +994,9 @@
         width: 250px;
         text-align: left;
         display: block;
-        font-size: 12px;
+        font-size: 14px;
         z-index:2;
+        background: #969090;
     }
     .map-time1{
         top:50px!important;
@@ -1012,18 +1036,17 @@
         z-index:1;
         padding-top: 5px;
         box-sizing: border-box;
-        .video-num{
-            position: absolute;
-            z-index:2;
-            width:100%;
-            padding: 0px 10px;
-            box-sizing: border-box;
-            cursor: pointer;
-            @include layoutMode(between);
-        }
 
     }
-
+    .video-num{
+        position: absolute;
+        z-index:2;
+        width:100%;
+        padding: 0px 10px;
+        box-sizing: border-box;
+        cursor: pointer;
+        @include layoutMode(between);
+    }
  /*   .style:before{
         position: absolute;
         content: '';
@@ -1055,13 +1078,22 @@
         top: 84px;
         right: 10px;
         z-index:4;
-        width: 800px;
+        width: 900px;
         border:1px solid rgba(211, 134, 0, 0.5);
+        background: #000;
     }
     .video1-position{
         margin-bottom: 16px;
     }
-
+    .video-mask{
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 46px;
+        height: 46px;
+        z-index: 3;
+        cursor: pointer;
+    }
     .spat-detail{
         position: absolute;
         z-index: 2;
