@@ -4,8 +4,8 @@
             <img src="@/assets/images/logo.png" class="header-img" @click="routeGo"/>
             融合感知平台
         </div>
-        <div class="fusion-left-main">
-            <p class="c-title">融合结果</p>
+        <div class="fusion-left-main left-style">
+            <p class="c-title" style="margin-top: 0px;">融合结果</p>
             <ul class="perception-style">
                 <li>
                     <span class="overview-sign fusion-sign"></span>
@@ -63,8 +63,8 @@
     export default {
         data() {
             return {
-                webSocket:{},
-                warningWebsocket:{},
+                webSocket:null,
+                warningWebsocket:null,
                 fusionData:{},
                 platformData:{},
                 perceptionData:{},
@@ -104,11 +104,11 @@
                 let _this=this;
                 if ('WebSocket' in window) {
                     _this.webSocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                    _this.webSocket.onmessage = _this.onmessage;
+                    _this.webSocket.onclose = _this.onclose;
+                    _this.webSocket.onopen = _this.onopen;
+                    _this.webSocket.onerror = _this.onerror;
                 }
-                _this.webSocket.onmessage = _this.onmessage;
-                _this.webSocket.onclose = _this.onclose;
-                _this.webSocket.onopen = _this.onopen;
-                _this.webSocket.onerror = _this.onerror;
             },
             onmessage(mesasge){
                 let _this=this;
@@ -157,10 +157,10 @@
                 let _this=this;
                 if ('WebSocket' in window) {
                     _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    _this.warningWebsocket.onmessage = _this.onWarningMessage;
+                    _this.warningWebsocket.onclose = _this.onWarningClose;
+                    _this.warningWebsocket.onopen = _this.onWarningOpen;
                 }
-                _this.warningWebsocket.onmessage = _this.onWarningMessage;
-                _this.warningWebsocket.onclose = _this.onWarningClose;
-                _this.warningWebsocket.onopen = _this.onWarningOpen;
             },
             onWarningMessage(mesasge){
                 let _this=this;
@@ -214,13 +214,17 @@
 
         },
         destroyed(){
-            this.webSocket.close();
-            this.warningWebsocket.close();
+            this.webSocket&&this.webSocket.close();
+            this.warningWebsocket&&this.warningWebsocket.close();
         }
     }
 </script>
 <style lang="scss" scoped>
    /* @import '@/assets/scss/theme.scss';*/
+   .left-style{
+       padding-top:0px!important;
+       padding-bottom:0px!important;
+   }
     .perception-style{
         padding: 20px 10px;
         line-height: 28px;

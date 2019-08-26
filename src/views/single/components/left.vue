@@ -98,7 +98,7 @@
                     markerEnd: null
                 },
                 wholePath: [],
-                webSocket:{},
+                webSocket:null,
                 scale: 10,
                 webSocketData: {
                     'action':'route',
@@ -159,11 +159,11 @@
                 let _this=this;
                 if ('WebSocket' in window) {
                     _this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    _this.webSocket.onmessage = _this.onmessage;
+                    _this.webSocket.onclose = _this.onclose;
+                    _this.webSocket.onopen = _this.onopen;
+                    _this.webSocket.onerror = _this.onerror;
                 }
-                _this.webSocket.onmessage = _this.onmessage;
-                _this.webSocket.onclose = _this.onclose;
-                _this.webSocket.onopen = _this.onopen;
-                _this.webSocket.onerror = _this.onerror;
             },
             onmessage(message){
                 // console.log("行程概览 route *********************************************");
@@ -360,7 +360,7 @@
         },
         destroyed(){
             //销毁Socket
-            this.webSocket.close();
+            this.webSocket&&this.webSocket.close();
         }
     }
 </script>

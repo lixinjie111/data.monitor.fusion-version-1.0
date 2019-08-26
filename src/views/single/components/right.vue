@@ -100,7 +100,7 @@
                 timer1:0,
                 timer2:0,
                 vehicleId:this.$route.params.vehicleId,
-                lightWebsocket:{},
+                lightWebsocket:null,
                 rtmp1:'',
                 rtmp2:''
             }
@@ -363,8 +363,8 @@
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);
             this.timer2 = null;//清除直播报活
-            this.lightWebsocket.close();
-            this.$refs.tusvnMap.reset3DMap();
+            this.lightWebsocket&&this.lightWebsocket.close();
+            this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
 
         }
     }
