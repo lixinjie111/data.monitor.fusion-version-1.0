@@ -1,23 +1,7 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('4')" v-if="param==3"/>
-        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
-        <div class="video-style">
-            <div class="style video1-position" id="message1">
-                <div class="video-num" @click="changeMap('1')">编号:{{videoItem1.serialNum}}</div>
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
-            </div>
-            <div class="style video2-position" id="message2">
-                <div class="video-num" @click="changeMap('2')">编号:{{videoItem2.serialNum}}</div>
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
-            </div>
-        </div>
         <div class="map-right">
             <div class="perception-road" id="mapRoad">
-                <div class="map-type" @click="changeMap">
-                    <img src="@/assets/images/perception/3d.png" @click="changeMap('4')" v-if="param==3"/>
-                    <img src="@/assets/images/perception/2d.png" @click="changeMap('3')" v-else/>
-                </div>
                 <tusvn-map1
                         ref="map1"
                         targetId="map1"
@@ -65,6 +49,12 @@
                     </div>
                 </div>
         <div id="map" class="c-map">
+            <div class="style" id="message1" :style="{left:videoItem1.left+'px',bottom:videoItem1.bottom+'px',opacity:videoItem1.opacity}" v-show="videoItem1.videoShow">
+                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
+            </div>
+            <div class="style" id="message2" :style="{left:videoItem2.left+'px',bottom:videoItem2.bottom+'px',opacity:videoItem2.opacity}" v-show="videoItem2.videoShow">
+                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
+            </div>
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
@@ -99,14 +89,22 @@
                     }*/
                 ],
                 videoItem1:{
+                    left:'',
+                    bottom:'',
+                    opacity:0,
+                    videoShow:false,
                     rtmp:'',
-                    serialNum:'',
-                    cameraParam:''
+                    lon:'',
+                    lat:''
                 },
                 videoItem2:{
+                    left:'',
+                    bottom:'',
+                    opacity:0,
+                    videoShow:false,
                     rtmp:'',
-                    serialNum:'',
-                    cameraParam:''
+                    lon:'',
+                    lat:''
                 },
                 option1:{},
                 option2:{},
@@ -135,9 +133,8 @@
                 lightWebsocket:null,
                 isFirst:true,
                 time:0,
-                initCameraParam:{},
-                param:3, //平面 俯视
-
+                ele1:{},
+                ele2:{},
                /* pointLeft:10,
                 pointTop:10,
                 pointLeft1:10,
@@ -250,6 +247,7 @@
                 }
 //                this.$refs.perceptionMap.updateCameraPosition(326343.19123227906,3462351.5698124655,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
+
              },
             map1InitComplete(){
                 this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
@@ -260,20 +258,48 @@
             mouseUpChanged(){
                 console.log("监听鼠标移动地图")
                 clearTimeout(this.viewTime);
-                if(this.param==3){
-                    this.source='mouseMove';
-                    this.getCurrentExtent();
-                    this.getCenter();
-                    this.$emit('getCurrentExtent', this.currentExtent);
-                    //地图不连续移动，判断红绿灯的位置受否再可视区
-                    this.typeRoadData();
+                this.source='mouseMove';
+                let flag1 = this.getPointRange(this.videoItem1.lon,this.videoItem1.lat);
+                let flag2 = this.getPointRange(this.videoItem2.lon,this.videoItem2.lat);
+                this.getCurrentExtent();
+                this.getCenter();
+                this.$emit('getCurrentExtent', this.currentExtent);
+                this.$refs.videoPlayer1.initialize();
+                this.$refs.videoPlayer1.player.options(this.option1);
+                this.$refs.videoPlayer2.initialize();
+                this.$refs.videoPlayer2.player.options(this.option2);
+                if(flag1){
+                    this.videoItem1.videoShow=true;
+                    this.$refs.videoPlayer1.player.src(this.videoItem1.rtmp);
+                }else{
+                    this.videoItem1.rtmp="";
+                    this.$refs.videoPlayer1.player.src("");
+                    this.ele1.className="style";
+                    this.getPerceptionAreaInfo();
                 }
+               /* this.$refs.videoPlayer1.player.load(this.videoItem1.rtmp);
+                this.$refs.videoPlayer1.player.play();*/
+                if(flag2){
+                    this.videoItem2.videoShow=true;
+                    this.$refs.videoPlayer2.player.src(this.videoItem2.rtmp);
+                }else{
+                    this.videoItem2.rtmp="";
+                    this.$refs.videoPlayer2.player.src("");
+                    this.ele2.className="style";
+                    this.getPerceptionAreaInfo();
+                }
+                /*this.$refs.videoPlayer2.player.load(this.videoItem2.rtmp);
+                this.$refs.videoPlayer2.player.play();
+                console.log("++++++++++++++")*/
+                //地图不连续移动，判断红绿灯的位置受否再可视区
+                this.typeRoadData();
             },
             cameraChanged(){
                 console.log("窗口发生变化")
                 if(this.isFirst){
-                    this.initCameraParam = this.$refs.perceptionMap.getCamera();
                     this.time = setTimeout(()=>{
+                        let ele = document.getElementById("message1");
+                        ele.className="style";
                         this.getCurrentExtent();
                         this.getCenter();
                         this.$emit('getCurrentExtent', this.currentExtent);
@@ -284,9 +310,20 @@
                     },500)
                 }
                 //地图不是第一次初始化
-                if(this.param==3&&!this.isFirst){
+                if(!this.isFirst){
+                    console.log("-----")
+                    this.lightList=[];
+                    if(this.videoItem1.videoShow||this.videoItem1.rtmp!=''){
+                        this.$refs.videoPlayer1.dispose();
+                        this.videoItem1.videoShow=false;
+                    }
+                    if(this.videoItem2.videoShow||this.videoItem2.rtmp!=''){
+                        this.$refs.videoPlayer2.dispose();
+                        this.videoItem2.videoShow=false;
+                    }
                     this.lightWebsocket&&this.lightWebsocket.close();
                     this.$refs.perceptionMap.resetModels();
+                    console.log("-----")
                     //判断地图缩放、全屏，调试等
                     this.viewTime = setTimeout(()=>{
                         this.getData();
@@ -297,7 +334,7 @@
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
-                if(this.param==3&&this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
+                if(this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
                     clearTimeout(this.viewTime);
                     this.getData();
                 }
@@ -308,10 +345,21 @@
                 this.isFirst=false;
             },
             getData(){
+                this.$refs.videoPlayer1.initialize();
+                this.$refs.videoPlayer1.player.options(this.option1);
+                this.videoItem1.rtmp="";
+                this.$refs.videoPlayer1.player.src("");
+                this.$refs.videoPlayer2.initialize();
+                this.$refs.videoPlayer2.player.options(this.option1);
+                this.videoItem2.rtmp="";
+                this.$refs.videoPlayer2.player.src("");
+
+                this.ele1.className="style";
+                this.ele2.className="style";
                 this.getCurrentExtent();
                 this.getCenter();
                 this.$emit('getCurrentExtent', this.currentExtent);
-//                this.getPerceptionAreaInfo();
+                this.getPerceptionAreaInfo();
                 //地图不连续移动，判断红绿灯的位置受否再可视区
                 this.typeRoadData();
             },
@@ -365,11 +413,21 @@
                                 if(cameraList[j].priority!=0){
                                     if(!camera1.serialNum){
                                         camera1=cameraList[j];
+                                        this.videoItem1.left = parseInt(pixel[0]);
+                                        this.videoItem1.bottom=topPosition-parseInt(pixel[1]);
+                                        this.videoItem1.opacity=1;
+                                        this.videoItem1.lon=item.ptLon;
+                                        this.videoItem1.lat=item.ptLat;
                                         cameraCount++;
                                         continue;
                                     }
                                     if(!camera2.serialNum){
                                         camera2=cameraList[j];
+                                        this.videoItem2.left = parseInt(pixel[0]);
+                                        this.videoItem2.bottom=topPosition-parseInt(pixel[1]);
+                                        this.videoItem2.opacity=1;
+                                        this.videoItem2.lon=item.ptLon;
+                                        this.videoItem2.lat=item.ptLat;
                                         cameraCount++;
                                     }
                                     if(cameraCount>=2){
@@ -389,20 +447,32 @@
                             //三维坐标转成平面像素
                             let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
                             if(!camera1.serialNum){
+                                this.videoItem1.left = parseInt(pixel[0]);
+                                this.videoItem1.bottom=topPosition-parseInt(pixel[1]);
+                                this.videoItem1.opacity=1;
+                                this.videoItem1.lon=item.ptLon;
+                                this.videoItem1.lat=item.ptLat;
                                 camera1=typicalList[0].cameraList[0];
 
                             }
 
                             if(!camera2.serialNum){
+                                this.videoItem2.left = parseInt(pixel[0]);
+                                this.videoItem2.bottom=topPosition-parseInt(pixel[1]);
+                                this.videoItem2.opacity=1;
+                                this.videoItem2.lon=item.ptLon;
+                                this.videoItem2.lat=item.ptLat;
                                 camera2=typicalList[0].cameraList[1];
                             }
                         }
-                        this.videoItem1.serialNum=camera1.serialNum;
-                        this.videoItem1.cameraParam=camera1.cameraParam;
-                        this.videoItem2.serialNum=camera2.serialNum;
-                        this.videoItem2.cameraParam=camera2.cameraParam;
-                        this.getVideo(camera1,0);
-                        this.getVideo(camera2,1);
+                        //地图移动停止10s
+                        let time1 = setTimeout(()=>{
+                            this.videoItem1.videoShow=true;
+                            this.videoItem2.videoShow=true;
+                            this.getVideo(camera1,0);
+                            this.getVideo(camera2,1);
+                            clearTimeout(time1);
+                        },5000)
                     }
                     if(sideList&&sideList.length>0){
                         sideList.forEach(item=>{
@@ -432,8 +502,14 @@
                         if(_this.videoItem1.rtmp==""){
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                            _this.ele1.className="style style2";
                         }else{
                             _this.option1.sources[0].src=_this.videoItem1.rtmp;
+                            //播放2s移动到下方
+                            let time1 = setTimeout(()=>{
+                                _this.ele1.className="style style1";
+                                clearTimeout(time1);
+                            },2000)
                         }
                     }
                     if(index==1){
@@ -441,8 +517,18 @@
                         if(_this.videoItem2.rtmp==""){
                             _this.option2.notSupportedMessage="";
                             _this.option2.notSupportedMessage='视频流不存在，请稍候重试';
+                            _this.ele2.className="style style2";
                         }else{
                             _this.option2.sources[0].src=_this.videoItem2.rtmp;
+                            //播放20s移动到下方
+                            let time1 = setTimeout(()=>{
+                                if(_this.videoItem1.rtmp==""){
+                                    _this.ele2.className="style style1";
+                                }else{
+                                    _this.ele2.className="style style11";
+                                }
+                                clearTimeout(time1);
+                            },2000)
                         }
                     }
                 })
@@ -809,33 +895,13 @@
                 }else {
                     return false;
                 }
-            },
-            changeMap(param){
-                this.lightList=[];
-                let cameraParam;
-                if(param==1){
-                    cameraParam = JSON.parse(this.videoItem1.cameraParam);
-                    this.param=1;
-                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
-                }
-                if(param==2){
-                    cameraParam = JSON.parse(this.videoItem2.cameraParam);
-                    this.param=2;
-                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
-                }
-                if(param==3){
-                    this.param=3;
-                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
-                }
-                if(param==4){
-                    this.param=4;
-                    this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
-                }
             }
         },
         mounted() {
             this.option1 = this.getOption();
             this.option2 = this.getOption();
+            this.ele1 = document.getElementById("message1");
+            this.ele2 = document.getElementById("message2");
         },
         destroyed(){
             clearInterval(this.mapTime1);
@@ -856,7 +922,7 @@
         display: none;
     }
     .style .vjs-modal-dialog-content{
-        padding-top:80px!important;
+        padding-top:50px!important;
     }
     .style .vjs-custom-skin > .video-js .vjs-big-play-button{
         font-size: 0.5em!important;
@@ -874,23 +940,14 @@
         top: 10px;*/
     }
     .perception-road{
-        height: 120px;
-        width: 120px;
-        border:1px solid rgba(211, 134, 0, 0.3);
+        height: 150px;
+        width: 250px;
+        border:1px solid rgba(211, 134, 0, 0.5);
         position: absolute;
         bottom: 10px;
         background: #000;
         right: 10px;
         z-index:100;
-        .map-type{
-            position: absolute;
-            z-index: 110;
-            right:0;
-            img{
-                width: 18px;
-                cursor: pointer;
-            }
-        }
     }
     .base-info{
         padding:10px 0px ;
@@ -901,25 +958,38 @@
         }
     }
     .style{
-      /*  width: 400px;*/
-       /* height: 160px;*/
-        border:1px solid rgba(211, 134, 0, 0.5);
-        position: relative;
+        width: 260px;
+        height: 160px;
+        border:4px solid #666666;
+        position: absolute;
+        /*left: 800px;
+        !*top: calc(440px-160px-20px);*!
+        bottom:260px;*/
         z-index:1;
         padding-top: 5px;
         box-sizing: border-box;
-        .video-num{
-            position: absolute;
-            z-index:2;
-            width:100%;
-            padding: 0px 10px;
-            box-sizing: border-box;
-            cursor: pointer;
-        }
+        transition: all 2s ease-in-out;
+        opacity: 0;
+        /*animation: move 3s linear;*/
 
     }
-
- /*   .style:before{
+    .style1{
+        left: 310px!important;
+        bottom: 0px!important;
+    }
+    .style11{
+        left: 580px!important;
+        bottom: 0px!important;
+    }
+    .style2{
+        transition: all 1s ease-in-out;
+        opacity: 0!important;
+    }
+    /*@keyframes move {
+        0%{transform:translate(0,0);}
+        100%{transform:translate(50px,100px);}
+    }*/
+    .style:before{
         position: absolute;
         content: '';
         width: 0;
@@ -929,26 +999,7 @@
         bottom: -20px;
         left:16px;
 
-    }*/
-    .img-style{
-        position: absolute;
-        top: 86px;
-        z-index:3;
-        right: 420px;
-        width:40px;
-        cursor: pointer;
     }
-    .video-style{
-        position: absolute;
-        top: 86px;
-        right: 10px;
-        z-index:3;
-        width: 400px;
-    }
-    .video1-position{
-        margin-bottom: 16px;
-    }
-
     .spat-detail{
         position: absolute;
         z-index: 2;

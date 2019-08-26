@@ -289,10 +289,10 @@
                 let _this=this;
                 if ('WebSocket' in window) {
                     _this.lightWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    _this.lightWebsocket.onmessage = _this.onLightMessage;
+                    _this.lightWebsocket.onclose = _this.onLightClose;
+                    _this.lightWebsocket.onopen = _this.onLightOpen;
                 }
-                _this.lightWebsocket.onmessage = _this.onLightMessage;
-                _this.lightWebsocket.onclose = _this.onLightClose;
-                _this.lightWebsocket.onopen = _this.onLightOpen;
             },
             onLightMessage(mesasge){
                 var _this=this;
