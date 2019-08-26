@@ -9,15 +9,29 @@
                     <span>摄像头编号:{{videoItem1.deviceId}}</span>
                     <span>{{videoItem1.rsPtName}}</span>
                 </div>
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" @fullscreenchange="fullScreen($event)" ref="videoPlayer1"></video-player>
+                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" :events="events" @fullscreenchange="fullScreen($event)" ref="videoPlayer1"></video-player>
             </div>
             <div class="style video2-position" id="message2">
                 <div class="video-num" @click="changeMap('2')">
                     <span>摄像头编号:{{videoItem2.deviceId}}</span>
                     <span>{{videoItem2.rsPtName}}</span>
                 </div>
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" :events="events" @fullscreenchange="fullScreen($event)" ref="videoPlayer2"></video-player>
+                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" :events="events1" @fullscreenchange="fullScreen1($event)" ref="videoPlayer2"></video-player>
             </div>
+        </div>
+        <div class="big-video" v-show="video1Show">
+            <div class="video-num" @click="changeMap('1')">
+                <span>摄像头编号:{{videoItem1.deviceId}}</span>
+                <span>{{videoItem1.rsPtName}}</span>
+            </div>
+            <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ></video-player>
+        </div>
+        <div class="big-video" v-show="video2Show">
+            <div class="video-num" @click="changeMap('1')">
+                <span>摄像头编号:{{videoItem1.deviceId}}</span>
+                <span>{{videoItem1.rsPtName}}</span>
+            </div>
+            <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"  ></video-player>
         </div>
         <div class="map-right">
             <div class="perception-road" id="mapRoad">
@@ -32,7 +46,7 @@
             </div>
         </div>
         <div class="map-left"></div>
-        <div class="spat-detail " v-for="(item,key) in lightList" :style="{left:item.left+'px',top:item.top+'px'}">
+        <div class="spat-detail " v-for="(item,key) in lightList" :style="{left:item.left+'px',top:item.top+'px'}" v-show="item.flag">
                <!-- <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">-->
                     <div v-show="item.key=='turn'" class="spat-detail-style">
                         <div class="spat-detail-img" >
@@ -93,6 +107,7 @@
                 option1:{},
                 option2:{},
                 events: ['fullscreenchange'],
+                events1: ['fullscreenchange'],
                 lightList:[
                     /*{
                         left:250,
@@ -147,7 +162,9 @@
                 param:4, //平面 俯视
                 time:'',
                 x:0,
-                y:0
+                y:0,
+                video1Show:false,
+                video2Show:false,
 
                /* pointLeft:10,
                 pointTop:10,
@@ -374,7 +391,7 @@
                     if(this.videoItem1.rtmp==''){
                         this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
                     }
-                    if(this.videoItem1.rtmp==''){
+                    if(this.videoItem2.rtmp==''){
                         this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
                     }
                     clearTimeout(time);
@@ -588,6 +605,7 @@
                                     obj.key = key;
                                     obj.spareTime = '';
                                     obj.lightColor='';
+                                    obj.flag=false;
                                     this.spatCount++;
                                     this.lightList.push(obj);
                                     i++;
@@ -743,29 +761,32 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
                 _this.time=json.time;
-                let resultData=[];
-                if(data&&data.length>0){
-                    data.forEach(item=>{
-                        let option={
-                            leftTime:item.leftTime,
-                            light:item.status,
-                            direction:item.direction,
-                            spatId:item.spatId
+                if(_this.param==3){
+                    let resultData=[];
+                    if(data&&data.length>0){
+                        data.forEach(item=>{
+                            let option={
+                                leftTime:item.leftTime,
+                                light:item.status,
+                                direction:item.direction,
+                                spatId:item.spatId
 
-                        }
-                        resultData.push(option);
-                    });
-                    resultData.forEach(function (item,index,arr) {
-                        let spatId="light_"+item.spatId;
-                        let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
-                        _this.lightList.forEach((item1,index1)=>{
-                            //相交的
-                            if(item1.spatId==spatId){
-                                item1.spareTime = item.leftTime;
-                                item1.lightColor = item.light;
                             }
+                            resultData.push(option);
+                        });
+                        resultData.forEach(function (item,index,arr) {
+                            let spatId="light_"+item.spatId;
+                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
+                            _this.lightList.forEach((item1,index1)=>{
+                                //相交的
+                                if(item1.spatId==spatId){
+                                    item1.spareTime = item.leftTime;
+                                    item1.lightColor = item.light;
+                                    item1.flag=true;
+                                }
+                            })
                         })
-                    })
+                    }
                 }
             },
             onLightClose(data){
@@ -873,9 +894,27 @@
                     this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
                 }
             },
-            fullScreen(e){
-                debugger
-            }
+            fullScreen(player){
+                this.video1Show=!this.video1Show;
+                if(this.videoItem1.rtmp==""){
+                    this.option1.notSupportedMessage="";
+                    this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                }else{
+                    this.option1.sources[0].src=this.videoItem1.rtmp;
+                }
+                player.exitFullscreen() //强制退出全屏，恢复正常大小
+
+            },
+            fullScreen1(player){
+                this.video2Show=!this.video2Show;
+                if(this.videoItem2.rtmp==""){
+                    this.option2.notSupportedMessage="";
+                    this.option2.notSupportedMessage='视频流不存在，请稍候重试';
+                }else{
+                    this.option2.sources[0].src=this.videoItem2.rtmp;
+                }
+                player.exitFullscreen() //强制退出全屏，恢复正常大小
+            },
         },
         mounted() {
             this.option1 = this.getOption();
@@ -1000,6 +1039,14 @@
         right: 10px;
         z-index:3;
         width: 400px;
+    }
+    .big-video{
+        position: absolute;
+        top: 84px;
+        right: 10px;
+        z-index:4;
+        width: 800px;
+        border:1px solid rgba(211, 134, 0, 0.5);
     }
     .video1-position{
         margin-bottom: 16px;
