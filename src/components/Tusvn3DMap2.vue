@@ -162,18 +162,20 @@ export default {
             // setInterval(()=>{
             //     this.processCarTrackMessage();
             // },50);
+            setTimeout(() => {
+                console.log("开始执行小车平滑移动");
+                let id3=setInterval(() => {
+                    if(this.monitorTag)
+                    {
+                        console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
+                        let d = this.cacheMainCarTrackData.shift();
+                        this.moveMainCar(d);
+                    }
+                }, 2000);
+                this.intervalIds.push(id3);
+            }, 6000);
 
-            let id3=setInterval(() => {
-
-                if(this.monitorTag)
-                {
-                    console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
-                    let d = this.cacheMainCarTrackData.shift();
-                    // this.lastMainCarData2=d;
-                    this.moveMainCar(d);
-                }
-            }, 3000);
-            this.intervalIds.push(id3);
+            
             // setInterval(() => {
             //     if(this.cacheMainCarTrackData.length>0&&this.tag)
             //     {
@@ -1173,12 +1175,12 @@ export default {
             }           
         },
         moveMainCar:function(data){
-            let a = new Date().getTime();
             console.log("当前缓存数据量moveMainCar："+this.cacheMainCarTrackData.length);
             if(data==null)
             {
                 return;
             }
+            let a = new Date().getTime();
             if(this.lastMainCarData2==null)
             {
                 this.lastMainCarData2 = data;
