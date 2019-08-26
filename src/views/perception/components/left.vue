@@ -92,6 +92,15 @@
             }
         },
         watch:{
+           /* currentExtent: {
+                handler: function (val, oldVal) {
+                    this.warningCount=0;
+                    this.initWebSocket();
+                    this.initWarningWebSocket();
+                },
+                immediate: true,
+                deep:true
+            }*/
             currentExtent(newValue,oldValue){
 //                console.log("大小："+this.currentExtent.length);
                 this.warningCount=0;
