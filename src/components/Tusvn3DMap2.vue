@@ -156,6 +156,7 @@ export default {
 
             //处理缓存队列的数据
             setTimeout(() => {
+                console.log("处理感知车辆缓存队列中的数据");
                 this.processPerceptionData();
             }, this.waitingProcessPerceptionTime);
 
