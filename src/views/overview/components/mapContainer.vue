@@ -11,7 +11,7 @@ export default {
             id: "car-map-container",
             AMap: null,
             // 获取在驶车辆实时数据（辆）
-            webSocket:{},
+            webSocket:null,
             webSocketData: {
                 action: "vehicleOnline",
                 token: 'fpx',
@@ -33,11 +33,11 @@ export default {
             // console.log('websocket获取地图行驶车辆展示');
             if ('WebSocket' in window) {
                 this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                this.webSocket.onmessage = this.onmessage;
+                this.webSocket.onclose = this.onclose;
+                this.webSocket.onopen = this.onopen;
+                this.webSocket.onerror = this.onerror;
             }
-            this.webSocket.onmessage = this.onmessage;
-            this.webSocket.onclose = this.onclose;
-            this.webSocket.onopen = this.onopen;
-            this.webSocket.onerror = this.onerror;
         },
         onmessage(message) {
             let _json = JSON.parse(message.data),
@@ -175,7 +175,7 @@ export default {
     },
     destroyed(){
         //销毁Socket
-        this.webSocket.close();
+        this.webSocket&&this.webSocket.close();
     }
 }
 // export default {

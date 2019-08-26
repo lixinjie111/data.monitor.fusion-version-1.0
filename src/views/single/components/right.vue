@@ -100,7 +100,7 @@
                 timer1:0,
                 timer2:0,
                 vehicleId:this.$route.params.vehicleId,
-                lightWebsocket:{},
+                lightWebsocket:null,
                 rtmp1:'',
                 rtmp2:''
             }
@@ -289,10 +289,10 @@
                 let _this=this;
                 if ('WebSocket' in window) {
                     _this.lightWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    _this.lightWebsocket.onmessage = _this.onLightMessage;
+                    _this.lightWebsocket.onclose = _this.onLightClose;
+                    _this.lightWebsocket.onopen = _this.onLightOpen;
                 }
-                _this.lightWebsocket.onmessage = _this.onLightMessage;
-                _this.lightWebsocket.onclose = _this.onLightClose;
-                _this.lightWebsocket.onopen = _this.onLightOpen;
             },
             onLightMessage(mesasge){
                 var _this=this;
@@ -363,8 +363,8 @@
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);
             this.timer2 = null;//清除直播报活
-            this.lightWebsocket.close();
-            this.$refs.tusvnMap.reset3DMap();
+            this.lightWebsocket&&this.lightWebsocket.close();
+            this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
 
         }
     }

@@ -28,7 +28,7 @@ export default {
         sideVehicleObj: {}, // 地图上画车辆
         sideLight: {} //
       },
-      roadWebSocket: {}
+      roadWebSocket: null
     };
   },
   mounted() {
@@ -107,11 +107,11 @@ export default {
       let _this = this;
       if ("WebSocket" in window) {
         _this.roadWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
+          _this.roadWebSocket.onmessage = _this.onMessage;
+          _this.roadWebSocket.onclose = _this.onClose;
+          _this.roadWebSocket.onopen = _this.onOpen;
+          _this.roadWebSocket.onerror = _this.onError;
       }
-      _this.roadWebSocket.onmessage = _this.onMessage;
-      _this.roadWebSocket.onclose = _this.onClose;
-      _this.roadWebSocket.onopen = _this.onOpen;
-      _this.roadWebSocket.onerror = _this.onError;
     },
     onMessage(message) {
       let _this = this;
@@ -309,7 +309,7 @@ export default {
     }
   },
   destroyed() {
-    this.roadWebSocket.close();
+      this.roadWebSocket&&this.roadWebSocket.close();
   }
 };
 </script>

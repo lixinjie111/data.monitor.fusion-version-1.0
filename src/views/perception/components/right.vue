@@ -1,6 +1,8 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <div class="map-right">
+        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('4')" v-if="param==3"/>
+        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
+        <div class="video-style">
             <div class="style video1-position" id="message1">
                 <div class="video-num" @click="changeMap('1')">编号:{{videoItem1.serialNum}}</div>
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
@@ -9,10 +11,12 @@
                 <div class="video-num" @click="changeMap('2')">编号:{{videoItem2.serialNum}}</div>
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
             </div>
+        </div>
+        <div class="map-right">
             <div class="perception-road" id="mapRoad">
                 <div class="map-type" @click="changeMap">
-                    <img src="@/assets/images/perception/2d.png" @click="changeMap('3')"/>
-                    <img src="@/assets/images/perception/3d.png" @click="changeMap('4')"/>
+                    <img src="@/assets/images/perception/3d.png" @click="changeMap('4')" v-if="param==3"/>
+                    <img src="@/assets/images/perception/2d.png" @click="changeMap('3')" v-else/>
                 </div>
                 <tusvn-map1
                         ref="map1"
@@ -128,11 +132,11 @@
                 viewTime:0,
                 isConMov:false,
                 source:'',
-                lightWebsocket:{},
+                lightWebsocket:null,
                 isFirst:true,
                 time:0,
                 initCameraParam:{},
-                param:3 //平面 俯视
+                param:3, //平面 俯视
 
                /* pointLeft:10,
                 pointTop:10,
@@ -281,12 +285,8 @@
                 }
                 //地图不是第一次初始化
                 if(this.param==3&&!this.isFirst){
-                    console.log("-----")
-                    if(this.lightWebsocket){
-                        this.lightWebsocket.close();
-                    }
+                    this.lightWebsocket&&this.lightWebsocket.close();
                     this.$refs.perceptionMap.resetModels();
-                    console.log("-----")
                     //判断地图缩放、全屏，调试等
                     this.viewTime = setTimeout(()=>{
                         this.getData();
@@ -694,10 +694,10 @@
                 let _this=this;
                 if ('WebSocket' in window) {
                     _this.lightWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                    _this.lightWebsocket.onmessage = _this.onLightMessage;
+                    _this.lightWebsocket.onclose = _this.onLightClose;
+                    _this.lightWebsocket.onopen = _this.onLightOpen;
                 }
-                _this.lightWebsocket.onmessage = _this.onLightMessage;
-                _this.lightWebsocket.onclose = _this.onLightClose;
-                _this.lightWebsocket.onopen = _this.onLightOpen;
             },
             onLightMessage(mesasge){
                 let _this=this;
@@ -843,10 +843,8 @@
             clearInterval(this.mapTime3);
             clearInterval(this.mapTime4);
             clearTimeout(this.time);
-            this.lightWebsocket.close();
-            if(this.$refs.perceptionMap){
-                this.$refs.perceptionMap.reset3DMap();
-            }
+            this.lightWebsocket&&this.lightWebsocket.close();
+            this.$refs.perceptionMap&&this.$refs.perceptionMap.reset3DMap();
         }
 }
 </script>
@@ -876,9 +874,9 @@
         top: 10px;*/
     }
     .perception-road{
-        height: 150px;
-        width: 250px;
-        border:1px solid rgba(211, 134, 0, 0.5);
+        height: 120px;
+        width: 120px;
+        border:1px solid rgba(211, 134, 0, 0.3);
         position: absolute;
         bottom: 10px;
         background: #000;
@@ -903,10 +901,10 @@
         }
     }
     .style{
-        width: 400px;
+      /*  width: 400px;*/
        /* height: 160px;*/
-        border:1px solid #666666;
-        position: absolute;
+        border:1px solid rgba(211, 134, 0, 0.5);
+        position: relative;
         z-index:1;
         padding-top: 5px;
         box-sizing: border-box;
@@ -932,14 +930,25 @@
         left:16px;
 
     }*/
+    .img-style{
+        position: absolute;
+        top: 86px;
+        z-index:3;
+        right: 420px;
+        width:40px;
+        cursor: pointer;
+    }
+    .video-style{
+        position: absolute;
+        top: 86px;
+        right: 10px;
+        z-index:3;
+        width: 400px;
+    }
     .video1-position{
-        top: 80px;
-        right: 0;
+        margin-bottom: 16px;
     }
-    .video2-position{
-        top: 320px;
-        right: 0;
-    }
+
     .spat-detail{
         position: absolute;
         z-index: 2;
