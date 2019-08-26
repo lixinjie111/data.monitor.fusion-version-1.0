@@ -64,7 +64,7 @@ export default {
             ,platformCars:null
             ,cachePerceptionQueue:new Array()//缓存感知数据
             ,processPerceptionInterval:200//处理缓存数据的间隔
-            ,waitingProcessPerceptionTime:3000
+            ,waitingProcessPerceptionTime:20000
 
 
             ,cacheTrackCarData:null
@@ -720,6 +720,11 @@ export default {
                         if(data2.result.dataFlag == 1)
                         {
                             this.platformCars=data2.result.vehDataDTO;
+                        }
+                        let d2 = data2.result.vehDataDTO[0];
+                        if(d2!=null)
+                        {
+                            this.$emit("processPerceptionDataTime",d2.gpsTime)
                         }
                         //不丢包
                         this.processPerceptionMesage();

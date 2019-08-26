@@ -370,15 +370,15 @@
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
             getPerceptionAreaInfo(){
-                let time = setTimeout(()=>{
-                    if(this.videoItem1.rtmp==''){
-                        this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
-                    }
-                    if(this.videoItem1.rtmp==''){
-                        this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
-                    }
-                    clearTimeout(time);
-                },1000)
+                // let time = setTimeout(()=>{
+                //     if(this.videoItem1.rtmp==''){
+                //         this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
+                //     }
+                //     if(this.videoItem1.rtmp==''){
+                //         this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
+                //     }
+                //     clearTimeout(time);
+                // },1000)
                 getPerceptionAreaInfo({
                     "areaPoints":this.currentExtent,
                     "centerPoint": {
