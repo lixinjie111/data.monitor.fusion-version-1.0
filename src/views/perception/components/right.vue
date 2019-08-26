@@ -3,6 +3,7 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('4')" v-if="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
         <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
+        <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
         <div class="video-style">
             <div class="style video1-position" id="message1">
                 <div class="video-num" @click="changeMap('1')">
@@ -85,7 +86,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' @mousedrop="mouseUpChanged">
+            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' @mousedrop="mouseUpChanged" @processPerceptionDataTime='getTime'>
             </tusvn-map>
         </div>
         <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
@@ -161,6 +162,7 @@
                 time:0,
                 param:4, //平面 俯视
                 time:'',
+                time1:'',
                 x:0,
                 y:0,
                 video1Show:false,
@@ -475,6 +477,11 @@
                         })
                     }
                 });
+            },
+            getTime(time){
+                if(time!=''){
+                    this.time1=time;
+                }
             },
             getVideo(camera,index){
                 let _this = this;
@@ -966,6 +973,9 @@
         display: block;
         font-size: 12px;
         z-index:2;
+    }
+    .map-time1{
+        top:50px!important;
     }
     .perception-road{
         height: 130px;
