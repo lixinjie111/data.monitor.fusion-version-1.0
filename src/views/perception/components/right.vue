@@ -909,7 +909,7 @@
                 if(param==1){
                     this.video1Show=true;
                     if(!this.$refs.videoPlayer3){
-                        this.$refs.videoPlayer3.player.initialize();
+                        this.$refs.videoPlayer3.initialize();
                         this.$refs.videoPlayer3.player.setOption(this.option1);
 
                     }
@@ -923,7 +923,7 @@
                 if(param==2){
                     this.video2Show=true;
                     if(!this.$refs.videoPlayer4){
-                        this.$refs.videoPlayer4.player.initialize();
+                        this.$refs.videoPlayer4.initialize();
                         this.$refs.videoPlayer4.player.setOption(this.option2);
 
                     }
@@ -938,11 +938,11 @@
             screenShrink(param){
                 if(param==1){
                     this.video1Show=false;
-                    this.$refs.videoPlayer3.player.dispose();
+                    this.$refs.videoPlayer3.dispose();
                 }
                 if(param==2){
                     this.video2Show=false;
-                    this.$refs.videoPlayer4.player.dispose();
+                    this.$refs.videoPlayer4.dispose();
                 }
             }
         },
