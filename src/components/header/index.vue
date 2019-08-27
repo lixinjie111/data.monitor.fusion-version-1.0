@@ -21,11 +21,13 @@ export default {
             city: {},
             weather: {},
             changeCenterPoint: [121.17265957261286,31.284096076877844],
-            time:null
+            time:null,
+            requestData:{}
         }
     },
     mounted() {
         this.getAddress();
+        this.getTopHead();
     },
     methods: {
         getAddress() {

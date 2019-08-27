@@ -1,6 +1,9 @@
 <template>
     <div class="fusion-style">
-        <header></header>
+        <!--头部-->
+        <div class="header-style">
+            <header-top></header-top>
+        </div>
         <div class="fusion-layout">
             <div class="fusion-left">
                 <div class="c-scroll-wrap">
@@ -16,7 +19,7 @@
 <script>
     import Left from './components/left.vue'
     import Right from './components/right'
-    import Header from '@/components/header/index.vue'
+    import HeaderTop from '../../components/header/index.vue';
     export default {
         data() {
             return {
@@ -29,7 +32,7 @@
             }
         },
         components:{
-            Header
+            HeaderTop,Left,Right
         },
         watch:{
             '$route.params':function (newValue,oldValue) {
@@ -121,7 +124,6 @@
             }
 
         },
-        components:{Left,Right},
         mounted() {
             let _this = this;
             _this.socket.onmessage = _this.onmessage1;
