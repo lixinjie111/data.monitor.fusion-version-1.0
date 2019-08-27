@@ -1,13 +1,6 @@
 <template>
     <div class="fusion-style">
-        <div class="base-info">
-            <span class="base-time">{{$parent.formatTime || '--'}}</span>
-            <span>
-                    <em >{{$parent.city.district || '--'}}</em>
-                    <img src="@/assets/images/weather/default.png" class="weather-icon"/>
-                    <em class="c-middle">{{$parent.weather.wendu || '--'}}°</em>
-                </span>
-        </div>
+        <header></header>
         <div class="fusion-layout">
             <div class="fusion-left">
                 <div class="c-scroll-wrap">
@@ -23,6 +16,7 @@
 <script>
     import Left from './components/left.vue'
     import Right from './components/right'
+    import Header from '@/components/header/index.vue'
     export default {
         data() {
             return {
@@ -33,6 +27,9 @@
                 realData:{},
                 time:0
             }
+        },
+        components:{
+            Header
         },
         watch:{
             '$route.params':function (newValue,oldValue) {

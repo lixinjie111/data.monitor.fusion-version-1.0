@@ -13,9 +13,6 @@
 // import { mapActions } from 'vuex';
 export default {
 	name: "Header",
-    props: {
-        changeCenterPoint: [Array, Object]
-    },
     data() {
         return {
             responseData: {
@@ -23,6 +20,7 @@ export default {
             },
             city: {},
             weather: {},
+            changeCenterPoint: [121.17265957261286,31.284096076877844]
         }
     },
     mounted() {
@@ -71,28 +69,6 @@ export default {
             }else {
                 return '--'
             }
-        },
-        socket (){
-            let socket = new WebSocket(window.config.websocketUrl);
-            /*if(socket.readyState!=WebSocket.OPEN){
-                let i=0;
-                this.time = setInterval(()=>{
-                    i++;
-                    //尝试建立连接5次
-                    if(i==5){
-                        clearInterval(this.time);
-                        return;
-                    }
-                    if(socket.readyState==WebSocket.OPEN){
-                        clearInterval(this.time);
-                        return;
-                    }
-                    console.log("i:"+i)
-                    socket = new WebSocket(window.config.websocketUrl);
-                    return socket;
-                },1000)
-            }*/
-            return socket;
         }
     },
 
