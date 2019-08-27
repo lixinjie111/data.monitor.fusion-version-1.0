@@ -20,7 +20,8 @@ export default {
             },
             city: {},
             weather: {},
-            changeCenterPoint: [121.17265957261286,31.284096076877844]
+            changeCenterPoint: [121.17265957261286,31.284096076877844],
+            time:null
         }
     },
     mounted() {
@@ -51,6 +52,9 @@ export default {
             // console.log('获取天气数据、预警故障数量');
             getTopHead({}).then(res => {
                 this.responseData = res.data;
+                this.time = setInterval(() => {
+                    this.responseData.timestamp += 1000;
+                }, 1000);
             });
         }
     },
@@ -77,6 +81,9 @@ export default {
             }
         }
     },
+    destroyed(){
+	    clearInterval(this.time);
+    }
 
 }
 </script>
