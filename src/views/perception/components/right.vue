@@ -908,9 +908,9 @@
             screenMagnify(param){
                 if(param==1){
                     this.video1Show=true;
-                    if(!this.$refs.videoPlayer3){
+                    if(!this.$refs.videoPlayer3.player){
                         this.$refs.videoPlayer3.initialize();
-                        this.$refs.videoPlayer3.player.setOption(this.option1);
+                        this.$refs.videoPlayer3.player.options(this.option1);
 
                     }
                     if(this.videoItem1.rtmp==""){
@@ -922,9 +922,9 @@
                 }
                 if(param==2){
                     this.video2Show=true;
-                    if(!this.$refs.videoPlayer4){
+                    if(!this.$refs.videoPlayer4.player){
                         this.$refs.videoPlayer4.initialize();
-                        this.$refs.videoPlayer4.player.setOption(this.option2);
+                        this.$refs.videoPlayer4.player.options(this.option2);
 
                     }
                     if(this.videoItem2.rtmp==""){
