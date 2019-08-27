@@ -107,7 +107,8 @@ export default {
                         offset: new AMap.Pixel(-2, -2),
                         angle: _data.heading,
                         zIndex: 50,
-                        vehicleId: _data.vehicleId
+                        vehicleId: _data.vehicleId,
+                        anchor: 'top-center'
                     });
                     _markerObj.platNoMarker = new AMap.Text({
                         map: _this.AMap,
@@ -123,8 +124,9 @@ export default {
                             'font-size': '10px',
                             'line-height': '16px',
                             'letter-spacing': '0',
-                            'margin-top': '14px',  //车头
-                            'color': '#ccc'
+                            'margin-top': '0',  //车头
+                            'color': '#ccc',
+                            'anchor': 'top-center'
                         },
                         position: _data.position,
                         vehicleId: _data.vehicleId
