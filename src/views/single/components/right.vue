@@ -412,6 +412,7 @@
             this.option2 = this.getOption();
             this.getDeviceInfo();
             this.initLightWebSocket();
+            this.initWarningWebSocket();
         },
         components:{
             TusvnMap
