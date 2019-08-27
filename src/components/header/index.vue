@@ -9,7 +9,7 @@
     </div>
 </template>
 <script>
-// import { getTopHead, getTopWeather } from '@/api/header';
+ import { getTopHead, getTopWeather } from '@/api/header';
 // import { mapActions } from 'vuex';
 export default {
 	name: "Header",
@@ -45,6 +45,12 @@ export default {
         getTopWeather() {
             getTopWeather(this.requestData).then(res => {
                 this.weather = res.data;
+            });
+        },
+        getTopHead() {
+            // console.log('获取天气数据、预警故障数量');
+            getTopHead({}).then(res => {
+                this.responseData = res.data;
             });
         }
     },
