@@ -17,7 +17,8 @@ export default {
         return {
             mapoption:{
                 doc: this.targetId,
-                background:this.background == undefined? "black":this.background,
+                // background:this.background == undefined? "#353239":this.background,
+                background:this.background == undefined? "#000000":"#353239",
                 navMode: this.navMode == undefined? Pt.EarthControls:Pt.OrbitControls   //    Pt.EarthControls  Pt.OrbitControls
             }
             ,viewer:null
@@ -156,7 +157,7 @@ export default {
 
             //处理缓存队列的数据
             setTimeout(() => {
-                console.log("处理感知车辆缓存队列中的数据");
+                console.log("1处理感知车辆缓存队列中的数据"+this.cachePerceptionQueue.length);
                 this.processPerceptionData();
             }, this.waitingProcessPerceptionTime);
 
@@ -261,17 +262,19 @@ export default {
          * visible:是否可见，默认是 true， 可选
          * map:纹理的url，默认是 null 可选
          * proj:数据的坐标系，默认是 和点云坐标系一致 可选
+         * z:高程
          */
-        addShape:function(name,url,color,width,size,visible,map,proj){
+        addShape:function(name,url,color,width,size,visible,map,proj,z){
             let shp = new dl.Shape({
                 url: url,
                 name: name,
-                color: color==undefined?"#fff":color,
-                width: width==undefined?1.0:width,
-                size: size==undefined?6.0:size,
-                visible: visible==undefined?true:visible,
-                map: map==undefined?null:map,
-                proj: proj
+                color: color==null?"#fff":color,
+                width: width==null?1.0:width,
+                size: size==null?6.0:size,
+                visible: visible==null?true:visible,
+                map: map==null?null:map,
+                proj: proj,
+                z:z
             });
             this.scene.add(shp);
 
@@ -710,6 +713,7 @@ export default {
         },
         processPerceptionData:function(){
             setTimeout(() => {
+                console.log("2处理感知车辆缓存队列中的数据"+this.cachePerceptionQueue.length);
                 if(this.cachePerceptionQueue.length>0)
                 {
                     let data = this.cachePerceptionQueue.shift();
@@ -724,7 +728,7 @@ export default {
                         let d2 = data2.result.vehDataDTO[0];
                         if(d2!=null)
                         {
-                            this.$emit("processPerceptionDataTime",d2.gpsTime)
+                            this.$emit("processPerceptionDataTime",this.timetrans(d2.gpsTime))
                         }
                         //不丢包
                         this.processPerceptionMesage();
@@ -732,7 +736,7 @@ export default {
                     }
                 }
                 this.processPerceptionData();
-            }, this.processPerceptionInterval);
+            }, this.processPerceptionInterval);//this.processPerceptionInterval
         },
         resetModels:function(){
             this.lastPerceptionMessage=null;
