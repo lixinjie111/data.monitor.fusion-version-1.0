@@ -64,8 +64,9 @@ export default {
             ,lastPerceptionMessage:null
             ,platformCars:null
             ,cachePerceptionQueue:new Array()//缓存感知数据
-            ,processPerceptionInterval:200//处理缓存数据的间隔
-            ,waitingProcessPerceptionTime:20000
+            ,processPerceptionInterval:100//处理缓存数据的间隔
+            ,waitingProcessPerceptionTime:3000
+            ,lastPerceptionData:null
 
 
             ,cacheTrackCarData:null
@@ -91,8 +92,8 @@ export default {
             ,pmodels:[]
             ,pCacheModelNum:100
 
-            ,matStdObjects : new THREE.MeshStandardMaterial( { color: 0x7337E3, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
-            ,matStdObjects_in : new THREE.MeshStandardMaterial( { color: 0x7337E3, roughness: 1, metalness: 0, opacity: 0.5, transparent: true } )
+            ,matStdObjects : new THREE.MeshStandardMaterial( { color: 0xef56e4, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
+            ,matStdObjects_in : new THREE.MeshStandardMaterial( { color: 0xef56e4, roughness: 1, metalness: 0, opacity: 0.5, transparent: true } )
             ,person : new THREE.MeshStandardMaterial( { color: 0xC4B17A, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
             ,fontface:"宋体"
             ,fontSize:60
@@ -712,6 +713,7 @@ export default {
             this.cachePerceptionQueue.push(data);            
         },
         processPerceptionData:function(){
+            let timeA = new Date().getTime();
             setTimeout(() => {
                 console.log("2处理感知车辆缓存队列中的数据"+this.cachePerceptionQueue.length);
                 if(this.cachePerceptionQueue.length>0)
@@ -728,11 +730,37 @@ export default {
                         let d2 = data2.result.vehDataDTO[0];
                         if(d2!=null)
                         {
+                            // if(this.lastPerceptionData!=null&&d2.gpsTime<this.lastPerceptionData.gpsTime)
+                            // {
+                            //     return;
+                            // }
                             this.$emit("processPerceptionDataTime",this.timetrans(d2.gpsTime))
                         }
                         //不丢包
                         this.processPerceptionMesage();
                         this.processPlatformCars();
+                        let timeB = new Date().getTime();
+
+                        if(this.lastPerceptionData!=null)
+                        {
+                            this.processPerceptionInterval = d2.gpsTime- this.lastPerceptionData.gpsTime-(timeB-timeA);
+                        }else{
+                            this.processPerceptionInterval = 1;
+                        }
+                        if(this.processPerceptionInterval<=0)
+                        {
+                            this.processPerceptionInterval = 1;
+                        }
+                        if(this.processPerceptionInterval>1000)
+                        {
+                            this.processPerceptionInterval=200;
+                        }
+
+                        if(d2!=null)
+                        {
+                            this.lastPerceptionData=d2;
+                        }
+                        console.log("处理间隔："+this.processPerceptionInterval);
                     }
                 }
                 this.processPerceptionData();
@@ -1277,6 +1305,7 @@ export default {
         },
         changeModelColor:function(data,model)
         {
+            //ef56e4
             if(data.fuselType==2&&data.fuselLevel==1)
             {
                 model.material.color.setStyle("#ffbf64");
@@ -1293,6 +1322,7 @@ export default {
             {
                 model.material.color.setStyle("#651399");
             }
+            model.material.color.setStyle("#bc2cb2");
         },
         animateCar:function(data2,model){
             // console.log(data2);
