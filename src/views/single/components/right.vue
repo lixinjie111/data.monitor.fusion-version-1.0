@@ -102,7 +102,8 @@
                 vehicleId:this.$route.params.vehicleId,
                 lightWebsocket:null,
                 rtmp1:'',
-                rtmp2:''
+                rtmp2:'',
+                warningWebsocket:null
             }
 
         },
@@ -347,25 +348,81 @@
                     return;
                 }
             },
+            initWarningWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    _this.warningWebsocket.onmessage = _this.onWarningMessage;
+                    _this.warningWebsocket.onclose = _this.onWarningClose;
+                    _this.warningWebsocket.onopen = _this.onWarningOpen;
+                }
+            },
+            onWarningMessage(mesasge){
+
+//        console.log("时间----"+new Date().getTime())
+                let _this=this;
+                /*if(this.i>4){
+                  return;
+                }*/
+                let json = JSON.parse(mesasge.data);
+                let warningData = json.result.data;
+                let type = json.result.type;
+                let count=0;
+                if(warningData.length>0){
+                    if(type=='CLOUD'){
+                        let eventType = json.result.eventType;
+                        warningData.forEach(item=>{
+                            //name,text,x,y
+                            let msg = item.warnMsg+"   "+item.dis;
+                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+count,msg,item.longitude,item.latitude,20);
+                            count++;
+                        })
+                    }
+                }
+
+            },
+            onWarningClose(data){
+                console.log("结束连接");
+            },
+            onWarningOpen(data){
+                //旁车
+                var warning = {
+                    "action": "warning",
+                    "vehicleId": this.vehicleId
+                }
+                var warningMsg = JSON.stringify(warning);
+                this.sendWarningMsg(warningMsg);
+            },
+            sendWarningMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.warningWebsocket.send(msg); //send()发送消息
+                        console.log("warning已发送消息:"+ msg);
+                    }
+                }else{
+                    return;
+                }
+            },
         },
         mounted(){
             this.option1 = this.getOption();
             this.option2 = this.getOption();
             this.getDeviceInfo();
             this.initLightWebSocket();
+            this.initWarningWebSocket();
         },
         components:{
             TusvnMap
         },
         beforeDestroy(){
-
             clearTimeout(this.timer1);
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);
             this.timer2 = null;//清除直播报活
             this.lightWebsocket&&this.lightWebsocket.close();
             this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
-
+            this.warningWebsocket&&this.warningWebsocket.close();
         }
     }
 </script>
