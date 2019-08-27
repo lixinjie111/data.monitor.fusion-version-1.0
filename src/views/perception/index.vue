@@ -90,7 +90,8 @@
                          return;
                      }*/
                     this.$router.push({
-                        path: path+"/"+data.position.longitude+"/"+data.position.latitude
+                        path: path+"/"+data.position.longitude+"/"+data.position.latitude,
+                        query:{crossId:data.id}
                     });
                 }
                 if(type=='map'){

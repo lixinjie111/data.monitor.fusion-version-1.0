@@ -3,7 +3,7 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('4')" v-if="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
         <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
-        <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
+        <div class="map-time map-time1" v-if="param!=3">{{time1|dateFormat}}</div>
         <div class="video-style">
             <div class="style video1-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
@@ -351,7 +351,6 @@
                         this.getData();
                         clearTimeout(this.viewTime);
                     },1000)
-
                 }
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
@@ -384,7 +383,7 @@
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
                 let currentExtend = this.currentExtent;
-//                debugger;
+                console.log("currentExtent:"+this.currentExtent)
                 overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
@@ -1029,14 +1028,10 @@
         }
     }
     .style{
-      /*  width: 400px;*/
-       /* height: 160px;*/
         border:1px solid rgba(211, 134, 0, 0.5);
         position: relative;
         z-index:1;
-        padding-top: 5px;
         box-sizing: border-box;
-
     }
     .video-num{
         position: absolute;
