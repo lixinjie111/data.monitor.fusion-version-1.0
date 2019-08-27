@@ -3,7 +3,7 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('4')" v-if="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
         <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
-        <div class="map-time map-time1" v-if="param!=3">{{time1|dateFormat}}</div>
+        <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
         <div class="video-style">
             <div class="style video1-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
