@@ -87,8 +87,7 @@ export default {
                      return;
                  }*/
                 this.$router.push({
-                    path: path+"/"+data.position.longitude+"/"+data.position.latitude,
-                    query:{crossId:data.id}
+                    path: path+"/"+data.position.longitude+"/"+data.position.latitude
                 });
             }
             if(type=='map'){
