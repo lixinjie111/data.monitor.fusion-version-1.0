@@ -367,17 +367,15 @@
                 let json = JSON.parse(mesasge.data);
                 let warningData = json.result.data;
                 let type = json.result.type;
+                let count=0;
                 if(warningData.length>0){
                     if(type=='CLOUD'){
                         let eventType = json.result.eventType;
                         warningData.forEach(item=>{
-                            let dist = parseInt(item.dis);
-                            if(!dist){
-                                dist=-1;
-                            }
-                            var obj = {type:eventType,timer:null,flag:true,dist:dist,message:item.warnMsg,icon:item.warnIcon,warnColor:item.warnColor};
                             //name,text,x,y
-                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+count,item.warnMsg)
+                            let msg = item.warnMsg+"   "+item.dis;
+                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+count,msg,item.longitude,item.latitude,20);
+                            count++;
                         })
                     }
                 }
