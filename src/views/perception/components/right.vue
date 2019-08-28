@@ -90,7 +90,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' @mousedrop="mouseUpChanged" @processPerceptionDataTime='getTime'>
+            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' @mousedrop="mouseUpChanged" @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
         </div>
         <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
@@ -171,6 +171,7 @@
                 y:0,
                 video1Show:false,
                 video2Show:false,
+                waitingtime:this.$route.query.waitingtime
 
                /* pointLeft:10,
                 pointTop:10,
