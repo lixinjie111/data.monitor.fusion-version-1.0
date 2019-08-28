@@ -12,7 +12,7 @@ import _ from 'lodash';
 
 export default {
     name:"Tusvn3DMap2",
-    props:["targetId","background","navMode","minX","minY","minZ","maxX","maxY","maxZ","z"],
+    props:["targetId","background","navMode","minX","minY","minZ","maxX","maxY","maxZ","z","waitingtime"],
     data(){
         return {
             mapoption:{
@@ -64,8 +64,8 @@ export default {
             ,lastPerceptionMessage:null
             ,platformCars:null
             ,cachePerceptionQueue:new Array()//缓存感知数据
-            ,processPerceptionInterval:100//处理缓存数据的间隔
-            ,waitingProcessPerceptionTime:3000
+            ,processPerceptionInterval:50//处理缓存数据的间隔
+            ,waitingProcessPerceptionTime:0
             ,lastPerceptionData:null
 
 
@@ -157,6 +157,11 @@ export default {
             },500);
 
             //处理缓存队列的数据
+            console.log("this.waitingtime:"+this.waitingtime);
+            if(this.waitingtime!=null)
+            {
+                this.waitingProcessPerceptionTime = this.waitingtime;
+            }
             setTimeout(() => {
                 console.log("1处理感知车辆缓存队列中的数据"+this.cachePerceptionQueue.length);
                 this.processPerceptionData();
