@@ -712,6 +712,7 @@ export default {
         //     console.log(new Date().getTime());
             this.cachePerceptionQueue.push(data);            
         },
+        
         processPerceptionData:function(){
             let timeA = new Date().getTime();
             setTimeout(() => {
@@ -735,32 +736,33 @@ export default {
                             //     return;
                             // }
                             this.$emit("processPerceptionDataTime",this.timetrans(d2.gpsTime))
-                        }
-                        //不丢包
-                        this.processPerceptionMesage();
-                        this.processPlatformCars();
-                        let timeB = new Date().getTime();
+                             //不丢包
+                            this.processPerceptionMesage();
+                            this.processPlatformCars();
+                            let timeB = new Date().getTime();
 
-                        if(this.lastPerceptionData!=null)
-                        {
-                            this.processPerceptionInterval = d2.gpsTime- this.lastPerceptionData.gpsTime-(timeB-timeA);
-                        }else{
-                            this.processPerceptionInterval = 1;
-                        }
-                        if(this.processPerceptionInterval<=0)
-                        {
-                            this.processPerceptionInterval = 1;
-                        }
-                        if(this.processPerceptionInterval>1000)
-                        {
-                            this.processPerceptionInterval=200;
-                        }
+                            // if(this.lastPerceptionData!=null)
+                            // {
+                            //     this.processPerceptionInterval = d2.gpsTime- this.lastPerceptionData.gpsTime-(timeB-timeA);
+                            // }else{
+                            //     this.processPerceptionInterval = 1;
+                            // }
+                            // if(this.processPerceptionInterval<=0)
+                            // {
+                            //     this.processPerceptionInterval = 1;
+                            // }
+                            // if(this.processPerceptionInterval>1000)
+                            // {
+                            //     this.processPerceptionInterval=200;
+                            // }
 
-                        if(d2!=null)
-                        {
-                            this.lastPerceptionData=d2;
+                            if(d2!=null)
+                            {
+                                this.lastPerceptionData=d2;
+                            }
+                            console.log("处理间隔："+this.processPerceptionInterval);
                         }
-                        console.log("处理间隔："+this.processPerceptionInterval);
+                       
                     }
                 }
                 this.processPerceptionData();
