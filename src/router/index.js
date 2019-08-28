@@ -44,7 +44,7 @@ export default new VueRouter({
       component: Single,
       meta: {}
   },{
-      path: '/perception/:lon/:lat',
+      path: '/perception/:lon/:lat/:crossId/:waitingtime',
       name: 'Perception',
       component: Perception,
       meta: {}

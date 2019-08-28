@@ -171,7 +171,7 @@
                 y:0,
                 video1Show:false,
                 video2Show:false,
-                waitingtime:this.$route.query.waitingtime
+                waitingtime:this.$route.params.waitingtime
 
                /* pointLeft:10,
                 pointTop:10,
@@ -288,7 +288,7 @@
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
-                    let param = this.$route.query.crossId;
+                    let param = this.$route.params.crossId;
                     if(param==5){
                         this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
                         this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
