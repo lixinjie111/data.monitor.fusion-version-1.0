@@ -283,7 +283,7 @@
                     this.x=utm[0];
                     this.y=utm[1];
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                   /* setInterval(()=>{
+                    /*setInterval(()=>{
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
@@ -383,7 +383,7 @@
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
                 let currentExtend = this.currentExtent;
-                console.log("currentExtent:"+this.currentExtent)
+//                console.log("currentExtent:"+this.currentExtent)
                 overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
@@ -886,7 +886,8 @@
                 if(param==1){
                     cameraParam = JSON.parse(this.videoItem1.cameraParam);
                     this.param=1;
-                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    this.$refs.perceptionMap.updateCameraPosition(326301.2101863512,3462325.464917423,29.514954501751557,32.07798462013099,-0.028791432602168508,-2.7172200799826958);
+//                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==2){
                     cameraParam = JSON.parse(this.videoItem2.cameraParam);
