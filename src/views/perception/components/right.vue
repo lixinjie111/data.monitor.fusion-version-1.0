@@ -1,11 +1,11 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('4')" v-if="param==3"/>
+        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-if="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
         <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
         <div class="video-style">
-            <div class="style video1-position" id="message1">
+            <div class="style video1-position" id="message1" :class="{'active-style':isActive}">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
                 <div class="video-num" @click="changeMap('1')">
                     <span>摄像头编号:{{videoItem1.deviceId}}</span>
@@ -13,7 +13,7 @@
                 </div>
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
-            <div class="style video2-position" id="message2">
+            <div class="style video2-position" id="message2" :class="{'active-style':!isActive}">
                 <div class="video-mask" @click="screenMagnify('2')"></div>
                 <div class="video-num" @click="changeMap('2')">
                     <span>摄像头编号:{{videoItem2.deviceId}}</span>
@@ -164,14 +164,15 @@
                 lightWebsocket:null,
                 isFirst:true,
                 time:0,
-                param:4, //平面 俯视
+                param:1, //平面 俯视
                 time:'',
                 time1:'',
                 x:0,
                 y:0,
                 video1Show:false,
                 video2Show:false,
-                waitingtime:this.$route.params.waitingtime
+                waitingtime:this.$route.params.waitingtime,
+                isActive:true
 
                /* pointLeft:10,
                 pointTop:10,
@@ -887,13 +888,16 @@
                 if(param==1){
                     cameraParam = JSON.parse(this.videoItem1.cameraParam);
                     this.param=1;
-                    this.$refs.perceptionMap.updateCameraPosition(326301.2101863512,3462325.464917423,29.514954501751557,32.07798462013099,-0.028791432602168508,-2.7172200799826958);
+                    this.isActive=true;
+                    this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
 //                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==2){
                     cameraParam = JSON.parse(this.videoItem2.cameraParam);
                     this.param=2;
-                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    this.isActive=false;
+                    this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
+//                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==3){
                     this.param=3;
@@ -901,10 +905,10 @@
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }
-                if(param==4){
+                /*if(param==4){
                     this.param=4;
                     this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
-                }
+                }*/
             },
             screenMagnify(param){
                 if(param==1){
@@ -1030,10 +1034,10 @@
         }
     }
     .style{
-        border:1px solid rgba(211, 134, 0, 0.5);
         position: relative;
         z-index:1;
         box-sizing: border-box;
+        border:1px solid rgba(234, 233, 229, 0.1);
     }
     .video-num{
         position: absolute;
@@ -1069,6 +1073,9 @@
         right: 10px;
         z-index:3;
         width: 400px;
+        .active-style{
+            border:1px solid rgba(211, 134, 0, 0.5)!important;
+        }
     }
     .big-video{
         position: absolute;
