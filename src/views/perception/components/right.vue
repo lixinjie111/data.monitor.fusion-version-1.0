@@ -5,7 +5,7 @@
         <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
         <div class="video-style">
-            <div class="style video1-position" id="message1" :class="{'active-style':isActive}">
+            <div class="style video1-position" id="message1" :class="{'active-style':isActive=='1'}">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
                 <div class="video-num" @click="changeMap('1')">
                     <span>摄像头编号:{{videoItem1.deviceId}}</span>
@@ -13,7 +13,7 @@
                 </div>
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
-            <div class="style video2-position" id="message2" :class="{'active-style':!isActive}">
+            <div class="style video2-position" id="message2" :class="{'active-style':isActive=='2'}">
                 <div class="video-mask" @click="screenMagnify('2')"></div>
                 <div class="video-num" @click="changeMap('2')">
                     <span>摄像头编号:{{videoItem2.deviceId}}</span>
@@ -172,7 +172,7 @@
                 video1Show:false,
                 video2Show:false,
                 waitingtime:this.$route.params.waitingtime,
-                isActive:true
+                isActive:'1'
 
                /* pointLeft:10,
                 pointTop:10,
@@ -385,7 +385,7 @@
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
                 let currentExtend = this.currentExtent;
-//                console.log("currentExtent:"+this.currentExtent)
+                console.log("currentExtent:"+this.currentExtent)
                 overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
@@ -888,20 +888,21 @@
                 if(param==1){
                     cameraParam = JSON.parse(this.videoItem1.cameraParam);
                     this.param=1;
-                    this.isActive=true;
+                    this.isActive='1';
                     this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
 //                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==2){
                     cameraParam = JSON.parse(this.videoItem2.cameraParam);
                     this.param=2;
-                    this.isActive=false;
+                    this.isActive='2';
                     this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
 //                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==3){
                     this.param=3;
                     this.isFirst=true;
+                    this.isActive='0';
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }

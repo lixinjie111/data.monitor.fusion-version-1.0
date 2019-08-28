@@ -161,6 +161,7 @@ export default {
         letter-spacing: 3px;
         background-color: #f2f2f2;
         @include layoutMode();
+        color: #000;
     }
     .login-item-box {
         padding: 40px 40px 57px;
