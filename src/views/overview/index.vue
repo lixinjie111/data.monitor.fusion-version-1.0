@@ -1,7 +1,9 @@
 <template>
     <div class="fusion-style">
         <!--头部-->
-        <header></header>
+        <div class="header-style">
+            <header-top></header-top>
+        </div>
         <!-- 左侧 -->
         <div class="fusion-left">
             <div class="c-scroll-wrap">
@@ -27,14 +29,14 @@ import LeftOverview from './components/leftOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
 import SpecialRoad from './components/specialRoad';
-import Header from '../../components/header/index.vue';
+import HeaderTop from '../../components/header/index.vue';
 export default {
     components: {
         LeftOverview,
         MapContainer,
         BottomOverview,
         SpecialRoad,
-        Header
+        HeaderTop
     },
     data() {
         return {
