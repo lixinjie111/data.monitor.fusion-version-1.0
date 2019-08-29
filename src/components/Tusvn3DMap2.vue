@@ -309,11 +309,25 @@ export default {
         getModel:function(id){
           return this.models[id];
         },
-        addStaticModel:function(name,url,x,y,z){
-            let model = new dl.Model({url: url});
+        addStaticModel:function(name,url,x,y,z,pitch,yaw,roll){
+            let model = new dl.Model({
+                url: url
+                // ,scale:scale==null?[1,1,1]:scale
+                // scale:[5,5,5]
+            });
             model.position.x = x;
             model.position.y = y;
             model.position.z = z;
+            // if(color!=null)
+            // {
+            //     model.setColor(color);
+            // }
+            // model.setColor("#ffffff");
+            let pitch1 = pitch==null?0:pitch;
+            let yaw1 = yaw==null?0:yaw;
+            let roll1 = roll==null?0:roll;
+            model.rotation.set( pitch1,yaw1,roll1);
+
             this.scene.add(model);
             this.staticmodels[name]=model;
         },
@@ -501,7 +515,7 @@ export default {
                     for(let m = 0;m<this.cacheModelNum;m++)
                     {
                         //车
-                        var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+                        var geoBox1 = new THREE.BoxBufferGeometry(3.8,1.6,  1.4);
                         var model1 = new THREE.Mesh( geoBox1, this.matStdObjects );
                         model1.position.set( 0, 0, 0 );
                         model1.rotation.set( this.pitch,this.yaw,this.roll );
@@ -730,13 +744,16 @@ export default {
         processPerceptionData:function(){
             let timeA = new Date().getTime();
             setTimeout(() => {
-                console.log("2处理感知车辆缓存队列中的数据"+this.cachePerceptionQueue.length);
+                console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
                 if(this.cachePerceptionQueue.length>0)
                 {
                     let data = this.cachePerceptionQueue.shift();
+                    let  length = 0 ;
                     if(data!=null)
                     {
                         this.lastPerceptionMessage = data;
+
+
                         var data2 = JSON.parse(data.data);
                         if(data2.result.dataFlag == 1)
                         {
@@ -745,6 +762,7 @@ export default {
                         let d2 = null;
                         try{
                             d2 = data2.result.vehDataDTO[0];
+                            length = data2.result.vehDataDTO.length;
                         }catch(e){
                             console.log(data2.result);
                         }
@@ -754,7 +772,26 @@ export default {
                             // {
                             //     return;
                             // }
-                            this.$emit("processPerceptionDataTime",this.timetrans(d2.gpsTime))
+                            let ss = this.timetrans(d2.gpsTime)+" 当前包数据条数："+ length +"  缓存数:"+this.cachePerceptionQueue.length+"  最新数据时间：";
+                            if(this.cachePerceptionQueue.length>0)
+                            {
+                                let d3 = this.cachePerceptionQueue[this.cachePerceptionQueue.length-1];
+                                var data3 = JSON.parse(d3.data);
+
+                                let d4 = null;
+                                try{
+                                    d4 = data3.result.vehDataDTO[0];
+                                    ss+=this.timetrans(d4.gpsTime);
+                                }catch(e){
+                                    console.log(data3.result);
+                                    ss+="没有感知数据"
+                                }
+                            }else{
+                                ss+=this.timetrans(d2.gpsTime);
+                            }
+
+                            
+                            this.$emit("processPerceptionDataTime",ss)
                              //不丢包
                             this.processPerceptionMesage();
                             this.processPlatformCars();
@@ -866,7 +903,7 @@ export default {
                     for(let m = 0;m<this.cacheModelNum;m++)
                     {
                         //车
-                        var geoBox1 = new THREE.BoxBufferGeometry(4.6,1.7, 1.4);
+                        var geoBox1 = new THREE.BoxBufferGeometry(3.8,1.6, 1.4);
                         var model1 = new THREE.Mesh( geoBox1, this.matStdObjects );
                         model1.position.set( 0, 0, 0 );
                         model1.rotation.set( this.pitch,this.yaw,this.roll );

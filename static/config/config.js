@@ -20,4 +20,60 @@ window.config = {
     version: 1.0,       // 版本号
 }
 
+//地图额外配置项添加
+window.mapOption = {
+     center: [121.551976, 31.276054],	//上海-高德地图坐标点  感知右下角
+    // center: [113.07876,28.255618],	//长沙-高德地图坐标点
+    mapStyleEmpty: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00", // 纯灰色背景地图
+};
+//单车
+window.defaultMapOption = {
+    center: [121.551976, 31.276054], //上海
+    zoom: 11,		// 默认：比例尺显示100m
+    resizeEnable: true, //是否监控地图容器尺寸变化
+    rotateEnable: true,
+    mapStyle: "amap://styles/7b007636f01d8a19e9cc2841a85dc083"
+}
+// 调用
+// this.distanceMap = new AMap.Map('map-container', window.defaultMapOption);
+// let _option = Object.assign(
+// 	{},
+// 	window.defaultMapOption,
+// 	{
+// 		mapStyle: window.mapOption.mapStyleEmpty
+// 	}
+// );
+// this.distanceMap = new AMap.Map('map-container', _option);
+
+
+
+//路网配置参数
+window.dlWmsOption = {
+    'LAYERS_gjlk': 'shanghai_qcc:dl_shcsq_wgs84_gjlk',
+    'LAYERS_withoutz': 'shanghai_qcc:dl_shcsq_wgs84_rc_withoutz',
+    'VERSION':'1.1.0',
+    'GD_ROAD_CENTERLINE':'gd_road_centerline',
+
+    'LAYERS_centerline': 'shanghai_qcc:dl_shcsq_wgs84_lane_centerline',
+    'STYLES':'shanghai_qcc:dl_shcsq_wgs84_road_centerline_car_statistics',
+
+}
+window.dlWmsDefaultOption = {
+    url:window.config.dlWmsUrl+'geoserver/shanghai_qcc/wms',
+    blend: false,
+    tileSize: 256,
+    params:{}
+}
+//	调用
+// let _optionWms = Object.assign(
+// 	{},
+// 	window.dlWmsDefaultOption,
+// 	{
+// 		params:{'LAYERS': window.dlWmsOption.LAYERS_centerline,'STYLES': window.dlWmsOption.STYLES, 'VERSION': window.dlWmsOption.VERSION}
+// 	}
+// );
+// this.wms = new AMap.TileLayer.WMS(_optionWms);
+// this.distanceMap.add(this.wms);
+
+
 // ws://120.133.21.14:29998/ws

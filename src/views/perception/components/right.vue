@@ -5,19 +5,25 @@
         <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
         <div class="video-style">
-            <div class="style video1-position" id="message1" :class="{'active-style':isActive}">
+            <div class="style video1-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
                 <div class="video-num" @click="changeMap('1')">
                     <span>摄像头编号:{{videoItem1.deviceId}}</span>
                     <span>{{videoItem1.rsPtName}}</span>
                 </div>
+                <div class="active-block">
+                    <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
+                </div>
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
-            <div class="style video2-position" id="message2" :class="{'active-style':!isActive}">
+            <div class="style video2-position" id="message2">
                 <div class="video-mask" @click="screenMagnify('2')"></div>
                 <div class="video-num" @click="changeMap('2')">
                     <span>摄像头编号:{{videoItem2.deviceId}}</span>
                     <span>{{videoItem2.rsPtName}}</span>
+                </div>
+                <div class="active-block">
+                    <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
                 </div>
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
             </div>
@@ -172,7 +178,7 @@
                 video1Show:false,
                 video2Show:false,
                 waitingtime:this.$route.params.waitingtime,
-                isActive:true
+                isActive:'1'
 
                /* pointLeft:10,
                 pointTop:10,
@@ -279,6 +285,9 @@
                 this.$refs.perceptionMap.addModel('tra_light00011111','./static/map3d/models/traffic_light.3ds',326279.672803747,3462360.84818288,12.68);
                 let longitude=parseFloat(this.$route.params.lon);
                 let latitude=parseFloat(this.$route.params.lat);
+              /*  alert("js改变")
+                this.$refs.perceptionMap.updateCameraPosition(325827.67761071684,3462548.5166341495,49.58125062491973,71.34607858022329,-0.4587365615867862,-1.4305945547157297);
+                return;*/
                 //设置地图的中心点
                 if(longitude||latitude){
                     let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
@@ -291,14 +300,18 @@
                     },500)*/
                     let param = this.$route.params.crossId;
                     if(param==5){
-                        this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
-                        this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
-                        this.center=[[121.17548002587952,76.2279931281073]];
+                        this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
+//                        this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
+                        this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+//                        this.center=[[121.17548002587952,76.2279931281073]];
+                        this.center=[121.247,31.242];
                     }
                     if(param==6){
                         this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
-                        this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
-                        this.center=[[121.1709654293097,76.22695122794798]];
+//                        this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
+                        this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+//                        this.center=[[121.1709654293097,76.22695122794798]];
+                        this.center=[121.247,31.242];
                     }
                     this.getPerceptionAreaInfo();
                     //地图不连续移动，判断红绿灯的位置受否再可视区
@@ -311,9 +324,10 @@
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
              },
             map1InitComplete(){
-                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
+//                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
+                this.$refs.map1.centerAt(window.mapOption.center);
                 this.$refs.map1.zoomTo(14);
-                this.$refs.map1.addWms("shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","http://113.208.118.62:8080/geoserver/shanghai_qcc/wms","shanghai_qcc:dl_shcsq_wgs84_rc_withoutz","gd_road_centerline",1,true,null); // 上海汽车城
+                this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,window.dlWmsOption.GD_ROAD_CENTERLINE,1,true,null); // 上海汽车城
 
             },
             mouseUpChanged(){
@@ -385,7 +399,7 @@
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
                 let currentExtend = this.currentExtent;
-//                console.log("currentExtent:"+this.currentExtent)
+                console.log("currentExtent:"+this.currentExtent)
                 overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
@@ -525,10 +539,11 @@
                 let x2 = utm2[0];
                 let y2 = utm2[1];
 //                this.getNewCurrentExtent(x1,y1,x2,y2);
-                this.currentExtent.push([x2, y1]);
+               /* this.currentExtent.push([x2, y1]);
                 this.currentExtent.push([x1, y1]);
                 this.currentExtent.push([x1, y2]);
-                this.currentExtent.push([x2, y2]);
+                this.currentExtent.push([x2, y2]);*/
+                this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
                 console.log("边界值："+this.currentExtent);
 //                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
             },
@@ -545,7 +560,8 @@
                 let y2 = utm2[0];
                 let x0 = (x1+x2)/2;
                 let y0 = (y1+y2)/2;
-                this.center.push([x0,y0]);
+//                this.center.push([x0,y0]);
+                this.center=[121.247,31.242];
                 console.log("中心点："+this.center)
 //                console.log("中心点："+this.center);
             },
@@ -888,20 +904,21 @@
                 if(param==1){
                     cameraParam = JSON.parse(this.videoItem1.cameraParam);
                     this.param=1;
-                    this.isActive=true;
-                    this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
-//                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    this.isActive='1';
+//                    this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
+                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==2){
                     cameraParam = JSON.parse(this.videoItem2.cameraParam);
                     this.param=2;
-                    this.isActive=false;
-                    this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
-//                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    this.isActive='2';
+//                    this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
+                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 }
                 if(param==3){
                     this.param=3;
                     this.isFirst=true;
+                    this.isActive='0';
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }
@@ -1037,7 +1054,8 @@
         position: relative;
         z-index:1;
         box-sizing: border-box;
-        border:1px solid rgba(234, 233, 229, 0.1);
+        /*border:1px solid rgba(234, 233, 229, 0.1);*/
+        border:1px solid rgba(211, 134, 0, 0.5)!important;
     }
     .video-num{
         position: absolute;
@@ -1073,8 +1091,28 @@
         right: 10px;
         z-index:3;
         width: 400px;
-        .active-style{
-            border:1px solid rgba(211, 134, 0, 0.5)!important;
+        transition: all 2s ease-in-out;
+        .active-block{
+            position: absolute;
+            z-index: 2;
+            margin-top: 20px;
+            left:50%;
+            margin-left: -4px;
+            background:transparent ;
+            .active-circle{
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+
+            }
+            .active-style{
+                /* border:1px solid rgba(211, 134, 0, 0.5)!important;*/
+                /*width: 800px;*/
+                background: #4eaf6b !important;
+                /*background: red !important;*/
+
+            }
         }
     }
     .big-video{

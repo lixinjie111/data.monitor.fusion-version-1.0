@@ -81,11 +81,12 @@
     export default {
         data() {
             return {
-                mapOption: {
+                /*mapOption: {
                     center: this.$parent.defalutCenterPoint,
                     zoom: 11,
                     mapStyle: "amap://styles/7b007636f01d8a19e9cc2841a85dc083"
-                },
+                },*/
+                mapOption:{},
                 singleVehicle:{},
                 routeId:'',
                 all: 1,
@@ -354,6 +355,7 @@
             }
         },
         mounted() {
+            this.mapOption=window.defaultMapOption;
             this.distanceMap = new AMap.Map('singleMap', this.mapOption);
             this.getBaseData();
             this.getRouteDataByVehId();
