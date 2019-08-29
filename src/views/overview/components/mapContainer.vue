@@ -26,7 +26,7 @@ export default {
     },
     mounted() {
         this.initWebSocket();
-        this.AMap = new AMap.Map(this.id, this.$parent.$parent.defaultMapOption);
+        this.AMap = new AMap.Map(this.id, window.defaultMapOption);
     },
     methods: {
         initWebSocket(){

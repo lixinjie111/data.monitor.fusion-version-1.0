@@ -28,12 +28,13 @@ window.mapOption = {
 };
 //单车
 window.defaultMapOption = {
-    center: [121.551976, 31.276054], //上海
+    center: window.mapOption.center, //上海
     zoom: 11,		// 默认：比例尺显示100m
     resizeEnable: true, //是否监控地图容器尺寸变化
     rotateEnable: true,
-    mapStyle: "amap://styles/7b007636f01d8a19e9cc2841a85dc083"
+    mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
 }
+
 // 调用
 // this.distanceMap = new AMap.Map('map-container', window.defaultMapOption);
 // let _option = Object.assign(
