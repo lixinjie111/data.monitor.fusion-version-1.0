@@ -324,9 +324,10 @@
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
              },
             map1InitComplete(){
-                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
+//                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
+                this.$refs.map1.centerAt(window.mapOption.center);
                 this.$refs.map1.zoomTo(14);
-                this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,"gd_road_centerline",1,true,null); // 上海汽车城
+                this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,window.dlWmsOption.GD_ROAD_CENTERLINE,1,true,null); // 上海汽车城
 
             },
             mouseUpChanged(){
