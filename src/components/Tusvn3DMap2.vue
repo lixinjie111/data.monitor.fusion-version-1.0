@@ -295,6 +295,14 @@ export default {
             this.scene.add(model);
             this.models[name]=model;
         },
+        removeModel:function(name){
+            let m = this.getModel(name);
+            if(m!=null)
+            {
+                dl.removeModel(m,this.viewer);
+                delete  this.models[name];
+            }
+        },
         addGeometry:function(geomModel){
             this.scene.add(geomModel);
         },
