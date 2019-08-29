@@ -1,5 +1,5 @@
 export function getMap(map){
-  map.addShape("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#063259",3,null,null,null,null,21.5)
+  map.addShape("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffffff",3,null,null,null,null,21.5)
   map.addShape("intersection","./static/map3d/dl_shcsq_zc/Intersection.shp","#351906")
   map.addShape("Crosswalk","./static/map3d/dl_shcsq_zc/Crosswalk.shp","#023c2d")
   map.addShape("lane_marking","./static/map3d/dl_shcsq_zc/Lane_marking.shp",dl.styles.lane_marking.color)
