@@ -17,6 +17,7 @@ export default {
             // defaultCenterPoint: [121.455372,31.249569], //上海
             defaultCenterPoint: defaultCenterPoint,
             defaultMapOption: {
+                resizeEnable: true,
                 center: defaultCenterPoint,
                 zoom: 11,
                 mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
