@@ -10,7 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
+const version = new Date().getTime();
 const env = require('../config/prod.env')
 
 const webpackConfig = merge(baseWebpackConfig, {
@@ -24,8 +24,10 @@ const webpackConfig = merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? config.build.devtool : false,
   output: {
     path: config.build.assetsRoot,
-    filename: utils.assetsPath('js/[name].[chunkhash].js'),
-    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
+    filename: utils.assetsPath('js/[name].[chunkhash].'+version+'js'),
+    chunkFilename: utils.assetsPath('js/[id].[chunkhash].'+version+'js')
+      /*filename: utils.assetsPath('js/[name].[chunkhash].js'),
+      chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')*/
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
@@ -69,6 +71,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       filename: config.build.index,
       template: 'index.html',
       inject: true,
+      hash: version,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
