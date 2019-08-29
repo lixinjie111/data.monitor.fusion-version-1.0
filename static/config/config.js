@@ -52,12 +52,8 @@ window.defaultMapOption = {
 window.dlWmsOption = {
     'LAYERS_gjlk': 'shanghai_qcc:dl_shcsq_wgs84_gjlk',
     'LAYERS_withoutz': 'shanghai_qcc:dl_shcsq_wgs84_rc_withoutz',
-    'VERSION':'1.1.0',
     'GD_ROAD_CENTERLINE':'gd_road_centerline',
-
-    'LAYERS_centerline': 'shanghai_qcc:dl_shcsq_wgs84_lane_centerline',
-    'STYLES':'shanghai_qcc:dl_shcsq_wgs84_road_centerline_car_statistics',
-
+    'VERSION':'1.1.0'
 }
 window.dlWmsDefaultOption = {
     url:window.config.dlWmsUrl+'geoserver/shanghai_qcc/wms',

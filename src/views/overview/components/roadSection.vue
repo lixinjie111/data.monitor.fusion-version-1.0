@@ -17,7 +17,6 @@ export default {
       mapOption: {
         resizeEnable: false,
         zoom: 18,
-//        mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
         mapStyle: ""
       },
       crossData: {
@@ -42,12 +41,6 @@ export default {
         this.mapRoadData.longitude,
         this.mapRoadData.latitude
       );
-//      this.wms = new AMap.TileLayer.WMS({
-//        url: window.config.dlWmsUrl+"geoserver/shanghai_qcc/wms",
-//        blend: false,
-//        tileSize: 256,
-//        params: { LAYERS: "shanghai_qcc:dl_shcsq_wgs84_gjlk", VERSION: "1.1.0" }
-//      });
 
       let _optionWms = Object.assign({},window.dlWmsDefaultOption,
         {

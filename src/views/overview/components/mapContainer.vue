@@ -30,7 +30,6 @@ export default {
     },
     methods: {
         initWebSocket(){
-            // console.log('websocket获取地图行驶车辆展示');
             if ('WebSocket' in window) {
                 this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
             }
@@ -54,7 +53,6 @@ export default {
                         plateNo: item.plateNo,
                         source: item.source.join(','),
                         heading: item.heading,
-                        // position: new AMap.LngLat(item.longitude, item.latitude)
                         position: [item.longitude, item.latitude] // （经度，纬度)
                     };
                     return _option;
@@ -166,11 +164,9 @@ export default {
             this.sendMsg(JSON.stringify(this.webSocketData));
         },
         sendMsg(msg) {
-            // console.log("vehicleOnline--连接状态："+this.webSocket.readyState);
             if(window.WebSocket){
                 if(this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
                     this.webSocket.send(msg); //send()发送消息
-                    // console.log("vehicleOnline--已发送消息:"+ msg);
                 }
             }else{
                 return;
