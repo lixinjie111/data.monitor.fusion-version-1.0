@@ -54,7 +54,7 @@ export default {
     },
     methods: {
         drawMap() {
-            let _option = Object.assign({}, this.$parent.$parent.defaultMapOption, {
+            let _option = Object.assign({}, window.defaultMapOption, {
                 zoom: this.zoom
             });
             this.AMap = new AMap.Map(this.id, _option);

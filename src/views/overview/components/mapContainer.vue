@@ -26,13 +26,13 @@ export default {
     },
     mounted() {
         this.initWebSocket();
-        this.AMap = new AMap.Map(this.id, this.$parent.$parent.defaultMapOption);
+        this.AMap = new AMap.Map(this.id, window.defaultMapOption);
     },
     methods: {
         initWebSocket(){
             // console.log('websocket获取地图行驶车辆展示');
             if ('WebSocket' in window) {
-                this.webSocket = new WebSocket(window.cfg.socketUrl);  //获得WebSocket对象
+                this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
             }
             this.webSocket.onmessage = this.onmessage;
             this.webSocket.onclose = this.onclose;
