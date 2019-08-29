@@ -67,6 +67,7 @@ export default {
             ,processPerceptionInterval:1//处理缓存数据的间隔
             ,waitingProcessPerceptionTime:0
             ,lastPerceptionData:null
+            ,person: new THREE.MeshStandardMaterial( { color: 0xC4B17A, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
 
 
             ,cacheTrackCarData:null
@@ -733,7 +734,12 @@ export default {
                         {
                             this.platformCars=data2.result.vehDataDTO;
                         }
-                        let d2 = data2.result.vehDataDTO[0];
+                        let d2 = null;
+                        try{
+                            d2 = data2.result.vehDataDTO[0];
+                        }catch(e){
+                            console.log(data2.result);
+                        }
                         if(d2!=null)
                         {
                             // if(this.lastPerceptionData!=null&&d2.gpsTime<this.lastPerceptionData.gpsTime)
@@ -862,6 +868,18 @@ export default {
                         this.scene.add(model1);
                         this.deviceModels[deviceid].cars[m] = model1;
 
+                        //行人
+
+                        var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
+                        var pmodel1 = new THREE.Mesh( pBox1, this.person );
+                        pmodel1.position.set( 0, 0, 0 );
+                        pmodel1.rotation.set( 0, 0, 0 );
+                        pmodel1.castShadow = true;
+                        pmodel1.receiveShadow = true;
+
+                        this.deviceModels[deviceid].persons[m]= pmodel1;
+                        this.scene.add(pmodel1);
+
                         //融合车辆
                         var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
                         var model_out = new THREE.Mesh( geoBox_out, this.matStdObjects );
@@ -901,6 +919,14 @@ export default {
                         mixCar.position.y = 0;
                         mixCar.position.z = 0;
                     }
+
+                    for(let q=0;q<this.deviceModels[deviceid].persons.length;q++)
+                    {
+                        let person = this.deviceModels[deviceid].persons[q];
+                        person.position.x = 0;
+                        person.position.y = 0;
+                        person.position.z = 0;
+                    }
                 }
             }
             for(let i = 0;i<fusionList.length;i++)
@@ -920,7 +946,7 @@ export default {
                         let mdl = this.deviceModels[deviceid].persons[i];
                         mdl.position.x = dUTM[0];
                         mdl.position.y = dUTM[1];
-                        mdl.position.z = this.defualtZ+4;
+                        mdl.position.z = this.defualtZ;
 
                         // let text = this.deviceModels[deviceid].texts[i];
                         // text.setText(d.vehicleId.substr(0,8));
