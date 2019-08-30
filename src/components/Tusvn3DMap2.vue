@@ -772,7 +772,27 @@ export default {
                             // {
                             //     return;
                             // }
-                            let ss = this.timetrans(d2.gpsTime)+" 当前包数据条数："+ length +"  缓存数:"+this.cachePerceptionQueue.length+"  最新数据时间：";
+                            let pcarnum = 0;
+                            let persons = 0;
+                            let zcarnum = 0;
+                            for (let i=0;i<length;i++)
+                            {
+                                let obj = data2.result.vehDataDTO[i];
+                                if(obj.type == 1)
+                                {
+                                    zcarnum++;
+                                    continue;
+                                }
+                                if(d.targetType==0||d.targetType==1||d.targetType==3)
+                                {
+                                    persons++;
+                                }else{
+                                    pcarnum++;
+                                }
+
+                            }
+                            let nums = length+"="+zcarnum +"(自车)+"+pcarnum+"(感知)+"+persons+"(人)";
+                            let ss = this.timetrans(d2.gpsTime)+" 当前包数据条数："+ nums +"  缓存数:"+this.cachePerceptionQueue.length+"  最新数据时间：";
                             if(this.cachePerceptionQueue.length>0)
                             {
                                 let d3 = this.cachePerceptionQueue[this.cachePerceptionQueue.length-1];
@@ -791,11 +811,17 @@ export default {
                             }
 
                             
-                            this.$emit("processPerceptionDataTime",ss)
+                            // this.$emit("processPerceptionDataTime",ss)
                              //不丢包
                             this.processPerceptionMesage();
                             this.processPlatformCars();
                             let timeB = new Date().getTime();
+
+                            let  hs = timeB-timeA;
+
+                            ss+="  耗时："+hs
+
+                            this.$emit("processPerceptionDataTime",ss)
 
                             // if(this.lastPerceptionData!=null)
                             // {
