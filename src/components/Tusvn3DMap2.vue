@@ -783,7 +783,7 @@ export default {
                                     zcarnum++;
                                     continue;
                                 }
-                                if(d.targetType==0||d.targetType==1||d.targetType==3)
+                                if(obj.targetType==0||obj.targetType==1||obj.targetType==3)
                                 {
                                     persons++;
                                 }else{
