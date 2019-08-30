@@ -17,21 +17,21 @@ export default {
       mapOption: {
         resizeEnable: false,
         zoom: 18,
-        mapStyle: ""
+        mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
       },
       crossData: {
         roadLights: [], // 红绿灯数据
         roadSenseCars: [], // 车辆数据
+        roadWebSocket: {}, // websocket对象
         finalFourPosition: [],
+        count: 0,
         sideVehicleObj: {}, // 地图上画车辆
         sideLight: {} //
       },
-      mapPointData: [],
       roadWebSocket: null
     };
   },
   mounted() {
-    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
     this.aMap = new AMap.Map(this.id, this.mapOption);
     this.drawRoadMap();
   },
@@ -41,13 +41,12 @@ export default {
         this.mapRoadData.longitude,
         this.mapRoadData.latitude
       );
-
-      let _optionWms = Object.assign({},window.dlWmsDefaultOption,
-        {
-            params:{'LAYERS': window.dlWmsOption.LAYERS_gjlk, 'VERSION': window.dlWmsOption.VERSION}
-        }
-      );
-      this.wms = new AMap.TileLayer.WMS(_optionWms);
+      this.wms = new AMap.TileLayer.WMS({
+        url: window.config.dlWmsUrl+"geoserver/shanghai_qcc/wms",
+        blend: false,
+        tileSize: 256,
+        params: { LAYERS: "shanghai_qcc:dl_shcsq_wgs84_gjlk", VERSION: "1.1.0" }
+      });
       this.wms.setMap(this.aMap);
       this.aMap.setCenter(position);
       this.aMap.setZoom(18);
@@ -119,6 +118,7 @@ export default {
       let jsonData = JSON.parse(message.data);
       let result = jsonData.result;
       let lightPosition;
+      let carPosition;
       if ("spatDataDTO" in result === true) {
         _this.crossData.roadLights = result.spatDataDTO;
         if (_this.crossData.roadLights.length > 0) {
@@ -159,7 +159,7 @@ export default {
               _this.crossData.sideLight[
                 subItem.spatId
               ].marker = new AMap.Marker({
-                position: [subItem.longitude, subItem.latitude],
+                position: subItem.position,
                 map: _this.aMap,
                 icon: this.dealLight(subItem),
                 spatId: subItem.spatId,
@@ -172,60 +172,98 @@ export default {
         }
       }
       // 车辆
-      if ("vehDataDTO" in result === true) {
-
-        if (_this.crossData.roadSenseCars.length > 0) {
+      if (this.crossData.count === 0) {
+        this.crossData.count++;
+        // 新建点
+        if ("vehDataDTO" in result === true) {
           _this.crossData.roadSenseCars = result.vehDataDTO;
+          let time = jsonData.time;
+          // console.log('路口1', _this.mapOne.roadSenseCars, _this.mapOne.roadSenseCars.length)
           _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
             x => x.targetType === 2 || x.targetType === 5
           );
-          let _filterData = {};
-          _this.crossData.roadSenseCars.forEach((item, index) => {
-            _filterData[item.vehicleId] = {
-              longitude: item.longitude,
-              latitude: item.latitude,
-              heading: item.heading,
-              speed: item.speed,
-              vehicleId: item.vehicleId,
-              devId: item.devId,
-              marker: null,
-            };
-          });
-          
-
-          for (let id in _this.crossData.sideVehicleObj) {
-            if(_filterData[id]) {   //表示有该点，做setPosition
-              _filterData[id].marker = _this.crossData.sideVehicleObj[id].marker;
-              let _currentCar = _filterData[id];
-              _filterData[id].marker.setAngle(_currentCar.heading);
-              _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
-            }else {   //表示没有该点，做remove
-              _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
+          if (_this.crossData.roadSenseCars.length > 0) {
+            _this.crossData.roadSenseCars.map((x, index) => {
+              carPosition = new AMap.LngLat(x.longitude, x.latitude);
+              _this.$set(x, "position", carPosition);
+            });
+            for (let id in _this.crossData.sideVehicleObj) {
+              let flag = false;
+              // 比对已经打点的id和返回的将要打点的车辆， 有，设置flag = true
+              for (let i = 0; i < _this.crossData.roadSenseCars.length; i++) {
+                if (id === _this.crossData.roadSenseCars[i].vehicleId) {
+                  if (_this.crossData.sideVehicleObj[id].flag) {
+                    flag = true;
+                    break;
+                  }
+                }
+              }
+              // 不存在时，隐藏掉
+              if (!flag) {
+                _this.crossData.sideVehicleObj[id].marker.hide();
+                _this.crossData.sideVehicleObj[id].flag = false;
+              }
+            }
+            // 开始打点
+            _this.crossData.roadSenseCars.forEach(
+              (subItem, subIndex, subArr) => {
+                _this.crossData.count++;
+                if (_this.crossData.sideVehicleObj[subItem.vehicleId]) {
+                  let sideCar =
+                    _this.crossData.sideVehicleObj[subItem.vehicleId];
+                  if (sideCar.flag) {
+                    // console.log('zhiqian', new Date().getTime());
+                    sideCar.marker.setAngle(subItem.heading);
+                    sideCar.marker.moveTo(subItem.position, subItem.speed);
+                    // console.log('vehicleId', subItem.vehicleId);
+                    // console.log('时间', time);
+                    // console.log('当前时间', new Date().getTime());
+                  } else {
+                    sideCar.marker.setAngle(subItem.heading);
+                    sideCar.marker.setPosition(subItem.position);
+                    sideCar.marker.show();
+                    _this.crossData.sideVehicleObj[
+                      subItem.vehicleId
+                    ].flag = true;
+                  }
+                } else {
+                  // 新的
+                  _this.crossData.sideVehicleObj[subItem.vehicleId] = {
+                    marker: null,
+                    flag: true
+                  };
+                  _this.crossData.sideVehicleObj[
+                    subItem.vehicleId
+                  ].marker = new AMap.Marker({
+                    position: subItem.position,
+                    map: _this.aMap,
+                    icon: "static/images/road/car.png",
+                    angle: subItem.heading,
+                    devId: subItem.devId,
+                    // offset: new AMap.Pixel(-15, -10),
+                    zIndex: 1
+                  });
+                  _this.aMap.add(
+                    _this.crossData.sideVehicleObj[subItem.vehicleId].marker
+                  );
+                }
+                if (subIndex === subArr.length - 1) {
+                  setTimeout(() => {
+                    _this.crossData.count = 0;
+                  }, 0);
+                }
+              }
+            );
+          } else {
+            // 返回的数据为空
+            this.crossData.count = 0;
+            for (let i in _this.crossData.sideVehicleObj) {
+              if (_this.crossData.sideVehicleObj[i]) {
+                _this.crossData.sideVehicleObj[i].marker.hide();
+                _this.crossData.sideVehicleObj[i].flag = false;
+              }
             }
           }
-          for (let id in _filterData) {
-            if(!_this.crossData.sideVehicleObj[id]) {   //表示新增该点，做add
-                _filterData[id].marker = new AMap.Marker({
-                  position: [_filterData[id].longitude, _filterData[id].latitude],
-                  map: _this.aMap,
-                  icon: "static/images/road/car.png",
-                  angle: _filterData[id].heading,
-                  devId: _filterData[id].devId,
-                  // offset: new AMap.Pixel(-15, -10),
-                  zIndex: 1
-                });
-                _this.aMap.add(
-                  _filterData[id].marker
-                );
-            }
-          }
-          _this.crossData.sideVehicleObj = _filterData;
-        } else {
-          // 返回的数据为空
-          for (let id in _this.crossData.sideVehicleObj) {
-            _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
-          }
-          _this.crossData.sideVehicleObj = {};
         }
       }
     },
