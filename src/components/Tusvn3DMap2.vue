@@ -110,6 +110,8 @@ export default {
             ,sourceProject:"EPSG:4326"
             // ,destinatePorject:"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//北京
             ,destinatePorject:"+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//上海
+            ,timeA:0
+            ,timeB:0
         }
     },
     watch:{
@@ -742,8 +744,10 @@ export default {
         },
         
         processPerceptionData:function(){
-            let timeA = new Date().getTime();
-            setTimeout(() => {
+            // let timeA = new Date().getTime();
+            setInterval(() => {
+                this.timeA = new Date().getTime();
+                console.log(this.timeA-this.timeB);
                 console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
                 if(this.cachePerceptionQueue.length>0)
                 {
@@ -815,9 +819,9 @@ export default {
                              //不丢包
                             this.processPerceptionMesage();
                             this.processPlatformCars();
-                            let timeB = new Date().getTime();
+                            this.timeB = new Date().getTime();
 
-                            let  hs = timeB-timeA;
+                            let  hs = this.timeB-this.timeA;
 
                             ss+="  耗时："+hs
 
@@ -847,8 +851,8 @@ export default {
                        
                     }
                 }
-                this.processPerceptionData();
-            }, this.processPerceptionInterval);//this.processPerceptionInterval
+                // this.processPerceptionData();
+            },0);//this.processPerceptionInterval
         },
         resetModels:function(){
             this.lastPerceptionMessage=null;
