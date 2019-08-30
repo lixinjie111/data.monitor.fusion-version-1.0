@@ -27,13 +27,15 @@ export default {
         sideLight: {} //
       },
       mapPointData: [],
-      roadWebSocket: null
+      roadWebSocket: null,
+      prevData: {}
     };
   },
   mounted() {
     this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
     this.aMap = new AMap.Map(this.id, this.mapOption);
     this.drawRoadMap();
+    let test = {};
   },
   methods: {
     drawRoadMap() {
@@ -191,41 +193,43 @@ export default {
               marker: null,
             };
           });
-          console.log('_filterData', _filterData);
 
-          for (let id in _this.crossData.sideVehicleObj) {
+          for (let id in _this.prevData) {
             if(_filterData[id]) {   //表示有该点，做move
-              _filterData[id].marker = _this.crossData.sideVehicleObj[id].marker;
+              _filterData[id].marker = _this.prevData[id].marker;
               let _currentCar = _filterData[id];
               _filterData[id].marker.setAngle(_currentCar.heading);
               _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
             } else {   //表示没有该点，做remove
-              // console.log('现在没有', _this.crossData.sideVehicleObj[id]);
-              _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
+              _this.prevData[id].marker.stopMove();
+              _this.aMap.remove(_this.prevData[id].marker);
+              delete _this.prevData[id];
             }
           }
           for (let id in _filterData) {
-            if(!_this.crossData.sideVehicleObj[id]) {   //表示新增该点，做add
+            if(!_this.prevData[id]) {   //表示新增该点，做add
+                console.log('_filterData[id].longitude', _filterData[id].longitude);
                 _filterData[id].marker = new AMap.Marker({
                   position: [_filterData[id].longitude, _filterData[id].latitude],
                   map: _this.aMap,
                   icon: "static/images/road/car.png",
                   angle: _filterData[id].heading,
                   devId: _filterData[id].devId,
-                  // offset: new AMap.Pixel(-15, -10),
                   zIndex: 1
                 });
-                _this.aMap.add(_filterData[id].marker);
             }
           }
-          _this.crossData.sideVehicleObj = _filterData;
+
+          _this.prevData = _filterData;
+
         } else {
           // 返回的数据为空
-          for (let id in _this.crossData.sideVehicleObj) {
-            // console.log('无车', _this.crossData.sideVehicleObj[id]);
-            _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
+          let obj = Object.values(_this.prevData);
+          for (let key in obj) {
+            obj[key].marker.stopMove();
+            _this.aMap.remove(obj[key].marker);
+            delete obj[key];
           }
-          _this.crossData.sideVehicleObj = {};
         }
       }
     },
