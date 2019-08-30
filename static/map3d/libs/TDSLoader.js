@@ -28,6 +28,8 @@ THREE.TDSLoader.prototype = {
 
 	constructor: THREE.TDSLoader,
 
+	crossOrigin: 'anonymous',
+
 	/**
 	 * Load 3ds file from url.
 	 *
@@ -44,7 +46,7 @@ THREE.TDSLoader.prototype = {
 		var path = this.path !== undefined ? this.path : THREE.LoaderUtils.extractUrlBase( url );
 
 		var loader = new THREE.FileLoader( this.manager );
-
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( data ) {
@@ -219,7 +221,7 @@ THREE.TDSLoader.prototype = {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
-		var material = new THREE.MeshLambertMaterial();
+		var material = new THREE.MeshPhongMaterial();
 
 		while ( next !== 0 ) {
 
@@ -257,7 +259,7 @@ THREE.TDSLoader.prototype = {
 			} else if ( next === MAT_SPECULAR ) {
 
 				this.debugMessage( '   Specular Color' );
-				//material.specular = this.readColor( data );
+				material.specular = this.readColor( data );
 
 			} else if ( next === MAT_AMBIENT ) {
 
@@ -267,7 +269,7 @@ THREE.TDSLoader.prototype = {
 			} else if ( next === MAT_SHININESS ) {
 
 				var shininess = this.readWord( data );
-				//material.shininess = shininess;
+				material.shininess = shininess;
 				this.debugMessage( '   Shininess : ' + shininess );
 
 			} else if ( next === MAT_TEXMAP ) {
@@ -324,7 +326,7 @@ THREE.TDSLoader.prototype = {
 		var geometry = new THREE.BufferGeometry();
 		var uvs = [];
 
-		var material = new THREE.MeshLambertMaterial();
+		var material = new THREE.MeshPhongMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'mesh';
 
@@ -520,7 +522,7 @@ THREE.TDSLoader.prototype = {
 		var texture = {};
 
 		var loader = new THREE.TextureLoader( this.manager );
-		loader.setPath( path );
+		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		while ( next !== 0 ) {
 
@@ -842,15 +844,46 @@ THREE.TDSLoader.prototype = {
 	},
 
 	/**
-	 * Set resource path used to determine the file path to attached resources.
+	 * Set path to adjust the path to the original 3ds file.
 	 *
 	 * @method setPath
-	 * @param {String} path Path to resources.
+	 * @param {String} path Path to file.
 	 * @return Self for chaining.
 	 */
 	setPath: function ( path ) {
 
 		this.path = path;
+
+		return this;
+
+	},
+
+	/**
+	 * Set resource path used to determine the path to attached resources like textures.
+	 *
+	 * @method setResourcePath
+	 * @param {String} resourcePath Path to resources.
+	 * @return Self for chaining.
+	 */
+	setResourcePath: function ( resourcePath ) {
+
+		this.resourcePath = resourcePath;
+
+		return this;
+
+	},
+
+	/**
+	 * Set crossOrigin value to configure CORS settings
+	 * for the image loading process.
+	 *
+	 * @method setCrossOrigin
+	 * @param {String} crossOrigin crossOrigin string.
+	 * @return Self for chaining.
+	 */
+	setCrossOrigin: function ( crossOrigin ) {
+
+		this.crossOrigin = crossOrigin;
 
 		return this;
 

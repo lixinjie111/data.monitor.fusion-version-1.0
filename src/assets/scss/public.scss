@@ -216,7 +216,9 @@ img {
   height: 60px;
   letter-spacing: 3px;
   font-size: 22px;
-  @include layoutMode(both);
+  line-height: 60px;
+  margin-left: 24px;
+ /* @include layoutMode(both);*/
   .header-img{
     vertical-align: middle;
     padding-right: 8px;
@@ -264,7 +266,13 @@ img {
   background:linear-gradient(90deg,transparent 0%,rgb(0,0,0) 100%);
   z-index:1;
 }
-
+.header-style{
+  position: absolute;
+  z-index:2;
+  right: 30px;
+  top: 20px;
+}
+/*
 .base-info {
   position:absolute;
   right: 30px;
@@ -281,4 +289,4 @@ img {
     vertical-align: middle;
     padding-left: 10px;
   }
-}
+}*/

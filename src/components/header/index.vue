@@ -1,56 +1,63 @@
 <template>
-	<div class="header clearfix">
-        <div class="logo-wrap">
-            <img src="@/assets/images/logo.png" class="logo"/>
-            <span class="logo-word"> 感知融合平台</span>
-        </div>
-        <!-- <ul class="menu-box clearfix">
-           <router-link tag="li" v-for="item in navList" :key="item.id" class="menu-list" :to="item.path">{{item.name}}</router-link>
-        </ul> -->
-        <!-- <div class="sub-info clearfix">
-            <span class="tip">{{formatTime || '--'}}</span>
-            <span class="tip">
-                <em class="c-middle">{{city.province}}{{city.district}}</em>
-                <img src="@/assets/images/weather/default.png" class="weather-icon" /><em class="c-middle">{{weather.wendu || '--'}}°</em>
-            </span>
-            <a href="javascript:;" class="tip" @click="dialogWarning">预警<em class="num">{{ warningNum || '--' }}</em></a>
-            <a href="javascript:;" class="tip" @click="dialogFault">故障<em class="num">{{ faultNum || '--' }}</em></a>
-        </div>
-        <dialog-warning-fault :type="type" v-if="DialogWarningFlag" @closeDialogWarning="closeDialogWarning"></dialog-warning-fault> -->
-
+    <div class="base-info">
+        <span class="base-time">{{formatTime || '--'}}</span>
+        <span>
+            <em >{{city.district || '--'}}</em>
+            <img src="@/assets/images/weather/default.png" class="weather-icon"/>
+            <em class="c-middle">{{weather.wendu || '--'}}°</em>
+        </span>
     </div>
 </template>
 <script>
-// import { getTopHead, getTopWeather } from '@/api/header';
+ import { getTopHead, getTopWeather } from '@/api/header';
 // import { mapActions } from 'vuex';
 export default {
 	name: "Header",
-    props: {
-        changeCenterPoint: [Array, Object]
-    },
-    // components: {
-    //     DialogWarningFault
-    // },
     data() {
         return {
-            sysAdminName: this.$store.state.admin.adminName,
-            navList: [
-              {id:1,name:'概览',path:'/dataMonitor'},
-              {id:2,name:'车辆',path:'/carMonitor'},
-              {id:3,name:'路网',path:'/roadMonitor'},
-              {id:4,name:'路侧设备',path:'/sideDeviceMonitor'}
-            ],
             responseData: {
                 timestamp: new Date().getTime()
             },
             city: {},
             weather: {},
-            requestData: {
-                disCode: ''
-            },
-            DialogWarningFlag: false,
-            DialogFaultFlag: false,
-            type: 1
+            changeCenterPoint: [121.17265957261286,31.284096076877844],
+            time:null,
+            requestData:{}
+        }
+    },
+    mounted() {
+        this.getAddress();
+        this.getTopHead();
+    },
+    methods: {
+        getAddress() {
+            let geocoder = new AMap.Geocoder();
+            geocoder.getAddress(this.changeCenterPoint, (status, result) => {
+                if (status === 'complete' && result.regeocode) {
+                    let data = result.regeocode.addressComponent;
+                    this.city.province = data.province;
+                    this.city.district = data.district;
+                    this.requestData.disCode = data.adcode;
+                    this.getTopWeather();
+                } else {
+                    console.log('根据经纬度获取地区失败');
+                }
+            });
+        },
+        // 获取天气
+        getTopWeather() {
+            getTopWeather(this.requestData).then(res => {
+                this.weather = res.data;
+            });
+        },
+        getTopHead() {
+            // console.log('获取天气数据、预警故障数量');
+            getTopHead({}).then(res => {
+                this.responseData = res.data;
+                this.time = setInterval(() => {
+                    this.responseData.timestamp += 1000;
+                }, 1000);
+            });
         }
     },
     computed: {
@@ -76,80 +83,10 @@ export default {
             }
         }
     },
-    watch: {
-        deep: true,
-        changeCenterPoint: {
-            handler(newVal, oldVal) {
-                this.getAddress(newVal);
-            }
-        }
-    },
-    // mounted(){
-    //     this.getTopHead();
-    //     this.changeTime();
+    destroyed(){
+	    clearInterval(this.time);
+    }
 
-    //     this.getAddress(this.changeCenterPoint);
-    // },
-    // methods: {
-    //     dialogWarning() {
-    //         this.DialogWarningFlag = true;
-    //         this.type = 1;
-    //     },
-    //     dialogFault() {
-    //         this.DialogWarningFlag = true;
-    //         this.type = 2;
-    //     },
-    //     getTopHead() {
-    //         // console.log('获取天气数据、预警故障数量');
-    //         getTopHead({}).then(res => {
-    //             this.responseData = res.data;
-    //         });
-    //     },
-    //     changeTime() {
-    //         setInterval(() => {
-    //             this.responseData.timestamp += 1000;
-    //         }, 1000);
-    //     },
-    //     getAddress(lnglat) {
-    //         let _this = this,
-    //             geocoder = new AMap.Geocoder();
-    //         geocoder.getAddress(lnglat, function(status, result) {
-    //             if (status === 'complete' && result.regeocode) {
-    //                 let _data = result.regeocode.addressComponent;
-    //                 _this.city.province = _data.province;
-    //                 _this.city.district = _data.district;
-    //                 _this.requestData.disCode = _data.adcode;
-    //                 _this.getTopWeather();
-    //             }else{
-    //                 console.log('根据经纬度查询地址失败')
-    //             }
-    //         });
-    //     },
-    //     getTopWeather() {
-    //         getTopWeather(this.requestData).then(res => {
-    //             this.weather = res.data;
-    //         });
-    //     },
-    //     closeDialogWarning() {
-    //         this.DialogWarningFlag = false;
-    //     },
-    //     closeDialogFault() {
-    //         this.DialogFaultFlag = false;
-    //     },
-    //     ...mapActions(['goLogOut']),
-    //     //退出登录
-    //     logout() {
-    //         let that = this;
-    //         that.$confirm('确认退出吗?', '提示', {
-    //         }).then(() => {
-    //             that.goLogOut(that).then(res => {
-    //                 that.ClearMenuList();
-    //                 that.$router.push({ path: '/' });
-    //             });
-    //         }).catch(() => {
-    //         });
-    //     }
-    // }
 }
 </script>
 <style scoped lang="scss">

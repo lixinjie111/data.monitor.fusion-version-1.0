@@ -1,5 +1,9 @@
 <template>
     <div class="fusion-style">
+        <!--头部-->
+        <div class="header-style">
+            <header-top></header-top>
+        </div>
         <!-- 左侧 -->
         <div class="fusion-left">
             <div class="c-scroll-wrap">
@@ -11,14 +15,6 @@
         <!-- 地图 -->
         <map-container></map-container>
         <!-- 右侧 -->
-        <div class="base-info">
-            <span class="base-time">{{$parent.formatTime || '--'}}</span>
-            <span>
-                <em >{{$parent.city.district || '--'}}</em>
-                <img src="@/assets/images/weather/default.png" class="weather-icon"/>
-                <em class="c-middle">{{$parent.weather.wendu || '--'}}°</em>
-            </span>
-        </div>
         <div class="fusion-right">
             <special-road></special-road>
         </div>
@@ -33,12 +29,14 @@ import LeftOverview from './components/leftOverview.vue';
 import MapContainer from './components/mapContainer.vue';
 import BottomOverview from './components/bottomOverview.vue';
 import SpecialRoad from './components/specialRoad';
+import HeaderTop from '../../components/header/index.vue';
 export default {
     components: {
         LeftOverview,
         MapContainer,
         BottomOverview,
-        SpecialRoad
+        SpecialRoad,
+        HeaderTop
     },
     data() {
         return {

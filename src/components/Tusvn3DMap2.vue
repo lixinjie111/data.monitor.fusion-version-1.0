@@ -12,12 +12,13 @@ import _ from 'lodash';
 
 export default {
     name:"Tusvn3DMap2",
-    props:["targetId","background","navMode","minX","minY","minZ","maxX","maxY","maxZ","z"],
+    props:["targetId","background","navMode","minX","minY","minZ","maxX","maxY","maxZ","z","waitingtime"],
     data(){
         return {
             mapoption:{
                 doc: this.targetId,
-                background:this.background == undefined? "black":this.background,
+                // background:this.background == undefined? "#353239":this.background,
+                background:this.background == undefined? "#000000":"#353239",
                 navMode: this.navMode == undefined? Pt.EarthControls:Pt.OrbitControls   //    Pt.EarthControls  Pt.OrbitControls
             }
             ,viewer:null
@@ -62,6 +63,12 @@ export default {
             ,perceptionParams:null
             ,lastPerceptionMessage:null
             ,platformCars:null
+            ,cachePerceptionQueue:new Array()//缓存感知数据
+            ,processPerceptionInterval:1//处理缓存数据的间隔
+            ,waitingProcessPerceptionTime:0
+            ,lastPerceptionData:null
+            ,person: new THREE.MeshStandardMaterial( { color: 0xC4B17A, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
+
 
             ,cacheTrackCarData:null
             ,lasttime:0
@@ -86,8 +93,8 @@ export default {
             ,pmodels:[]
             ,pCacheModelNum:100
 
-            ,matStdObjects : new THREE.MeshStandardMaterial( { color: 0x7337E3, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
-            ,matStdObjects_in : new THREE.MeshStandardMaterial( { color: 0x7337E3, roughness: 1, metalness: 0, opacity: 0.5, transparent: true } )
+            ,matStdObjects : new THREE.MeshStandardMaterial( { color: 0xef56e4, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
+            ,matStdObjects_in : new THREE.MeshStandardMaterial( { color: 0xef56e4, roughness: 1, metalness: 0, opacity: 0.5, transparent: true } )
             ,person : new THREE.MeshStandardMaterial( { color: 0xC4B17A, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } )
             ,fontface:"宋体"
             ,fontSize:60
@@ -103,6 +110,8 @@ export default {
             ,sourceProject:"EPSG:4326"
             // ,destinatePorject:"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//北京
             ,destinatePorject:"+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//上海
+            ,timeA:0
+            ,timeB:0
         }
     },
     watch:{
@@ -149,15 +158,27 @@ export default {
                 // this.changeRcuId2("ws://120.133.21.14:49982/mon","{\"action\": \"road_real_data\",\"data\": {\"polygon\": [[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]]}}");
 
             },500);
-            let id1 = setInterval(() => {
-                this.processPerceptionMesage();
-            }, 200);
-            this.intervalIds.push(id1);
 
-            let id2=setInterval(() => {
-               this.processPlatformCars();
-            }, 200);
-            this.intervalIds.push(id2);
+            //处理缓存队列的数据
+            console.log("this.waitingtime:"+this.waitingtime);
+            if(this.waitingtime!=null)
+            {
+                this.waitingProcessPerceptionTime = this.waitingtime;
+            }
+            setTimeout(() => {
+                console.log("1处理感知车辆缓存队列中的数据"+this.cachePerceptionQueue.length);
+                this.processPerceptionData();
+            }, this.waitingProcessPerceptionTime);
+
+            // let id1 = setInterval(() => {
+            //     this.processPerceptionMesage();
+            // }, 200);
+            // this.intervalIds.push(id1);
+
+            // let id2=setInterval(() => {
+            //    this.processPlatformCars();
+            // }, 200);
+            // this.intervalIds.push(id2);
 
             // setInterval(()=>{
             //     this.processCarTrackMessage();
@@ -250,17 +271,19 @@ export default {
          * visible:是否可见，默认是 true， 可选
          * map:纹理的url，默认是 null 可选
          * proj:数据的坐标系，默认是 和点云坐标系一致 可选
+         * z:高程
          */
-        addShape:function(name,url,color,width,size,visible,map,proj){
+        addShape:function(name,url,color,width,size,visible,map,proj,z){
             let shp = new dl.Shape({
                 url: url,
                 name: name,
-                color: color==undefined?"#fff":color,
-                width: width==undefined?1.0:width,
-                size: size==undefined?6.0:size,
-                visible: visible==undefined?true:visible,
-                map: map==undefined?null:map,
-                proj: proj
+                color: color==null?"#fff":color,
+                width: width==null?1.0:width,
+                size: size==null?6.0:size,
+                visible: visible==null?true:visible,
+                map: map==null?null:map,
+                proj: proj,
+                z:z
             });
             this.scene.add(shp);
 
@@ -274,17 +297,39 @@ export default {
             this.scene.add(model);
             this.models[name]=model;
         },
+        removeModel:function(name){
+            let m = this.getModel(name);
+            if(m!=null)
+            {
+                dl.removeModel(m,this.viewer);
+                delete  this.models[name];
+            }
+        },
         addGeometry:function(geomModel){
             this.scene.add(geomModel);
         },
         getModel:function(id){
           return this.models[id];
         },
-        addStaticModel:function(name,url,x,y,z){
-            let model = new dl.Model({url: url});
+        addStaticModel:function(name,url,x,y,z,pitch,yaw,roll){
+            let model = new dl.Model({
+                url: url
+                // ,scale:scale==null?[1,1,1]:scale
+                // scale:[5,5,5]
+            });
             model.position.x = x;
             model.position.y = y;
             model.position.z = z;
+            // if(color!=null)
+            // {
+            //     model.setColor(color);
+            // }
+            // model.setColor("#ffffff");
+            let pitch1 = pitch==null?0:pitch;
+            let yaw1 = yaw==null?0:yaw;
+            let roll1 = roll==null?0:roll;
+            model.rotation.set( pitch1,yaw1,roll1);
+
             this.scene.add(model);
             this.staticmodels[name]=model;
         },
@@ -472,7 +517,7 @@ export default {
                     for(let m = 0;m<this.cacheModelNum;m++)
                     {
                         //车
-                        var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+                        var geoBox1 = new THREE.BoxBufferGeometry(3.8,1.6,  1.4);
                         var model1 = new THREE.Mesh( geoBox1, this.matStdObjects );
                         model1.position.set( 0, 0, 0 );
                         model1.rotation.set( this.pitch,this.yaw,this.roll );
@@ -695,12 +740,119 @@ export default {
         {
         //     console.log("===========addPerceptionData=============");
         //     console.log(new Date().getTime());
-            this.lastPerceptionMessage = data;
-            var data2 = JSON.parse(data.data);
-            if(data2.result.dataFlag == 1)
-            {
-                this.platformCars=data2.result.vehDataDTO;
-            }
+            this.cachePerceptionQueue.push(data);            
+        },
+        
+        processPerceptionData:function(){
+            // let timeA = new Date().getTime();
+            setInterval(() => {
+                this.timeA = new Date().getTime();
+                console.log(this.timeA-this.timeB);
+                console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
+                if(this.cachePerceptionQueue.length>0)
+                {
+                    let data = this.cachePerceptionQueue.shift();
+                    let  length = 0 ;
+                    if(data!=null)
+                    {
+                        this.lastPerceptionMessage = data;
+
+
+                        var data2 = JSON.parse(data.data);
+                        if(data2.result.dataFlag == 1)
+                        {
+                            this.platformCars=data2.result.vehDataDTO;
+                        }
+                        let d2 = null;
+                        try{
+                            d2 = data2.result.vehDataDTO[0];
+                            length = data2.result.vehDataDTO.length;
+                        }catch(e){
+                            console.log(data2.result);
+                        }
+                        if(d2!=null)
+                        {
+                            // if(this.lastPerceptionData!=null&&d2.gpsTime<this.lastPerceptionData.gpsTime)
+                            // {
+                            //     return;
+                            // }
+                            let pcarnum = 0;
+                            let persons = 0;
+                            let zcarnum = 0;
+                            for (let i=0;i<length;i++)
+                            {
+                                let obj = data2.result.vehDataDTO[i];
+                                if(obj.type == 1)
+                                {
+                                    zcarnum++;
+                                    continue;
+                                }
+                                if(obj.targetType==0||obj.targetType==1||obj.targetType==3)
+                                {
+                                    persons++;
+                                }else{
+                                    pcarnum++;
+                                }
+
+                            }
+                            let nums = length+"="+zcarnum +"(自车)+"+pcarnum+"(感知)+"+persons+"(人)";
+                            let ss = this.timetrans(d2.gpsTime)+" 当前包数据条数："+ nums +"  缓存数:"+this.cachePerceptionQueue.length+"  最新数据时间：";
+                            if(this.cachePerceptionQueue.length>0)
+                            {
+                                let d3 = this.cachePerceptionQueue[this.cachePerceptionQueue.length-1];
+                                var data3 = JSON.parse(d3.data);
+
+                                let d4 = null;
+                                try{
+                                    d4 = data3.result.vehDataDTO[0];
+                                    ss+=this.timetrans(d4.gpsTime);
+                                }catch(e){
+                                    console.log(data3.result);
+                                    ss+="没有感知数据"
+                                }
+                            }else{
+                                ss+=this.timetrans(d2.gpsTime);
+                            }
+
+                            
+                            // this.$emit("processPerceptionDataTime",ss)
+                             //不丢包
+                            this.processPerceptionMesage();
+                            this.processPlatformCars();
+                            this.timeB = new Date().getTime();
+
+                            let  hs = this.timeB-this.timeA;
+
+                            ss+="  耗时："+hs
+
+                            this.$emit("processPerceptionDataTime",ss)
+
+                            // if(this.lastPerceptionData!=null)
+                            // {
+                            //     this.processPerceptionInterval = d2.gpsTime- this.lastPerceptionData.gpsTime-(timeB-timeA);
+                            // }else{
+                            //     this.processPerceptionInterval = 1;
+                            // }
+                            // if(this.processPerceptionInterval<=0)
+                            // {
+                            //     this.processPerceptionInterval = 1;
+                            // }
+                            // if(this.processPerceptionInterval>1000)
+                            // {
+                            //     this.processPerceptionInterval=200;
+                            // }
+
+                            if(d2!=null)
+                            {
+                                this.lastPerceptionData=d2;
+                            }
+                            console.log("处理间隔："+this.processPerceptionInterval);
+                        }
+                       
+                    }
+                }
+                // this.processPerceptionData();
+            },0);//this.processPerceptionInterval
         },
         resetModels:function(){
             this.lastPerceptionMessage=null;
@@ -753,7 +905,7 @@ export default {
                 {
                     // debugger;
                     let d = this.platformCars[i];
-                    if(d.type == 1)
+                    if(d.type == 1)//平台车
                     {
                         this.animateCar2(d);
                     }
@@ -781,7 +933,7 @@ export default {
                     for(let m = 0;m<this.cacheModelNum;m++)
                     {
                         //车
-                        var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+                        var geoBox1 = new THREE.BoxBufferGeometry(3.8,1.6, 1.4);
                         var model1 = new THREE.Mesh( geoBox1, this.matStdObjects );
                         model1.position.set( 0, 0, 0 );
                         model1.rotation.set( this.pitch,this.yaw,this.roll );
@@ -790,6 +942,18 @@ export default {
 
                         this.scene.add(model1);
                         this.deviceModels[deviceid].cars[m] = model1;
+
+                        //行人
+
+                        var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
+                        var pmodel1 = new THREE.Mesh( pBox1, this.person );
+                        pmodel1.position.set( 0, 0, 0 );
+                        pmodel1.rotation.set( 0, 0, 0 );
+                        pmodel1.castShadow = true;
+                        pmodel1.receiveShadow = true;
+
+                        this.deviceModels[deviceid].persons[m]= pmodel1;
+                        this.scene.add(pmodel1);
 
                         //融合车辆
                         var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
@@ -830,13 +994,21 @@ export default {
                         mixCar.position.y = 0;
                         mixCar.position.z = 0;
                     }
+
+                    for(let q=0;q<this.deviceModels[deviceid].persons.length;q++)
+                    {
+                        let person = this.deviceModels[deviceid].persons[q];
+                        person.position.x = 0;
+                        person.position.y = 0;
+                        person.position.z = 0;
+                    }
                 }
             }
             for(let i = 0;i<fusionList.length;i++)
             {
                 let d = fusionList[i];
 
-                if(d.type==1)
+                if(d.type==1)//平台车
                 {
                     continue;
                 }
@@ -849,7 +1021,7 @@ export default {
                         let mdl = this.deviceModels[deviceid].persons[i];
                         mdl.position.x = dUTM[0];
                         mdl.position.y = dUTM[1];
-                        mdl.position.z = this.defualtZ+4;
+                        mdl.position.z = this.defualtZ;
 
                         // let text = this.deviceModels[deviceid].texts[i];
                         // text.setText(d.vehicleId.substr(0,8));
@@ -863,7 +1035,8 @@ export default {
                             let mdl = this.deviceModels[deviceid].cars[i];
                             mdl.position.x = dUTM[0];
                             mdl.position.y = dUTM[1];
-                            mdl.position.z = this.defualtZ+4;
+                            mdl.position.z = this.defualtZ;
+                            mdl.rotation.set( this.pitch,this.yaw,(Math.PI/180.0)*d.heading);
 
                             this.changeModelColor(d,mdl);
                         }
@@ -877,7 +1050,8 @@ export default {
                             let mixCar = this.mixCars[deviceid].cars[i];
                             mixCar.position.x = dUTM[0];
                             mixCar.position.y = dUTM[1];
-                            mixCar.position.z = this.defualtZ+4;
+                            mixCar.position.z = this.defualtZ;
+                            mixCar.rotation.set( this.pitch,this.yaw,(Math.PI/180.0)*d.heading);
                         }
                     }
                 }
@@ -1239,6 +1413,7 @@ export default {
         },
         changeModelColor:function(data,model)
         {
+            //ef56e4
             if(data.fuselType==2&&data.fuselLevel==1)
             {
                 model.material.color.setStyle("#ffbf64");
@@ -1255,6 +1430,7 @@ export default {
             {
                 model.material.color.setStyle("#651399");
             }
+            model.material.color.setStyle("#bc2cb2");
         },
         animateCar:function(data2,model){
             // console.log(data2);

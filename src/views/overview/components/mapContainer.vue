@@ -11,7 +11,7 @@ export default {
             id: "car-map-container",
             AMap: null,
             // 获取在驶车辆实时数据（辆）
-            webSocket:null,
+            webSocket:{},
             webSocketData: {
                 action: "vehicleOnline",
                 token: 'fpx',
@@ -26,18 +26,18 @@ export default {
     },
     mounted() {
         this.initWebSocket();
-        this.AMap = new AMap.Map(this.id, this.$parent.$parent.defaultMapOption);
+        this.AMap = new AMap.Map(this.id, window.defaultMapOption);
     },
     methods: {
         initWebSocket(){
             // console.log('websocket获取地图行驶车辆展示');
             if ('WebSocket' in window) {
                 this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                this.webSocket.onmessage = this.onmessage;
-                this.webSocket.onclose = this.onclose;
-                this.webSocket.onopen = this.onopen;
-                this.webSocket.onerror = this.onerror;
             }
+            this.webSocket.onmessage = this.onmessage;
+            this.webSocket.onclose = this.onclose;
+            this.webSocket.onopen = this.onopen;
+            this.webSocket.onerror = this.onerror;
         },
         onmessage(message) {
             let _json = JSON.parse(message.data),
@@ -107,8 +107,7 @@ export default {
                         offset: new AMap.Pixel(-2, -2),
                         angle: _data.heading,
                         zIndex: 50,
-                        vehicleId: _data.vehicleId,
-                        anchor: 'top-center'
+                        vehicleId: _data.vehicleId
                     });
                     _markerObj.platNoMarker = new AMap.Text({
                         map: _this.AMap,
@@ -124,9 +123,8 @@ export default {
                             'font-size': '10px',
                             'line-height': '16px',
                             'letter-spacing': '0',
-                            'margin-top': '0',  //车头
-                            'color': '#ccc',
-                            'anchor': 'top-center'
+                            'margin-top': '14px',  //车头
+                            'color': '#ccc'
                         },
                         position: _data.position,
                         vehicleId: _data.vehicleId
@@ -151,9 +149,13 @@ export default {
             }
         },
         showView(e) {
-            this.$router.push({
-                path: '/single/'+e.target.get("vehicleId"),
-            });
+            const { href } = this.$router.resolve({
+                name: 'Single',
+                params: {
+                    vehicleId: e.target.get("vehicleId")
+                }
+            })
+            window.open(href, '_blank')
         },
         onclose(data){
             // console.log("结束--vehicleOnline--连接");
@@ -177,65 +179,9 @@ export default {
     },
     destroyed(){
         //销毁Socket
-        this.webSocket&&this.webSocket.close();
+        this.webSocket.close();
     }
 }
-// export default {
-//     name: "MapContainer",
-//     data () {
-//         return {
-//             id: "data-map-container",
-//             AMap: null,
-//             // 获取在驾驶的实时车辆数据
-//             webSocket: {},
-//             webSocketData: {
-//                 aciton: 'vehicleOnline',
-//                 token: 'fpx',
-//                 vehicleId: 'vehicleOnline'
-//             },
-//             responseDataDraw: [],
-//             setFitViewFlag: true,
-//             count: 0,
-//             flag: true
-//             // setCenter: [121.262939,31.245149]
-//         }
-//     },
-//     mounted() {
-//         this.initWebSocket();
-//         this.AMap = new AMap.Map(this.id, this.$parent.$parent.defaultMapOption);
-//         // this.getWms();
-//     },
-//     methods: {
-//         // websocket获取地图行驶车辆展示
-//         initWebSocket() {
-//             if ('WebSocket' in window) {
-//                 this.webSocket = new WebSocket(window.config.socketUrl); // 获取websocket对象
-//             };
-//             this.webSocket.onmessage = this.onmessage;
-//             this.webSocket.onclose = this.onclose;
-//             this.webSocket.onopen = this.onopen;
-//             this.webSocket.onerror = this.onerror; 
-//         },
-//         // onmessage方法
-//         onmessage(message) {
-//             let _json = JSON.parse(message.data);
-//             _result = _json.result.allVehicle;
-//             console.log('_json', _json);
-//         },
-//         // 将定点坐标的图层添加到地图中
-//         getWms() {
-//             var wms  = new AMap.TileLayer.WMS({
-//                 // url:'http://10.0.1.22:8080/geoserver/shanghai_qcc/wms',
-//                 blend: false,
-//                 tileSize: 256,
-//                 params:{'LAYERS': 'shanghai_qcc:gd_dlzc', VERSION:'1.1.0'}
-//             })
-//             wms.setMap(this.AMap);
-//             this.AMap.setZoom(12);
-//             this.$parent.$parent.changeCenterPoint = this.setCenter;
-//         }
-//     }
-// }
 </script>
 <style scoped lang="scss">
 .c-view-map{
@@ -244,3 +190,4 @@ export default {
     z-index: -2;
 }
 </style>
+

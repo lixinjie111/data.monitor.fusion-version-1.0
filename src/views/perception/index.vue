@@ -1,12 +1,8 @@
 <template>
     <div class="fusion-style">
-        <div class="base-info">
-            <span class="base-time">{{$parent.formatTime || '--'}}</span>
-            <span>
-                    <em >{{$parent.city.district || '--'}}</em>
-                    <img src="@/assets/images/weather/default.png" class="weather-icon"/>
-                    <em class="c-middle">{{$parent.weather.wendu || '--'}}°</em>
-                </span>
+        <!--头部-->
+        <div class="header-style">
+            <header-top></header-top>
         </div>
         <div class="fusion-layout">
             <div class="fusion-left">
@@ -23,6 +19,7 @@
 <script>
     import Left from './components/left.vue'
     import Right from './components/right'
+    import HeaderTop from '../../components/header/index.vue';
     export default {
         data() {
             return {
@@ -33,6 +30,9 @@
                 realData:{},
                 time:0
             }
+        },
+        components:{
+            HeaderTop,Left,Right
         },
         watch:{
             '$route.params':function (newValue,oldValue) {
@@ -90,7 +90,8 @@
                          return;
                      }*/
                     this.$router.push({
-                        path: path+"/"+data.position.longitude+"/"+data.position.latitude
+                        path: path+"/"+data.position.longitude+"/"+data.position.latitude,
+                        query:{crossId:data.id}
                     });
                 }
                 if(type=='map'){
@@ -123,7 +124,6 @@
             }
 
         },
-        components:{Left,Right},
         mounted() {
             let _this = this;
             _this.socket.onmessage = _this.onmessage1;
