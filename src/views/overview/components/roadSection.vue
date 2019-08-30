@@ -201,7 +201,9 @@ export default {
               _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
             } else {   //表示没有该点，做remove
               // console.log('现在没有', _this.crossData.sideVehicleObj[id]);
-              _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
+//              _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
+                console.log("车牌id："+id);
+                _this.crossData.sideVehicleObj[key].marker.setMap(null);
             }
           }
           for (let id in _filterData) {
@@ -221,9 +223,12 @@ export default {
           _this.crossData.sideVehicleObj = _filterData;
         } else {
           // 返回的数据为空
-          for (let id in _this.crossData.sideVehicleObj) {
+          for (let key in _this.crossData.sideVehicleObj) {
             // console.log('无车', _this.crossData.sideVehicleObj[id]);
-            _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
+              console.log("车牌key："+key);
+              _this.crossData.sideVehicleObj[key].marker.setMap(null);
+//              _this.aMap.add();
+//            _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
           }
           _this.crossData.sideVehicleObj = {};
         }
