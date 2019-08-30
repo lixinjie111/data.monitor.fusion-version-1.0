@@ -173,12 +173,12 @@ export default {
       }
       // 车辆
       if ("vehDataDTO" in result === true) {
-
+         _this.crossData.roadSenseCars = result.vehDataDTO;
         if (_this.crossData.roadSenseCars.length > 0) {
-          _this.crossData.roadSenseCars = result.vehDataDTO;
           _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
             x => x.targetType === 2 || x.targetType === 5
           );
+          // console.log('_this.crossData.roadSenseCars', _this.crossData.roadSenseCars);
           let _filterData = {};
           _this.crossData.roadSenseCars.forEach((item, index) => {
             _filterData[item.vehicleId] = {
@@ -191,15 +191,16 @@ export default {
               marker: null,
             };
           });
-          
+          console.log('_filterData', _filterData);
 
           for (let id in _this.crossData.sideVehicleObj) {
-            if(_filterData[id]) {   //表示有该点，做setPosition
+            if(_filterData[id]) {   //表示有该点，做move
               _filterData[id].marker = _this.crossData.sideVehicleObj[id].marker;
               let _currentCar = _filterData[id];
               _filterData[id].marker.setAngle(_currentCar.heading);
               _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
-            }else {   //表示没有该点，做remove
+            } else {   //表示没有该点，做remove
+              // console.log('现在没有', _this.crossData.sideVehicleObj[id]);
               _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
             }
           }
@@ -214,15 +215,14 @@ export default {
                   // offset: new AMap.Pixel(-15, -10),
                   zIndex: 1
                 });
-                _this.aMap.add(
-                  _filterData[id].marker
-                );
+                _this.aMap.add(_filterData[id].marker);
             }
           }
           _this.crossData.sideVehicleObj = _filterData;
         } else {
           // 返回的数据为空
           for (let id in _this.crossData.sideVehicleObj) {
+            // console.log('无车', _this.crossData.sideVehicleObj[id]);
             _this.aMap.remove(_this.crossData.sideVehicleObj[id].marker);
           }
           _this.crossData.sideVehicleObj = {};

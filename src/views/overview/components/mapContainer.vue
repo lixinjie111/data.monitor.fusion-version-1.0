@@ -126,6 +126,7 @@ export default {
                             'margin-top': '14px',  //车头
                             'color': '#ccc'
                         },
+                        offset: new AMap.Pixel(0, -35),
                         position: _data.position,
                         vehicleId: _data.vehicleId
                     });
