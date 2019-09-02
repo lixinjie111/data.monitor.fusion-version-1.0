@@ -66,14 +66,24 @@ export default {
                         _filterData[id].plateNoMarker = _this.prevData[id].plateNoMarker;
                         let _currentCar = _filterData[id];
                         _filterData[id].marker.setAngle(_currentCar.heading);
+<<<<<<< HEAD
                         _filterData[id].marker.moveTo(_currentCar.position, _currentCar.speed);
                         _filterData[id].plateNoMarker.moveTo(_currentCar.position, _currentCar.speed);
+=======
+                        _filterData[id].marker.setPosition(_currentCar.position);
+                        _filterData[id].plateNoMarker.setPosition(_currentCar.position);
+>>>>>>> dev
                     }else {   //表示没有该点，做remove
                         // console.log(_this.prevData[id].plateNo, "remove");
                         _this.prevData[id].marker.off('click', _this.showView);
                         _this.prevData[id].plateNoMarker.off('click', _this.showView);
+<<<<<<< HEAD
                         _this.prevData[id].marker.stopMove();
                         _this.prevData[id].plateNoMarker.stopMove();
+=======
+                        // _this.prevData[id].marker.stopMove();
+                        // _this.prevData[id].plateNoMarker.stopMove();
+>>>>>>> dev
                         _this.AMap.remove(_this.prevData[id].marker);
                         _this.AMap.remove(_this.prevData[id].plateNoMarker);
                         delete _this.prevData[id];
@@ -100,8 +110,13 @@ export default {
                     _this.prevData[id].plateNoMarker.off('click', _this.showView);
                     // _this.prevData[id].marker.setMap(null);
                     // _this.prevData[id].plateNoMarker.setMap(null);
+<<<<<<< HEAD
                     _this.prevData[id].marker.stopMove();
                     _this.prevData[id].plateNoMarker.stopMove();
+=======
+                    // _this.prevData[id].marker.stopMove();
+                    // _this.prevData[id].plateNoMarker.stopMove();
+>>>>>>> dev
                     _this.AMap.remove(_this.prevData[id].marker);
                     _this.AMap.remove(_this.prevData[id].plateNoMarker);
                     delete _this.prevData[id];
@@ -141,10 +156,128 @@ export default {
                 },
                 offset: new AMap.Pixel(0, -35),
                 position: obj.position,
+<<<<<<< HEAD
                 vehicleId: obj.vehicleId
             });
             obj.plateNoMarker.on('click', this.showView);
         },
+=======
+                vehicleId: obj.vehicleId,
+                zIndex: 60
+            });
+            obj.plateNoMarker.on('click', this.showView);
+        },
+        // onmessage(message) {
+        //     let _json = JSON.parse(message.data),
+        //     _result = _json.result.allVehicle;
+        //     if (_result.length == 0) {
+        //         console.log(_json);
+        //         console.log("当前数据为空",this.dateUtil.formatTime(_json.result.time));
+        //     }
+        //     if (this.flag) {
+        //         this.flag = false;
+        //         let _responseData = _result.map( item => {
+        //             let _option = {
+        //                 vehicleId: item.vehicleId,
+        //                 plateNo: item.plateNo,
+        //                 source: item.source.join(','),
+        //                 heading: item.heading,
+        //                 // position: new AMap.LngLat(item.longitude, item.latitude)
+        //                 position: [item.longitude, item.latitude] // （经度，纬度)
+        //             };
+        //             return _option;
+        //         });
+        //         this.changeLngLat(_responseData);
+        //     }
+        // },
+        // changeLngLat(_allPointData) {
+        //     let _this = this;
+        //     // console.log(_this.count);
+        //     // _allPointData.forEach((item, index, arr) => {
+        //     for ( let i = 0; i < _allPointData.length; i++) {
+        //         // console.log(_allPointData[i].position);
+        //         (function(itemIndex){
+        //             // 数组中每一项item的position的经纬度转换
+        //             let _position = ConvertCoord.wgs84togcj02(_allPointData[itemIndex].position[0], _allPointData[itemIndex].position[1]);
+        //             _allPointData[itemIndex].position = _position;
+        //             _this.count ++;
+        //             if(_this.count == _allPointData.length) {
+        //                 //绘制线的轨迹
+        //                 _this.drawMarker(_allPointData);
+        //             }
+        //         })(i);
+        //     };
+        // },
+        // drawMarker(allPointData) {
+        //     let _this = this,
+        //         _responseDataDrawLength = _this.responseDataDraw.length,
+        //         _allPointDataLength = allPointData.length;
+        //     if(_responseDataDrawLength > 0) {
+        //         for(let m = 0; m < _this.responseDataDraw.length; m++) {
+        //             _this.responseDataDraw[m].marker.off('click', _this.showView);
+        //             _this.responseDataDraw[m].platNoMarker.off('click', _this.showView);
+        //             _this.AMap.remove(_this.responseDataDraw[m].marker);
+        //             _this.AMap.remove(_this.responseDataDraw[m].platNoMarker);
+        //         }
+        //         _this.responseDataDraw = [];
+        //     }
+        //     for(let i = 0; i < _allPointDataLength; i++) {
+        //         let _data = allPointData[i];
+        //         if(_data.position) {
+        //             let _markerObj = {
+        //                 marker: null,
+        //                 platNoMarker: null
+        //             };
+        //             _markerObj.marker = new AMap.Marker({
+        //                 map: _this.AMap,
+        //                 position: _data.position,
+        //                 icon: "static/images/car/point.png",
+        //                 offset: new AMap.Pixel(-2, -2),
+        //                 angle: _data.heading,
+        //                 zIndex: 50,
+        //                 vehicleId: _data.vehicleId
+        //             });
+        //             _markerObj.platNoMarker = new AMap.Text({
+        //                 map: _this.AMap,
+        //                 text: _data.plateNo+"<br/><span style='color:#e6a23c'>"+_data.source+'</span>',
+        //                 // text: '京N123456',
+        //                 anchor: 'center', // 设置文本标记锚点
+        //                 style: {
+        //                     'padding': '0 5px',
+        //                     'border-radius': '4px',
+        //                     'background-color': 'rgba(55, 186, 123, .2)',
+        //                     'border-width': 0,
+        //                     'text-align': 'center',
+        //                     'font-size': '10px',
+        //                     'line-height': '16px',
+        //                     'letter-spacing': '0',
+        //                     'margin-top': '14px',  //车头
+        //                     'color': '#ccc'
+        //                 },
+        //                 offset: new AMap.Pixel(0, -35),
+        //                 position: _data.position,
+        //                 vehicleId: _data.vehicleId
+        //             });
+        //             _markerObj.marker.on('click', _this.showView);
+        //             _markerObj.platNoMarker.on('click', _this.showView);
+
+        //             _this.responseDataDraw.push(_markerObj);
+        //         }
+
+        //         if(i == _allPointDataLength - 1) {
+        //             if(_this.setFitViewFlag) {
+        //                 this.AMap.setFitView();
+        //                 _this.setFitViewFlag = false;
+        //             }
+        //             setTimeout(() => {
+        //                 _this.count = 0;
+        //                 _this.flag = true;
+        //                 // console.log("绘制结束--------");
+        //             }, 0);
+        //         }
+        //     }
+        // },
+>>>>>>> dev
         showView(e) {
             const { href } = this.$router.resolve({
                 name: 'Single',

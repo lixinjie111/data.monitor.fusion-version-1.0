@@ -110,6 +110,8 @@ export default {
             ,sourceProject:"EPSG:4326"
             // ,destinatePorject:"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//北京
             ,destinatePorject:"+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//上海
+            ,timeA:0
+            ,timeB:0
         }
     },
     watch:{
@@ -158,13 +160,13 @@ export default {
             },500);
 
             //处理缓存队列的数据
-            console.log("this.waitingtime:"+this.waitingtime);
+//            console.log("this.waitingtime:"+this.waitingtime);
             if(this.waitingtime!=null)
             {
                 this.waitingProcessPerceptionTime = this.waitingtime;
             }
             setTimeout(() => {
-                console.log("1处理感知车辆缓存队列中的数据"+this.cachePerceptionQueue.length);
+//                console.log("1处理感知车辆缓存队列中的数据"+this.cachePerceptionQueue.length);
                 this.processPerceptionData();
             }, this.waitingProcessPerceptionTime);
 
@@ -182,11 +184,11 @@ export default {
             //     this.processCarTrackMessage();
             // },50);
             setTimeout(() => {
-                console.log("开始执行小车平滑移动");
+//                console.log("开始执行小车平滑移动");
                 let id3=setInterval(() => {
                     if(this.monitorTag)
                     {
-                        console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
+//                        console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
                         let d = this.cacheMainCarTrackData.shift();
                         this.moveMainCar(d);
                     }
@@ -717,8 +719,8 @@ export default {
             }
         },
         onPerceptionMessage:function(data){
-            console.log("=======================onPerceptionMessage===================");
-            console.log(new Date().getTime());
+//            console.log("=======================onPerceptionMessage===================");
+//            console.log(new Date().getTime());
             this.lastPerceptionMessage = data;
             var data2 = JSON.parse(data.data);
             if(data2.result.dataFlag == 1)
@@ -742,9 +744,11 @@ export default {
         },
         
         processPerceptionData:function(){
-            let timeA = new Date().getTime();
-            setTimeout(() => {
-                console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
+            // let timeA = new Date().getTime();
+            setInterval(() => {
+                this.timeA = new Date().getTime();
+//                console.log(this.timeA-this.timeB);
+//                console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
                 if(this.cachePerceptionQueue.length>0)
                 {
                     let data = this.cachePerceptionQueue.shift();
@@ -783,7 +787,11 @@ export default {
                                     zcarnum++;
                                     continue;
                                 }
+<<<<<<< HEAD
                                 if(d.targetType==0||d.targetType==1||d.targetType==3)
+=======
+                                if(obj.targetType==0||obj.targetType==1||obj.targetType==3)
+>>>>>>> dev
                                 {
                                     persons++;
                                 }else{
@@ -803,7 +811,7 @@ export default {
                                     d4 = data3.result.vehDataDTO[0];
                                     ss+=this.timetrans(d4.gpsTime);
                                 }catch(e){
-                                    console.log(data3.result);
+//                                    console.log(data3.result);
                                     ss+="没有感知数据"
                                 }
                             }else{
@@ -815,7 +823,13 @@ export default {
                              //不丢包
                             this.processPerceptionMesage();
                             this.processPlatformCars();
-                            let timeB = new Date().getTime();
+                            this.timeB = new Date().getTime();
+
+                            let  hs = this.timeB-this.timeA;
+
+                            ss+="  耗时："+hs
+
+                            this.$emit("processPerceptionDataTime",ss)
 
                             let  hs = timeB-timeA;
 
@@ -842,13 +856,13 @@ export default {
                             {
                                 this.lastPerceptionData=d2;
                             }
-                            console.log("处理间隔："+this.processPerceptionInterval);
+//                            console.log("处理间隔："+this.processPerceptionInterval);
                         }
                        
                     }
                 }
-                this.processPerceptionData();
-            }, this.processPerceptionInterval);//this.processPerceptionInterval
+                // this.processPerceptionData();
+            },0);//this.processPerceptionInterval
         },
         resetModels:function(){
             this.lastPerceptionMessage=null;
@@ -1032,7 +1046,7 @@ export default {
                             mdl.position.x = dUTM[0];
                             mdl.position.y = dUTM[1];
                             mdl.position.z = this.defualtZ;
-                            mdl.rotation.set( this.pitch,this.yaw,(Math.PI/180.0)*d.heading);
+                            mdl.rotation.set( this.pitch,this.yaw,(Math.PI/180.0)*(d.heading-50));
 
                             this.changeModelColor(d,mdl);
                         }
