@@ -378,10 +378,7 @@
                 this.$emit('getCurrentExtent', this.currentExtent);
 //                this.getPerceptionAreaInfo();
                 //地图不连续移动，判断红绿灯的位置受否再可视区
-                let lightData = this.lightList;
-                this.lightList=null;
-                this.lightList = lightData;
-//                this.typeRoadData();
+                this.typeRoadData();
             },
             getMap(){
                 let overviewMap = this.$refs.map1;
@@ -560,13 +557,13 @@
 //                console.log("中心点："+this.center);
             },
             typeRoadData(){
+                this.lightList=[];
                 if(this.crossId==5){
                     this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
                 }
                 if(this.crossId==6){
                     this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
                 }
-                this.lightList=[];
                 typeRoadData(
                     [
                         {
@@ -918,6 +915,7 @@
                 if(param==3){
                     this.param=3;
                     this.isActive='0';
+                    this.isFirst=true;
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }
