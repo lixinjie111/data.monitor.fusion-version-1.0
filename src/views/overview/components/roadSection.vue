@@ -219,7 +219,7 @@ export default {
                 });
             }
           }
-         
+
           _this.prevData = _filterData;
 
         } else {
