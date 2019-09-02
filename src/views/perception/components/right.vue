@@ -5,40 +5,20 @@
         <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
         <div class="video-style">
-            <div class="style video1-position" id="message1">
+            <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
                 <div class="video-num" @click="changeMap('1')">
-                    <div>
-                        <span>摄像头编号:{{videoItem1.deviceId}}</span>
-                        <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
-                    </div>
-                    <!--<span>摄像头编号:{{videoItem1.deviceId}}</span>
-                    <div class="active-block">
-                        <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
-                    </div>-->
-                    <span>{{videoItem1.rsPtName}}</span>
+                    <span :class="{'active-style':isActive=='1'}">摄像头编号:{{videoItem1.deviceId}}</span>
+                    <span :class="{'active-style':isActive=='1'}">{{videoItem1.rsPtName}}</span>
                 </div>
-                <!--<div class="active-block">
-                    <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
-                </div>-->
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
-            <div class="style video2-position" id="message2">
+            <div class="style" id="message2">
                 <div class="video-mask" @click="screenMagnify('2')"></div>
                 <div class="video-num" @click="changeMap('2')">
-                    <div>
-                        <span>摄像头编号:{{videoItem2.deviceId}}</span>
-                        <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
-                    </div>
-                    <!--<span>摄像头编号:{{videoItem2.deviceId}}</span>
-                    <div class="active-block">
-                        <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
-                    </div>-->
-                    <span>{{videoItem2.rsPtName}}</span>
+                     <span :class="{'active-style':isActive=='2'}">摄像头编号:{{videoItem2.deviceId}}</span>
+                    <span :class="{'active-style':isActive=='2'}">{{videoItem2.rsPtName}}</span>
                 </div>
-                <!--<div class="active-block">
-                    <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
-                </div>-->
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
             </div>
         </div>
@@ -1070,6 +1050,10 @@
         box-sizing: border-box;
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
+        .active-style{
+            display: inline-block;
+            border-bottom: 1px solid #fff;
+        }
     }
     .video-num{
         position: absolute;
@@ -1078,6 +1062,7 @@
         padding: 0px 10px;
         box-sizing: border-box;
         cursor: pointer;
+        line-height: 30px;
         @include layoutMode(between);
     }
  /*   .style:before{
@@ -1113,34 +1098,6 @@
             border-radius: 50%;
 
         }
-        .active-style{
-            /* border:1px solid rgba(211, 134, 0, 0.5)!important;*/
-            /*width: 800px;*/
-            background: #4eaf6b !important;
-            /*background: red !important;*/
-
-        }
-        .active-block{
-            /*position: absolute;*/
-            z-index: 2;
-           /* margin-top: 20px;
-            left:50%;
-            margin-left: -4px;*/
-            .active-circle{
-                display: inline-block;
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background:transparent ;
-            }
-            .active-style{
-                /* border:1px solid rgba(211, 134, 0, 0.5)!important;*/
-                /*width: 800px;*/
-                background: #4eaf6b !important;
-                /*background: red !important;*/
-
-            }
-        }
     }
     .big-video{
         position: absolute;
@@ -1151,7 +1108,7 @@
         border:1px solid rgba(211, 134, 0, 0.5);
         background: #000;
     }
-    .video1-position{
+    .video-position{
         margin-bottom: 16px;
     }
     .video-mask{
