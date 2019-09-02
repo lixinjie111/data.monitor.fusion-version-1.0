@@ -340,7 +340,7 @@
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.centerAt(window.mapOption.center);
-                this.$refs.map1.zoomTo(14);
+                this.$refs.map1.zoomTo(10);
                 this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,window.dlWmsOption.GD_ROAD_CENTERLINE,1,true,null); // 上海汽车城
 
             },
@@ -414,10 +414,10 @@
                 }
                 let currentExtend = this.currentExtent;
                 console.log("currentExtent:"+this.currentExtent)
-                overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
+                /*overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
-                    null, 1, overviewLayerId);
+                    null, 1, overviewLayerId);*/
 
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
