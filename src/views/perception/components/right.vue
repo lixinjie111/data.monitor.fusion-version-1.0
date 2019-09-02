@@ -1,9 +1,9 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-if="param==3"/>
-        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
-        <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
-        <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
+        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
+        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
+        <div class="map-time" v-show="param!=3">{{time|dateFormat}}</div>
+        <div class="map-time map-time1" v-show="param!=3">{{time1}}</div>
         <div class="video-style">
             <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
@@ -109,10 +109,6 @@
     export default {
         data() {
             return {
-                option1:{},
-                option2:{},
-                events: ['fullscreenchange'],
-                events1: ['fullscreenchange'],
                 lightList:[
                     /*{
                         left:250,
@@ -172,7 +168,10 @@
                 video1Show:false,
                 video2Show:false,
                 waitingtime:this.$route.params.waitingtime,
-                isActive:'1'
+                isActive:'1',
+                crossId:'',
+                d2LightList:[],
+                d3LightList:[]
 
                /* pointLeft:10,
                 pointTop:10,
@@ -202,7 +201,6 @@
                 },
 //                immediate: true,
                 deep: true
-
             }
         },
         filters: {
@@ -292,15 +290,15 @@
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
-                    let param = this.$route.params.crossId;
-                    if(param==5){
+                    this.crossId = this.$route.params.crossId;
+                    if(this.crossId==5){
                         this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
 //                        this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
                         this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
 //                        this.center=[[121.17548002587952,76.2279931281073]];
                         this.center=[121.247,31.242];
                     }
-                    if(param==6){
+                    if(this.crossId==6){
                         this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
 //                        this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
                         this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
@@ -327,14 +325,14 @@
             mouseUpChanged(){
                 console.log("监听鼠标移动地图")
                 clearTimeout(this.viewTime);
-                if(this.param==3){
+//                if(this.param==3){
                     this.source='mouseMove';
                     this.getCurrentExtent();
                     this.getCenter();
                     this.$emit('getCurrentExtent', this.currentExtent);
                     //地图不连续移动，判断红绿灯的位置受否再可视区
                     this.typeRoadData();
-                }
+//                }
             },
             cameraChanged(){
                 console.log("窗口发生变化")
@@ -349,11 +347,13 @@
                         clearTimeout(this.time);
                     },500)
                 }*/
-                if(this.param==3&&this.isFirst){
+//                if(this.param==3&&this.isFirst){
+                if(this.isFirst){
                     this.typeRoadData();
                 }
-                //地图不是第一次初始化
-                if(this.param==3&&!this.isFirst){
+                //地图不是第一次初始化 判断地图缩放、全屏，调试等 （俯视图、3d地图）
+//                if(this.param==3&&!this.isFirst){
+                if(!this.isFirst){
                     this.lightWebsocket&&this.lightWebsocket.close();
                     this.$refs.perceptionMap.resetModels();
                     //判断地图缩放、全屏，调试等
@@ -364,15 +364,12 @@
                 }
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
-                //地图不连续动
+                //地图不连续动 俯视图
                 if(this.param==3&&this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
                     clearTimeout(this.viewTime);
                     this.getData();
                 }
-                /*//不是第一次
-                if(!this.isFirst){*/
-                   this.getMap();
-                /*}*/
+                this.getMap();
                 this.isFirst=false;
             },
             getData(){
@@ -381,7 +378,10 @@
                 this.$emit('getCurrentExtent', this.currentExtent);
 //                this.getPerceptionAreaInfo();
                 //地图不连续移动，判断红绿灯的位置受否再可视区
-                this.typeRoadData();
+                let lightData = this.lightList;
+                this.lightList=null;
+                this.lightList = lightData;
+//                this.typeRoadData();
             },
             getMap(){
                 let overviewMap = this.$refs.map1;
@@ -560,6 +560,12 @@
 //                console.log("中心点："+this.center);
             },
             typeRoadData(){
+                if(this.crossId==5){
+                    this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
+                }
+                if(this.crossId==6){
+                    this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
+                }
                 this.lightList=[];
                 typeRoadData(
                     [
@@ -627,7 +633,7 @@
                                     obj.key = key;
                                     obj.spareTime = '';
                                     obj.lightColor='';
-                                    obj.flag=false;
+                                    obj.flag=true;
                                     this.spatCount++;
                                     this.lightList.push(obj);
                                     i++;
@@ -783,7 +789,7 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
                 _this.time=json.time;
-                if(_this.param==3){
+                /*if(_this.param==3){*/
                     let resultData=[];
                     if(data&&data.length>0){
                         data.forEach(item=>{
@@ -809,7 +815,7 @@
                             })
                         })
                     }
-                }
+                /*}*/
             },
             onLightClose(data){
                 console.log("结束连接");
@@ -911,15 +917,14 @@
                 }
                 if(param==3){
                     this.param=3;
-                    this.isFirst=true;
                     this.isActive='0';
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }
-                /*if(param==4){
-                    this.param=4;
-                    this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
-                }*/
+//                /*if(param==4){
+//                    this.param=4;
+//                    this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
+//                }*/
             },
             screenMagnify(param){
                 if(param==1){
@@ -1090,7 +1095,7 @@
         right: 10px;
         z-index:3;
         width: 400px;
-        transition: all 2s ease-in-out;
+      /*  transition: all 2s ease-in-out;*/
         .active-circle{
             display: inline-block;
             width: 8px;
