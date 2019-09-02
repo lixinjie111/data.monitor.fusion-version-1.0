@@ -66,14 +66,14 @@ export default {
                         _filterData[id].plateNoMarker = _this.prevData[id].plateNoMarker;
                         let _currentCar = _filterData[id];
                         _filterData[id].marker.setAngle(_currentCar.heading);
-                        _filterData[id].marker.moveTo(_currentCar.position, _currentCar.speed);
-                        _filterData[id].plateNoMarker.moveTo(_currentCar.position, _currentCar.speed);
+                        _filterData[id].marker.setPosition(_currentCar.position);
+                        _filterData[id].plateNoMarker.setPosition(_currentCar.position);
                     }else {   //表示没有该点，做remove
                         // console.log(_this.prevData[id].plateNo, "remove");
                         _this.prevData[id].marker.off('click', _this.showView);
                         _this.prevData[id].plateNoMarker.off('click', _this.showView);
-                        _this.prevData[id].marker.stopMove();
-                        _this.prevData[id].plateNoMarker.stopMove();
+                        // _this.prevData[id].marker.stopMove();
+                        // _this.prevData[id].plateNoMarker.stopMove();
                         _this.AMap.remove(_this.prevData[id].marker);
                         _this.AMap.remove(_this.prevData[id].plateNoMarker);
                         delete _this.prevData[id];
@@ -100,8 +100,8 @@ export default {
                     _this.prevData[id].plateNoMarker.off('click', _this.showView);
                     // _this.prevData[id].marker.setMap(null);
                     // _this.prevData[id].plateNoMarker.setMap(null);
-                    _this.prevData[id].marker.stopMove();
-                    _this.prevData[id].plateNoMarker.stopMove();
+                    // _this.prevData[id].marker.stopMove();
+                    // _this.prevData[id].plateNoMarker.stopMove();
                     _this.AMap.remove(_this.prevData[id].marker);
                     _this.AMap.remove(_this.prevData[id].plateNoMarker);
                     delete _this.prevData[id];
@@ -121,7 +121,7 @@ export default {
             });
             obj.marker.on('click', this.showView);
         },
-         addPlateNoMarker(obj) {
+        addPlateNoMarker(obj) {
             obj.plateNoMarker = new AMap.Text({
                 map: this.AMap,
                 text: obj.plateNo+"<br/><span style='color:#e6a23c'>"+obj.source+'</span>',
@@ -141,7 +141,8 @@ export default {
                 },
                 offset: new AMap.Pixel(0, -35),
                 position: obj.position,
-                vehicleId: obj.vehicleId
+                vehicleId: obj.vehicleId,
+                zIndex: 60
             });
             obj.plateNoMarker.on('click', this.showView);
         },
