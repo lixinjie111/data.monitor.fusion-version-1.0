@@ -24,7 +24,7 @@
         </div>
     </div>
     <!-- 登录 -->
-
+    
     <div class="login-bottom">
         <span>建议浏览器：Chrome</span>
         <span>建议分辨率：1920x1080</span>
@@ -94,9 +94,12 @@ export default {
 <style lang="scss" scoped>
 @import "@/assets/scss/theme.scss";
 #login-warpper {
+    font-family: MicrosoftYaHei;
     position: relative;
     height: 100%;
     background-color: #f2f2f2;
+    letter-spacing: 2px;
+    line-height: 40px;
     .login-logo {
         position: absolute;
         left: 49px;
@@ -160,8 +163,8 @@ export default {
         height: 80px;
         letter-spacing: 3px;
         background-color: #f2f2f2;
-        @include layoutMode();
         color: #000;
+        @include layoutMode();
     }
     .login-item-box {
         padding: 40px 40px 57px;
@@ -176,7 +179,6 @@ export default {
         background-color: #3293bd;
         border-radius: 10px;
         font-size: 18px;
-        // letter-spacing: 7px;
         color: #fff;
         border: none;
         margin-top: 30px;
@@ -203,12 +205,14 @@ export default {
         }
     }
     .el-input__inner {
+        font-size: 14px;
         background: transparent;        
-        border: none;
+        border: none !important;
         height: 50px;
         padding: 0 21px;
         @include layoutMode(pack);
         color: #333 !important;
+        width: 100% !important;
     }
     input:-webkit-autofill {
         -webkit-box-shadow: 0 0 0px 1000px white inset;
