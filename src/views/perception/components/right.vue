@@ -1,44 +1,24 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-if="param==3"/>
-        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-else/>
-        <div class="map-time" v-if="param!=3">{{time|dateFormat}}</div>
-        <div class="map-time map-time1" v-if="param!=3">{{time1}}</div>
+        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
+        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
+        <div class="map-time" v-show="param!=3">{{time|dateFormat}}</div>
+        <div class="map-time map-time1" v-show="param!=3">{{time1}}</div>
         <div class="video-style">
-            <div class="style video1-position" id="message1">
+            <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
                 <div class="video-num" @click="changeMap('1')">
-                    <div>
-                        <span>摄像头编号:{{videoItem1.deviceId}}</span>
-                        <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
-                    </div>
-                    <!--<span>摄像头编号:{{videoItem1.deviceId}}</span>
-                    <div class="active-block">
-                        <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
-                    </div>-->
-                    <span>{{videoItem1.rsPtName}}</span>
+                    <span :class="{'active-style':isActive=='1'}">摄像头编号:{{videoItem1.deviceId}}</span>
+                    <span :class="{'active-style':isActive=='1'}">{{videoItem1.rsPtName}}</span>
                 </div>
-                <!--<div class="active-block">
-                    <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
-                </div>-->
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
-            <div class="style video2-position" id="message2">
+            <div class="style" id="message2">
                 <div class="video-mask" @click="screenMagnify('2')"></div>
                 <div class="video-num" @click="changeMap('2')">
-                    <div>
-                        <span>摄像头编号:{{videoItem2.deviceId}}</span>
-                        <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
-                    </div>
-                    <!--<span>摄像头编号:{{videoItem2.deviceId}}</span>
-                    <div class="active-block">
-                        <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
-                    </div>-->
-                    <span>{{videoItem2.rsPtName}}</span>
+                     <span :class="{'active-style':isActive=='2'}">摄像头编号:{{videoItem2.deviceId}}</span>
+                    <span :class="{'active-style':isActive=='2'}">{{videoItem2.rsPtName}}</span>
                 </div>
-                <!--<div class="active-block">
-                    <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
-                </div>-->
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
             </div>
         </div>
@@ -129,10 +109,6 @@
     export default {
         data() {
             return {
-                option1:{},
-                option2:{},
-                events: ['fullscreenchange'],
-                events1: ['fullscreenchange'],
                 lightList:[
                     /*{
                         left:250,
@@ -192,7 +168,10 @@
                 video1Show:false,
                 video2Show:false,
                 waitingtime:this.$route.params.waitingtime,
-                isActive:'1'
+                isActive:'1',
+                crossId:'',
+                d2LightList:[],
+                d3LightList:[]
 
                /* pointLeft:10,
                 pointTop:10,
@@ -222,7 +201,6 @@
                 },
 //                immediate: true,
                 deep: true
-
             }
         },
         filters: {
@@ -296,7 +274,7 @@
             },
             onMapComplete(){
                 getMap(this.$refs.perceptionMap);
-                this.$refs.perceptionMap.addModel('tra_light00011111','./static/map3d/models/traffic_light.3ds',326279.672803747,3462360.84818288,12.68);
+//                this.$refs.perceptionMap.addModel('tra_light00011111','./static/map3d/models/traffic_light.3ds',326279.672803747,3462360.84818288,12.68);
                 let longitude=parseFloat(this.$route.params.lon);
                 let latitude=parseFloat(this.$route.params.lat);
               /*  alert("js改变")
@@ -312,15 +290,15 @@
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
-                    let param = this.$route.params.crossId;
-                    if(param==5){
+                    this.crossId = this.$route.params.crossId;
+                    if(this.crossId==5){
                         this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
 //                        this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
                         this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
 //                        this.center=[[121.17548002587952,76.2279931281073]];
                         this.center=[121.247,31.242];
                     }
-                    if(param==6){
+                    if(this.crossId==6){
                         this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
 //                        this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
                         this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
@@ -340,21 +318,21 @@
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.centerAt(window.mapOption.center);
-                this.$refs.map1.zoomTo(14);
+                this.$refs.map1.zoomTo(10);
                 this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,window.dlWmsOption.GD_ROAD_CENTERLINE,1,true,null); // 上海汽车城
 
             },
             mouseUpChanged(){
                 console.log("监听鼠标移动地图")
                 clearTimeout(this.viewTime);
-                if(this.param==3){
+//                if(this.param==3){
                     this.source='mouseMove';
                     this.getCurrentExtent();
                     this.getCenter();
                     this.$emit('getCurrentExtent', this.currentExtent);
                     //地图不连续移动，判断红绿灯的位置受否再可视区
                     this.typeRoadData();
-                }
+//                }
             },
             cameraChanged(){
                 console.log("窗口发生变化")
@@ -369,11 +347,13 @@
                         clearTimeout(this.time);
                     },500)
                 }*/
-                if(this.param==3&&this.isFirst){
+//                if(this.param==3&&this.isFirst){
+                if(this.isFirst){
                     this.typeRoadData();
                 }
-                //地图不是第一次初始化
-                if(this.param==3&&!this.isFirst){
+                //地图不是第一次初始化 判断地图缩放、全屏，调试等 （俯视图、3d地图）
+//                if(this.param==3&&!this.isFirst){
+                if(!this.isFirst){
                     this.lightWebsocket&&this.lightWebsocket.close();
                     this.$refs.perceptionMap.resetModels();
                     //判断地图缩放、全屏，调试等
@@ -384,15 +364,12 @@
                 }
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
-                //地图不连续动
+                //地图不连续动 俯视图
                 if(this.param==3&&this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
                     clearTimeout(this.viewTime);
                     this.getData();
                 }
-                /*//不是第一次
-                if(!this.isFirst){*/
-                   this.getMap();
-                /*}*/
+                this.getMap();
                 this.isFirst=false;
             },
             getData(){
@@ -414,10 +391,10 @@
                 }
                 let currentExtend = this.currentExtent;
                 console.log("currentExtent:"+this.currentExtent)
-                overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
+                /*overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
-                    null, 1, overviewLayerId);
+                    null, 1, overviewLayerId);*/
 
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
@@ -581,6 +558,12 @@
             },
             typeRoadData(){
                 this.lightList=[];
+                if(this.crossId==5){
+                    this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
+                }
+                if(this.crossId==6){
+                    this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
+                }
                 typeRoadData(
                     [
                         {
@@ -647,7 +630,7 @@
                                     obj.key = key;
                                     obj.spareTime = '';
                                     obj.lightColor='';
-                                    obj.flag=false;
+                                    obj.flag=true;
                                     this.spatCount++;
                                     this.lightList.push(obj);
                                     i++;
@@ -655,8 +638,8 @@
                             }
                         })
                         this.$emit("count",this.signCount,this.spatCount);
-                        this.initLightWebSocket();
                     }
+                    this.initLightWebSocket();
                 })
             },
             moveMap(){
@@ -803,7 +786,7 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
                 _this.time=json.time;
-                if(_this.param==3){
+                /*if(_this.param==3){*/
                     let resultData=[];
                     if(data&&data.length>0){
                         data.forEach(item=>{
@@ -829,7 +812,7 @@
                             })
                         })
                     }
-                }
+                /*}*/
             },
             onLightClose(data){
                 console.log("结束连接");
@@ -920,26 +903,35 @@
                     this.param=1;
                     this.isActive='1';
 //                    this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
-                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    if(cameraParam.x){
+                        this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    }else {
+                        this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
+                    }
+
                 }
                 if(param==2){
                     cameraParam = JSON.parse(this.videoItem2.cameraParam);
                     this.param=2;
                     this.isActive='2';
 //                    this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
-                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    if(cameraParam.x){
+                        this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    }else{
+                        this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
+                    }
                 }
                 if(param==3){
                     this.param=3;
-                    this.isFirst=true;
                     this.isActive='0';
+                    this.isFirst=true;
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }
-                /*if(param==4){
-                    this.param=4;
-                    this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
-                }*/
+//                /*if(param==4){
+//                    this.param=4;
+//                    this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
+//                }*/
             },
             screenMagnify(param){
                 if(param==1){
@@ -1070,6 +1062,10 @@
         box-sizing: border-box;
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
+        .active-style{
+            display: inline-block;
+            border-bottom: 1px solid #fff;
+        }
     }
     .video-num{
         position: absolute;
@@ -1078,6 +1074,7 @@
         padding: 0px 10px;
         box-sizing: border-box;
         cursor: pointer;
+        line-height: 30px;
         @include layoutMode(between);
     }
  /*   .style:before{
@@ -1105,41 +1102,13 @@
         right: 10px;
         z-index:3;
         width: 400px;
-        transition: all 2s ease-in-out;
+      /*  transition: all 2s ease-in-out;*/
         .active-circle{
             display: inline-block;
             width: 8px;
             height: 8px;
             border-radius: 50%;
 
-        }
-        .active-style{
-            /* border:1px solid rgba(211, 134, 0, 0.5)!important;*/
-            /*width: 800px;*/
-            background: #4eaf6b !important;
-            /*background: red !important;*/
-
-        }
-        .active-block{
-            /*position: absolute;*/
-            z-index: 2;
-           /* margin-top: 20px;
-            left:50%;
-            margin-left: -4px;*/
-            .active-circle{
-                display: inline-block;
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background:transparent ;
-            }
-            .active-style{
-                /* border:1px solid rgba(211, 134, 0, 0.5)!important;*/
-                /*width: 800px;*/
-                background: #4eaf6b !important;
-                /*background: red !important;*/
-
-            }
         }
     }
     .big-video{
@@ -1151,7 +1120,7 @@
         border:1px solid rgba(211, 134, 0, 0.5);
         background: #000;
     }
-    .video1-position{
+    .video-position{
         margin-bottom: 16px;
     }
     .video-mask{
