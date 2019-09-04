@@ -8,17 +8,25 @@
             <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
                 <div class="video-num" @click="changeMap('1')">
-                    <span :class="{'active-style':isActive=='1'}">摄像头编号:{{videoItem1.deviceId}}</span>
-                    <span :class="{'active-style':isActive=='1'}">{{videoItem1.rsPtName}}</span>
+                    <span class="device-num">摄像头编号:{{videoItem1.deviceId}}</span>
+                    <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
+                    <span>{{videoItem1.rsPtName}}</span>
                 </div>
+                <!--<div class="active-block">
+                    <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
+                </div>-->
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
             </div>
             <div class="style" id="message2">
                 <div class="video-mask" @click="screenMagnify('2')"></div>
                 <div class="video-num" @click="changeMap('2')">
-                     <span :class="{'active-style':isActive=='2'}">摄像头编号:{{videoItem2.deviceId}}</span>
-                    <span :class="{'active-style':isActive=='2'}">{{videoItem2.rsPtName}}</span>
+                    <span class="device-num">摄像头编号:{{videoItem2.deviceId}}</span>
+                    <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
+                    <span>{{videoItem2.rsPtName}}</span>
                 </div>
+                <!--<div class="active-block">
+                    <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
+                </div>-->
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
             </div>
         </div>
@@ -90,7 +98,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' @mousedrop="mouseUpChanged" @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
+            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged'  @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
         </div>
         <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
@@ -170,8 +178,7 @@
                 waitingtime:this.$route.params.waitingtime,
                 isActive:'1',
                 crossId:'',
-                d2LightList:[],
-                d3LightList:[]
+                count:0
 
                /* pointLeft:10,
                 pointTop:10,
@@ -322,54 +329,21 @@
                 this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,window.dlWmsOption.GD_ROAD_CENTERLINE,1,true,null); // 上海汽车城
 
             },
-            mouseUpChanged(){
-                console.log("监听鼠标移动地图")
-                clearTimeout(this.viewTime);
-//                if(this.param==3){
-                    this.source='mouseMove';
-                    this.getCurrentExtent();
-                    this.getCenter();
-                    this.$emit('getCurrentExtent', this.currentExtent);
-                    //地图不连续移动，判断红绿灯的位置受否再可视区
-                    this.typeRoadData();
-//                }
-            },
             cameraChanged(){
-                console.log("窗口发生变化")
-               /* if(this.param==3&&this.isFirst){
-                    this.time = setTimeout(()=>{
-                        this.getCurrentExtent();
-                        this.getCenter();
-                        this.$emit('getCurrentExtent', this.currentExtent);
-                        this.getPerceptionAreaInfo();
-                        this.typeRoadData();
-                        this.getMap();
-                        clearTimeout(this.time);
-                    },500)
-                }*/
-//                if(this.param==3&&this.isFirst){
-                if(this.isFirst){
-                    this.typeRoadData();
+                console.log("窗口发生变化");
+                if(this.first){
+                    this.getMap();
                 }
-                //地图不是第一次初始化 判断地图缩放、全屏，调试等 （俯视图、3d地图）
-//                if(this.param==3&&!this.isFirst){
-                if(!this.isFirst){
-                    this.lightWebsocket&&this.lightWebsocket.close();
-                    this.$refs.perceptionMap.resetModels();
-                    //判断地图缩放、全屏，调试等
-                    this.viewTime = setTimeout(()=>{
-                        this.getData();
-                        clearTimeout(this.viewTime);
-                    },1000)
-                }
-                this.cameraParam = this.$refs.perceptionMap.getCamera();
-//                console.log("地图变化后的y："+this.cameraParam.y)
-                //地图不连续动 俯视图
-                if(this.param==3&&this.source=='mapMove'&&!this.isConMov&&!this.isFirst){
-                    clearTimeout(this.viewTime);
+                if(!this.first&&this.count==0){
+                    this.count=1;
+                    this.cameraParam = this.$refs.perceptionMap.getCamera();
+                    this.getMap();
                     this.getData();
+                    let time = setTimeout(()=>{
+                        this.count=0;
+                        clearTimeout(time);
+                    },2000)
                 }
-                this.getMap();
                 this.isFirst=false;
             },
             getData(){
@@ -1062,10 +1036,6 @@
         box-sizing: border-box;
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
-        .active-style{
-            display: inline-block;
-            border-bottom: 1px solid #fff;
-        }
     }
     .video-num{
         position: absolute;
@@ -1075,7 +1045,11 @@
         box-sizing: border-box;
         cursor: pointer;
         line-height: 30px;
-        @include layoutMode(between);
+        .device-num{
+            padding-left: 10px;
+            padding-right: 70px;
+        }
+       /* @include layoutMode(between);*/
     }
  /*   .style:before{
         position: absolute;
@@ -1108,7 +1082,23 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
+            position: absolute;
+            left: 4px;
+            top: 10px;
 
+        }
+        .active-style{
+            background: red !important;
+            animation: myAnimate 1s infinite;
+
+        }
+        @keyframes myAnimate {
+            0%{
+                opacity: 0;
+            }
+            /*50% {
+               opacity: 1;
+            }*/
         }
     }
     .big-video{
