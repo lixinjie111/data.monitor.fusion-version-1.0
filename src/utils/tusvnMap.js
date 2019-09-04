@@ -1,11 +1,11 @@
 export function getMap(map){
   map.addShape("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffffff",3,null,null,null,null,21.5)
   //路口
-  map.addShape("intersection","./static/map3d/dl_shcsq_zc/Intersection.shp","#4b4b4b")
+  map.addShape("intersection","./static/map3d/dl_shcsq_zc/Intersection.shp","#2f2f2f")
  
   map.addShape("lane_marking","./static/map3d/dl_shcsq_zc/Lane_marking.shp",dl.styles.lane_marking.color)
   //路标志
-  map.addShape("lane_arrow","./static/map3d/dl_shcsq_zc/Direction_arrow.shp","#ffffff")
+  map.addShape("lane_arrow","./static/map3d/dl_shcsq_zc/Direction_arrow.shp","#f3f3f3")
   map.addShape("lane_boundary","./static/map3d/dl_shcsq_zc/Lane_boundary.shp","#fefefe")
   map.addShape("lane_centerline","./static/map3d/dl_shcsq_zc/Lane_centerline.shp","#153641")
   // map.addShape("greenbelts","./static/map3d/dl_shcsq_zc/greenbelts.shp","#73b273")
@@ -37,7 +37,7 @@ export function getMap(map){
 //监控区域
   let area03 = new dl.Polygon({
     name:"强视区01",
-    color:"#3b547f",
+    color:"#494657",
     outline:false,
     outlineColor:"#f2abf2",
     opacity:0.5,
@@ -47,7 +47,7 @@ export function getMap(map){
   area03.updateVertices();
   area03.setOpacity(1);
   //斑马线
-  map.addShape1("Crosswalk","./static/map3d/dl_shcsq_zc/Crosswalk.shp","#ffffff")
+  map.addShape1("Crosswalk","./static/map3d/dl_shcsq_zc/Crosswalk.shp","#f3f3f3")
   // let area04 = new dl.Polygon({
   //   name:"强视区02",
   //   color:"#ff0000",
@@ -75,7 +75,7 @@ export function getMap(map){
   let circle = new dl.Circle({
     redius:600.0,
     center:[326279.672803747,3462360.84818288,13.618],
-    color:"#b7b7b7",
+    color:"#ffffff",
     outline:false,
     outlineColor:"#ff0000",
     opacity:0.5,
