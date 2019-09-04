@@ -746,6 +746,7 @@ export default {
         processPerceptionData:function(){
             // let timeA = new Date().getTime();
             setInterval(() => {
+                
                 this.timeA = new Date().getTime();
 //                console.log(this.timeA-this.timeB);
 //                console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
@@ -1169,6 +1170,8 @@ export default {
         //单车监控改变监控车辆
         changeMainCarId:function(url,carid)
         {
+            debugger;
+
             this.cartrackwebsocketUrl = url;
             this.carid = carid;
             this.mainCarVID = carid;
@@ -1234,6 +1237,8 @@ export default {
             this.processCarTrackMessage();
         },
         processCarTrackMessage:function(){
+            debugger;
+            
             // console.log("processCarTrackMessage:================>"+this.cacheMainCarTrackData.length);
             if(this.cacheTrackCarData == null)
             {
