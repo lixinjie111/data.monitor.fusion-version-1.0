@@ -123,7 +123,9 @@
     const isProduction = process.env.NODE_ENV === 'production'
     import TusvnMap1 from './TusvnMap.vue';
     import {getMap} from '@/utils/tusvnMap.js';
-    import TusvnMap from '@/components/Tusvn3DMap2'
+    //import TusvnMap from '@/components/Tusvn3DMap2'
+   import TusvnMap from '@/components/Tusvn3DMap3'
+   //   import TusvnMap from '@/components/map3D'
     import DateFormat from '@/utils/date.js'
     import {getPerceptionAreaInfo,getVideoByNum,typeRoadData} from '@/api/fusion'
     export default {
@@ -215,6 +217,7 @@
             }
         },
         components: { TusvnMap,TusvnMap1},
+        //  components: { TusvnMap},
         watch: {
             realData: {
                 handler(newName, oldName) {
@@ -295,7 +298,7 @@
                 }
             },
             onMapComplete(){
-                getMap(this.$refs.perceptionMap);
+               getMap(this.$refs.perceptionMap);
                 this.$refs.perceptionMap.addModel('tra_light00011111','./static/map3d/models/traffic_light.3ds',326279.672803747,3462360.84818288,12.68);
                 let longitude=parseFloat(this.$route.params.lon);
                 let latitude=parseFloat(this.$route.params.lat);
@@ -328,14 +331,15 @@
                         this.center=[121.247,31.242];
                     }
                     this.getPerceptionAreaInfo();
-                    //地图不连续移动，判断红绿灯的位置受否再可视区
+                    //test  影响cpu 
+            
                     this.typeRoadData();
                     this.$emit('getCurrentExtent', this.currentExtent);
                     return;
                 }else{
                     this.$refs.perceptionMap.updateCameraPosition(325827.67761071684,3462548.5166341495,49.58125062491973,71.34607858022329,-0.4587365615867862,-1.4305945547157297);
                 }
-                this.cameraParam = this.$refs.perceptionMap.getCamera();
+               // this.cameraParam = this.$refs.perceptionMap.getCamera();
              },
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
@@ -373,15 +377,15 @@
                     this.typeRoadData();
                 }
                 //地图不是第一次初始化
-                if(this.param==3&&!this.isFirst){
-                    this.lightWebsocket&&this.lightWebsocket.close();
-                    this.$refs.perceptionMap.resetModels();
-                    //判断地图缩放、全屏，调试等
-                    this.viewTime = setTimeout(()=>{
-                        this.getData();
-                        clearTimeout(this.viewTime);
-                    },1000)
-                }
+                // if(this.param==3&&!this.isFirst){
+                //     this.lightWebsocket&&this.lightWebsocket.close();
+                //     this.$refs.perceptionMap.resetModels();
+                //     //判断地图缩放、全屏，调试等
+                //     this.viewTime = setTimeout(()=>{
+                //         this.getData();
+                //         clearTimeout(this.viewTime);
+                //     },1000)
+                // }
                 this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                console.log("地图变化后的y："+this.cameraParam.y)
                 //地图不连续动
@@ -391,7 +395,7 @@
                 }
                 /*//不是第一次
                 if(!this.isFirst){*/
-                   this.getMap();
+                  // this.getMap();
                 /*}*/
                 this.isFirst=false;
             },
