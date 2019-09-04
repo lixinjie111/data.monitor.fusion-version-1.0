@@ -773,7 +773,8 @@ export default {
            // var geoBox1 = new THREE.BoxBufferGeometry(3.8, 1.6, 1.4);
            // var model1 = new THREE.Mesh(geoBox1, this.matStdObjects);
            //感知车
-            var model1=myBox.addMyBox(3.8, 1.6, 1.4,0xbc2cb2);
+           // var model1=myBox.addMyBox(3.8, 1.6, 1.4,0xbc2cb2);
+             var model1=myBox.addMyBox(3.8, 1.6, 1.4,this.carColor);
             model1.position.set(0, 0, 0);
             model1.rotation.set(this.pitch, this.yaw, this.roll);
             model1.castShadow = true;
@@ -783,15 +784,15 @@ export default {
             this.deviceModels[deviceid].cars[m] = model1;
 
 
-             var text1 = new dl.Text({
-              text: "11111",
-              fontsize: this.fontSize,
-              borderThickness: 0,
-              textColor: { r: 0, g: 0, b: 0, a: 1.0 }
-            });
+            //  var text1 = new dl.Text({
+            //   text: "11111",
+            //   fontsize: this.fontSize,
+            //   borderThickness: 0,
+            //   textColor: { r: 0, g: 0, b: 0, a: 1.0 }
+            // });
 
-            this.deviceModels[deviceid].texts[m] = text1;
-            dl.scene.add(text1);
+            // this.deviceModels[deviceid].texts[m] = text1;
+            // dl.scene.add(text1);
             
 
             //行人
