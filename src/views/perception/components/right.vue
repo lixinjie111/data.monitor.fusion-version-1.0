@@ -330,15 +330,22 @@
                 if(this.first){
                     this.getMap();
                 }
+                this.lightList=[];
                 if(!this.first&&this.count==0){
+                    console.log("---------")
                     this.count=1;
                     this.cameraParam = this.$refs.perceptionMap.getCamera();
                     this.getMap();
                     this.getData();
                     let time = setTimeout(()=>{
                         this.count=0;
+                        console.log("灯长度："+this.lightList.length)
+                        if(this.lightList.length==0){
+                            this.getMap();
+                            this.getData()
+                        }
                         clearTimeout(time);
-                    },2000)
+                    },3000)
                 }
                 this.isFirst=false;
             },
