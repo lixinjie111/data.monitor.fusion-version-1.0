@@ -88,8 +88,10 @@ export default {
                 }
 
                 if(_this.setFitViewFlag) {
-                    _this.AMap.setFitView();
-                    _this.setFitViewFlag = false;
+                    setTimeout(()=>{
+                        _this.AMap.setFitView();
+                        _this.setFitViewFlag = false;
+                    },500)
                 }
                 _this.prevData = _filterData;
             } else {

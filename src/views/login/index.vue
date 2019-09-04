@@ -92,127 +92,140 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/theme.scss";
-#login-warpper {
-    position: relative;
-    height: 100%;
-    background-color: #f2f2f2;
-    .login-logo {
-        position: absolute;
-        left: 49px;
-        top: 36px;
-    }
-    .login-container {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 50%;
-        margin-top: -250px;
-        height: 500px;
-        .login-bg {
-            width: 100%;
-            height: 100%;
+    @import "@/assets/scss/theme.scss";
+    #login-warpper {
+        font-family: MicrosoftYaHei;
+        position: relative;
+        height: 100%;
+        background-color: #f2f2f2;
+        letter-spacing: 2px;
+        line-height: 40px;
+        .login-logo {
+            position: absolute;
+            left: 49px;
+            top: 36px;
         }
-    }
-    .login-bottom {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 30px;
-        text-align: center;
-        color: #666;
-        font-size: 14px;
-        span {
-            padding: 0 20px;
-        }
-    }
-    .login-content {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        @include layoutMode(between);
-        .login-left {
-            @include layoutMode();
-            width: 65.5%;
-            height: 100%;
-            .login-left-title {
-                color: #fff;
-                font-size: 57px;
-                letter-spacing: 6px;
-                line-height: 90px;
-                border-bottom: 4px solid #dcdcdc;
+        .login-container {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            margin-top: -250px;
+            height: 500px;
+            .login-bg {
+                width: 100%;
+                height: 100%;
             }
         }
-        .login-card {
+        .login-bottom {
             position: absolute;
-            top: 50%;
-            right: 11.67%;
-            transform: translate(0, -50%);
-            background-color: rgba(255, 255, 255, .5);
-            width: 440px;
-            line-height: 50px;
+            left: 0;
+            right: 0;
+            bottom: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            span {
+                padding: 0 20px;
+            }
         }
-    }
-    .login-title {
-        font-size: 30px;
-        height: 80px;
-        letter-spacing: 3px;
-        background-color: #f2f2f2;
-        @include layoutMode();
-        color: #000;
-    }
-    .login-item-box {
-        padding: 40px 40px 57px;
-        .login-item {
-            background-color: #fff;
-        }
-    }
-    .login-button {
-        width: 100%;
-        height: 50px;
-        box-sizing: border-box;
-        background-color: #3293bd;
-        border-radius: 10px;
-        font-size: 18px;
-        // letter-spacing: 7px;
-        color: #fff;
-        border: none;
-        margin-top: 30px;
-    }
-}
-</style>
-<style lang="scss">
-@import "@/assets/scss/theme.scss";
-.login-item-box {
-    .el-form-item__label {
-        position: relative;
-        color: #999;
-        height: 50px;
-        padding: 0;
-        @include layoutMode();
-        &:after {
-            content: "";
+        .login-content {
             position: absolute;
+            left: 0;
             right: 0;
             top: 0;
             bottom: 0;
-            width: 1px;
-            background-color: #bfbfbf;
+            @include layoutMode(between);
+            .login-left {
+                @include layoutMode();
+                width: 65.5%;
+                height: 100%;
+                .login-left-title {
+                    color: #fff;
+                    font-size: 57px;
+                    letter-spacing: 6px;
+                    line-height: 90px;
+                    border-bottom: 4px solid #dcdcdc;
+                }
+            }
+            .login-card {
+                position: absolute;
+                top: 50%;
+                right: 11.67%;
+                transform: translate(0, -50%);
+                background-color: rgba(255, 255, 255, .5);
+                width: 440px;
+                line-height: 50px;
+            }
+        }
+        .login-title {
+            font-size: 30px;
+            height: 80px;
+            letter-spacing: 3px;
+            background-color: #f2f2f2;
+            color: #000;
+            @include layoutMode();
+        }
+        .login-item-box {
+            padding: 40px 40px 57px;
+            .login-item {
+                background-color: #fff;
+            }
+        }
+        .login-button {
+            width: 100%;
+            height: 50px;
+            box-sizing: border-box;
+            background-color: #3293bd;
+            border-radius: 10px;
+            font-size: 18px;
+            color: #fff;
+            border: none;
+            margin-top: 30px;
         }
     }
-    .el-input__inner {
-        background: transparent;        
-        border: none;
-        height: 50px;
-        padding: 0 21px;
-        @include layoutMode(pack);
-        color: #333 !important;
+</style>
+<style lang="scss">
+    @import "@/assets/scss/theme.scss";
+    .login-item-box {
+        .el-form-item {
+            margin-right: 0 !important;
+        }
+        .el-form-item__label {
+            position: relative;
+            color: #999;
+            height: 50px;
+            padding: 0;
+            @include layoutMode();
+            &:after {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 1px;
+                background-color: #bfbfbf;
+            }
+        }
+        .el-input__inner {
+            font-size: 14px;
+            background: transparent;
+            border: none !important;
+            height: 50px;
+            padding: 0 21px;
+            @include layoutMode(pack);
+            color: #333 !important;
+            width: 100% !important;
+        }
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px white inset;
+            -webkit-text-fill-color: #333;
+        }
+        .el-button{
+            i, span{
+                line-height: 0;
+                vertical-align: middle;
+            }
+        }
     }
-    input:-webkit-autofill {
-        -webkit-box-shadow: 0 0 0px 1000px white inset;
-        -webkit-text-fill-color: #333;
-    }
-}
 </style>
