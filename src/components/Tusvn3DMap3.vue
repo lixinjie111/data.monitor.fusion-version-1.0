@@ -879,11 +879,11 @@ export default {
             //  let text = this.deviceModels[deviceid].texts[i];
             //  text.setText(d.vehicleId.substr(0,8));
             //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
-let text1 = this.deviceModels[deviceid].texts[i];
+// let text1 = this.deviceModels[deviceid].texts[i];
      
  
-       text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
-     text1.update()
+//        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
+//      text1.update()
      
           }
         } else {
