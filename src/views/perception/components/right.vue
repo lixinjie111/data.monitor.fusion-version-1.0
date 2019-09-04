@@ -335,6 +335,7 @@
                     console.log("---------")
                     this.count=1;
                     this.cameraParam = this.$refs.perceptionMap.getCamera();
+//                    this.lightList=[];
                     this.getMap();
                     this.getData();
                     let time = setTimeout(()=>{
@@ -346,6 +347,7 @@
                         }
                         clearTimeout(time);
                     },3000)
+
                 }
                 this.isFirst=false;
             },

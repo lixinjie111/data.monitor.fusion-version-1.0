@@ -33,6 +33,7 @@ export default {
     return {
       viewVector1: { x: this.minX, y: this.minY, z: this.minZ },
       viewVector2: { x: this.maxX, y: this.maxY, z: this.maxZ },
+      carColor:0x80f77a,
 
       shps: {},
       models: {},
@@ -474,7 +475,7 @@ export default {
             //var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
            // var model1 = new THREE.Mesh(geoBox1, this.matStdObjects);
 
-             var model1=myBox.addMyBox(0.4, 0.4, 1.7,0xbc2cb2);
+             var model1=myBox.addMyBox(0.4, 0.4, 1.7,this.carColor);
 
             model1.position.set(0, 0, 0);
             model1.rotation.set(this.pitch, this.yaw, this.roll);
@@ -486,7 +487,7 @@ export default {
 
            // var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
             var pmodel1 = new THREE.Mesh(pBox1, this.person);
-             var pmodel1 = myBox.addMyBox(0.4, 0.4, 1.7,0xbc2cb2);
+             var pmodel1 = myBox.addMyBox(0.4, 0.4, 1.7,this.carColor);
 
             pmodel1.position.set(0, 0, 0);
             pmodel1.rotation.set(0, 0, 0);
@@ -497,7 +498,7 @@ export default {
             dl.scene.add(pmodel1);
 
             var text1 = new dl.Text({
-              text: "",
+              text: "11111",
               fontsize: this.fontSize,
               borderThickness: 0,
               textColor: { r: 0, g: 0, b: 0, a: 1.0 }
@@ -771,6 +772,7 @@ export default {
             //车
            // var geoBox1 = new THREE.BoxBufferGeometry(3.8, 1.6, 1.4);
            // var model1 = new THREE.Mesh(geoBox1, this.matStdObjects);
+           //感知车
             var model1=myBox.addMyBox(3.8, 1.6, 1.4,0xbc2cb2);
             model1.position.set(0, 0, 0);
             model1.rotation.set(this.pitch, this.yaw, this.roll);
@@ -779,6 +781,18 @@ export default {
 
             dl.scene.add(model1);
             this.deviceModels[deviceid].cars[m] = model1;
+
+
+             var text1 = new dl.Text({
+              text: "11111",
+              fontsize: this.fontSize,
+              borderThickness: 0,
+              textColor: { r: 0, g: 0, b: 0, a: 1.0 }
+            });
+
+            this.deviceModels[deviceid].texts[m] = text1;
+            dl.scene.add(text1);
+            
 
             //行人
 
@@ -796,12 +810,12 @@ export default {
            // var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
             //var model_out = new THREE.Mesh(geoBox_out, this.matStdObjects);
 
-            var model_out=myBox.addMyBox(1.7, 4.6, 1.4,0xbc2cb2);
+            var model_out=myBox.addMyBox(1.7, 4.6, 1.4,this.carColor);
 
             //var geoBox_in = new THREE.BoxBufferGeometry(0.85, 2.3, 0.7);
            // var model_in = new THREE.Mesh(geoBox_in, this.matStdObjects_in);
 
-            var model_in=myBox.addMyBox(0.85, 2.3, 0.7,0xbc2cb2);
+            var model_in=myBox.addMyBox(0.85, 2.3, 0.7,this.carColor);
 
             model_out.position.set(0, 0, 0);
             model_out.rotation.set(this.pitch, this.yaw, this.roll);
@@ -860,10 +874,16 @@ export default {
             mdl.position.x = dUTM[0];
             mdl.position.y = dUTM[1];
             mdl.position.z = this.defualtZ;
-
-            // let text = this.deviceModels[deviceid].texts[i];
-            // text.setText(d.vehicleId.substr(0,8));
-            // text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
+//test
+            //  let text = this.deviceModels[deviceid].texts[i];
+            //  text.setText(d.vehicleId.substr(0,8));
+            //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
+let text1 = this.deviceModels[deviceid].texts[i];
+     
+ 
+       text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
+     text1.update()
+     
           }
         } else {
           if (i < this.deviceModels[deviceid].cars.length) {
@@ -880,9 +900,9 @@ export default {
 
               this.changeModelColor(d, mdl);
             }
-            // let text = this.deviceModels[deviceid].texts[i];
-            // text.setText(d.vehicleId.substr(0,8));
-            // text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
+            //  let text = this.deviceModels[deviceid].texts[i];
+            //  text.setText(d.vehicleId.substr(0,8));
+            //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
           }
           if (i < this.mixCars[deviceid].cars.length) {
             if (d.fuselStatus == 1) {
@@ -2117,7 +2137,7 @@ export default {
 
     dl.init({
       doc: "dl-shp",
-      background: "#000000",
+      background: "#8c8c8c",
       navMode: Pt.EarthControls
     });
     // //初始化地图
