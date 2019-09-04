@@ -111,7 +111,7 @@
     const isProduction = process.env.NODE_ENV === 'production'
     import TusvnMap1 from './TusvnMap.vue';
     import {getMap} from '@/utils/tusvnMap.js';
-    import TusvnMap from '@/components/Tusvn3DMap2'
+    import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
     import {getPerceptionAreaInfo,getVideoByNum,typeRoadData} from '@/api/fusion'
     export default {
@@ -280,7 +280,7 @@
                 }
             },
             onMapComplete(){
-                getMap(this.$refs.perceptionMap);
+                //getMap(this.$refs.perceptionMap);
                 let longitude=parseFloat(this.$route.params.lon);
                 let latitude=parseFloat(this.$route.params.lat);
                 //设置地图的中心点
