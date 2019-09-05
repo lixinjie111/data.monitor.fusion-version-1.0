@@ -1084,8 +1084,8 @@
       /*  transition: all 2s ease-in-out;*/
         .active-circle{
             display: inline-block;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             position: absolute;
             left: 4px;
