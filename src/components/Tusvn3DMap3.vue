@@ -1552,10 +1552,10 @@ export default {
               this.defualtZ
             );
           } else {
-            //
+            // 
             this.models[vid] = model;
           }
-          //
+          // 
           this.add3DInfoLabel(
             vid,
             vid,

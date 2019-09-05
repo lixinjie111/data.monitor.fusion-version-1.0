@@ -80,7 +80,7 @@
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
-    import TusvnMap from '@/components/Tusvn3DMap2'
+    import TusvnMap from '@/components/Tusvn3DMap3'
     import {getMap} from '@/utils/tusvnMap.js';
     export default {
         data() {
