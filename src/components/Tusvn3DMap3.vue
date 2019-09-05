@@ -373,7 +373,7 @@ export default {
       text1.setTextColor({ r: 171, g: 101, b: 3, a: 1.0 });
       //text1.setPositon([326299.8136019115,3462328.443327571,34.16186920538662]);
 
-      text1.setPositon([utm[0], utm[1], z + 4.4+20]);
+      text1.setPositon([utm[0], utm[1], z + 24.4]);
       this.infoLabels["label"][name] = text1;
       dl.scene.add(text1);
 
@@ -2229,14 +2229,21 @@ export default {
       });
       dl.scene.add(shp);
     },
-    addShape1: function(name, url, color) {
-      let shp = new dl.Shape({
-        url: url,
-        name: name,
-        color: color == null ? "#fff" : color,
-        z: 20
-      });
-      dl.scene.add(shp);
+      addShape1:function(name,url,color,width,size,visible,map,proj,z){
+         let shp = new dl.Shape({
+                url: url,
+                name: name,
+                color: color==null?"#fff":color,
+                width: width==null?1.0:width,
+                size: size==null?6.0:size,
+                visible: visible==null?true:visible,
+                map: map==null?null:map,
+                proj: proj,
+                z:z
+            });
+            dl.scene.add(shp);
+
+            this.shps[name]=shp;
     }
     // addStaticModel: function(dl, name, url, x, y, z, pitch, yaw, roll) {
     //   let model = new dl.Model({
