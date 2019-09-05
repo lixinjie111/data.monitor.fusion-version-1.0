@@ -767,6 +767,7 @@
                 _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
+                _this.$emit("getPerceptionData",json.result.vehDataStat)
                 _this.time=json.time;
                 /*if(_this.param==3){*/
                     let resultData=[];
