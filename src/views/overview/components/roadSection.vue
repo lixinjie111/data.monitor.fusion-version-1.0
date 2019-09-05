@@ -124,13 +124,13 @@ export default {
       if ("spatDataDTO" in result === true) {
         _this.crossData.roadLights = result.spatDataDTO;
         if (_this.crossData.roadLights.length > 0) {
-          _this.crossData.roadLights.map((x, index) => {
-            lightPosition = new AMap.LngLat(
-              x.position.longitude,
-              x.position.latitude
-            );
-            _this.crossData.roadLights[index].position = lightPosition;
-          });
+          // _this.crossData.roadLights.map((x, index) => {
+          //   lightPosition = new AMap.LngLat(
+          //     x.position.longitude,
+          //     x.position.latitude
+          //   );
+          //   _this.crossData.roadLights[index].position = lightPosition;
+          // });
           for (let id in _this.crossData.sideLight) {
             let flag = false;
             // 比对已经打点的id和返回的将要打点的车辆， 有，设置flag = true
@@ -161,7 +161,7 @@ export default {
               _this.crossData.sideLight[
                 subItem.spatId
               ].marker = new AMap.Marker({
-                position: [subItem.longitude, subItem.latitude],
+                position: [subItem.position.longitude, subItem.position.latitude],
                 map: _this.aMap,
                 icon: this.dealLight(subItem),
                 spatId: subItem.spatId,
@@ -208,7 +208,6 @@ export default {
           }
           for (let id in _filterData) {
             if(!_this.prevData[id]) {   //表示新增该点，做add
-                console.log('_filterData[id].longitude', _filterData[id].longitude);
                 _filterData[id].marker = new AMap.Marker({
                   position: [_filterData[id].longitude, _filterData[id].latitude],
                   map: _this.aMap,

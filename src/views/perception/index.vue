@@ -8,11 +8,11 @@
             <div class="fusion-left">
                 <div class="c-scroll-wrap">
                     <div class="c-scroll-inner">
-                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount"></left>
+                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData"></left>
                     </div>
                 </div>
             </div>
-            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData"></right>
+            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData" @getPerceptionData="getPerceptionData"></right>
         </div>
     </div>
 </template>
@@ -28,7 +28,8 @@
                 spatCount:0,
                 signCount:0,
                 realData:{},
-                time:0
+                time:0,
+                perceptionData:{}
             }
         },
         components:{
@@ -48,6 +49,9 @@
             count(signCount,spatCount){
                 this.spatCount = spatCount;
                 this.signCount = signCount;
+            },
+            getPerceptionData(result){
+                this.perceptionData = result;
             },
             initWebSocket1(){
                 let _this=this;
@@ -90,8 +94,9 @@
                          return;
                      }*/
                     this.$router.push({
-                        path: path+"/"+data.position.longitude+"/"+data.position.latitude,
-                        query:{crossId:data.id}
+//                        path: path+"/"+data.position.longitude+"/"+data.position.latitude,
+//                        query:{crossId:data.id}
+                        path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1,
                     });
                 }
                 if(type=='map'){

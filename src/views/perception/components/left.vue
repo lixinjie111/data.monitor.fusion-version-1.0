@@ -71,7 +71,8 @@
                 sideData:{},
                 v2xData:{},
                 warningIdList:[],
-                warningCount:0
+                warningCount:0,
+                isFirstCon:true
 
             }
         },
@@ -89,7 +90,8 @@
             signCount:{
                 type:Number,
                 default:0
-            }
+            },
+            perceptionData:{}
         },
         watch:{
            /* currentExtent: {
@@ -101,67 +103,35 @@
                 immediate: true,
                 deep:true
             }*/
+            perceptionData(){
+                if(this.perceptionData.stat){
+                    this.fusionData = this.perceptionData.stat;
+                }
+                //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
+                if(this.perceptionData.cbox){
+                    this.platformData=this.perceptionData.cbox;
+                }
+                if(this.perceptionData.vehPer){
+                    this.perceptionData=this.perceptionData.vehPer;
+                }
+                if(this.perceptionData.rcu){
+                    this.sideData=this.perceptionData.rcu;
+                }
+                if(this.perceptionData.obu){
+                    this.v2xData=this.perceptionData.obu;
+                }
+            },
             currentExtent(newValue,oldValue){
 //                console.log("大小："+this.currentExtent.length);
                 this.warningCount=0;
-                this.initWebSocket();
-                this.initWarningWebSocket();
+                if(this.isFirstCon){
+                  /*  this.initWebSocket();*/
+                    this.initWarningWebSocket();
+                    this.isFirstCon=false;
+                }
             }
         },
         methods: {
-            initWebSocket(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                    _this.webSocket.onmessage = _this.onmessage;
-                    _this.webSocket.onclose = _this.onclose;
-                    _this.webSocket.onopen = _this.onopen;
-                    _this.webSocket.onerror = _this.onerror;
-                }
-            },
-            onmessage(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let result = json.result;
-                if(result.stat){
-                    _this.fusionData = result.stat;
-                }
-                //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
-                if(result.cbox){
-                    _this.platformData=result.cbox;
-                }
-                if(result.vehPer){
-                    _this.perceptionData=result.vehPer;
-                }
-                if(result.rcu){
-                    _this.sideData=result.rcu;
-                }
-                if(result.obu){
-                    _this.v2xData=result.obu;
-                }
-            },
-            onclose(data){
-                console.log("结束连接");
-            },
-            onopen(data){
-                //获取车辆状态
-                var fusionStatus = {
-                    "action":"road_real_data_stat",
-                    "region": this.currentExtent
-                }
-                var fusionStatusMsg = JSON.stringify(fusionStatus);
-                this.sendMsg(fusionStatusMsg);
-            },
-            sendMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.webSocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
             initWarningWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
@@ -223,7 +193,6 @@
 
         },
         destroyed(){
-            this.webSocket&&this.webSocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
         }
     }

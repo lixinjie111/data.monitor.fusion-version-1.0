@@ -2,8 +2,8 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
-        <div class="map-time" v-show="param!=3">{{time|dateFormat}}</div>
-        <div class="map-time map-time1" v-show="param!=3">{{time1}}</div>
+        <div class="map-time">{{time|dateFormat}}</div>
+        <div class="map-time map-time1">{{time1}}</div>
         <div class="video-style">
             <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
@@ -167,6 +167,7 @@
                 source:'',
                 lightWebsocket:null,
                 isFirst:true,
+                isMapFirst:true,
                 time:0,
                 param:1, //平面 俯视
                 time:'',
@@ -234,7 +235,7 @@
                     },
                     sources: [
                         {
-                            type: 'rtmp/mp4',
+                            type: 'rtmp/flv',
                             src: ''
                         }
                     ],
@@ -313,10 +314,7 @@
                     this.typeRoadData();
                     this.$emit('getCurrentExtent', this.currentExtent);
                     return;
-                }else{
-                    this.$refs.perceptionMap.updateCameraPosition(325827.67761071684,3462548.5166341495,49.58125062491973,71.34607858022329,-0.4587365615867862,-1.4305945547157297);
                 }
-                this.cameraParam = this.$refs.perceptionMap.getCamera();
              },
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
@@ -484,6 +482,7 @@
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
                         }else{
+//                            _this.option1.sources[0].src=_this.videoItem1.rtmp;
                             _this.option1.sources[0].src=_this.videoItem1.rtmp;
                         }
                     }
@@ -536,30 +535,31 @@
 //                console.log("中心点："+this.center);
             },
             typeRoadData(){
-                this.lightList=[];
-                if(this.crossId==5){
-                    this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
+                let _this = this;
+                _this.lightList=[];
+                if(_this.crossId==5){
+                    _this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
                 }
-                if(this.crossId==6){
-                    this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
+                if(_this.crossId==6){
+                    _this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
                 }
                 typeRoadData(
                     [
                         {
-                            "polygon":this.currentExtent
+                            "polygon":_this.currentExtent
                         }
                     ]
                 ).then(res=>{
                     let signs = res.data[0].baseData.signs;
                     let spats = res.data[0].baseData.spats;
-                    this.signCount=0;
-                    this.spatCount=0;
+                    _this.signCount=0;
+                    _this.spatCount=0;
                     if(signs&&signs.length>0){
                         signs.forEach(item=>{
-                            this.signCount++;
+                            _this.signCount++;
                             //将小的转成大的3
-                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
-                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
+                            let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
+                            _this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
                         })
                     }
                     if(spats&&spats.length>0){
@@ -592,9 +592,9 @@
                                     let latitude = parseFloat(item1.lightPos.split(",")[1]);
                                     if(i==0){
                                         //球面坐标转成三维坐标
-                                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
+                                        let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                                         //三维坐标转成平面像素
-                                        let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                                        let pixel = _this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
                                         obj.left = parseInt(pixel[0]);
                                         obj.top = parseInt(pixel[1]);
                                         top=obj.top;
@@ -610,15 +610,18 @@
                                     obj.spareTime = '';
                                     obj.lightColor='';
                                     obj.flag=true;
-                                    this.spatCount++;
-                                    this.lightList.push(obj);
+                                    _this.spatCount++;
+                                    _this.lightList.push(obj);
                                     i++;
                                 }
                             }
                         })
-                        this.$emit("count",this.signCount,this.spatCount);
+                        _this.$emit("count",_this.signCount,_this.spatCount);
+                        if(_this.isMapFirst){
+                            _this.initLightWebSocket();
+                            _this.isMapFirst=false;
+                        }
                     }
-                    this.initLightWebSocket();
                 })
             },
             moveMap(){
@@ -764,6 +767,7 @@
                 _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
+                _this.$emit("getPerceptionData",json.result.vehDataStat)
                 _this.time=json.time;
                 /*if(_this.param==3){*/
                     let resultData=[];
@@ -878,7 +882,9 @@
                 this.lightList=[];
                 let cameraParam;
                 if(param==1){
-                    cameraParam = JSON.parse(this.videoItem1.cameraParam);
+                    if(this.videoItem1.cameraParam){
+                        cameraParam = JSON.parse(this.videoItem1.cameraParam);
+                    }
                     this.param=1;
                     this.isActive='1';
 //                    this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
@@ -890,7 +896,9 @@
 
                 }
                 if(param==2){
-                    cameraParam = JSON.parse(this.videoItem2.cameraParam);
+                    if(this.videoItem2.cameraParam){
+                        cameraParam = JSON.parse(this.videoItem2.cameraParam);
+                    }
                     this.param=2;
                     this.isActive='2';
 //                    this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
