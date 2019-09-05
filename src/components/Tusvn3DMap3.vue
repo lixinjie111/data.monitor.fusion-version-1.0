@@ -893,7 +893,7 @@ export default {
 
               this.changeModelColor(d, mdl);
             }
-            debugger;
+            // debugger;
 
             //  let text = this.deviceModels[deviceid].texts[i];
             //  text.setText(d.vehicleId.substr(0,8));
@@ -1041,7 +1041,7 @@ export default {
     },
     //单车监控改变监控车辆
     changeMainCarId: function(url, carid) {
-      debugger;
+      // debugger;
 
       this.cartrackwebsocketUrl = url;
       this.carid = carid;
@@ -1108,7 +1108,7 @@ export default {
       this.processCarTrackMessage();
     },
     processCarTrackMessage: function() {
-      debugger;
+      // debugger;
 
       // console.log("processCarTrackMessage:================>"+this.cacheMainCarTrackData.length);
       if (this.cacheTrackCarData == null) {
@@ -2059,7 +2059,7 @@ export default {
      * 初始化shp数据
      */
     initShp: function() {
-      debugger;
+      // debugger;
 
       this.addShape(
         "road_boundary",
