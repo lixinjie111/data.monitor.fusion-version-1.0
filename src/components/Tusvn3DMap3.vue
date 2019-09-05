@@ -359,7 +359,7 @@ export default {
       this.infoLabels["gan"][name] = cylinderMesh;
 
       var text1 = new dl.Text({
-        text: text+"\nsdfsf",
+        text: text,
         fontsize: 200,
         borderThickness: 1
       });
