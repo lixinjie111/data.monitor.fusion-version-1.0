@@ -68,7 +68,7 @@ export default {
       lastPerceptionMessage: null,
       platformCars: null,
       cachePerceptionQueue: new Array(), //缓存感知数据
-      processPerceptionInterval: 1, //处理缓存数据的间隔
+      processPerceptionInterval: 5, //处理缓存数据的间隔
       waitingProcessPerceptionTime: 0,
       lastPerceptionData: null,
       person: new THREE.MeshStandardMaterial({
@@ -359,7 +359,7 @@ export default {
       this.infoLabels["gan"][name] = cylinderMesh;
 
       var text1 = new dl.Text({
-        text: text,
+        text: text+"\nsdfsf",
         fontsize: 200,
         borderThickness: 1
       });
@@ -784,15 +784,15 @@ export default {
             this.deviceModels[deviceid].cars[m] = model1;
 
 
-            //  var text1 = new dl.Text({
-            //   text: "11111",
-            //   fontsize: this.fontSize,
-            //   borderThickness: 0,
-            //   textColor: { r: 0, g: 0, b: 0, a: 1.0 }
-            // });
+             var text1 = new dl.Text({
+              text: "11111",
+              fontsize: this.fontSize,
+              borderThickness: 0,
+              textColor: { r: 0, g: 0, b: 0, a: 1.0 }
+            });
 
-            // this.deviceModels[deviceid].texts[m] = text1;
-            // dl.scene.add(text1);
+            this.deviceModels[deviceid].texts[m] = text1;
+            dl.scene.add(text1);
             
 
             //行人
@@ -882,7 +882,7 @@ export default {
 // let text1 = this.deviceModels[deviceid].texts[i];
      
  
-//        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
+//        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
 //      text1.update()
      
           }
@@ -901,9 +901,15 @@ export default {
 
               this.changeModelColor(d, mdl);
             }
+            debugger;
+
             //  let text = this.deviceModels[deviceid].texts[i];
             //  text.setText(d.vehicleId.substr(0,8));
             //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
+            let text1 = this.deviceModels[deviceid].texts[i]; 
+             text1.setText("["+d.heading+","+d.speed+"]");
+       text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
+     text1.update()
           }
           if (i < this.mixCars[deviceid].cars.length) {
             if (d.fuselStatus == 1) {
@@ -2142,9 +2148,9 @@ export default {
       navMode: Pt.EarthControls
     });
     // //初始化地图
-    // setTimeout(() => {
+     setTimeout(() => {
     this.initMap();
-    //  }, 1000);
+     }, 1000);
   },
   destroyed() {
     if ("WebSocket" in window) {
