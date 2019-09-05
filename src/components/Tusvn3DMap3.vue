@@ -359,7 +359,7 @@ export default {
       this.infoLabels["gan"][name] = cylinderMesh;
 
       var text1 = new dl.Text({
-        text: text+"\nsdfsf",
+        text: text,
         fontsize: 200,
         borderThickness: 1
       });
@@ -907,7 +907,10 @@ export default {
             //  text.setText(d.vehicleId.substr(0,8));
             //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
             let text1 = this.deviceModels[deviceid].texts[i]; 
-             text1.setText("["+d.heading+","+d.speed+"]");
+            let h=d.heading.toString().split('.')[0]+'.'+d.heading.toString().split('.')[1].charAt(0);
+ 
+let s=d.speed.toString().split('.')[0]+'.'+d.speed.toString().split('.')[1].charAt(0);
+             text1.setText("["+h+","+s+"]");
        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
      text1.update()
           }
@@ -2104,7 +2107,7 @@ export default {
       });
       dl.scene.add(shp);
     },
-      addShape1: function(name, url, color) {
+    addShape1: function(name, url, color) {
       let shp = new dl.Shape({
         url: url,
         name: name,
