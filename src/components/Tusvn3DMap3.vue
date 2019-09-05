@@ -11,9 +11,9 @@
 <script>
 import _ from "lodash";
 
-import * as myBox from '../utils/myBox';
-  import {getMap} from '@/utils/tusvnMap.js';
-  
+import * as myBox from "../utils/myBox";
+import { getMap } from "@/utils/tusvnMap.js";
+
 export default {
   name: "Tusvn3DMap2",
   props: [
@@ -33,7 +33,7 @@ export default {
     return {
       viewVector1: { x: this.minX, y: this.minY, z: this.minZ },
       viewVector2: { x: this.maxX, y: this.maxY, z: this.maxZ },
-      carColor:0x80f77a,
+      carColor: 0x80f77a,
 
       shps: {},
       models: {},
@@ -68,7 +68,7 @@ export default {
       lastPerceptionMessage: null,
       platformCars: null,
       cachePerceptionQueue: new Array(), //缓存感知数据
-      processPerceptionInterval: 5, //处理缓存数据的间隔
+      processPerceptionInterval: 50, //处理缓存数据的间隔
       waitingProcessPerceptionTime: 0,
       lastPerceptionData: null,
       person: new THREE.MeshStandardMaterial({
@@ -153,13 +153,11 @@ export default {
         this.viewVector2.z
       );
 
-
-
-      setTimeout(() => { 
-         getMap(this);
+      setTimeout(() => {
+        getMap(this);
         this.$emit("mapcomplete", this);
-      // dl.viewer.controls.addEventListener("drop", this.onDrop);
-         dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
+        // dl.viewer.controls.addEventListener("drop", this.onDrop);
+        dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
       }, 500);
 
       //处理缓存队列的数据
@@ -289,12 +287,10 @@ export default {
       let roll1 = roll == null ? 0 : roll;
       model.rotation.set(pitch1, yaw1, roll1);
 
-      
-      
       dl.scene.add(model);
       this.staticmodels[name] = model;
     },
-     addStaticModel1: function(name, url, x, y, z, pitch, yaw, roll) {
+    addStaticModel1: function(name, url, x, y, z, pitch, yaw, roll) {
       let model = new dl.Model({
         url: url
         // ,scale:scale==null?[1,1,1]:scale
@@ -313,8 +309,8 @@ export default {
       let roll1 = roll == null ? 0 : roll;
       model.rotation.set(pitch1, yaw1, roll1);
 
-     // model.setScale([0.1,0.1,0.1]);
-      
+      // model.setScale([0.1,0.1,0.1]);
+
       dl.scene.add(model);
       this.staticmodels[name] = model;
     },
@@ -473,9 +469,9 @@ export default {
           for (let m = 0; m < this.cacheModelNum; m++) {
             //车
             //var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
-           // var model1 = new THREE.Mesh(geoBox1, this.matStdObjects);
+            // var model1 = new THREE.Mesh(geoBox1, this.matStdObjects);
 
-             var model1=myBox.addMyBox(0.4, 0.4, 1.7,this.carColor);
+            var model1 = myBox.addMyBox(0.4, 0.4, 1.7, this.carColor);
 
             model1.position.set(0, 0, 0);
             model1.rotation.set(this.pitch, this.yaw, this.roll);
@@ -485,9 +481,9 @@ export default {
             dl.scene.add(model1);
             this.deviceModels[deviceid].cars[m] = model1;
 
-           // var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
+            // var pBox1 = new THREE.BoxBufferGeometry(0.4, 0.4, 1.7);
             var pmodel1 = new THREE.Mesh(pBox1, this.person);
-             var pmodel1 = myBox.addMyBox(0.4, 0.4, 1.7,this.carColor);
+            var pmodel1 = myBox.addMyBox(0.4, 0.4, 1.7, this.carColor);
 
             pmodel1.position.set(0, 0, 0);
             pmodel1.rotation.set(0, 0, 0);
@@ -702,7 +698,7 @@ export default {
           }
         }
         // this.processPerceptionData();
-      }, 0); //this.processPerceptionInterval
+      }, this.processPerceptionInterval); //
     },
     resetModels: function() {
       this.lastPerceptionMessage = null;
@@ -770,11 +766,11 @@ export default {
           this.mixCars[deviceid] = { cars: [] };
           for (let m = 0; m < this.cacheModelNum; m++) {
             //车
-           // var geoBox1 = new THREE.BoxBufferGeometry(3.8, 1.6, 1.4);
-           // var model1 = new THREE.Mesh(geoBox1, this.matStdObjects);
-           //感知车
-           // var model1=myBox.addMyBox(3.8, 1.6, 1.4,0xbc2cb2);
-             var model1=myBox.addMyBox(3.8, 1.6, 1.4,this.carColor);
+            // var geoBox1 = new THREE.BoxBufferGeometry(3.8, 1.6, 1.4);
+            // var model1 = new THREE.Mesh(geoBox1, this.matStdObjects);
+            //感知车
+            // var model1=myBox.addMyBox(3.8, 1.6, 1.4,0xbc2cb2);
+            var model1 = myBox.addMyBox(3.8, 1.6, 1.4, this.carColor);
             model1.position.set(0, 0, 0);
             model1.rotation.set(this.pitch, this.yaw, this.roll);
             model1.castShadow = true;
@@ -783,8 +779,7 @@ export default {
             dl.scene.add(model1);
             this.deviceModels[deviceid].cars[m] = model1;
 
-
-             var text1 = new dl.Text({
+            var text1 = new dl.Text({
               text: "11111",
               fontsize: this.fontSize,
               borderThickness: 0,
@@ -793,7 +788,6 @@ export default {
 
             this.deviceModels[deviceid].texts[m] = text1;
             dl.scene.add(text1);
-            
 
             //行人
 
@@ -808,15 +802,15 @@ export default {
             dl.scene.add(pmodel1);
 
             //融合车辆
-           // var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+            // var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
             //var model_out = new THREE.Mesh(geoBox_out, this.matStdObjects);
 
-            var model_out=myBox.addMyBox(1.7, 4.6, 1.4,this.carColor);
+            var model_out = myBox.addMyBox(1.7, 4.6, 1.4, this.carColor);
 
             //var geoBox_in = new THREE.BoxBufferGeometry(0.85, 2.3, 0.7);
-           // var model_in = new THREE.Mesh(geoBox_in, this.matStdObjects_in);
+            // var model_in = new THREE.Mesh(geoBox_in, this.matStdObjects_in);
 
-            var model_in=myBox.addMyBox(0.85, 2.3, 0.7,this.carColor);
+            var model_in = myBox.addMyBox(0.85, 2.3, 0.7, this.carColor);
 
             model_out.position.set(0, 0, 0);
             model_out.rotation.set(this.pitch, this.yaw, this.roll);
@@ -875,16 +869,14 @@ export default {
             mdl.position.x = dUTM[0];
             mdl.position.y = dUTM[1];
             mdl.position.z = this.defualtZ;
-//test
+            //test
             //  let text = this.deviceModels[deviceid].texts[i];
             //  text.setText(d.vehicleId.substr(0,8));
             //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
-// let text1 = this.deviceModels[deviceid].texts[i];
-     
- 
-//        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
-//      text1.update()
-     
+            // let text1 = this.deviceModels[deviceid].texts[i];
+
+            //        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
+            //      text1.update()
           }
         } else {
           if (i < this.deviceModels[deviceid].cars.length) {
@@ -906,13 +898,25 @@ export default {
             //  let text = this.deviceModels[deviceid].texts[i];
             //  text.setText(d.vehicleId.substr(0,8));
             //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
-            let text1 = this.deviceModels[deviceid].texts[i]; 
-            let h=d.heading.toString().split('.')[0]+'.'+d.heading.toString().split('.')[1].charAt(0);
- 
-let s=d.speed.toString().split('.')[0]+'.'+d.speed.toString().split('.')[1].charAt(0);
-             text1.setText("["+h+","+s+"]");
-       text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
-     text1.update()
+            let text1 = this.deviceModels[deviceid].texts[i];
+            let h =
+              d.heading.toString().split(".")[0] +
+              "." +
+              d.heading
+                .toString()
+                .split(".")[1]
+                .charAt(0);
+
+            let s =
+              d.speed.toString().split(".")[0] +
+              "." +
+              d.speed
+                .toString()
+                .split(".")[1]
+                .charAt(0);
+            text1.setText("[" + h + ", " + s + "]");
+            text1.setPositon([dUTM[0], dUTM[1], this.defualtZ + 2]);
+            text1.update();
           }
           if (i < this.mixCars[deviceid].cars.length) {
             if (d.fuselStatus == 1) {
@@ -1292,22 +1296,21 @@ let s=d.speed.toString().split('.')[0]+'.'+d.speed.toString().split('.')[1].char
     },
     changeModelColor: function(data, model) {
       //ef56e4
-      if(model.type!="Group")
-            {
-      if (data.fuselType == 2 && data.fuselLevel == 1) {
-        model.material.color.setStyle("#ffbf64");
+      if (model.type != "Group") {
+        if (data.fuselType == 2 && data.fuselLevel == 1) {
+          model.material.color.setStyle("#ffbf64");
+        }
+        if (data.fuselType == 2 && data.fuselLevel == 2) {
+          model.material.color.setStyle("#ab6604");
+        }
+        if (data.fuselType == 1 && data.fuselLevel == 1) {
+          model.material.color.setStyle("#a257d1");
+        }
+        if (data.fuselType == 1 && data.fuselLevel == 2) {
+          model.material.color.setStyle("#651399");
+        }
+        model.material.color.setStyle("#bc2cb2");
       }
-      if (data.fuselType == 2 && data.fuselLevel == 2) {
-        model.material.color.setStyle("#ab6604");
-      }
-      if (data.fuselType == 1 && data.fuselLevel == 1) {
-        model.material.color.setStyle("#a257d1");
-      }
-      if (data.fuselType == 1 && data.fuselLevel == 2) {
-        model.material.color.setStyle("#651399");
-      }
-      model.material.color.setStyle("#bc2cb2");
-            }
     },
     animateCar: function(data2, model) {
       // console.log(data2);
@@ -2112,10 +2115,10 @@ let s=d.speed.toString().split('.')[0]+'.'+d.speed.toString().split('.')[1].char
         url: url,
         name: name,
         color: color == null ? "#fff" : color,
-        z:20
+        z: 20
       });
       dl.scene.add(shp);
-    },
+    }
     // addStaticModel: function(dl, name, url, x, y, z, pitch, yaw, roll) {
     //   let model = new dl.Model({
     //     url: url
@@ -2136,7 +2139,6 @@ let s=d.speed.toString().split('.')[0]+'.'+d.speed.toString().split('.')[1].char
     //   model.rotation.set(pitch1, yaw1, roll1);
     //   dl.scene.add(model);
     // },
-     
   },
   created() {},
   mounted() {
@@ -2151,9 +2153,9 @@ let s=d.speed.toString().split('.')[0]+'.'+d.speed.toString().split('.')[1].char
       navMode: Pt.EarthControls
     });
     // //初始化地图
-     setTimeout(() => {
-    this.initMap();
-     }, 1000);
+    setTimeout(() => {
+      this.initMap();
+    }, 1000);
   },
   destroyed() {
     if ("WebSocket" in window) {
