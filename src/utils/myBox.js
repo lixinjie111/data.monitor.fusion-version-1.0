@@ -18,8 +18,8 @@ export function addMyBox(x, y, z, color) {
     }
     var geometry = new THREE.BoxBufferGeometry(x, y, z);
     //颜色
-    let mesh1 = new THREE.MeshStandardMaterial({ color: 0xab6604, roughness: 1, metalness: 0, opacity: 0.7, transparent: true });
-
+    let mesh1 = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, metalness: 0, opacity:0.5, transparent: true, wireframe: false});
+    //let mesh1 = new THREE.MeshStandardMaterial({ color: 0xc3c3c382, wireframe: true,opacity:0.5});
     // var fillMaterial = new THREE.MeshBasicMaterial({
     //     color: 0x0000ff
     // });
@@ -32,7 +32,7 @@ export function addMyBox(x, y, z, color) {
     }
     var boxHelper = new THREE.Outline(fillMesh, color); //立方体边框 
     var group = new THREE.Group();
-    //group.add(fillMesh);
+    group.add(fillMesh);
     group.add(boxHelper);
     //update();
     return group;
