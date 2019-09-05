@@ -901,7 +901,7 @@ export default {
 
               this.changeModelColor(d, mdl);
             }
-            debugger;
+//            debugger;
 
             //  let text = this.deviceModels[deviceid].texts[i];
             //  text.setText(d.vehicleId.substr(0,8));
