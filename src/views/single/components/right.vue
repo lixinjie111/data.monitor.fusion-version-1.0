@@ -370,6 +370,7 @@
                 let count=0;
                 if(warningData.length>0){
                     if(type=='CLOUD'){
+                        debugger
                         let eventType = json.result.eventType;
                         warningData.forEach(item=>{
                             //name,text,x,y

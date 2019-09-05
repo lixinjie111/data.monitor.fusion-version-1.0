@@ -330,7 +330,7 @@ export default {
       }
     },
     add3DInfoLabel: function(name, text, x, y, z) {
-      var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05, 8, 0, 0);
+      var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05, 100, 0, 0);
       var cylinderMat = new THREE.MeshLambertMaterial({
         //创建材料
         color: 0xab6503,

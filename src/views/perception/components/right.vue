@@ -2,8 +2,8 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
-        <div class="map-time">{{time|dateFormat}}</div>
-        <div class="map-time map-time1">{{time1}}</div>
+        <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
+        <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="video-style">
             <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
@@ -209,6 +209,14 @@
                 },
 //                immediate: true,
                 deep: true
+            },
+            $route: {
+                handler: function(val, oldVal){
+                   this.isShow = val.params.isShow;
+                },
+                // 深度观察监听
+                deep: true,
+                immediate: true,
             }
         },
         filters: {
