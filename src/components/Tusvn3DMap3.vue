@@ -136,7 +136,9 @@ export default {
       destinatePorject:
         "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //上海
       timeA: 0,
-      timeB: 0
+      timeB: 0,
+      //按照vid缓存插值的小车轨迹
+      cacheAndInterpolateDataByVid:{}
     };
   },
   watch: {},
@@ -174,7 +176,7 @@ export default {
         //                console.log("开始执行小车平滑移动");
         let id3 = setInterval(() => {
           if (this.monitorTag) {
-            //                        console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
+            // console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
             let d = this.cacheMainCarTrackData.shift();
             this.moveMainCar(d);
           }
@@ -1169,11 +1171,9 @@ export default {
             this.changeModelColor(pcar, model);
           } else {
             //type=1  平台注册的车
-            // let mesh1 = new THREE.MeshStandardMaterial( { color: 0xab6604, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } );
-            // var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
-            // var model1 = new THREE.Mesh( geoBox1, mesh1);
-            // this.animateCar(pcar,model1);
             this.animateCar(pcar);
+            //缓存数据
+
           }
         }
       }
@@ -1228,6 +1228,34 @@ export default {
           this.animateCar(data2);
         }
       }
+    },
+    //缓存并且插值平台车轨迹
+    cacheAndInterpolatePlatformCar:function(pcar){
+        let vid = pcar.vehicleId;
+        let cdata = this.cacheAndInterpolateDataByVid[vid];
+        if(cdata==null)//没有该车的数据
+        {
+          cdata = {
+            cacheData:new Array(),
+            intervalid:null,
+            lastRecieveData:null,
+            nowRecieveData:null,
+            lastProcessData:null,
+            nowProcessData:null
+          };
+          let d = {
+            vehicleId: vid,
+            longitude: pcar.longitude,
+            latitude: pcar.latitude,
+            gpsTime: pcar.gpsTime,
+            heading: pcar.heading,
+          };
+          cdata.cacheData.push(d);
+          cdata.nowRecieveData = d;
+          this.cacheAndInterpolateDataByVid[vid]=cdata;
+        }else{//存在该车的数据
+
+        }
     },
     moveMainCar: function(data) {
       // console.log(
