@@ -289,6 +289,15 @@ export default {
 
             this.shps[name]=shp;
         },
+        addShape1: function(name, url, color) {
+            let shp = new dl.Shape({
+                url: url,
+                name: name,
+                color: color == null ? "#fff" : color,
+                z:20
+            });
+            dl.scene.add(shp);
+        },
         addModel:function(name,url,x,y,z){
             let model = new dl.Model({url: url});
             model.position.x = x;
@@ -332,6 +341,30 @@ export default {
 
             this.scene.add(model);
             this.staticmodels[name]=model;
+        },
+        addStaticModel1: function(name, url, x, y, z, pitch, yaw, roll) {
+            let model = new dl.Model({
+                url: url
+                // ,scale:scale==null?[1,1,1]:scale
+                // scale:[5,5,5]
+            });
+            model.position.x = x;
+            model.position.y = y;
+            model.position.z = z;
+            // if(color!=null)
+            // {
+            //     model.setColor(color);
+            // }
+            // model.setColor("#ffffff");
+            let pitch1 = pitch == null ? 0 : pitch;
+            let yaw1 = yaw == null ? 0 : yaw;
+            let roll1 = roll == null ? 0 : roll;
+            model.rotation.set(pitch1, yaw1, roll1);
+
+            // model.setScale([0.1,0.1,0.1]);
+            
+            dl.scene.add(model);
+            this.staticmodels[name] = model;
         },
         getStaticModel:function(id){
           return this.staticmodels[id];
@@ -1170,7 +1203,7 @@ export default {
         //单车监控改变监控车辆
         changeMainCarId:function(url,carid)
         {
-            debugger;
+            // debugger;
 
             this.cartrackwebsocketUrl = url;
             this.carid = carid;
@@ -1237,7 +1270,7 @@ export default {
             this.processCarTrackMessage();
         },
         processCarTrackMessage:function(){
-            debugger;
+            // debugger;
             
             // console.log("processCarTrackMessage:================>"+this.cacheMainCarTrackData.length);
             if(this.cacheTrackCarData == null)

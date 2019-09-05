@@ -2098,7 +2098,7 @@ export default {
       });
       dl.scene.add(shp);
     },
-      addShape1: function(name, url, color) {
+    addShape1: function(name, url, color) {
       let shp = new dl.Shape({
         url: url,
         name: name,
