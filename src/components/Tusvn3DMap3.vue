@@ -43,7 +43,7 @@ export default {
       mixCars: {},
 
       modelPersonArr: [],
-      cacheModelNum: 1000,
+      cacheModelNum: 200,
       interval: 1,
       count: 0,
       websocketUrl: "ws://192.168.1.68:9982/mon",
@@ -583,8 +583,8 @@ export default {
     },
 
     processPerceptionData: function() {
-      let timeA = new Date().getTime();
-      setInterval(() => { 
+//      let timeA = new Date().getTime();
+      setInterval(() => {
         this.timeA = new Date().getTime();
         //                console.log(this.timeA-this.timeB);
         //                console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
@@ -750,7 +750,7 @@ export default {
       }
     },
     processPerceptionMesage: function() {
-      
+
       let data = null;
       if (this.lastPerceptionMessage == null) {
         return;
@@ -852,7 +852,7 @@ export default {
           }
         }
       }
-      
+
       for (let i = 0; i < fusionList.length; i++) {
         let d = fusionList[i];
 
@@ -896,7 +896,7 @@ export default {
                 0,
                 0,
                 -(Math.PI / 180.0) * (d.heading-180)
-                
+
               );
     //         var axis = new THREE.Vector3(0,0,this.defualtZ);//向量axis
     // mdl.rotateOnAxis(axis,(Math.PI / 180.0) * d.heading);//绕axis轴旋转π/8

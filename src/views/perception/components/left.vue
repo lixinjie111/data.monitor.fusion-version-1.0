@@ -71,7 +71,8 @@
                 sideData:{},
                 v2xData:{},
                 warningIdList:[],
-                warningCount:0
+                warningCount:0,
+                isFirstCon:true
 
             }
         },
@@ -104,8 +105,11 @@
             currentExtent(newValue,oldValue){
 //                console.log("大小："+this.currentExtent.length);
                 this.warningCount=0;
-                this.initWebSocket();
-                this.initWarningWebSocket();
+                if(this.isFirstCon){
+                    this.initWebSocket();
+                    this.initWarningWebSocket();
+                    this.isFirstCon=false;
+                }
             }
         },
         methods: {
