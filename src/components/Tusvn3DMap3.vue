@@ -136,7 +136,11 @@ export default {
       destinatePorject:
         "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //上海
       timeA: 0,
-      timeB: 0
+      timeB: 0,
+      //按照vid缓存插值的小车轨迹
+      cacheAndInterpolateDataByVid:{},
+      processPlatformCarsTrackIntervalId:null
+
     };
   },
   watch: {},
@@ -174,13 +178,18 @@ export default {
         //                console.log("开始执行小车平滑移动");
         let id3 = setInterval(() => {
           if (this.monitorTag) {
-            //                        console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
+            // console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
             let d = this.cacheMainCarTrackData.shift();
             this.moveMainCar(d);
           }
         }, 2000);
         this.intervalIds.push(id3);
       }, 6000);
+
+      //单车监控
+      setTimeout(() => {
+        this.processPlatformCarsTrack();
+      }, 1000);
     },
     /**
      * 地图沿屏幕x,y,z方向移动
@@ -744,7 +753,8 @@ export default {
           let d = this.platformCars[i];
           if (d.type == 1) {
             //平台车
-            this.animateCar2(d);
+            // this.animateCar2(d);
+            this.cacheAndInterpolatePlatformCar(d);
           }
         }
       }
@@ -1159,11 +1169,9 @@ export default {
             this.changeModelColor(pcar, model);
           } else {
             //type=1  平台注册的车
-            // let mesh1 = new THREE.MeshStandardMaterial( { color: 0xab6604, roughness: 1, metalness: 0, opacity: 0.7, transparent: true } );
-            // var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
-            // var model1 = new THREE.Mesh( geoBox1, mesh1);
-            // this.animateCar(pcar,model1);
-            this.animateCar(pcar);
+            // this.animateCar(pcar);
+            //缓存数据
+            this.cacheAndInterpolatePlatformCar(pcar);
           }
         }
       }
@@ -1215,10 +1223,95 @@ export default {
           }
           this.lastMainCarData = data2;
         } else {
-          this.animateCar(data2);
+          // this.animateCar(data2);
         }
       }
     },
+    //缓存并且插值平台车轨迹
+    cacheAndInterpolatePlatformCar:function(pcar){
+        let vid = pcar.vehicleId;
+        if (vid == this.mainCarVID)
+        {
+          // delete  this.cacheAndInterpolateDataByVid[vid];
+          // return;
+        }
+        let cdata = this.cacheAndInterpolateDataByVid[vid];
+        if(cdata==null)//没有该车的数据
+        {
+          cdata = {
+            cacheData:new Array(),
+            intervalid:null,
+            lastRecieveData:null,
+            nowRecieveData:null,
+            lastProcessData:null,
+            nowProcessData:null
+          };
+          let d = {
+            vehicleId: vid,
+            longitude: pcar.longitude,
+            latitude: pcar.latitude,
+            gpsTime: pcar.gpsTime,
+            heading: pcar.heading,
+          };
+          cdata.cacheData.push(d);
+          cdata.lastRecieveData = d;
+          cdata.nowRecieveData = d;
+          this.cacheAndInterpolateDataByVid[vid]=cdata;
+        }else{//存在该车的数据
+          let d = {
+            vehicleId: vid,
+            longitude: pcar.longitude,
+            latitude: pcar.latitude,
+            gpsTime: pcar.gpsTime,
+            heading: pcar.heading,
+          };
+          cdata.nowRecieveData = d;
+
+          if (cdata.nowRecieveData.gpsTime <= cdata.lastRecieveData.gpsTime) {
+            console.log("到达顺序错误");
+            return;
+          }
+          let deltaTime = cdata.nowRecieveData.gpsTime - cdata.lastRecieveData.gpsTime;
+          if (deltaTime <= this.stepTime) {
+            cdata.cacheData.push(cdata.nowRecieveData);
+          } else {
+            //插值处理
+            let deltaLon =  cdata.nowRecieveData.longitude -  cdata.lastRecieveData.longitude;
+            let deltaLat =  cdata.nowRecieveData.latitude -  cdata.lastRecieveData.latitude;
+            let steps = Math.ceil(deltaTime / this.stepTime);
+            let timeStep = deltaTime / steps;
+            let lonStep = deltaLon / steps;
+            let latStep = deltaLat / steps;
+            for (let i = 1; i <= steps; i++) {
+              let d2 = {};
+              d2.longitude = cdata.lastRecieveData.longitude + lonStep * i;
+              d2.latitude = cdata.lastRecieveData.latitude + latStep * i;
+              d2.gpsTime = cdata.lastRecieveData.gpsTime + timeStep * i;
+              d2.heading = cdata.nowRecieveData.heading;
+              d2.vehicleId = cdata.nowRecieveData.vehicleId;
+              cdata.cacheData.push(d2);
+            }
+          }
+          cdata.lastRecieveData=cdata.nowRecieveData;
+        }
+    },
+    processPlatformCarsTrack:function(){
+        this.processPlatformCarsTrackIntervalId=setInterval(() => {
+            for(var vid in this.cacheAndInterpolateDataByVid)
+            {
+              let carCacheData = this.cacheAndInterpolateDataByVid[vid];
+              if(carCacheData!=null)
+              {
+                if(carCacheData.cacheData.length>0)
+                {
+                  let cardata = this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
+                  this.moveCar2(cardata);
+                }
+              }
+            }          
+        }, this.stepTime);//this.stepTime
+    },
+
     moveMainCar: function(data) {
       // console.log(
       //   "当前缓存数据量moveMainCar：" + this.cacheMainCarTrackData.length
@@ -1290,6 +1383,37 @@ export default {
         yaw: (-Math.PI / 180) * data.heading,
         pitch: this.cameraDefualtPitch
       });
+    },
+    moveCar2: function(data) {
+      let vid = data.vehicleId;
+      let carModel = this.models[vid];
+      let position = proj4(this.sourceProject, this.destinatePorject, [
+        data.longitude,
+        data.latitude
+      ]);
+      if (carModel == null) {
+        this.addModel(
+          vid,
+          "./static/map3d/map_photo/car.3DS",
+          position[0],
+          position[1],
+          this.defualtZ
+        );
+      } else {
+        this.models[vid].position.set(position[0], position[1], this.defualtZ);
+        this.models[vid].rotation.set(
+          this.pitch,
+          this.yaw,
+          (-Math.PI / 180) * data.heading
+        );
+      }
+
+      // dl.moveTo({
+      //   position: [position[0], position[1], this.cameraDefualtZ],
+      //   radius: this.cameraDefualtRadius + 10,
+      //   yaw: (-Math.PI / 180) * data.heading,
+      //   pitch: this.cameraDefualtPitch
+      // });
     },
     changeModelColor: function(data, model) {
       //ef56e4
@@ -2171,6 +2295,14 @@ export default {
       clearInterval(this.intervalIds[i]);
     }
     this.intervalIds = new Array();
+
+    if(this.processPlatformCarsTrackIntervalId!=null)
+    {
+      clearInterval(this.processPlatformCarsTrackIntervalId);
+      this.processPlatformCarsTrackIntervalId=null;
+    }
+
+    this.cacheAndInterpolateDataByVid = {};
   }
 };
 </script>
