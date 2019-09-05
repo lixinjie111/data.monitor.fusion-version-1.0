@@ -740,7 +740,7 @@ export default {
           }
         }
         for (let i = 0; i < this.platformCars.length; i++) {
-          // debugger;
+          // 
           let d = this.platformCars[i];
           if (d.type == 1) {
             //平台车
@@ -894,26 +894,31 @@ export default {
               this.changeModelColor(d, mdl);
             }
             // debugger;
+            
 
             //  let text = this.deviceModels[deviceid].texts[i];
             //  text.setText(d.vehicleId.substr(0,8));
             //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+6]);
             let text1 = this.deviceModels[deviceid].texts[i];
-            let h =
-              d.heading.toString().split(".")[0] +
-              "." +
-              d.heading
-                .toString()
-                .split(".")[1]
-                .charAt(0);
+            // let h =
+            //   d.heading.toString().split(".")[0] +
+            //   "." +
+            //   d.heading
+            //     .toString()
+            //     .split(".")[1]
+            //     .charAt(0);
 
-            let s =
-              d.speed.toString().split(".")[0] +
-              "." +
-              d.speed
-                .toString()
-                .split(".")[1]
-                .charAt(0);
+ let h=d.heading.toFixed(1);
+
+            // let s =
+            //   d.speed.toString().split(".")[0] +
+            //   "." +
+            //   d.speed
+            //     .toString()
+            //     .split(".")[1]
+            //     .charAt(0);
+
+                 let s=d.speed.toFixed(1);
             text1.setText("[" + h + ", " + s + "]");
             text1.setPositon([dUTM[0], dUTM[1], this.defualtZ + 2]);
             text1.update();
@@ -1042,6 +1047,7 @@ export default {
     //单车监控改变监控车辆
     changeMainCarId: function(url, carid) {
       // debugger;
+      
 
       this.cartrackwebsocketUrl = url;
       this.carid = carid;
@@ -1109,6 +1115,7 @@ export default {
     },
     processCarTrackMessage: function() {
       // debugger;
+      
 
       // console.log("processCarTrackMessage:================>"+this.cacheMainCarTrackData.length);
       if (this.cacheTrackCarData == null) {
@@ -1549,10 +1556,10 @@ export default {
               this.defualtZ
             );
           } else {
-            // debugger;
+            // 
             this.models[vid] = model;
           }
-          // debugger;
+          // 
           this.add3DInfoLabel(
             vid,
             vid,
@@ -2059,7 +2066,7 @@ export default {
      * 初始化shp数据
      */
     initShp: function() {
-      // debugger;
+      
 
       this.addShape(
         "road_boundary",
