@@ -179,7 +179,9 @@
                 waitingtime:this.$route.params.waitingtime,
                 isActive:'1',
                 crossId:'',
-                count:0
+                count:0,
+                vehData:[],
+                isFirstTrans:true
 
                /* pointLeft:10,
                 pointTop:10,
@@ -603,8 +605,10 @@
                                         let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                                         //三维坐标转成平面像素
                                         let pixel = _this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                                        obj.left = parseInt(pixel[0]);
-                                        obj.top = parseInt(pixel[1]);
+                                        let tempLeft = parseInt(pixel[0])-32;
+                                        let tempTop = parseInt(pixel[1])-20;
+                                        obj.left =tempLeft;
+                                        obj.top = tempTop;
                                         top=obj.top;
                                         left=obj.left;
                                     }
@@ -775,6 +779,20 @@
                 _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
+                let vehData = json.result.vehDataStat;
+                _this.vehData.push(vehData);
+                if(_this.waitingtime!=''){
+                    if(_this.isFirstTrans){
+                        setTimeout(()=>{
+                            _this.$emit("getPerceptionData",_this.vehData);
+                            _this.isFirstTrans=false;
+                        },_this.waitingtime)
+                    }else{
+                        _this.vehData.shift();
+                        _this.$emit("getPerceptionData",_this.vehData);
+                    }
+
+                }
 //                _this.$emit("getPerceptionData",json.result.vehDataStat)
                 _this.time=json.time;
                 /*if(_this.param==3){*/

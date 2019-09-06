@@ -12,7 +12,7 @@
                     </div>
                 </div>
             </div>
-            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData" ></right>
+            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData" @getPerceptionData="getPerceptionData"></right>
         </div>
     </div>
 </template>
@@ -50,9 +50,9 @@
                 this.spatCount = spatCount;
                 this.signCount = signCount;
             },
-            /*getPerceptionData(result){
+            getPerceptionData(result){
                 this.perceptionData = result;
-            },*/
+            },
             initWebSocket1(){
                 let _this=this;
                 if ('WebSocket' in window) {
