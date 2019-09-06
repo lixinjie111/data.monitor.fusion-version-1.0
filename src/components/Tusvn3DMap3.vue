@@ -749,6 +749,7 @@ export default {
       }
     },
     processPlatformCars: function() {
+      
       if (this.platformCars != null) {
         for (var key in this.models) {
           let tag = false;
@@ -1166,8 +1167,10 @@ export default {
               opacity: 0.7,
               transparent: true
             });
-            var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
-            var model1 = new THREE.Mesh(geoBox1, mesh1);
+           // var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+            //var model1 = new THREE.Mesh(geoBox1, mesh1);
+             var model1 = myBox.addMyBox(1.7, 4.6, 1.4, this.carColor);
+
             model1.position.set(0, 0, this.defualtZ);
             model1.rotation.set(this.pitch, this.yaw, this.roll);
             model1.castShadow = true;
@@ -1200,7 +1203,7 @@ export default {
             //type=1  平台注册的车
             // this.animateCar(pcar);
             //缓存数据
-           this.cacheAndInterpolatePlatformCar(pcar);
+            this.cacheAndInterpolatePlatformCar(pcar);
           }
         }
       }
@@ -1307,7 +1310,7 @@ export default {
             //插值处理
             let deltaLon =  cdata.nowRecieveData.longitude -  cdata.lastRecieveData.longitude;
             let deltaLat =  cdata.nowRecieveData.latitude -  cdata.lastRecieveData.latitude;
-            let steps = Math.ceil(deltaTime / this.stepTime);
+            let steps =2;// Math.ceil(deltaTime / this.stepTime);
             let timeStep = deltaTime / steps;
             let lonStep = deltaLon / steps;
             let latStep = deltaLat / steps;
