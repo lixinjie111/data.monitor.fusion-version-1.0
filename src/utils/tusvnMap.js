@@ -313,7 +313,7 @@ export function getMap(map){
     [326285.7199200000 ,3462263.4905400000 ,277],
     [326285.6372510000 ,3462264.0168700000 ,278]];
   spatData.forEach((arr,index)=>{
-    map.addStaticModel('traffic_light_'+index,'./static/map3d/models/traffic_light.3ds',arr[0],arr[1],20);
+    map.addStaticModel_traffic_light('traffic_light_'+index,'./static/map3d/models/traffic_light.3ds',arr[0],arr[1],20);
   })
  /*
   map.addStaticModel('traffic_light_0','./static/map3d/models/traffic_light.3ds',325921.545860186,3462541.0160225183,12.68);
