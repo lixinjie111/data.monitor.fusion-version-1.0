@@ -436,6 +436,7 @@
                 float: right;
                 img{
                     height: 18px;
+                    display: inline-block;
                 }
                 .real-img{
                     display: inline-block;

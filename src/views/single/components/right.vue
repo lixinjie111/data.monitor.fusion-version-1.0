@@ -126,7 +126,7 @@
         props:{
             realData:{
                 type:Object,
-                default() {
+                default(){
                     return {
 
                     };
@@ -370,7 +370,6 @@
                 let count=0;
                 if(warningData.length>0){
                     if(type=='CLOUD'){
-                        debugger
                         let eventType = json.result.eventType;
                         warningData.forEach(item=>{
                             //name,text,x,y
@@ -417,6 +416,7 @@
             TusvnMap
         },
         beforeDestroy(){
+            console.log("单车页面销毁")
             clearTimeout(this.timer1);
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);

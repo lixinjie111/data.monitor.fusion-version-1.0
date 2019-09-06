@@ -12,7 +12,7 @@
                     </div>
                 </div>
             </div>
-            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData" @getPerceptionData="getPerceptionData"></right>
+            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData" ></right>
         </div>
     </div>
 </template>
@@ -29,7 +29,7 @@
                 signCount:0,
                 realData:{},
                 time:0,
-                perceptionData:{}
+//                perceptionData:{}
             }
         },
         components:{
@@ -50,9 +50,9 @@
                 this.spatCount = spatCount;
                 this.signCount = signCount;
             },
-            getPerceptionData(result){
+            /*getPerceptionData(result){
                 this.perceptionData = result;
-            },
+            },*/
             initWebSocket1(){
                 let _this=this;
                 if ('WebSocket' in window) {
