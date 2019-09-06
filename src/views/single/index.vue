@@ -114,7 +114,7 @@
                     this.$router.push({
 //                        path: path+"/"+data.position.longitude+"/"+data.position.latitude,
 //                        query:{crossId:data.id}
-                        path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1,
+                        path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1+ "/"+false,
                     });
                 }
                 if(type=='map'){

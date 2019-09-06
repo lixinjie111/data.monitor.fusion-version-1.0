@@ -2,8 +2,8 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
-        <div class="map-time">{{time|dateFormat}}</div>
-        <div class="map-time map-time1">{{time1}}</div>
+        <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
+        <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="video-style">
             <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
@@ -179,7 +179,9 @@
                 waitingtime:this.$route.params.waitingtime,
                 isActive:'1',
                 crossId:'',
-                count:0
+                count:0,
+                vehData:[],
+                isFirstTrans:true
 
                /* pointLeft:10,
                 pointTop:10,
@@ -209,6 +211,14 @@
                 },
 //                immediate: true,
                 deep: true
+            },
+            $route: {
+                handler: function(val, oldVal){
+                   this.isShow = val.params.isShow;
+                },
+                // 深度观察监听
+                deep: true,
+                immediate: true,
             }
         },
         filters: {
@@ -595,8 +605,10 @@
                                         let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
                                         //三维坐标转成平面像素
                                         let pixel = _this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                                        obj.left = parseInt(pixel[0]);
-                                        obj.top = parseInt(pixel[1]);
+                                        let tempLeft = parseInt(pixel[0])-32;
+                                        let tempTop = parseInt(pixel[1])-20;
+                                        obj.left =tempLeft;
+                                        obj.top = tempTop;
                                         top=obj.top;
                                         left=obj.left;
                                     }
@@ -767,7 +779,21 @@
                 _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
-                _this.$emit("getPerceptionData",json.result.vehDataStat)
+                let vehData = json.result.vehDataStat;
+                _this.vehData.push(vehData);
+                if(_this.waitingtime!=''){
+                    if(_this.isFirstTrans){
+                        setTimeout(()=>{
+                            _this.$emit("getPerceptionData",_this.vehData);
+                            _this.isFirstTrans=false;
+                        },_this.waitingtime)
+                    }else{
+                        _this.vehData.shift();
+                        _this.$emit("getPerceptionData",_this.vehData);
+                    }
+
+                }
+//                _this.$emit("getPerceptionData",json.result.vehDataStat)
                 _this.time=json.time;
                 /*if(_this.param==3){*/
                     let resultData=[];

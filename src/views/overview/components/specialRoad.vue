@@ -18,18 +18,18 @@ export default {
     components: {
         RoadSection
     },
-    data() {
+    data(){
         return {
             centerPointData: []
         }
     },
-    mounted() {
+    mounted(){
         this.fetchTypicalRoad();
     },
     methods: {
         showRoadDetail(item) {
             this.$router.push({
-                path: '/perception/' + item.longitude + "/" + item.latitude+"/"+item.id+ "/"+1,
+                path: '/perception/' + item.longitude + "/" + item.latitude+"/"+item.id+ "/"+1+ "/"+false,
 //                query:{crossId:item.id}
             });
         },

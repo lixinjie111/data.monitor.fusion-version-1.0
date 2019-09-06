@@ -43,6 +43,8 @@ const admin = {
 						setAuthInfo(res.data);
 					}
 					resolve(res);
+				}).catch(error => {
+					reject(error);
 				});
 			}).catch(error => {
 				reject(error);
