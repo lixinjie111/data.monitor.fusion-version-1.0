@@ -1310,7 +1310,7 @@ export default {
             //插值处理
             let deltaLon =  cdata.nowRecieveData.longitude -  cdata.lastRecieveData.longitude;
             let deltaLat =  cdata.nowRecieveData.latitude -  cdata.lastRecieveData.latitude;
-            let steps =2;// Math.ceil(deltaTime / this.stepTime);
+            let steps =  Math.ceil(deltaTime / this.stepTime);
             let timeStep = deltaTime / steps;
             let lonStep = deltaLon / steps;
             let latStep = deltaLat / steps;
