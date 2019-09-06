@@ -776,7 +776,7 @@ export default {
           if (d.type == 1) {
             //平台车
             // this.animateCar2(d);
-            //this.cacheAndInterpolatePlatformCar(d);
+            this.cacheAndInterpolatePlatformCar(d);
           }
         }
       }
@@ -1200,7 +1200,7 @@ export default {
             //type=1  平台注册的车
             // this.animateCar(pcar);
             //缓存数据
-           // this.cacheAndInterpolatePlatformCar(pcar);
+           this.cacheAndInterpolatePlatformCar(pcar);
           }
         }
       }
