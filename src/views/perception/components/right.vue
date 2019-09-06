@@ -201,6 +201,14 @@
 
                     };
                 }
+            },
+            warningSign:{
+                type:Object,
+                default(){
+                    return {
+
+                    };
+                }
             }
         },
         components: { TusvnMap,TusvnMap1},
@@ -219,6 +227,9 @@
                 // 深度观察监听
                 deep: true,
                 immediate: true,
+            },
+            warningSign(){
+                this.$refs.perceptionMap.add3DInfoLabel(this.warningSign.id,this.warningSign.msg,this.warningSign.longitude,this.warningSign.latitude,20);
             }
         },
         filters: {

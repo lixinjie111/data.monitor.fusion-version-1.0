@@ -103,7 +103,8 @@
                 lightWebsocket:null,
                 rtmp1:'',
                 rtmp2:'',
-                warningWebsocket:null
+                warningWebsocket:null,
+                alertCount:0
             }
 
         },
@@ -367,15 +368,14 @@
                 let json = JSON.parse(mesasge.data);
                 let warningData = json.result.data;
                 let type = json.result.type;
-                let count=0;
                 if(warningData.length>0){
                     if(type=='CLOUD'){
                         let eventType = json.result.eventType;
                         warningData.forEach(item=>{
                             //name,text,x,y
-                            let msg = item.warnMsg+"   "+item.dis;
-                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+count,msg,item.longitude,item.latitude,20);
-                            count++;
+                            let msg = item.warnMsg+"   "+item.dis+"米";
+                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+_this.alertCount,msg,item.longitude,item.latitude,20);
+                            _this.alertCount++;
                         })
                     }
                 }

@@ -72,7 +72,8 @@
                 v2xData:{},
                 warningIdList:[],
                 warningCount:0,
-                isFirstCon:true
+                isFirstCon:true,
+                alertCount:0
 
             }
         },
@@ -161,6 +162,16 @@
                             console.log("索引:"+_this.warningIdList.indexOf(warningId));*/
                             _this.warningIdList.push(warningId);
                             _this.warningCount++;
+                            let msg = item.warnMsg+"   "+item.dis+"米";
+                            let obj = {
+                                id:'alert'+_this.alertCount,
+                                msg:msg,
+                                longitude:item.longitude,
+                                latitude:item.latitude
+
+                            }
+                            this.$emit("getWarningSign",obj);
+                            _this.alertCount++;
                         }
                     })
                 }
