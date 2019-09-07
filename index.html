@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <!--代表禁止浏览器从本地计算机的缓存中访问页面内容-->
-    <meta http-equiv="pragram" content="no-cache">
-    <!--请求和响应不缓存-->
-    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+    <!--<meta http-equiv="pragram" content="no-cache">
+    &lt;!&ndash;请求和响应不缓存&ndash;&gt;
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">-->
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
     <!--IE / Edge 自动给数字加下划线的问题-->
     <meta name="format-detection" content="telephone=no,email=no,address=no">
@@ -15,7 +15,10 @@
     <title>感知融合平台</title>
 
 
-    <script src="./static/config/config.js"></script>
+    <!--<script src="./static/config/config.js"></script>-->
+    <script>
+        document.write('<script src="./static/config/config.js?v='+ new Date().getTime() +'"><\/script>');
+    </script>
     <script src="https://webapi.amap.com/maps?v=1.4.14&key=8bf04484a44d846096c9ab84730e88b8&plugin=AMap.Geocoder"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.min.js"></script>

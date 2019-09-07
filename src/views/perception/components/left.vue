@@ -72,7 +72,8 @@
                 v2xData:{},
                 warningIdList:[],
                 warningCount:0,
-                isFirstCon:true
+                isFirstCon:true,
+                alertCount:0
 
             }
         },
@@ -91,7 +92,12 @@
                 type:Number,
                 default:0
             },
-            perceptionData:{}
+            perceptionData:{
+                type:Array,
+                default() {
+                    return [];
+                }
+            }
         },
         watch:{
            /* currentExtent: {
@@ -104,21 +110,21 @@
                 deep:true
             }*/
             perceptionData(){
-                if(this.perceptionData.stat){
-                    this.fusionData = this.perceptionData.stat;
+                if(this.perceptionData[0].stat){
+                    this.fusionData = this.perceptionData[0].stat;
                 }
                 //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
-                if(this.perceptionData.cbox){
-                    this.platformData=this.perceptionData.cbox;
+                if(this.perceptionData[0].cbox){
+                    this.platformData=this.perceptionData[0].cbox;
                 }
-                if(this.perceptionData.vehPer){
-                    this.perceptionData=this.perceptionData.vehPer;
+                if(this.perceptionData[0].vehPer){
+                    this.perceptionData=this.perceptionData[0].vehPer;
                 }
-                if(this.perceptionData.rcu){
-                    this.sideData=this.perceptionData.rcu;
+                if(this.perceptionData[0].rcu){
+                    this.sideData=this.perceptionData[0].rcu;
                 }
-                if(this.perceptionData.obu){
-                    this.v2xData=this.perceptionData.obu;
+                if(this.perceptionData[0].obu){
+                    this.v2xData=this.perceptionData[0].obu;
                 }
             },
             currentExtent(newValue,oldValue){
@@ -156,6 +162,16 @@
                             console.log("索引:"+_this.warningIdList.indexOf(warningId));*/
                             _this.warningIdList.push(warningId);
                             _this.warningCount++;
+                            let msg = item.warnMsg+"   "+item.dis+"米";
+                            let obj = {
+                                id:'alert'+_this.alertCount,
+                                msg:msg,
+                                longitude:item.longitude,
+                                latitude:item.latitude
+
+                            }
+                            this.$emit("getWarningSign",obj);
+                            _this.alertCount++;
                         }
                     })
                 }

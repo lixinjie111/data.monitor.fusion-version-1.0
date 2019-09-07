@@ -8,11 +8,11 @@
             <div class="fusion-left">
                 <div class="c-scroll-wrap">
                     <div class="c-scroll-inner">
-                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData"></left>
+                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" @getWarningSign="getWarningSign" :perceptionData="perceptionData"></left>
                     </div>
                 </div>
             </div>
-            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData" @getPerceptionData="getPerceptionData"></right>
+            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData" @getPerceptionData="getPerceptionData" :warningSign="warningSign"></right>
         </div>
     </div>
 </template>
@@ -29,7 +29,8 @@
                 signCount:0,
                 realData:{},
                 time:0,
-                perceptionData:{}
+                warningSign:{}
+//                perceptionData:{}
             }
         },
         components:{
@@ -52,6 +53,9 @@
             },
             getPerceptionData(result){
                 this.perceptionData = result;
+            },
+            getWarningSign(result){
+                this.warningSign=result;
             },
             initWebSocket1(){
                 let _this=this;
@@ -96,7 +100,7 @@
                     this.$router.push({
 //                        path: path+"/"+data.position.longitude+"/"+data.position.latitude,
 //                        query:{crossId:data.id}
-                        path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1,
+                        path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1+ "/"+false,
                     });
                 }
                 if(type=='map'){

@@ -103,7 +103,8 @@
                 lightWebsocket:null,
                 rtmp1:'',
                 rtmp2:'',
-                warningWebsocket:null
+                warningWebsocket:null,
+                alertCount:0
             }
 
         },
@@ -126,7 +127,7 @@
         props:{
             realData:{
                 type:Object,
-                default() {
+                default(){
                     return {
 
                     };
@@ -367,15 +368,14 @@
                 let json = JSON.parse(mesasge.data);
                 let warningData = json.result.data;
                 let type = json.result.type;
-                let count=0;
                 if(warningData.length>0){
                     if(type=='CLOUD'){
                         let eventType = json.result.eventType;
                         warningData.forEach(item=>{
                             //name,text,x,y
-                            let msg = item.warnMsg+"   "+item.dis;
-                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+count,msg,item.longitude,item.latitude,20);
-                            count++;
+                            let msg = item.warnMsg+"   "+item.dis+"米";
+                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+_this.alertCount,msg,item.longitude,item.latitude,20);
+                            _this.alertCount++;
                         })
                     }
                 }
@@ -416,6 +416,7 @@
             TusvnMap
         },
         beforeDestroy(){
+            console.log("单车页面销毁")
             clearTimeout(this.timer1);
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);

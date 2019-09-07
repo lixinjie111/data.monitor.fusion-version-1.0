@@ -86,7 +86,7 @@ export default {
                  }*/
                 this.$router.push({
 //                    path: path+"/"+data.position.longitude+"/"+data.position.latitude
-                    path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1,
+                    path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1+ "/"+false,
                 });
             }
             if(type=='map'){

@@ -105,11 +105,11 @@
             },
             loginFunc(params) {
                 this.goLogin(params).then(res => {
-                    this.$router.push({ path: '/overview' });
                     this.loading = false;
-
-                    localStorage.setItem("yk-token",JSON.stringify({data:JSON.parse(res.data).token,"time":new Date().getTime()}));
-                    if(res.status != 200) {
+                    if(res.status == 200) {
+                        this.$router.push({ path: '/overview' });
+                        localStorage.setItem("yk-token",JSON.stringify({data:JSON.parse(res.data).token,"time":new Date().getTime()}));
+                    }else {
                         this.removeStorage();
                     }
                 }).catch(err => {

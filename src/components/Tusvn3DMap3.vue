@@ -323,6 +323,28 @@ export default {
       dl.scene.add(model);
       this.staticmodels[name] = model;
     },
+     addStaticModel_traffic_light: function(name, url, x, y, z, pitch, yaw, roll) {
+      let model = new dl.Model({
+        url: url
+        // ,scale:scale==null?[1,1,1]:scale
+        // scale:[5,5,5]
+      });
+      model.position.x = x;
+      model.position.y = y;
+      model.position.z = z;
+      // if(color!=null)
+      // {
+      //     model.setColor(color);
+      // }
+      // model.setColor("#ffffff");
+      let pitch1 = pitch == null ? 0 : pitch;
+      let yaw1 = yaw == null ? 0 : yaw;
+      let roll1 = roll == null ? 30 : roll;
+      model.rotation.set(pitch1, yaw1, roll1);
+
+      dl.scene.add(model);
+      this.staticmodels[name] = model;
+    },
     getStaticModel: function(id) {
       return this.staticmodels[id];
     },
@@ -373,7 +395,7 @@ export default {
       text1.setTextColor({ r: 171, g: 101, b: 3, a: 1.0 });
       //text1.setPositon([326299.8136019115,3462328.443327571,34.16186920538662]);
 
-      text1.setPositon([utm[0], utm[1], z + 4.4+20]);
+      text1.setPositon([utm[0], utm[1], z + 24.4]);
       this.infoLabels["label"][name] = text1;
       dl.scene.add(text1);
 
@@ -727,6 +749,7 @@ export default {
       }
     },
     processPlatformCars: function() {
+      
       if (this.platformCars != null) {
         for (var key in this.models) {
           let tag = false;
@@ -860,6 +883,13 @@ export default {
             person.position.y = 0;
             person.position.z = 0;
           }
+            for (let q = 0; q < this.deviceModels[deviceid].texts.length; q++) {
+            let text = this.deviceModels[deviceid].texts[q];
+            text.position.x = 0;
+            text.position.y = 0;
+            text.position.z = 0;
+          }
+
         }
       }
 
@@ -1137,8 +1167,10 @@ export default {
               opacity: 0.7,
               transparent: true
             });
-            var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
-            var model1 = new THREE.Mesh(geoBox1, mesh1);
+           // var geoBox1 = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
+            //var model1 = new THREE.Mesh(geoBox1, mesh1);
+             var model1 = myBox.addMyBox(1.7, 4.6, 1.4, this.carColor);
+
             model1.position.set(0, 0, this.defualtZ);
             model1.rotation.set(this.pitch, this.yaw, this.roll);
             model1.castShadow = true;
@@ -1278,7 +1310,7 @@ export default {
             //插值处理
             let deltaLon =  cdata.nowRecieveData.longitude -  cdata.lastRecieveData.longitude;
             let deltaLat =  cdata.nowRecieveData.latitude -  cdata.lastRecieveData.latitude;
-            let steps = Math.ceil(deltaTime / this.stepTime);
+            let steps =  Math.ceil(deltaTime / this.stepTime);
             let timeStep = deltaTime / steps;
             let lonStep = deltaLon / steps;
             let latStep = deltaLat / steps;
@@ -2229,14 +2261,21 @@ export default {
       });
       dl.scene.add(shp);
     },
-    addShape1: function(name, url, color) {
-      let shp = new dl.Shape({
-        url: url,
-        name: name,
-        color: color == null ? "#fff" : color,
-        z: 20
-      });
-      dl.scene.add(shp);
+      addShape1:function(name,url,color,width,size,visible,map,proj,z){
+         let shp = new dl.Shape({
+                url: url,
+                name: name,
+                color: color==null?"#fff":color,
+                width: width==null?1.0:width,
+                size: size==null?6.0:size,
+                visible: visible==null?true:visible,
+                map: map==null?null:map,
+                proj: proj,
+                z:z
+            });
+            dl.scene.add(shp);
+
+            this.shps[name]=shp;
     }
     // addStaticModel: function(dl, name, url, x, y, z, pitch, yaw, roll) {
     //   let model = new dl.Model({

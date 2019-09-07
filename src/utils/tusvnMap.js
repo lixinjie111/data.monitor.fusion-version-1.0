@@ -1,5 +1,6 @@
 export function getMap(map){
-  map.addShape("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08",3,null,null,null,null,21.5)
+  //map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ff0000",22)
+  map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08",3,null,null,null,null,22)
   //路口
  // map.addShape("intersection","./static/map3d/dl_shcsq_zc/Intersection.shp","#2f2f2f")
  
@@ -47,7 +48,7 @@ export function getMap(map){
   area03.updateVertices();
   area03.setOpacity(0.8);
   //斑马线
-  map.addShape1("Crosswalk","./static/map3d/dl_shcsq_zc/Crosswalk.shp","#f3f3f3")
+  map.addShape("Crosswalk","./static/map3d/dl_shcsq_zc/Crosswalk.shp","#f3f3f3")
   // let area04 = new dl.Polygon({
   //   name:"强视区02",
   //   color:"#ff0000",
@@ -312,7 +313,7 @@ export function getMap(map){
     [326285.7199200000 ,3462263.4905400000 ,277],
     [326285.6372510000 ,3462264.0168700000 ,278]];
   spatData.forEach((arr,index)=>{
-    map.addStaticModel('traffic_light_'+index,'./static/map3d/models/traffic_light.3ds',arr[0],arr[1],20);
+    map.addStaticModel_traffic_light('traffic_light_'+index,'./static/map3d/models/traffic_light.3ds',arr[0],arr[1],20);
   })
  /*
   map.addStaticModel('traffic_light_0','./static/map3d/models/traffic_light.3ds',325921.545860186,3462541.0160225183,12.68);
