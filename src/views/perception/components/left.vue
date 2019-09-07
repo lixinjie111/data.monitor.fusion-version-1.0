@@ -162,7 +162,7 @@
                             console.log("索引:"+_this.warningIdList.indexOf(warningId));*/
                             _this.warningIdList.push(warningId);
                             _this.warningCount++;
-                            let msg = item.warnMsg+"   "+item.dis+"米";
+                            let msg = item.warnMsg;
                             let obj = {
                                 id:'alert'+_this.alertCount,
                                 msg:msg,
