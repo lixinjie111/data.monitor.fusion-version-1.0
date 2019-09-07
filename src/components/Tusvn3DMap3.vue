@@ -186,7 +186,7 @@ export default {
         this.intervalIds.push(id3);
       }, 6000);
 
-      //单车监控
+      //插值后的平台车处理
       setTimeout(() => {
         this.processPlatformCarsTrack();
       }, 1000);
