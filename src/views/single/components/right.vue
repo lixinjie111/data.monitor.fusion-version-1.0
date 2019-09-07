@@ -104,7 +104,8 @@
                 rtmp1:'',
                 rtmp2:'',
                 warningWebsocket:null,
-                alertCount:0
+                alertCount:0,
+                warningData:{}
             }
 
         },
@@ -359,25 +360,43 @@
                 }
             },
             onWarningMessage(mesasge){
-
-//        console.log("时间----"+new Date().getTime())
                 let _this=this;
-                /*if(this.i>4){
-                  return;
-                }*/
                 let json = JSON.parse(mesasge.data);
                 let warningData = json.result.data;
                 let type = json.result.type;
-                if(warningData.length>0){
-                    if(type=='CLOUD'){
-                        let eventType = json.result.eventType;
-                        warningData.forEach(item=>{
-                            //name,text,x,y
-                            let msg = item.warnMsg+"   "+item.dis+"米";
-                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+_this.alertCount,msg,item.longitude,item.latitude,20);
+                let warningId;
+                if(type=='CLOUD'){
+                    warningData.forEach(item=>{
+                        warningId = item.warnId;
+                        warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                        let msg = item.warnMsg;
+                        let warningObj={
+                            longitude:item.longitude,
+                            latitude:item.latitude
+                        }
+                        let warningHash = _this.hashcode(JSON.stringify(warningObj));
+                        //如果告警id不存在
+                        if(!_this.warningData[warningId]){
+                            let obj = {
+                                id:'alert'+_this.alertCount,
+                                msg:msg,
+                                longitude:item.longitude,
+                                latitude:item.latitude,
+                                hash:warningHash
+                            }
+                            _this.warningData[warningId]=obj;
                             _this.alertCount++;
-                        })
-                    }
+                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                        }else{
+                            //判断是否需要更新
+                            let obj = _this.warningData[warningId];
+                            if(obj.hash!=warningHash){
+                                //进行更新
+                                _this.$refs.perceptionMap.removeModel(obj.id);
+                                _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                            }
+                        }
+                    })
                 }
 
             },
@@ -404,6 +423,16 @@
                     return;
                 }
             },
+            hashcode(str) {
+                let hash = 0, i, chr, len;
+                if (str.length === 0) return hash;
+                for (i = 0, len = str.length; i < len; i++) {
+                    chr   = str.charCodeAt(i);
+                    hash  = ((hash << 5) - hash) + chr;
+                    hash |= 0; // Convert to 32bit integer
+                }
+                return hash;
+            }
         },
         mounted(){
             this.option1 = this.getOption();

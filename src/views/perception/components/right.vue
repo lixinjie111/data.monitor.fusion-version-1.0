@@ -182,9 +182,9 @@
                 count:0,
                 vehData:[],
                 isFirstTrans:true,
-                warningIdList:[],
                 alertCount:0,
-                warningData:{}
+                warningData:{},
+                warningCount:0
 
                /* pointLeft:10,
                 pointTop:10,
@@ -354,7 +354,7 @@
                 if(!this.first&&this.count==0){
                     console.log("---------")
                     this.count=1;
-                    this.cameraParam = this.$refs.perceptionMap.getCamera();
+//                    this.cameraParam = this.$refs.perceptionMap.getCamera();
 //                    this.lightList=[];
                     this.getMap();
                     this.getData();
@@ -950,6 +950,7 @@
                     this.isActive='0';
                     this.isFirst=true;
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
+//                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                 }
 //                /*if(param==4){
@@ -1012,38 +1013,33 @@
                 let warningData = json.result.data;
                 let type = json.result.type;
                 let warningId;
-                let warningCount=0;
                 if(type=='CLOUD'){
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
                         let msg = item.warnMsg;
-                        let obj = {
-                            id:'alert'+_this.alertCount,
-                            msg:msg,
-                            longitude:item.longitude,
-                            latitude:item.latitude
-                        }
                         let warningObj={
-                            id:'alert'+_this.alertCount,
                             longitude:item.longitude,
                             latitude:item.latitude
                         }
-                        let warningHash = hashcode(JSON.stringify(warningObj));
-
+                        let warningHash = _this.hashcode(JSON.stringify(warningObj));
                         //如果告警id不存在
-                        if(_this.warningIdList.indexOf(warningId)==-1){
-                            /* console.log("warningId:"+warningId);
-                             console.log("索引:"+_this.warningIdList.indexOf(warningId));*/
-                            _this.warningIdList.push(warningId);
-                            warningCount++;
-//                            _this.warningSign = obj;
+                        if(!_this.warningData[warningId]){
+                            _this.warningCount++;
+                            let obj = {
+                                id:'alert'+_this.alertCount,
+                                msg:msg,
+                                longitude:item.longitude,
+                                latitude:item.latitude,
+                                hash:warningHash
+                            }
+                            _this.warningData[warningId]=obj;
                             _this.alertCount++;
-                            _this.warningData[obj.id]=warningHash;
                             _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
-                            if(_this.warningData[obj.id]!=warningHash){
+                            let obj = _this.warningData[warningId];
+                            if(obj.hash!=warningHash){
                                 //进行更新
                                 _this.$refs.perceptionMap.removeModel(obj.id);
                                 _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
@@ -1051,7 +1047,7 @@
                         }
                     })
                     //此次告警结束，将总数传递出去
-                    _this.$emit("getWarningCount",warningCount);
+                    _this.$emit("getWarningCount",_this.warningCount);
                 }
             },
             onWarningClose(data){
@@ -1076,6 +1072,16 @@
                 }else{
                     return;
                 }
+            },
+            hashcode(str) {
+                let hash = 0, i, chr, len;
+                if (str.length === 0) return hash;
+                for (i = 0, len = str.length; i < len; i++) {
+                    chr   = str.charCodeAt(i);
+                    hash  = ((hash << 5) - hash) + chr;
+                    hash |= 0; // Convert to 32bit integer
+                }
+                return hash;
             }
         },
         mounted() {
