@@ -181,7 +181,10 @@
                 crossId:'',
                 count:0,
                 vehData:[],
-                isFirstTrans:true
+                isFirstTrans:true,
+                warningIdList:[],
+                alertCount:0,
+                warningData:{}
 
                /* pointLeft:10,
                 pointTop:10,
@@ -209,7 +212,7 @@
 
                     };
                 }
-            }
+            },
         },
         components: { TusvnMap,TusvnMap1},
         watch: {
@@ -227,9 +230,6 @@
                 // 深度观察监听
                 deep: true,
                 immediate: true,
-            },
-            warningSign(){
-                this.$refs.perceptionMap.add3DInfoLabel(this.warningSign.id,this.warningSign.msg,this.warningSign.longitude,this.warningSign.latitude,20);
             }
         },
         filters: {
@@ -333,7 +333,8 @@
                     this.getPerceptionAreaInfo();
                     //地图不连续移动，判断红绿灯的位置受否再可视区
                     this.typeRoadData();
-                    this.$emit('getCurrentExtent', this.currentExtent);
+                    this.initWarningWebSocket();
+//                    this.$emit('getCurrentExtent', this.currentExtent);
                     return;
                 }
              },
@@ -373,7 +374,6 @@
             getData(){
                 this.getCurrentExtent();
                 this.getCenter();
-                this.$emit('getCurrentExtent', this.currentExtent);
 //                this.getPerceptionAreaInfo();
                 //地图不连续移动，判断红绿灯的位置受否再可视区
                 this.typeRoadData();
@@ -996,6 +996,86 @@
                     this.video2Show=false;
                     this.$refs.videoPlayer4.dispose();
                 }
+            },
+            initWarningWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    _this.warningWebsocket.onmessage = _this.onWarningMessage;
+                    _this.warningWebsocket.onclose = _this.onWarningClose;
+                    _this.warningWebsocket.onopen = _this.onWarningOpen;
+                }
+            },
+            onWarningMessage(mesasge){
+                let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let warningData = json.result.data;
+                let type = json.result.type;
+                let warningId;
+                let warningCount=0;
+                if(type=='CLOUD'){
+                    warningData.forEach(item=>{
+                        warningId = item.warnId;
+                        warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                        let msg = item.warnMsg;
+                        let obj = {
+                            id:'alert'+_this.alertCount,
+                            msg:msg,
+                            longitude:item.longitude,
+                            latitude:item.latitude
+                        }
+                        let warningObj={
+                            id:'alert'+_this.alertCount,
+                            longitude:item.longitude,
+                            latitude:item.latitude
+                        }
+                        let warningHash = hashcode(JSON.stringify(warningObj));
+
+                        //如果告警id不存在
+                        if(_this.warningIdList.indexOf(warningId)==-1){
+                            /* console.log("warningId:"+warningId);
+                             console.log("索引:"+_this.warningIdList.indexOf(warningId));*/
+                            _this.warningIdList.push(warningId);
+                            warningCount++;
+//                            _this.warningSign = obj;
+                            _this.alertCount++;
+                            _this.warningData[obj.id]=warningHash;
+                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                        }else{
+                            //判断是否需要更新
+                            if(_this.warningData[obj.id]!=warningHash){
+                                //进行更新
+                                _this.$refs.perceptionMap.removeModel(obj.id);
+                                _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                            }
+                        }
+                    })
+                    //此次告警结束，将总数传递出去
+                    _this.$emit("getWarningCount",warningCount);
+                }
+            },
+            onWarningClose(data){
+                console.log("结束连接");
+            },
+            onWarningOpen(data){
+                //旁车
+                var warning = {
+                    "action": "clod_event",
+                    "region": this.currentExtent
+                }
+                var warningMsg = JSON.stringify(warning);
+                this.sendWarningMsg(warningMsg);
+            },
+            sendWarningMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.warningWebsocket.send(msg); //send()发送消息
+                        console.log("warning已发送消息:"+ msg);
+                    }
+                }else{
+                    return;
+                }
             }
         },
         mounted() {
@@ -1010,6 +1090,7 @@
             clearTimeout(this.time);
             this.lightWebsocket&&this.lightWebsocket.close();
             this.$refs.perceptionMap&&this.$refs.perceptionMap.reset3DMap();
+            this.warningWebsocket&&this.warningWebsocket.close();
         }
 }
 </script>
