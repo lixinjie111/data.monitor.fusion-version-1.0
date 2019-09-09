@@ -369,7 +369,7 @@
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        let msg = item.warnMsg;
+                        let msg = item.warnMsg+" "+item.dis+"米";
                         let warningObj={
                             longitude:item.longitude,
                             latitude:item.latitude
@@ -386,14 +386,14 @@
                             }
                             _this.warningData[warningId]=obj;
                             _this.alertCount++;
-                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
                             let obj = _this.warningData[warningId];
                             if(obj.hash!=warningHash){
                                 //进行更新
-                                _this.$refs.perceptionMap.removeModel(obj.id);
-                                _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                                _this.$refs.tusvnMap.removeModel(obj.id);
+                                _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                             }
                         }
                     })

@@ -921,25 +921,18 @@
                 if(param==1){
                     if(this.videoItem1.cameraParam){
                         cameraParam = JSON.parse(this.videoItem1.cameraParam);
-                    }
-                    this.param=1;
-                    this.isActive='1';
-//                    this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
-                    if(cameraParam.x){
+                        this.param=1;
+                        this.isActive='1';
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
-                    }else {
+                    }else{
                         this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
                     }
-
                 }
                 if(param==2){
                     if(this.videoItem2.cameraParam){
                         cameraParam = JSON.parse(this.videoItem2.cameraParam);
-                    }
-                    this.param=2;
-                    this.isActive='2';
-//                    this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
-                    if(cameraParam.x){
+                        this.param=2;
+                        this.isActive='2';
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);

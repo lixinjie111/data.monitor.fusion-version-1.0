@@ -634,7 +634,7 @@ export default {
               d2 = data2.result.vehDataDTO[0];
               length = data2.result.vehDataDTO.length;
             } catch (e) {
-              console.log(data2.result);
+//              console.log(data2.result);
             }
             if (d2 != null) {
               // if(this.lastPerceptionData!=null&&d2.gpsTime<this.lastPerceptionData.gpsTime)
@@ -696,7 +696,7 @@ export default {
 
               // this.$emit("processPerceptionDataTime",ss)
               //不丢包
-             this.processPerceptionMesage();
+              this.processPerceptionMesage();
               this.processPlatformCars();
               this.timeB = new Date().getTime();
 
