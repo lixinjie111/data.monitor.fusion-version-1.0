@@ -838,16 +838,27 @@
                             resultData.push(option);
                         });
                         resultData.forEach(function (item,index,arr) {
-                            let spatId="light_"+item.spatId;
-                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
-                            _this.lightList.forEach((item1,index1)=>{
-                                //相交的
-                                if(item1.spatId==spatId){
-                                    item1.spareTime = item.leftTime;
-                                    item1.lightColor = item.light;
-                                    item1.flag=true;
-                                }
-                            })
+                            let light={
+                                id: "1",
+                                img1: "./static/images/single/000_03.png",
+                                img2: "./static/images/single/2.png",
+                                img3: "./static/images/single/000_16.png"
+                            };
+                            if(item.direction=='turn'){
+
+                            }
+//                            _this.$refs.perceptionMap.addStaticModel_light_1();
+//                            let spatId="light_"+item.spatId;
+//                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
+//                            _this.lightList.forEach((item1,index1)=>{
+//                                //相交的
+//                                if(item1.spatId==spatId){
+//                                    item1.spareTime = item.leftTime;
+//                                    item1.lightColor = item.light;
+//                                    item1.flag=true;
+//                                }
+//                            })
+
                         })
                     }
                 /*}*/
