@@ -602,42 +602,60 @@
                                     spatObj["right"]=spat;
                                 }
                             });
-                            let i=0;
+                            /*let i=0;
                             let top;
-                            let left;
+                            let left;*/
+                            let lights=[];
+                            let x;
+                            let y;
+                            let z;
+                            //一组灯的操作
                             for(let key in spatObj){
                                 let item1 = spatObj[key];
                                 if(item1.roadId){
-                                    let obj = {};
-                                    let longitude = parseFloat(item1.lightPos.split(",")[0]);
-                                    let latitude = parseFloat(item1.lightPos.split(",")[1]);
-                                    if(i==0){
-                                        //球面坐标转成三维坐标
-                                        let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
-                                        //三维坐标转成平面像素
-                                        let pixel = _this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                                        let tempLeft = parseInt(pixel[0])-32;
-                                        let tempTop = parseInt(pixel[1])-20;
-                                        obj.left =tempLeft;
-                                        obj.top = tempTop;
-                                        top=obj.top;
-                                        left=obj.left;
-                                    }
-                                    if(i>0){
-                                        obj.left = left+56*i;
-                                        obj.top=top;
-                                    }
-                                    let spatId = "light_"+item1.spatId;
-                                    obj.spatId = spatId;
-                                    obj.key = key;
-                                    obj.spareTime = '';
-                                    obj.lightColor='';
-                                    obj.flag=true;
+                                    let lightObj={
+//                                        img1: "./static/images/light/left-red.png",
+//                                        img2: "./static/images/light/2.png",
+//                                        img3: "./static/images/light/6.png"
+                                    };
+                                    lightObj.id=item1.spatId;
+                                    x=parseFloat(item1.lightPos.split(",")[0]);
+                                    y=parseFloat(item1.lightPos.split(",")[1]);
+                                    z=parseFloat(item1.lightPos.split(",")[2]);
                                     _this.spatCount++;
-                                    _this.lightList.push(obj);
-                                    i++;
+                                    lights.push(lightObj);
+                                    /*let obj = {};
+                                   let longitude = parseFloat(item1.lightPos.split(",")[0]);
+                                   let latitude = parseFloat(item1.lightPos.split(",")[1]);
+                                   let z = parseFloat(item1.lightPos.split(",")[2]);
+                                  if(i==0){
+                                       //球面坐标转成三维坐标
+                                       let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
+                                       //三维坐标转成平面像素
+                                       let pixel = _this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
+                                       let tempLeft = parseInt(pixel[0])-32;
+                                       let tempTop = parseInt(pixel[1])-20;
+                                       obj.left =tempLeft;
+                                       obj.top = tempTop;
+                                       top=obj.top;
+                                       left=obj.left;
+                                   }
+                                   if(i>0){
+                                       obj.left = left+56*i;
+                                       obj.top=top;
+                                   }
+                                   let spatId = "light_"+item1.spatId;
+                                   obj.spatId = spatId;
+                                   obj.key = key;
+                                   obj.spareTime = '';
+                                   obj.lightColor='';
+                                   obj.flag=true;
+                                   _this.spatCount++;
+                                   _this.lightList.push(obj);
+                                   i++;*/
                                 }
                             }
+                            _this.$refs.perceptionMap.addModel_light(x,y,z,lights);
                         })
                         _this.$emit("count",_this.signCount,_this.spatCount);
                         if(_this.isMapFirst){
@@ -921,25 +939,18 @@
                 if(param==1){
                     if(this.videoItem1.cameraParam){
                         cameraParam = JSON.parse(this.videoItem1.cameraParam);
-                    }
-                    this.param=1;
-                    this.isActive='1';
-//                    this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
-                    if(cameraParam.x){
+                        this.param=1;
+                        this.isActive='1';
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
-                    }else {
+                    }else{
                         this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
                     }
-
                 }
                 if(param==2){
                     if(this.videoItem2.cameraParam){
                         cameraParam = JSON.parse(this.videoItem2.cameraParam);
-                    }
-                    this.param=2;
-                    this.isActive='2';
-//                    this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
-                    if(cameraParam.x){
+                        this.param=2;
+                        this.isActive='2';
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
