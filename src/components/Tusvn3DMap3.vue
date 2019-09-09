@@ -139,8 +139,8 @@ export default {
       timeB: 0,
       //按照vid缓存插值的小车轨迹
       cacheAndInterpolateDataByVid:{},
-      processPlatformCarsTrackIntervalId:null
-
+      processPlatformCarsTrackIntervalId:null,
+        cacheLightData:[]
     };
   },
   watch: {},
@@ -323,6 +323,121 @@ export default {
       dl.scene.add(model);
       this.staticmodels[name] = model;
     },
+
+      addModel_light: function(x, y, z,cacheLightData) {
+        this.cacheLightData=cacheLightData;
+//          var ligth = {
+//              id: "1",
+//              img1: "./static/images/single/000_03.png",
+//              img2: "./static/images/single/2.png",
+//              img3: "./static/images/single/000_16.png"
+//          };
+//          var ligth2 = {
+//              id: "2",
+//              img1: "./static/images/single/000_03.png",
+//              img2: "./static/images/single/2.png",
+//              img3: "./static/images/single/000_16.png"
+//          };
+//          this.cacheLightData.push(ligth);
+//          this.cacheLightData.push(ligth2);
+
+          //7
+          // var img1= "./static/images/single/000_03.png";
+          // var img2= "./static/images/single/2.png";
+          // var img3="./static/images/single/000_16.png";
+          let utm = this.coordinateTransfer(
+              "EPSG:4326",
+              "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+              x,
+              y
+          );
+          x = utm[0];
+          y = utm[1];
+          for (var i = 0; i < this.cacheLightData.length; i++) {
+              var xrotation = 7 * i;
+              var geometry1 = new THREE.CircleGeometry(1, 32);
+              var texture = new THREE.TextureLoader().load(
+                  this.cacheLightData[i].img1
+              );
+              var box_metal1 = new THREE.MeshBasicMaterial({
+                  map: texture,
+                  opacity: 1
+              });
+              var mesh1 = new THREE.Mesh(geometry1, box_metal1);
+              mesh1.position.x = x + xrotation;
+              mesh1.position.y = y;
+              mesh1.position.z = z;
+              mesh1.rotation.x = (-Math.PI / 180) * 90;
+              mesh1.rotation.z = (Math.PI / 180) * 180;
+
+              var geometry2 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+              var texture2 = new THREE.TextureLoader().load(
+                  this.cacheLightData[i].img2
+              );
+              var box_metal2 = new THREE.MeshBasicMaterial({
+                  map: texture2,
+                  transparent: true,
+                  opacity: 1
+              });
+              var mesh2 = new THREE.Mesh(geometry2, box_metal2);
+              mesh2.position.x = x - 2 + xrotation;
+              mesh2.position.y = y;
+              mesh2.position.z = z;
+              mesh2.rotation.x = (-Math.PI / 180) * 90;
+              mesh2.rotation.z = (Math.PI / 180) * 180;
+
+              var geometry3 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+              var texture3 = new THREE.TextureLoader().load(
+                  this.cacheLightData[i].img3
+              );
+              var box_metal3 = new THREE.MeshBasicMaterial({
+                  map: texture3,
+                  transparent: true,
+                  opacity: 1
+              });
+              var mesh3 = new THREE.Mesh(geometry3, box_metal3);
+              mesh3.position.x = x - 3 + xrotation;
+              mesh3.position.y = y;
+              mesh3.position.z = z;
+              mesh3.rotation.x = (-Math.PI / 180) * 90;
+              mesh3.rotation.z = (Math.PI / 180) * 180;
+
+              var group = new THREE.Group();
+              group.add(mesh1);
+              group.add(mesh2);
+              group.add(mesh3);
+              group.name = this.cacheLightData[i].id;
+              dl.scene.add(group);
+          }
+      },
+      addStaticModel_light_1: function(light) {
+         /* var ligth = {
+              id: "1",
+              img1: "./static/images/single/000_03.png",
+              img2: "./static/images/single/2.png",
+              img3: "./static/images/single/000_16.png"
+          };*/
+
+          for (var i = 0; i < this.cacheLightData.length; i++) {
+              if (this.cacheLightData[i].id == ligth.id) {
+                  var object = dl.scene.getObjectByName(ligth.id);
+
+                  if (object.children.length > 0) {
+                      var texture = new THREE.TextureLoader().load(ligth.img1);
+                      object.children[0].material.map = texture;
+                  }
+
+                  if (object.children.length > 1) {
+                      var texture2 = new THREE.TextureLoader().load(ligth.img2);
+                      object.children[1].material.map = texture2;
+                  }
+                  if (object.children.length > 2) {
+                      var texture3 = new THREE.TextureLoader().load(ligth.img3);
+                      object.children[2].material.map = texture3;
+                  }
+              }
+          }
+      },
      addStaticModel_traffic_light: function(name, url, x, y, z, pitch, yaw, roll) {
       let model = new dl.Model({
         url: url
