@@ -5,7 +5,7 @@
             <img class="login-bg" src="static/images/login-bg.jpg">
             <div class="login-content">
                 <div class="login-left">
-                    <p class="login-left-title">智慧互联 启迪云控</p>
+                    <p class="login-left-title">云控，启迪未来</p>
                 </div>
                 <div class="login-card">
                     <div class="login-title">融合感知平台</div>
