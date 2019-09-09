@@ -140,7 +140,7 @@ export default {
       //按照vid缓存插值的小车轨迹
       cacheAndInterpolateDataByVid:{},
       processPlatformCarsTrackIntervalId:null,
-        cacheLightData:[]
+        cacheLightData: new Array()
     };
   },
   watch: {},
@@ -159,6 +159,52 @@ export default {
 
       setTimeout(() => {
         getMap(this);
+          let lights=new Array();
+          let lightObj={
+              id:"276",
+              img1: "./static/images/light/left-red.png",
+              img2: "./static/images/light/2.png",
+              img3: "./static/images/light/6.png"
+          };
+          lights.push(lightObj);
+          let lightObj2={
+              id:"275",
+              img1: "./static/images/light/left-red.png",
+              img2: "./static/images/light/2.png",
+              img3: "./static/images/light/6.png"
+          };
+          lights.push(lightObj2);
+          this.addModel_light(121.17551589465815,31.281617738453047,30,lights)
+
+
+          let lights2=new Array();
+          let lightObj3={
+              id:"278",
+              img1: "./static/images/light/left-red.png",
+              img2: "./static/images/light/2.png",
+              img3: "./static/images/light/6.png"
+          };
+          lights2.push(lightObj3);
+          let lightObj4={
+              id:"277",
+              img1: "./static/images/light/left-red.png",
+              img2: "./static/images/light/2.png",
+              img3: "./static/images/light/6.png"
+          };
+          lights2.push(lightObj4);
+          this.addModel_light(121.17510881207043,31.281747510005268,30,lights2)
+
+
+          let lights3=new Array();
+          let lightObj5={
+              id:"282",
+              img1: "./static/images/light/left-red.png",
+              img2: "./static/images/light/2.png",
+              img3: "./static/images/light/6.png"
+          };
+          lights3.push(lightObj5);
+          this.addModel_light(121.17533995826606,31.282071700494583,30,lights3)
+
         this.$emit("mapcomplete", this);
         // dl.viewer.controls.addEventListener("drop", this.onDrop);
         dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
@@ -190,6 +236,7 @@ export default {
       setTimeout(() => {
         this.processPlatformCarsTrack();
       }, 1000);
+
     },
     /**
      * 地图沿屏幕x,y,z方向移动
@@ -325,7 +372,7 @@ export default {
     },
 
       addModel_light: function(x, y, z,cacheLightData) {
-        this.cacheLightData=cacheLightData;
+        this.cacheLightData.push(cacheLightData);
 //          var ligth = {
 //              id: "1",
 //              img1: "./static/images/single/000_03.png",
@@ -353,11 +400,11 @@ export default {
           );
           x = utm[0];
           y = utm[1];
-          for (var i = 0; i < this.cacheLightData.length; i++) {
+          for (var i = 0; i < cacheLightData.length; i++) {
               var xrotation = 7 * i;
               var geometry1 = new THREE.CircleGeometry(1, 32);
               var texture = new THREE.TextureLoader().load(
-                  this.cacheLightData[i].img1
+                  cacheLightData[i].img1
               );
               var box_metal1 = new THREE.MeshBasicMaterial({
                   map: texture,
@@ -372,7 +419,7 @@ export default {
 
               var geometry2 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
               var texture2 = new THREE.TextureLoader().load(
-                  this.cacheLightData[i].img2
+                  cacheLightData[i].img2
               );
               var box_metal2 = new THREE.MeshBasicMaterial({
                   map: texture2,
@@ -388,7 +435,7 @@ export default {
 
               var geometry3 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
               var texture3 = new THREE.TextureLoader().load(
-                  this.cacheLightData[i].img3
+                  cacheLightData[i].img3
               );
               var box_metal3 = new THREE.MeshBasicMaterial({
                   map: texture3,
@@ -406,34 +453,36 @@ export default {
               group.add(mesh1);
               group.add(mesh2);
               group.add(mesh3);
-              group.name = this.cacheLightData[i].id;
+              group.name = cacheLightData[i].id;
               dl.scene.add(group);
           }
       },
-      addStaticModel_light_1: function(light) {
+      addStaticModel_light_1: function(ligth) {
+
          /* var ligth = {
               id: "1",
               img1: "./static/images/single/000_03.png",
               img2: "./static/images/single/2.png",
               img3: "./static/images/single/000_16.png"
           };*/
-
           for (var i = 0; i < this.cacheLightData.length; i++) {
-              if (this.cacheLightData[i].id == ligth.id) {
-                  var object = dl.scene.getObjectByName(ligth.id);
+              for (var j = 0; j< this.cacheLightData[i].length; j++) {
+                  if (this.cacheLightData[i][j].id == ligth.id) {
+                      var object = dl.scene.getObjectByName(ligth.id);
 
-                  if (object.children.length > 0) {
-                      var texture = new THREE.TextureLoader().load(ligth.img1);
-                      object.children[0].material.map = texture;
-                  }
+                      if (object.children.length > 0) {
+                          var texture = new THREE.TextureLoader().load(ligth.img1);
+                          object.children[0].material.map = texture;
+                      }
 
-                  if (object.children.length > 1) {
-                      var texture2 = new THREE.TextureLoader().load(ligth.img2);
-                      object.children[1].material.map = texture2;
-                  }
-                  if (object.children.length > 2) {
-                      var texture3 = new THREE.TextureLoader().load(ligth.img3);
-                      object.children[2].material.map = texture3;
+                      if (object.children.length > 1) {
+                          var texture2 = new THREE.TextureLoader().load(ligth.img2);
+                          object.children[1].material.map = texture2;
+                      }
+                      if (object.children.length > 2) {
+                          var texture3 = new THREE.TextureLoader().load(ligth.img3);
+                          object.children[2].material.map = texture3;
+                      }
                   }
               }
           }

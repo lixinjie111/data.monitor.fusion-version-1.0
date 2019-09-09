@@ -334,6 +334,7 @@
                     //地图不连续移动，判断红绿灯的位置受否再可视区
                     this.typeRoadData();
                     this.initWarningWebSocket();
+                    this.initLightWebSocket();
 //                    this.$emit('getCurrentExtent', this.currentExtent);
                     return;
                 }
@@ -351,7 +352,7 @@
                     this.getMap();
                 }
                 this.lightList=[];
-                if(!this.first&&this.count==0){
+             /*   if(!this.first&&this.count==0){
                     console.log("---------")
                     this.count=1;
 //                    this.cameraParam = this.$refs.perceptionMap.getCamera();
@@ -368,15 +369,15 @@
                         clearTimeout(time);
                     },3000)
 
-                }
+                }*/
                 this.isFirst=false;
             },
             getData(){
-                this.getCurrentExtent();
-                this.getCenter();
-//                this.getPerceptionAreaInfo();
-                //地图不连续移动，判断红绿灯的位置受否再可视区
-                this.typeRoadData();
+//                this.getCurrentExtent();
+//                this.getCenter();
+////                this.getPerceptionAreaInfo();
+//                //地图不连续移动，判断红绿灯的位置受否再可视区
+//                this.typeRoadData();
             },
             getMap(){
                 let overviewMap = this.$refs.map1;
@@ -614,9 +615,9 @@
                                 let item1 = spatObj[key];
                                 if(item1.roadId){
                                     let lightObj={
-//                                        img1: "./static/images/light/left-red.png",
-//                                        img2: "./static/images/light/2.png",
-//                                        img3: "./static/images/light/6.png"
+                                        img1: "./static/images/light/left-red.png",
+                                        img2: "./static/images/light/2.png",
+                                        img3: "./static/images/light/6.png"
                                     };
                                     lightObj.id=item1.spatId;
                                     x=parseFloat(item1.lightPos.split(",")[0]);
@@ -624,6 +625,11 @@
                                     z=parseFloat(item1.lightPos.split(",")[2]);
                                     _this.spatCount++;
                                     lights.push(lightObj);
+                                    let obj = {};
+                                    obj.spatId=item1.spatId;
+                                    obj.key=key;
+                                    _this.lightList.push(obj);
+                                    console.log(x,y,item1.spatId);
                                     /*let obj = {};
                                    let longitude = parseFloat(item1.lightPos.split(",")[0]);
                                    let latitude = parseFloat(item1.lightPos.split(",")[1]);
@@ -655,13 +661,14 @@
                                    i++;*/
                                 }
                             }
-                            _this.$refs.perceptionMap.addModel_light(x,y,z,lights);
+                            //_this.$refs.perceptionMap.addModel_light(x,y,30,lights);
                         })
+
                         _this.$emit("count",_this.signCount,_this.spatCount);
-                        if(_this.isMapFirst){
+                        /*if(_this.isMapFirst){
                             _this.initLightWebSocket();
                             _this.isMapFirst=false;
-                        }
+                        }*/
                     }
                 })
             },
@@ -794,6 +801,107 @@
                     }
                 }
             },
+            getNumPng(color,num){
+                let img;
+                if(color=='RED'){
+                    if(num==0){
+                        img='./static/images/light/0.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9.png'
+                    }
+                }
+                if(color=='YELLOW'){
+                    if(num==0){
+                        img='./static/images/light/0-2.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1-2.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2-2.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3-2.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4-2.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5-2.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6-2.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7-2.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8-2.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9-2.png'
+                    }
+                }
+                if(color=='GREEN'){
+                    if(num==0){
+                        img='./static/images/light/0-1.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1-1.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2-1.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3-1.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4-1.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5-1.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6-1.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7-1.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8-1.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9-1.png'
+                    }
+                }
+                return img;
+
+            },
             initLightWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
@@ -838,16 +946,140 @@
                             resultData.push(option);
                         });
                         resultData.forEach(function (item,index,arr) {
+
+//                            _this.lightList.forEach((item1,index1)=>{
+//                                //相交的
+//                                if(item1.spatId==item.spatId){
+//                                    item1.spareTime = item.leftTime;
+//                                    item1.lightColor = item.light;
+//                                    item1.flag=true;
+//                                }
+//                            })
+
                             let light={
-                                id: "1",
+                                /*id: "1",
                                 img1: "./static/images/single/000_03.png",
                                 img2: "./static/images/single/2.png",
-                                img3: "./static/images/single/000_16.png"
+                                img3: "./static/images/single/000_16.png"*/
                             };
-                            if(item.direction=='turn'){
-
+                            let array=(item.leftTime+"").split("");
+                            let img1;
+                            let img2;
+                            let img3;
+                            //cross
+                            if(item.direction==1){
+                                //cross red
+                                if(item.light=='RED'){
+                                    img1='./static/images/light/cross-red.png';
+                                    img2 = _this.getNumPng('RED',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('RED',array[1]);
+                                    }
+                                }
+                                //cross yellow
+                                if(item.light=='YELLOW'){
+                                    img1='./static/images/light/cross-yellow.png';
+                                    img2 = _this.getNumPng('YELLOW',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('YELLOW',array[1]);
+                                    }
+                                }
+                                //cross green
+                                if(item.light=='GREEN'){
+                                    img1='./static/images/light/cross-green.png';
+                                    img2 = _this.getNumPng('GREEN',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('GREEN',array[1]);
+                                    }
+                                }
                             }
-//                            _this.$refs.perceptionMap.addStaticModel_light_1();
+                            //left
+                            if(item.direction==2){
+                                //left red
+                                if(item.light=='RED'){
+                                    img1='./static/images/light/left-red.png';
+                                    img2 = _this.getNumPng('RED',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('RED',array[1]);
+                                    }
+                                }
+                                //left yellow
+                                if(item.light=='YELLOW'){
+                                    img1='./static/images/light/left-yellow.png';
+                                    img2 = _this.getNumPng('YELLOW',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('YELLOW',array[1]);
+                                    }
+                                }
+                                //left green
+                                if(item.light=='GREEN'){
+                                    img1='./static/images/light/left-green.png';
+                                    img2 = _this.getNumPng('GREEN',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('GREEN',array[1]);
+                                    }
+                                }
+                            }
+                            //turn
+                            if(item.direction==3){
+                                //turn red
+                                if(item.light=='RED'){
+                                    img1='./static/images/light/turn-red.png';
+                                    img2 = _this.getNumPng('RED',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('RED',array[1]);;
+                                    }
+                                }
+                                //turn yellow
+                                if(item.light=='YELLOW'){
+                                    img1='./static/images/light/turn-yellow.png';
+                                    img2 = _this.getNumPng('YELLOW',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('YELLOW',array[1]);;
+                                    }
+                                }
+                                //turn green
+                                if(item.light=='GREEN'){
+                                    img1='./static/images/light/turn-green.png';
+                                    img2 = _this.getNumPng('GREEN',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('GREEN',array[1]);
+                                    }
+                                }
+                            }
+                            //right
+                            if(item.direction==4){
+                                //right red
+                                if(item.light=='RED'){
+                                    img1='./static/images/light/right-red.png';
+                                    img2 = _this.getNumPng('RED',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('RED',array[1]);
+                                    }
+                                }
+                                //right yellow
+                                if(item.light=='YELLOW'){
+                                    img1='./static/images/light/right-yellow.png';
+                                    img2 = _this.getNumPng('YELLOW',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('YELLOW',array[1]);
+                                    }
+                                }
+                                //right green
+                                if(item.light=='GREEN'){
+                                    img1='./static/images/light/right-green.png';
+                                    img2 = _this.getNumPng('GREEN',array[0]);
+                                    if(array[1]){
+                                        img3 = _this.getNumPng('GREEN',array[1]);
+                                    }
+                                }
+                            }
+                            light.id=item.spatId;
+                            light.img1=img1;
+                            light.img2=img2;
+                            light.img3=img3;
+//                            console.log(light);
+                            _this.$refs.perceptionMap.addStaticModel_light_1(light);
 //                            let spatId="light_"+item.spatId;
 //                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
 //                            _this.lightList.forEach((item1,index1)=>{
