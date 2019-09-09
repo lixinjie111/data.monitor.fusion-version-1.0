@@ -494,6 +494,7 @@
             height: 110px;
             img{
                 height:110px;
+                display: inline-block;
             }
         }
     }

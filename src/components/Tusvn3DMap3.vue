@@ -174,7 +174,7 @@ export default {
               img3: "./static/images/light/6.png"
           };
           lights.push(lightObj2);
-          this.addModel_light(121.17551589465815,31.281617738453047,30,lights)
+          this.addModel_light(121.17551589465815,31.281617738453047,25,lights)
 
 
           let lights2=new Array();
@@ -192,7 +192,7 @@ export default {
               img3: "./static/images/light/6.png"
           };
           lights2.push(lightObj4);
-          this.addModel_light(121.17510881207043,31.281747510005268,30,lights2)
+          this.addModel_light(121.17510881207043,31.281747510005268,25,lights2)
 
 
           let lights3=new Array();
@@ -203,7 +203,7 @@ export default {
               img3: "./static/images/light/6.png"
           };
           lights3.push(lightObj5);
-          this.addModel_light(121.17533995826606,31.282071700494583,30,lights3)
+          this.addModel_light(121.17533995826606,31.282071700494583,25,lights3)
 
         this.$emit("mapcomplete", this);
         // dl.viewer.controls.addEventListener("drop", this.onDrop);
@@ -486,6 +486,54 @@ export default {
                   }
               }
           }
+      },
+      light2d: function() {
+
+          for (var i = 0; i < this.cacheLightData.length; i++) {
+              for (var j = 0; j< this.cacheLightData[i].length; j++) {
+
+                      var object = dl.scene.getObjectByName(this.cacheLightData[i][j].id);
+
+                      if (object.children.length > 0) {
+                          object.children[0].rotateX((-Math.PI / 180) * 90);
+                      }
+
+                      if (object.children.length > 1) {
+                          object.children[1].rotateX((-Math.PI / 180) * 90);
+                      }
+                      if (object.children.length > 2) {
+                          object.children[2].rotateX((-Math.PI / 180) * 90);
+                      }
+
+              }
+          }
+
+
+
+      },
+      light3d: function() {
+
+          for (var i = 0; i < this.cacheLightData.length; i++) {
+              for (var j = 0; j< this.cacheLightData[i].length; j++) {
+
+                  var object = dl.scene.getObjectByName(this.cacheLightData[i][j].id);
+
+                  if (object.children.length > 0) {
+                      object.children[0].rotateX((Math.PI / 180) * 90);
+                  }
+
+                  if (object.children.length > 1) {
+                      object.children[1].rotateX((Math.PI / 180) * 90);
+                  }
+                  if (object.children.length > 2) {
+                      object.children[2].rotateX((Math.PI / 180) * 90);
+                  }
+
+              }
+          }
+
+
+
       },
      addStaticModel_traffic_light: function(name, url, x, y, z, pitch, yaw, roll) {
       let model = new dl.Model({

@@ -184,7 +184,8 @@
                 isFirstTrans:true,
                 alertCount:0,
                 warningData:{},
-                warningCount:0
+                warningCount:0,
+                isFirstComplete:false
 
                /* pointLeft:10,
                 pointTop:10,
@@ -920,11 +921,13 @@
                 _this.vehData.push(vehData);
                 if(_this.waitingtime!=''){
                     if(_this.isFirstTrans){
+                        _this.isFirstTrans=false;
                         setTimeout(()=>{
                             _this.$emit("getPerceptionData",_this.vehData);
-                            _this.isFirstTrans=false;
+                            _this.isFirstComplete=true;
                         },_this.waitingtime)
-                    }else{
+                    }
+                    if(_this.isFirstComplete){
                         _this.vehData.shift();
                         _this.$emit("getPerceptionData",_this.vehData);
                     }
@@ -1184,6 +1187,7 @@
                         cameraParam = JSON.parse(this.videoItem1.cameraParam);
                         this.param=1;
                         this.isActive='1';
+                        this.$refs.perceptionMap.light3d();
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
@@ -1194,6 +1198,7 @@
                         cameraParam = JSON.parse(this.videoItem2.cameraParam);
                         this.param=2;
                         this.isActive='2';
+                        this.$refs.perceptionMap.light2d();
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
@@ -1203,6 +1208,7 @@
                     this.param=3;
                     this.isActive='0';
                     this.isFirst=true;
+                    this.$refs.perceptionMap.light2d();
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
 //                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
