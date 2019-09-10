@@ -81,7 +81,6 @@
     const isProduction = process.env.NODE_ENV === 'production'
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
     import TusvnMap from '@/components/Tusvn3DMap3'
-    import {getMap} from '@/utils/tusvnMap.js';
     export default {
         data() {
             return {
@@ -104,6 +103,7 @@
                 rtmp1:'',
                 rtmp2:'',
                 warningWebsocket:null,
+                warningCancleWebsocket:null,
                 carWebsocket:null,
                 alertCount:0,
                 warningData:{}
@@ -283,7 +283,6 @@
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
-                getMap(this.$refs.tusvnMap);
                 this.$refs.tusvnMap.updateCameraPosition(326181.72659014474,3462354.6747002415,737.3642832288795,741.5052736914325,-1.5707963267948966,-0.05266622778143515);
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.config.websocketUrl,this.roadItem1.camSerialNum);*/
@@ -469,13 +468,59 @@
                     return;
                 }
             },
+
+            initWarningCancleWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.warningCancleWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                    _this.warningCancleWebsocket.onmessage = _this.onWarningCancleMessage;
+                    _this.warningCancleWebsocket.onclose = _this.onWarningCancleClose;
+                    _this.warningCancleWebsocket.onopen = _this.onWarningCancleOpen;
+                }
+            },
+            onWarningCancleMessage(mesasge){
+                let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let warningCancleData = json.result;
+                let obj;
+                let warningIds = JSON.parse(warningCancleData);
+                warningIds.forEach(warningId=>{
+                    obj = _this.warningData[warningId];
+                    _this.$refs.perceptionMap.removeModel(obj.id);
+                    delete _this.warningData[warningId];
+                })
+            },
+            onWarningCancleClose(data){
+                console.log("结束连接");
+            },
+            onWarningCancleOpen(data){
+                //旁车
+                let warningCancel = {
+                    "action": "event_cancel",
+                    "token": "tusvn"
+                }
+                let warningMsg = JSON.stringify(warningCancel);
+                this.sendWarningCancleMsg(warningMsg);
+            },
+            sendWarningCancleMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.warningCancleWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.warningCancleWebsocket.send(msg); //send()发送消息
+                        console.log("warning已发送消息:"+ msg);
+                    }
+                }else{
+                    return;
+                }
+            },
         },
         mounted(){
             this.option1 = this.getOption();
             this.option2 = this.getOption();
             this.getDeviceInfo();
-//            this.initLightWebSocket();
+            this.initLightWebSocket();
             this.initWarningWebSocket();
+            this.initWarningCancleWebSocket();
         },
         components:{
             TusvnMap
@@ -490,6 +535,7 @@
             this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
             this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
+            this.warningCancleWebsocket&&this.warningCancleWebsocket.close();
         }
     }
 </script>
