@@ -70,10 +70,7 @@
                 perceptionData:{},
                 sideData:{},
                 v2xData:{},
-                warningIdList:[],
-                warningCount:0,
                 isFirstCon:true,
-                alertCount:0
 
             }
         },
@@ -97,6 +94,10 @@
                 default() {
                     return [];
                 }
+            },
+            warningCount:{
+                type:Number,
+                default:0
             }
         },
         watch:{
@@ -126,79 +127,10 @@
                 if(this.perceptionData[0].obu){
                     this.v2xData=this.perceptionData[0].obu;
                 }
-            },
-            currentExtent(newValue,oldValue){
-//                console.log("大小："+this.currentExtent.length);
-                this.warningCount=0;
-                if(this.isFirstCon){
-                  /*  this.initWebSocket();*/
-                    this.initWarningWebSocket();
-                    this.isFirstCon=false;
-                }
             }
         },
         methods: {
-            initWarningWebSocket(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                    _this.warningWebsocket.onmessage = _this.onWarningMessage;
-                    _this.warningWebsocket.onclose = _this.onWarningClose;
-                    _this.warningWebsocket.onopen = _this.onWarningOpen;
-                }
-            },
-            onWarningMessage(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let warningData = json.result.data;
-                let type = json.result.type;
-                let warningId;
-                if(type=='CLOUD'){
-                    warningData.forEach(item=>{
-                        warningId = item.warnId;
-                        warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        if(_this.warningIdList.indexOf(warningId)==-1){
-                           /* console.log("warningId:"+warningId);
-                            console.log("索引:"+_this.warningIdList.indexOf(warningId));*/
-                            _this.warningIdList.push(warningId);
-                            _this.warningCount++;
-                            let msg = item.warnMsg+"   "+item.dis+"米";
-                            let obj = {
-                                id:'alert'+_this.alertCount,
-                                msg:msg,
-                                longitude:item.longitude,
-                                latitude:item.latitude
 
-                            }
-                            this.$emit("getWarningSign",obj);
-                            _this.alertCount++;
-                        }
-                    })
-                }
-            },
-            onWarningClose(data){
-                console.log("结束连接");
-            },
-            onWarningOpen(data){
-                //旁车
-                var warning = {
-                    "action": "clod_event",
-                    "region": this.currentExtent
-                }
-                var warningMsg = JSON.stringify(warning);
-                this.sendWarningMsg(warningMsg);
-            },
-            sendWarningMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.warningWebsocket.send(msg); //send()发送消息
-                        console.log("warning已发送消息:"+ msg);
-                    }
-                }else{
-                    return;
-                }
-            },
             routeGo(){
                 this.$router.push({
                     path: '/overview'

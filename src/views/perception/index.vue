@@ -8,11 +8,11 @@
             <div class="fusion-left">
                 <div class="c-scroll-wrap">
                     <div class="c-scroll-inner">
-                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" @getWarningSign="getWarningSign" :perceptionData="perceptionData"></left>
+                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount"></left>
                     </div>
                 </div>
             </div>
-            <right @getCurrentExtent="getCurrentExtent" @count="count" :realData="realData" @getPerceptionData="getPerceptionData" :warningSign="warningSign"></right>
+            <right  @count="count" :realData="realData" @getPerceptionData="getPerceptionData" @getWarningCount="getWarningCount"></right>
         </div>
     </div>
 </template>
@@ -29,7 +29,7 @@
                 signCount:0,
                 realData:{},
                 time:0,
-                warningSign:{}
+
 //                perceptionData:{}
             }
         },
@@ -43,19 +43,12 @@
             }
         },
         methods: {
-            getCurrentExtent(currentExtent){
-                this.currentExtent = currentExtent;
-//                console.log("边界值："+this.currentExtent);
-            },
             count(signCount,spatCount){
                 this.spatCount = spatCount;
                 this.signCount = signCount;
             },
             getPerceptionData(result){
                 this.perceptionData = result;
-            },
-            getWarningSign(result){
-                this.warningSign=result;
             },
             initWebSocket1(){
                 let _this=this;
@@ -130,8 +123,10 @@
                 }else{
                     return;
                 }
+            },
+            getWarningCount(result){
+                this.warningCount=result;
             }
-
         },
         mounted() {
             let _this = this;
