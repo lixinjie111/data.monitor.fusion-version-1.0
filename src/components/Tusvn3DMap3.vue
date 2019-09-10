@@ -189,7 +189,7 @@ export default {
       //插值后的平台车处理
       setTimeout(() => {
         this.processPlatformCarsTrack();
-      }, 1000);
+      }, 10);
     },
     /**
      * 地图沿屏幕x,y,z方向移动
@@ -361,6 +361,7 @@ export default {
       }
     },
     add3DInfoLabel: function(name, text, x, y, z) {
+      return;
       var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05,45, 0, 0);
       var cylinderMat = new THREE.MeshLambertMaterial({
         //创建材料
@@ -1300,7 +1301,7 @@ export default {
           cdata.nowRecieveData = d;
 
           if (cdata.nowRecieveData.gpsTime <= cdata.lastRecieveData.gpsTime) {
-            console.log("到达顺序错误");
+            console.log("到达顺序错误："+vid+"  "+cdata.nowRecieveData.gpsTime +", "+cdata.lastRecieveData.gpsTime);
             return;
           }
           let deltaTime = cdata.nowRecieveData.gpsTime - cdata.lastRecieveData.gpsTime;
