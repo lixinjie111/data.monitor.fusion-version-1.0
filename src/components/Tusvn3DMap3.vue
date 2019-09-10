@@ -681,48 +681,54 @@
                     delete this.infoLabels["label"][name];
                 }
             },
-            add3DInfoLabel: function(name, text, x, y, z) {
-                var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05,16, 0, 0);
-                var cylinderMat = new THREE.MeshLambertMaterial({
+            add3DInfoLabel: function(name, text, x, y, z) {
+                var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05,16, 0, 0);
+                var cylinderMat = new THREE.MeshLambertMaterial({
                     //创建材料
-                    color: 0xab6503,
-                    wireframe: false
+                    color: 0xab6503,
+                    wireframe: false
                 });
                 //创建圆柱体网格模型
-                var cylinderMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
+                var cylinderMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
 
-                let utm = this.coordinateTransfer(
+                let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
 
-                cylinderMesh.position.set(utm[0], utm[1],z+8); //设置圆柱坐标
-                cylinderMesh.rotation.x = Math.PI / 2;
-                //cylinderMesh.position.set(utm[0], utm[1], z);
+                cylinderMesh.position.set(utm[0], utm[1],z+8); //设置圆柱坐标
+                cylinderMesh.rotation.x = Math.PI / 2;
+                //cylinderMesh.position.set(utm[0], utm[1], z);
 
-                dl.scene.add(cylinderMesh);
+                //dl.scene.add(cylinderMesh);
 
-                this.infoLabels["gan"][name] = cylinderMesh;
+                this.infoLabels["gan"][name] = cylinderMesh;
 
-                var text1 = new dl.Text({
-                    text: text,
-                    fontsize: 200,
-                    borderThickness: 1
+                var text1 = new dl.Text({
+                    text: text,
+                    fontsize: 200,
+                    borderThickness: 1
                 });
-                text1.setBorderColor({ r: 171, g: 101, b: 3, a: 1.0 });
-                text1.setBackgroundColor({ r: 255, g: 255, b: 255, a: 1 });
-                text1.setTextColor({ r: 171, g: 101, b: 3, a: 1.0 });
+                text1.setBorderColor({ r: 171, g: 101, b: 3, a: 1.0 });
+                text1.setBackgroundColor({ r: 255, g: 255, b: 255, a: 1 });
+                text1.setTextColor({ r: 171, g: 101, b: 3, a: 1.0 });
                 //text1.setPositon([326299.8136019115,3462328.443327571,34.16186920538662]);
 
-                text1.setPositon([utm[0], utm[1], z + 16]);
-                this.infoLabels["label"][name] = text1;
-                dl.scene.add(text1);
+                text1.setPositon([utm[0], utm[1], z + 16]);
+                this.infoLabels["label"][name] = text1;
 
-                // text1.setPositon([x, y, z]);
-                //  text1.fontface = this.fontface;
-                // text1.update();
+                var group = new THREE.Group();
+                group.add(cylinderMesh);
+                group.add(text1);
+                dl.scene.add(group);
+
+                this.models[name] = group;
+
+                // text1.setPositon([x, y, z]);
+                //  text1.fontface = this.fontface;
+                // text1.update();
             },
             updateModelPostion: function(modelId, x, y, z, heading) {
                 let model = this.models[modelId];
