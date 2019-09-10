@@ -1072,26 +1072,6 @@
             processPlatformCars: function() {
 
                 if (this.platformCars != null) {
-                    for (var key in this.models) {
-                        let tag = false;
-                        for (let i = 0; i < this.platformCars.length; i++) {
-                            let vehid = this.platformCars[i].vehicleId;
-                            if (key == vehid) {
-                                tag = true;
-                                break;
-                            }
-                        }
-                        if (!tag) {
-                            // debugger
-                            // console.log(dl.models);
-                            let model = this.models[key];
-                            // dl.removeModel(model,dl.viewer);
-                            model.position.set(0, 0, 0);
-                            delete this.models[key];
-                            // this.tweens[key].stop();
-                            delete this.tweens[key];
-                        }
-                    }
                     for (let i = 0; i < this.platformCars.length; i++) {
                         //
                         let d = this.platformCars[i];
