@@ -220,17 +220,17 @@ export default {
         this.processPerceptionData();
       }, this.waitingProcessPerceptionTime);
 
-      setTimeout(() => {
-        //                console.log("开始执行小车平滑移动");
-        let id3 = setInterval(() => {
-          if (this.monitorTag) {
-            // console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
-            let d = this.cacheMainCarTrackData.shift();
-            this.moveMainCar(d);
-          }
-        }, 2000);
-        this.intervalIds.push(id3);
-      }, 6000);
+      // setTimeout(() => {
+      //   //                console.log("开始执行小车平滑移动");
+      //   let id3 = setInterval(() => {
+      //     if (this.monitorTag) {
+      //       // console.log("当前缓存数据量："+this.cacheMainCarTrackData.length);
+      //       let d = this.cacheMainCarTrackData.shift();
+      //       this.moveMainCar(d);
+      //     }
+      //   }, 2000);
+      //   this.intervalIds.push(id3);
+      // }, 6000);
 
       //插值后的平台车处理
       setTimeout(() => {
@@ -1425,6 +1425,9 @@ export default {
       let data2 = json.result.selfVehInfo;
 
       if (data2 != null) {
+        this.mainCarVID = data2.vehicleId;
+        this.cacheAndInterpolatePlatformCar(data2);
+        return;
         // console.log(data2);
         // data2.gpsTime = new Date().getTime();
         // this.animateCar(data2);
@@ -1551,7 +1554,13 @@ export default {
                 if(carCacheData.cacheData.length>0)
                 {
                   let cardata = this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
-                  this.moveCar2(cardata);
+                  if(cardata.vehicleId == this.mainCarVID)
+                  {
+                    this.moveCar(cardata);
+                  }else{
+                    this.moveCar2(cardata);
+                  }
+                  
                 }
               }
             }          
@@ -1594,8 +1603,8 @@ export default {
             console.log("time:" + time);
             console.log("time2:" + this.time2);
             console.log(time - this.time2);
-          },
-          time - this.time2 <= 0 ? 1 : time - this.time2
+          }
+          ,time - this.time2 <= 0 ? 1 : time - this.time2
         ); //time-this.time2
       }
     },
