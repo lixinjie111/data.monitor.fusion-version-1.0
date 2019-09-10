@@ -1421,13 +1421,15 @@ export default {
       }
       // return ;
       //处理自车信息
+      // debugger
       let data2 = json.result.selfVehInfo;
 
       if (data2 != null) {
         // console.log(data2);
         // data2.gpsTime = new Date().getTime();
         // this.animateCar(data2);
-        if (data2.vehicleId == this.mainCarVID) {
+        // if (data2.vehicleId == this.mainCarVID) {
+          // if (true) {
           // console.log(this.cacheMainCarTrackData.length);
           // this.cacheMainCarTrackData.push(data2);
           // if(this.cacheMainCarTrackData.length<=2)
@@ -1466,9 +1468,9 @@ export default {
             }
           }
           this.lastMainCarData = data2;
-        } else {
+        // } else {
           // this.animateCar(data2);
-        }
+        // }
       }
     },
     //缓存并且插值平台车轨迹
