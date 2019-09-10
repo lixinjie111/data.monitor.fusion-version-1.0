@@ -105,6 +105,7 @@
                 warningWebsocket:null,
                 warningCancleWebsocket:null,
                 carWebsocket:null,
+                sideCarWebsocket:null,
                 alertCount:0,
                 warningData:{}
             }
@@ -287,6 +288,7 @@
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.config.websocketUrl,this.roadItem1.camSerialNum);*/
                 this.initCarWebSocket();
+                this.initSideCarWebSocket();
             },
             initLightWebSocket(){
                 let _this=this;
@@ -513,6 +515,41 @@
                     return;
                 }
             },
+
+            initSideCarWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.sideCarWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                    _this.sideCarWebsocket.onmessage = _this.onSideCarMessage;
+                    _this.sideCarWebsocket.onclose = _this.onSideCarClose;
+                    _this.sideCarWebsocket.onopen = _this.onSideCarOpen;
+                }
+            },
+            onSideCarMessage(message){
+                this.$refs.tusvnMap.onCarTrackMessage(message);
+            },
+            onSideCarClose(data){
+                console.log("结束连接");
+            },
+            onSideCarOpen(data){
+                //旁车
+                var sideCar = {
+                    "action": "fusel_sider_per_veh",
+                    "vehicleId": this.vehicleId
+                }
+                var sideCarMsg = JSON.stringify(sideCar);
+                this.sendSideCarMsg(sideCarMsg);
+            },
+            sendSideCarMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.sideCarWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.sideCarWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
         },
         mounted(){
             this.option1 = this.getOption();
@@ -536,6 +573,7 @@
             this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
             this.warningCancleWebsocket&&this.warningCancleWebsocket.close();
+            this.sideCarWebsocket&&this.sideCarWebsocket.close();
         }
     }
 </script>
