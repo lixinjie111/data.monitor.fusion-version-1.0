@@ -1015,7 +1015,6 @@
                                     ss += this.timetrans(d2.gpsTime);
                                 }
 
-                                this.$emit("processDataTime",this.timetrans(d2.gpsTime))
                                 // this.$emit("processPerceptionDataTime",ss)
                                 //不丢包
                                 this.processPerceptionMesage();
@@ -1026,8 +1025,8 @@
 
                                 ss += "  耗时：" + hs;
 
-                                this.$emit("processPerceptionDataTime", ss);
-
+                                this.$emit("processPerceptionDataTime", ss,d2.gpsTime);
+//                                this.$emit("processDataTime",d2.gpsTime)
                                 // if(this.lastPerceptionData!=null)
                                 // {
                                 //     this.processPerceptionInterval = d2.gpsTime- this.lastPerceptionData.gpsTime-(timeB-timeA);

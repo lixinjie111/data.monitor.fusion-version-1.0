@@ -4,7 +4,7 @@
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
-        <div class="map-time map-real-time" >{{processDataTime}}</div>
+        <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
             <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
@@ -64,7 +64,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime' @processDataTime='processDataTime'>
+            @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
         </div>
         <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
@@ -144,12 +144,10 @@
                 crossId:'',
                 count:0,
                 vehData:[],
-                isFirstTrans:true,
                 alertCount:0,
                 warningData:{},
                 warningCount:0,
-                isFirstComplete:false,
-                lastLight:[],
+                lastLightObj:{},
                 processDataTime:''
 
                /* pointLeft:10,
@@ -204,7 +202,7 @@
                 if(value!=''){
                     let ms = value%1000;
                     let time = DateFormat.formatTime(value);
-                    return time+":"+ms;
+                    return time+"."+ms;
                 }
             }
         },
@@ -428,14 +426,18 @@
                     }
                 });
             },
-            getTime(time){
+            getTime(time,processTime){
                 if(time!=''){
                     this.time1=time;
                 }
+                if(processTime!=''){
+                    this.processDataTime=processTime;
+                }
             },
-            processDataTime(time){
+           /* processDataTime(time){
+                debugger
                 this.processDataTime=time;
-            },
+            },*/
             getVideo(camera,index){
                 let _this = this;
                 getVideoByNum({
@@ -863,22 +865,6 @@
                 let vehData = json.result.vehDataStat;
                 _this.$emit("getPerceptionData",vehData);
                 _this.vehData.push(vehData);
-//                if(_this.waitingtime!=''){
-//                    if(_this.isFirstTrans){
-//                        _this.isFirstTrans=false;
-//                        setTimeout(()=>{
-//                            _this.$emit("getPerceptionData",_this.vehData);
-//                            console.log("调用。。。")
-//                            _this.isFirstComplete=true;
-//                        },_this.waitingtime)
-//                    }
-//                    if(_this.isFirstComplete){
-//                        _this.vehData.shift();
-//                        _this.$emit("getPerceptionData",_this.vehData);
-//                    }
-//
-//                }
-//                _this.$emit("getPerceptionData",json.result.vehDataStat)
                 _this.time=json.time;
                 /*if(_this.param==3){*/
                     let resultData=[];
@@ -893,9 +879,6 @@
                             }
                             resultData.push(option);
                         });
-                        if(_this.lastLight){
-
-                        }
                         resultData.forEach(function (item,index,arr) {
 
 //                            _this.lightList.forEach((item1,index1)=>{
@@ -917,10 +900,17 @@
                             let img1;
                             let img2;
                             let img3;
+                            let lastItem = _this.lastLightObj[item.spatId];
                             //cross
                             if(item.direction==1){
                                 //cross red
                                 if(item.light=='RED'){
+                                    //每个路灯相位都是固定的
+//                                    if(lastItem.light==item.light){
+//                                        img1="";
+//                                    }else{
+//                                        img1='./static/images/light/cross-red.png';
+//                                    }
                                     img1='./static/images/light/cross-red.png';
                                     img2 = _this.getNumPng('RED',array[0]);
                                     if(array[1]){
@@ -1029,7 +1019,7 @@
                             light.img1=img1;
                             light.img2=img2;
                             light.img3=img3;
-
+                            _this.lastLightObj[item.spatId]=item;
 //                            console.log(light);
                             _this.$refs.perceptionMap.addStaticModel_light_1(light);
 //                            let spatId="light_"+item.spatId;
@@ -1044,6 +1034,7 @@
 //                            })
 
                         })
+                        _this.lastLights = resultData;
                     }
                 /*}*/
             },
@@ -1136,7 +1127,6 @@
                         cameraParam = JSON.parse(this.videoItem1.cameraParam);
                         this.param=1;
                         this.isActive='1';
-                        this.$refs.perceptionMap.light3d();
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
@@ -1147,7 +1137,6 @@
                         cameraParam = JSON.parse(this.videoItem2.cameraParam);
                         this.param=2;
                         this.isActive='2';
-                        this.$refs.perceptionMap.light2d();
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
@@ -1156,10 +1145,9 @@
                 if(param==3){
                     this.param=3;
                     this.isActive='0';
-                    this.$refs.perceptionMap.light2d();
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
-//                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
-                    this.$refs.perceptionMap.updateCameraPosition(326308.49072616524,3462302.055910501,217.21056139773134,204.19919321851978,-1.440593551981663,-2.555594554715729);
+                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
+//                    this.$refs.perceptionMap.updateCameraPosition(326308.49072616524,3462302.055910501,217.21056139773134,204.19919321851978,-1.440593551981663,-2.555594554715729);
                 }
 //                /*if(param==4){
 //                    this.param=4;
@@ -1344,6 +1332,17 @@
         font-size: 14px;
         z-index:2;
         background: #969090;
+    }
+    .map-real-time{
+        position: absolute;
+        width: 300px;
+        font-size: 20px;
+        z-index: 2;
+        margin-top: 50px;
+        left:50%;
+        margin-left:-150px;
+        text-align: left;
+
     }
     .map-time1{
         top:50px!important;
