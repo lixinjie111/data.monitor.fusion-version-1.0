@@ -4,6 +4,7 @@
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
+        <div class="map-time map-real-time" >{{processDataTime}}</div>
         <div class="video-style">
             <div class="style video-position" id="message1">
                 <div class="video-mask" @click="screenMagnify('1')"></div>
@@ -63,7 +64,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
+            @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime' @processDataTime='processDataTime'>
             </tusvn-map>
         </div>
         <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
@@ -108,8 +109,6 @@
                 },
                 option1:{},
                 option2:{},
-                topPosition:0,
-                leftPosition:0,
                 count:0,
                 spatCount:0,
                 signCount:0,
@@ -131,7 +130,6 @@
                 isConMov:false,
                 source:'',
                 lightWebsocket:null,
-                isFirst:true,
                 isMapFirst:true,
                 time:0,
                 param:1, //平面 俯视
@@ -150,7 +148,9 @@
                 alertCount:0,
                 warningData:{},
                 warningCount:0,
-                isFirstComplete:false
+                isFirstComplete:false,
+                lastLight:[],
+                processDataTime:''
 
                /* pointLeft:10,
                 pointTop:10,
@@ -432,6 +432,9 @@
                 if(time!=''){
                     this.time1=time;
                 }
+            },
+            processDataTime(time){
+                this.processDataTime=time;
             },
             getVideo(camera,index){
                 let _this = this;
@@ -890,6 +893,9 @@
                             }
                             resultData.push(option);
                         });
+                        if(_this.lastLight){
+
+                        }
                         resultData.forEach(function (item,index,arr) {
 
 //                            _this.lightList.forEach((item1,index1)=>{
@@ -1023,6 +1029,7 @@
                             light.img1=img1;
                             light.img2=img2;
                             light.img3=img3;
+
 //                            console.log(light);
                             _this.$refs.perceptionMap.addStaticModel_light_1(light);
 //                            let spatId="light_"+item.spatId;
