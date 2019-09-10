@@ -112,22 +112,22 @@
             }*/
             perceptionData:{
                 handler: function (val, oldVal) {
-                    debugger
-                    if(this.perceptionData[0].stat){
-                        this.fusionData = this.perceptionData[0].stat;
+//                    console.log(val);
+                    if(this.perceptionData.stat){
+                        this.fusionData = this.perceptionData.stat;
                     }
                     //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
-                    if(this.perceptionData[0].cbox){
-                        this.platformData=this.perceptionData[0].cbox;
+                    if(this.perceptionData.cbox){
+                        this.platformData=this.perceptionData.cbox;
                     }
-                    if(this.perceptionData[0].vehPer){
-                        this.perceptionData=this.perceptionData[0].vehPer;
+                    if(this.perceptionData.vehPer){
+                        this.perceptionData=this.perceptionData.vehPer;
                     }
-                    if(this.perceptionData[0].rcu){
-                        this.sideData=this.perceptionData[0].rcu;
+                    if(this.perceptionData.rcu){
+                        this.sideData=this.perceptionData.rcu;
                     }
-                    if(this.perceptionData[0].obu){
-                        this.v2xData=this.perceptionData[0].obu;
+                    if(this.perceptionData.obu){
+                        this.v2xData=this.perceptionData.obu;
                     }
                 },
                 deep:true

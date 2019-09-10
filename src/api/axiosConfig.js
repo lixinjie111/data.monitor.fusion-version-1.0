@@ -45,8 +45,13 @@ function axiosFilter(vm) {
                     break;
                 }
                 default: {
-                    vm.$message.error(response.data.message || response.data || '操作失败');
-                    // vm.$message.error('操作失败');
+                    vm.$message({
+                        type: 'error',
+                        duration: '1500',
+                        message: response.data.message || response.data || '操作失败',
+                        showClose: true
+                    });
+                return Promise.reject(response);
                     return Promise.reject(response);
                 }
             }
@@ -56,8 +61,13 @@ function axiosFilter(vm) {
         // }
 
     }, function(error) {
-        vm.$message.error('error!');
-        // return Promise.reject(error);
+        vm.$message({
+            type: 'error',
+            duration: '1500',
+            message: '接口调用失败!',
+            showClose: true
+        });
+        return Promise.reject(error);
     });
 }
 

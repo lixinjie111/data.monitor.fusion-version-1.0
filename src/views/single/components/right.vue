@@ -488,6 +488,7 @@
             this.timer2 = null;//清除直播报活
             this.lightWebsocket&&this.lightWebsocket.close();
             this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
+            this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
         }
     }

@@ -30,7 +30,7 @@
                 realData:{},
                 time:0,
 
-//                perceptionData:{}
+                perceptionData:{}
             }
         },
         components:{
