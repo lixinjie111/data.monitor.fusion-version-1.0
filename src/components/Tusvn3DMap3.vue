@@ -1603,7 +1603,7 @@
                     };
                     cdata.nowRecieveData = d;
 
-                    if (cdata.nowRecieveData.gpsTime <= cdata.lastRecieveData.gpsTime) {
+                    if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime) {
                         console.log("到达顺序错误");
                         return;
                     }
