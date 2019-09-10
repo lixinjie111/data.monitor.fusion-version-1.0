@@ -82,16 +82,6 @@
     export default {
         data() {
             return {
-                lightList:[
-                    /*{
-                        left:250,
-                        top:260,
-                        key:'turn',
-                        lightColor:'RED',
-                        spareTime:'10'
-
-                    }*/
-                ],
                 videoItem1:{
                     rtmp:'',
                     serialNum:'',
@@ -563,7 +553,6 @@
                 }else{
 
                     this.isConMov=true;
-                    this.lightList=[];
                     //向上
                     if(direction=='1'){
                         clearInterval(this.mapTime1);
@@ -764,16 +753,6 @@
                             resultData.push(option);
                         });
                         resultData.forEach(function (item,index,arr) {
-
-//                            _this.lightList.forEach((item1,index1)=>{
-//                                //相交的
-//                                if(item1.spatId==item.spatId){
-//                                    item1.spareTime = item.leftTime;
-//                                    item1.lightColor = item.light;
-//                                    item1.flag=true;
-//                                }
-//                            })
-
                             let light={
                                 /*id: "1",
                                 img1: "./static/images/single/000_03.png",
@@ -963,26 +942,13 @@
                             light.img2=img2;
                             light.img3=img3;
                             _this.lastLightObj[item.spatId]=item;
-//                            console.log(light);
                             _this.$refs.perceptionMap.addStaticModel_light_1(light);
-//                            let spatId="light_"+item.spatId;
-//                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
-//                            _this.lightList.forEach((item1,index1)=>{
-//                                //相交的
-//                                if(item1.spatId==spatId){
-//                                    item1.spareTime = item.leftTime;
-//                                    item1.lightColor = item.light;
-//                                    item1.flag=true;
-//                                }
-//                            })
 
                         })
-                        _this.lastLights = resultData;
                     }
-                /*}*/
             },
             onLightClose(data){
-                console.log("结束连接");
+                console.log("红绿灯结束连接");
             },
             onLightOpen(data){
                 //旁车
@@ -1012,7 +978,6 @@
                 }
             },
             changeMap(param){
-                this.lightList=[];
                 let cameraParam;
                 if(param==1){
                     if(this.videoItem1.cameraParam){
@@ -1139,7 +1104,7 @@
                 }
             },
             onWarningClose(data){
-                console.log("结束连接");
+                console.log("告警结束连接");
             },
             onWarningOpen(data){
                 //旁车
@@ -1183,7 +1148,7 @@
                 })
             },
             onWarningCancleClose(data){
-                console.log("结束连接");
+                console.log("取消告警结束连接");
             },
             onWarningCancleOpen(data){
                 //旁车
