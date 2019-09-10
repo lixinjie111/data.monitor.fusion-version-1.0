@@ -104,6 +104,7 @@
                 rtmp1:'',
                 rtmp2:'',
                 warningWebsocket:null,
+                carWebsocket:null,
                 alertCount:0,
                 warningData:{}
             }
@@ -286,7 +287,7 @@
                 this.$refs.tusvnMap.updateCameraPosition(326181.72659014474,3462354.6747002415,737.3642832288795,741.5052736914325,-1.5707963267948966,-0.05266622778143515);
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.config.websocketUrl,this.roadItem1.camSerialNum);*/
-                this.$refs.tusvnMap.changeMainCarId(window.config.websocketUrl,this.vehicleId);
+                this.initCarWebSocket();
             },
             initLightWebSocket(){
                 let _this=this;
@@ -432,13 +433,48 @@
                     hash |= 0; // Convert to 32bit integer
                 }
                 return hash;
-            }
+            },
+
+            initCarWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.carWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    _this.carWebsocket.onmessage = _this.onCarMessage;
+                    _this.carWebsocket.onclose = _this.onCarClose;
+                    _this.carWebsocket.onopen = _this.onCarOpen;
+                }
+            },
+            onCarMessage(message){
+                this.$refs.tusvnMap.onCarTrackMessage(message);
+            },
+            onCarClose(data){
+                console.log("结束连接");
+            },
+            onCarOpen(data){
+                //旁车
+                var car = {
+                    "action": "sideVehicle",
+                    "vehicleId": this.vehicleId
+                }
+                var carMsg = JSON.stringify(car);
+                this.sendCarMsg(carMsg);
+            },
+            sendCarMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.carWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.carWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
         },
         mounted(){
             this.option1 = this.getOption();
             this.option2 = this.getOption();
             this.getDeviceInfo();
-            this.initLightWebSocket();
+//            this.initLightWebSocket();
             this.initWarningWebSocket();
         },
         components:{

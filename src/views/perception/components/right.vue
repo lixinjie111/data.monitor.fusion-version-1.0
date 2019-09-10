@@ -312,7 +312,7 @@
                     this.x=utm[0];
                     this.y=utm[1];
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                    /*setInterval(()=>{
+                   /* setInterval(()=>{
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
@@ -1211,7 +1211,7 @@
                     this.$refs.perceptionMap.light2d();
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
 //                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
-                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
+                    this.$refs.perceptionMap.updateCameraPosition(326308.49072616524,3462302.055910501,217.21056139773134,204.19919321851978,-1.440593551981663,-2.555594554715729);
                 }
 //                /*if(param==4){
 //                    this.param=4;

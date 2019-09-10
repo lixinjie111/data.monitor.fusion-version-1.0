@@ -573,6 +573,7 @@ export default {
       }
     },
     add3DInfoLabel: function(name, text, x, y, z) {
+        return;
       var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05,45, 0, 0);
       var cylinderMat = new THREE.MeshLambertMaterial({
         //创建材料

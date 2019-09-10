@@ -1201,8 +1201,7 @@ export default {
             console.log(e);
         },
         //单车监控改变监控车辆
-        changeMainCarId:function(url,carid)
-        {
+        changeMainCarId:function(url,carid){
             // debugger;
 
             this.cartrackwebsocketUrl = url;
@@ -1259,8 +1258,7 @@ export default {
                 }
             }
         },
-        onCarTrackMessage:function(data)
-        {
+        onCarTrackMessage:function(data){
             // console.log(data);
             // console.log("====================onCarTrackMessage===================");
             // let nowtime = new Date().getTime();
