@@ -59,46 +59,11 @@
             </div>
         </div>
         <div class="map-left"></div>
-        <div class="spat-detail " v-for="(item,key) in lightList" :style="{left:item.left+'px',top:item.top+'px'}" v-show="item.flag">
-               <!-- <div  v-for="(item,key) in obj.lightData" class="spat-layout" :key="key">-->
-                    <div v-show="item.key=='turn'" class="spat-detail-style">
-                        <div class="spat-detail-img" >
-                            <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'" class="turn-img"/>
-                            <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"  class="turn-img"/>
-                            <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"  class="turn-img"/>
-                        </div>
-                        <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                    </div>
-                    <div v-show="item.key=='left'" class="spat-detail-style">
-                        <div class="spat-detail-img">
-                            <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
-                            <img src="@/assets/images/single/light/left-red.png" class="left-img" v-show="item.lightColor=='RED'"/>
-                            <img src="@/assets/images/single/light/left-green.png" class="left-img" v-show="item.lightColor=='GREEN'"/>
-                        </div>
-                        <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                    </div>
-                    <div v-show="item.key=='cross'" class="spat-detail-style">
-                        <div class="spat-detail-img spat-straight">
-                            <img src="@/assets/images/single/light/left-yellow.png" class="straight-img" v-show="item.lightColor=='YELLOW'" />
-                            <img src="@/assets/images/single/light/left-red.png" class="straight-img" v-show="item.lightColor=='RED'"/>
-                            <img src="@/assets/images/single/light/left-green.png" class="straight-img" v-show="item.lightColor=='GREEN'"/>
-                        </div>
-                        <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                    </div>
-                    <div v-show="item.key=='right'" class="spat-detail-style">
-                        <div class="spat-detail-img spat-right">
-                            <img src="@/assets/images/single/light/left-yellow.png" class="right-img" v-show="item.lightColor=='YELLOW'"/>
-                            <img src="@/assets/images/single/light/left-red.png"  class="right-img" v-show="item.lightColor=='RED'"/>
-                            <img src="@/assets/images/single/light/left-green.png" class="right-img" v-show="item.lightColor=='GREEN'"/>
-                        </div>
-                        <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                    </div>
-                </div>
         <div id="map" class="c-map">
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete" @CameraChanged='cameraChanged'  @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
+            @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
         </div>
         <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
@@ -336,6 +301,7 @@
                     this.typeRoadData();
                     this.initWarningWebSocket();
                     this.initLightWebSocket();
+                    this.getMap();
 //                    this.$emit('getCurrentExtent', this.currentExtent);
                     return;
                 }
@@ -346,32 +312,6 @@
                 this.$refs.map1.zoomTo(10);
                 this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,window.dlWmsOption.GD_ROAD_CENTERLINE,1,true,null); // 上海汽车城
 
-            },
-            cameraChanged(){
-                console.log("窗口发生变化");
-                if(this.first){
-                    this.getMap();
-                }
-                this.lightList=[];
-             /*   if(!this.first&&this.count==0){
-                    console.log("---------")
-                    this.count=1;
-//                    this.cameraParam = this.$refs.perceptionMap.getCamera();
-//                    this.lightList=[];
-                    this.getMap();
-                    this.getData();
-                    let time = setTimeout(()=>{
-                        this.count=0;
-                        console.log("灯长度："+this.lightList.length)
-                        if(this.lightList.length==0){
-                            this.getMap();
-                            this.getData()
-                        }
-                        clearTimeout(time);
-                    },3000)
-
-                }*/
-                this.isFirst=false;
             },
             getData(){
 //                this.getCurrentExtent();
@@ -918,21 +858,23 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
                 let vehData = json.result.vehDataStat;
+                _this.$emit("getPerceptionData",vehData);
                 _this.vehData.push(vehData);
-                if(_this.waitingtime!=''){
-                    if(_this.isFirstTrans){
-                        _this.isFirstTrans=false;
-                        setTimeout(()=>{
-                            _this.$emit("getPerceptionData",_this.vehData);
-                            _this.isFirstComplete=true;
-                        },_this.waitingtime)
-                    }
-                    if(_this.isFirstComplete){
-                        _this.vehData.shift();
-                        _this.$emit("getPerceptionData",_this.vehData);
-                    }
-
-                }
+//                if(_this.waitingtime!=''){
+//                    if(_this.isFirstTrans){
+//                        _this.isFirstTrans=false;
+//                        setTimeout(()=>{
+//                            _this.$emit("getPerceptionData",_this.vehData);
+//                            console.log("调用。。。")
+//                            _this.isFirstComplete=true;
+//                        },_this.waitingtime)
+//                    }
+//                    if(_this.isFirstComplete){
+//                        _this.vehData.shift();
+//                        _this.$emit("getPerceptionData",_this.vehData);
+//                    }
+//
+//                }
 //                _this.$emit("getPerceptionData",json.result.vehDataStat)
                 _this.time=json.time;
                 /*if(_this.param==3){*/
@@ -1207,7 +1149,6 @@
                 if(param==3){
                     this.param=3;
                     this.isActive='0';
-                    this.isFirst=true;
                     this.$refs.perceptionMap.light2d();
 //                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
 //                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
