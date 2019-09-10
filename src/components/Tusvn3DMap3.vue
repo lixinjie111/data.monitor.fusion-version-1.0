@@ -682,7 +682,7 @@
                 }
             },
             add3DInfoLabel: function(name, text, x, y, z) {
-                var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05,45, 0, 0);
+                var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05,16, 0, 0);
                 var cylinderMat = new THREE.MeshLambertMaterial({
                     //创建材料
                     color: 0xab6503,
@@ -698,9 +698,9 @@
                     y
                 );
 
-                cylinderMesh.position.set(utm[0], utm[1], z); //设置圆柱坐标
+                cylinderMesh.position.set(utm[0], utm[1],z+8); //设置圆柱坐标
                 cylinderMesh.rotation.x = Math.PI / 2;
-                cylinderMesh.position.set(utm[0], utm[1], z);
+                //cylinderMesh.position.set(utm[0], utm[1], z);
 
                 dl.scene.add(cylinderMesh);
 
@@ -708,7 +708,7 @@
 
                 var text1 = new dl.Text({
                     text: text,
-                    fontsize: 600,
+                    fontsize: 200,
                     borderThickness: 1
                 });
                 text1.setBorderColor({ r: 171, g: 101, b: 3, a: 1.0 });
@@ -716,7 +716,7 @@
                 text1.setTextColor({ r: 171, g: 101, b: 3, a: 1.0 });
                 //text1.setPositon([326299.8136019115,3462328.443327571,34.16186920538662]);
 
-                text1.setPositon([utm[0], utm[1], z + 24.4]);
+                text1.setPositon([utm[0], utm[1], z + 16]);
                 this.infoLabels["label"][name] = text1;
                 dl.scene.add(text1);
 

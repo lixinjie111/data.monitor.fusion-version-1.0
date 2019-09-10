@@ -1,9 +1,9 @@
 /**
  * 自定义box
- * @param {x坐标} x 
- * @param {y坐标} y 
- * @param {y坐标} z 
- * @param {线颜色} color 
+ * @param {x坐标} x
+ * @param {y坐标} y
+ * @param {y坐标} z
+ * @param {线颜色} color
  */
 export function addMyBox(x, y, z, color) {
     //判断是否为空
@@ -63,7 +63,7 @@ THREE.Outline.prototype.update = (function () {
     var outline = new THREE.Box3();
     return function (object) {
         outline.setFromObject(object);
-        if (outline.empty()) return;
+        if (outline.isEmpty()) return;
         var min = outline.min;
         var max = outline.max;
         /*
