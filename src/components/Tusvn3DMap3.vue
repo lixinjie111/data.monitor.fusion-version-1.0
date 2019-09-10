@@ -68,6 +68,7 @@
                 lastPerceptionMessage: null,
                 platformCars: null,
                 cachePerceptionQueue: new Array(), //缓存感知数据
+                processPerceptionDataIntervalId:null,
                 processPerceptionInterval: 30, //处理缓存数据的间隔
                 waitingProcessPerceptionTime: 0,
                 lastPerceptionData: null,
@@ -936,7 +937,7 @@
 
             processPerceptionData: function() {
 //      let timeA = new Date().getTime();
-                setInterval(() => {
+                this.processPerceptionDataIntervalId = setInterval(() => {
                     this.timeA = new Date().getTime();
                     //                console.log(this.timeA-this.timeB);
                     //                console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
@@ -2652,6 +2653,13 @@
             }
 
             this.cacheAndInterpolateDataByVid = {};
+
+            if(this.processPerceptionDataIntervalId!=null)
+            {
+                clearInterval(this.processPerceptionDataIntervalId);
+                this.processPerceptionDataIntervalId=null;
+            }
+            this.cachePerceptionQueue = new Array();
         }
     };
 </script>
