@@ -237,7 +237,7 @@
                 //插值后的平台车处理
                 setTimeout(() => {
                     this.processPlatformCarsTrack();
-                }, 1000);
+                }, 10);
 
             },
             /**
