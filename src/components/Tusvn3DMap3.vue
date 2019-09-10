@@ -235,8 +235,7 @@ export default {
       //插值后的平台车处理
       setTimeout(() => {
         this.processPlatformCarsTrack();
-      }, 1000);
-
+      }, 10);
     },
     /**
      * 地图沿屏幕x,y,z方向移动
@@ -1513,7 +1512,7 @@ export default {
           cdata.nowRecieveData = d;
 
           if (cdata.nowRecieveData.gpsTime <= cdata.lastRecieveData.gpsTime) {
-            console.log("到达顺序错误");
+            console.log("到达顺序错误："+vid+"  "+cdata.nowRecieveData.gpsTime +", "+cdata.lastRecieveData.gpsTime);
             return;
           }
           let deltaTime = cdata.nowRecieveData.gpsTime - cdata.lastRecieveData.gpsTime;
