@@ -349,7 +349,7 @@
             addText: function(name, text, x, y, z) {
                 var text1 = new dl.Text({
                     text: text,
-                    fontsize: this.fontSize,
+                    fontsize:this.fontsize,
                     borderThickness: 0,
                     textColor: { r: 0, g: 0, b: 0, a: 1.0 }
                 });
@@ -359,8 +359,15 @@
             removeModel: function(name) {
                 let m = this.getModel(name);
                 if (m != null) {
-                    dl.removeModel(m, dl.viewer);
-                    delete this.models[name];
+                    try
+                    {
+                        dl.removeModel(m, dl.viewer);
+                        delete this.models[name];
+                    }
+                    catch(err)
+                    {
+
+                    }
                 }
             },
             addGeometry: function(geomModel) {
@@ -697,6 +704,8 @@
                         transparent: true,
                         opacity: 1
                     });
+                    box_metal2.alphaTest = 0.1;
+
                     var mesh2 = new THREE.Mesh(geometry2, box_metal2);
                     mesh2.position.x = x - 2 + xrotation;
                     mesh2.position.y = y;
@@ -865,8 +874,8 @@
                 });
             },
             animate: function(time) {
-                requestAnimationFrame(animate);
-                TWEEN.update(time);
+                // requestAnimationFrame(animate);
+                // TWEEN.update(time);
             },
             update: function(e) {
                 // console.log("=====================update====================================");
@@ -1053,6 +1062,7 @@
             addPerceptionData: function(data) {
                 //     console.log("===========addPerceptionData=============");
                 //     console.log(new Date().getTime());
+
                 this.cachePerceptionQueue.push(data);
             },
 
@@ -1073,8 +1083,10 @@
                                 this.platformCars = data2.result.vehDataDTO;
                             }
                             let d2 = null;
+                            let d2_vehDataStat = null;
                             try {
                                 d2 = data2.result.vehDataDTO[0];
+                                d2_vehDataStat=data2.result.vehDataStat;
                                 length = data2.result.vehDataDTO.length;
                             } catch (e) {
 //              console.log(data2.result);
@@ -1140,14 +1152,15 @@
                                 // this.$emit("processPerceptionDataTime",ss)
                                 //不丢包
                                 this.processPerceptionMesage();
-                                this.processPlatformCars();
+                                //  this.processPlatformCars();
                                 this.timeB = new Date().getTime();
 
                                 let hs = this.timeB - this.timeA;
 
                                 ss += "  耗时：" + hs;
 
-                                this.$emit("processPerceptionDataTime", ss,d2.gpsTime);
+
+                                this.$emit("processPerceptionDataTime", ss,d2.gpsTime,d2_vehDataStat);
 //                                this.$emit("processDataTime",d2.gpsTime)
                                 // if(this.lastPerceptionData!=null)
                                 // {
@@ -1651,7 +1664,7 @@
                         //     let data3 = this.cacheMainCarTrackData.shift();
                         //     this.animateCar3(data3);
                         // }
-                        // debugger
+                        //
                         if (this.cacheMainCarTrackData.length == 0) {
                             this.cacheMainCarTrackData.push(data2);
                         } else {
