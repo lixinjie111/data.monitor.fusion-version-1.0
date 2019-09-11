@@ -207,16 +207,39 @@
                     lights3.push(lightObj5);
                     this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights3)
 
-                    // //6路口
-                    // let lights6=new Array();
-                    // let lightObj6_1={
-                    //     id:"274",
-                    //     img1: "./static/images/light/left-red.png",
-                    //     img2: "./static/images/light/2.png",
-                    //     img3: "./static/images/light/6.png"
-                    // };
-                    // lights6.push(lightObj6_1);
-                    // this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights6)
+                    //6路口
+                    let lights6=new Array();
+                    let lightObj6_1={
+                        id:"274",
+                        img1: "./static/images/light/left-red.png",
+                        img2: "./static/images/light/2.png",
+                        img3: "./static/images/light/6.png"
+                    };
+                    lights6.push(lightObj6_1);
+                    this.addModel_light_y(121.17073573444654,31.284232094641546,25,lights6)
+
+
+
+                    let lights7=new Array();
+                    let lightObj7_1={
+                        id:"283",
+                        img1: "./static/images/light/left-red.png",
+                        img2: "./static/images/light/2.png",
+                        img3: "./static/images/light/6.png"
+                    };
+                    lights7.push(lightObj7_1);
+                    this.addModel_light(121.17087729460859,31.28414862604421,25,lights7)
+
+                    let lights8=new Array();
+                    let lightObj8_1={
+                        id:"273",
+                        img1: "./static/images/light/left-red.png",
+                        img2: "./static/images/light/2.png",
+                        img3: "./static/images/light/6.png"
+                    };
+                    lights8.push(lightObj8_1);
+                    this.addModel_light_y_6(121.17120509259806,31.284269933013952,25,lights8)
+
                     this.$emit("mapcomplete", this);
                     // dl.viewer.controls.addEventListener("drop", this.onDrop);
                     // dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
@@ -536,6 +559,79 @@
                     mesh3.rotation.z = (Math.PI / 180) * 180;
 
                     mesh3.rotation.y = (Math.PI / 180) * 90;
+
+                    var group = new THREE.Group();
+                    group.add(mesh1);
+                    group.add(mesh2);
+                    group.add(mesh3);
+                    group.name = cacheLightData[i].id;
+                    dl.scene.add(group);
+                }
+            },
+            addModel_light_y_6: function(x, y, z,cacheLightData) {
+                this.cacheLightData.push(cacheLightData);
+                let utm = this.coordinateTransfer(
+                    "EPSG:4326",
+                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    x,
+                    y
+                );
+                x = utm[0];
+                y = utm[1];
+                for (var i = 0; i < cacheLightData.length; i++) {
+                    var xrotation = 5 * i;
+                    var geometry1 = new THREE.CircleGeometry(1, 32);
+                    var texture = new THREE.TextureLoader().load(
+                        cacheLightData[i].img1
+                    );
+                    var box_metal1 = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        opacity: 1
+                    });
+                    var mesh1 = new THREE.Mesh(geometry1, box_metal1);
+                    mesh1.position.y = y + xrotation;
+                    mesh1.position.x = x;
+                    mesh1.position.z = z;
+                    mesh1.rotation.x = (-Math.PI / 180) * 90;
+                    mesh1.rotation.z = (Math.PI / 180) * 180;
+
+                    mesh1.rotation.y = (-Math.PI / 180) * 90;
+
+                    var geometry2 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var texture2 = new THREE.TextureLoader().load(
+                        cacheLightData[i].img2
+                    );
+                    var box_metal2 = new THREE.MeshBasicMaterial({
+                        map: texture2,
+                        transparent: true,
+                        opacity: 1
+                    });
+                    var mesh2 = new THREE.Mesh(geometry2, box_metal2);
+                    mesh2.position.y = y - 2 + xrotation;
+                    mesh2.position.x = x;
+                    mesh2.position.z = z;
+                    mesh2.rotation.x = (-Math.PI / 180) * 90;
+                    mesh2.rotation.z = (Math.PI / 180) * 180;
+
+                    mesh2.rotation.y= (-Math.PI / 180) * 90;
+
+                    var geometry3 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var texture3 = new THREE.TextureLoader().load(
+                        cacheLightData[i].img3
+                    );
+                    var box_metal3 = new THREE.MeshBasicMaterial({
+                        map: texture3,
+                        transparent: true,
+                        opacity: 1
+                    });
+                    var mesh3 = new THREE.Mesh(geometry3, box_metal3);
+                    mesh3.position.y = y- 3 + xrotation;
+                    mesh3.position.x = x;
+                    mesh3.position.z = z;
+                    mesh3.rotation.x = (-Math.PI / 180) * 90;
+                    mesh3.rotation.z = (Math.PI / 180) * 180;
+
+                    mesh3.rotation.y = (-Math.PI / 180) * 90;
 
                     var group = new THREE.Group();
                     group.add(mesh1);
