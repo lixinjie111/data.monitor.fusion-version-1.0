@@ -847,6 +847,7 @@
                 var group = new THREE.Group();
                 group.add(cylinderMesh);
                 group.add(text1);
+                group.name=name;
                 dl.scene.add(group);
 
                 this.models[name] = group;

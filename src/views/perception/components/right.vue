@@ -416,13 +416,14 @@
                     }
                 });
             },
-            getTime(time,processTime){
+            getTime(time,processTime,vehDataStat){
                 if(time!=''){
                     this.time1=time;
                 }
                 if(processTime!=''){
                     this.processDataTime=processTime;
                 }
+                this.$emit("getPerceptionData",vehDataStat);
             },
            /* processDataTime(time){
                 debugger
@@ -735,9 +736,9 @@
                 _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
-                let vehData = json.result.vehDataStat;
-                _this.$emit("getPerceptionData",vehData);
-                _this.vehData.push(vehData);
+//                let vehData = json.result.vehDataStat;
+//                _this.$emit("getPerceptionData",vehData);
+//                _this.vehData.push(vehData);
                 _this.time=json.time;
                 /*if(_this.param==3){*/
                     let resultData=[];
