@@ -85,7 +85,7 @@
                 cacheMainCarTrackData: new Array(),
                 lastMainCarData: null,
                 lastMainCarData2: null,
-                stepTime: 150.0,
+                stepTime: 50,
                 monitorTag: true,
                 time2: 0, //微调移动车的时间间隔
                 intervalIds: new Array(),
@@ -101,7 +101,7 @@
                 //     "1-2":new Array()
                 // }//旁车模型
                 pmodels: {},
-                pCacheModelNum: 200,
+                pCacheModelNum: 100,
 
                 matStdObjects: new THREE.MeshStandardMaterial({
                     color: 0xef56e4,
@@ -270,7 +270,7 @@
                 //插值后的平台车处理
                 setTimeout(() => {
                     this.processPlatformCarsTrack();
-                }, 10);
+                }, 0);
 
             },
             /**
@@ -1152,7 +1152,7 @@
                                 // this.$emit("processPerceptionDataTime",ss)
                                 //不丢包
                                 this.processPerceptionMesage();
-                                //  this.processPlatformCars();
+                                this.processPlatformCars();
                                 this.timeB = new Date().getTime();
 
                                 let hs = this.timeB - this.timeA;
