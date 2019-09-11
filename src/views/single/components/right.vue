@@ -317,7 +317,7 @@
                         }
                         resultData.push(option);
                     });
-                    /*resultData.forEach(function (item,index,arr) {
+                    resultData.forEach(function (item,index,arr) {
                         let light={};
                         let array=(item.leftTime+"").split("");
                         let img1;
@@ -502,7 +502,6 @@
                         light.img2=img2;
                         light.img3=img3;
                         _this.lastLightObj[item.spatId]=item;
-//                            console.log(light);
                         _this.$refs.tusvnMap.addStaticModel_light_1(light);
 //                            let spatId="light_"+item.spatId;
 //                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
@@ -515,8 +514,8 @@
 //                                }
 //                            })
 
-                    })*/
-                    resultData.forEach(function (item,index,arr) {
+                    })
+                   /* resultData.forEach(function (item,index,arr) {
                         let direction = item.direction + "";
                         let key = 'key_' + direction;
                         _this.lightData[key].spareTime = item.leftTime;
@@ -528,7 +527,7 @@
                         _this.lightData[key].time = setTimeout(item => {
                             _this.lightData[key].flag = false;
                         }, 3000)
-                    })
+                    })*/
                 }
                /* resultData.forEach(function (item,index,arr) {
                     let direction = item.direction + "";
