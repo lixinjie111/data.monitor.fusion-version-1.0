@@ -207,16 +207,16 @@
                     lights3.push(lightObj5);
                     this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights3)
 
-                    //6路口
-                    let lights6=new Array();
-                    let lightObj6_1={
-                        id:"274",
-                        img1: "./static/images/light/left-red.png",
-                        img2: "./static/images/light/2.png",
-                        img3: "./static/images/light/6.png"
-                    };
-                    lights6.push(lightObj6_1);
-                    this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights6)
+                    // //6路口
+                    // let lights6=new Array();
+                    // let lightObj6_1={
+                    //     id:"274",
+                    //     img1: "./static/images/light/left-red.png",
+                    //     img2: "./static/images/light/2.png",
+                    //     img3: "./static/images/light/6.png"
+                    // };
+                    // lights6.push(lightObj6_1);
+                    // this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights6)
                     this.$emit("mapcomplete", this);
                     // dl.viewer.controls.addEventListener("drop", this.onDrop);
                     // dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
@@ -1768,7 +1768,7 @@
                         this.defualtZ
                     );
 
-                    ///
+                    ///ceshi
                     this.addText(vid+"text",vid,position[0],
                         position[1],
                         this.defualtZ)
@@ -1783,7 +1783,7 @@
                     );
 
 
-                    ////////////
+                    ////////////ceshi
                     this.models[vid+"text"].position.set(position[0], position[1], this.defualtZ+2);
                     this.models[vid+"text"].rotation.set(
                         this.pitch,
