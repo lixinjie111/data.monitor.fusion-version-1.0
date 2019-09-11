@@ -750,7 +750,7 @@
                 }
                 return hash;
             },
-
+            //平台车
             initCarWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
@@ -803,8 +803,11 @@
                 let warningIds = JSON.parse(warningCancleData);
                 warningIds.forEach(warningId=>{
                     obj = _this.warningData[warningId];
-                    _this.$refs.perceptionMap.removeModel(obj.id);
-                    delete _this.warningData[warningId];
+                    //防止路口页面和单车页面事件交叉影响
+                    if(obj&&obj.id){
+                        _this.$refs.perceptionMap.removeModel(obj.id);
+                        delete _this.warningData[warningId];
+                    }
                 })
             },
             onWarningCancleClose(data){
@@ -830,7 +833,7 @@
                     return;
                 }
             },
-
+            //融合车
             initSideCarWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {

@@ -138,7 +138,8 @@
                 warningData:{},
                 warningCount:0,
                 lastLightObj:{},
-                processDataTime:''
+                processDataTime:'',
+                removeEventObj:{}
 
                /* pointLeft:10,
                 pointTop:10,
@@ -1071,6 +1072,9 @@
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                        if(_this.removeEventObj[warningId]){
+                            return;
+                        }
                         let msg = item.warnMsg;
                         let warningObj={
                             longitude:item.longitude,
@@ -1144,8 +1148,19 @@
                 let warningIds = JSON.parse(warningCancleData);
                 warningIds.forEach(warningId=>{
                     obj = _this.warningData[warningId];
-                    _this.$refs.perceptionMap.removeModel(obj.id);
-                    delete _this.warningData[warningId];
+                    //防止路口页面和单车页面事件交叉影响
+                    if(obj&&obj.id){
+                        _this.$refs.perceptionMap.removeModel(obj.id);
+                        delete _this.warningData[warningId];
+                        let eventObj = {
+                            id:warningId,
+                            time:null
+                        }
+                        eventObj.time=setTimeout(()=>{
+                            delete _this.removeEventObj[warningId];
+                        },2000)
+                        _this.removeEventObj[warningId]=eventObj;
+                    }
                 })
             },
             onWarningCancleClose(data){
