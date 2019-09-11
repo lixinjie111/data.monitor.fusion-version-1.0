@@ -207,7 +207,16 @@
                     lights3.push(lightObj5);
                     this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights3)
 
-///this.addModel_light(121.17533995826606,31.282071700494583,30,lights3)
+                    //6路口
+                    let lights6=new Array();
+                    let lightObj6_1={
+                        id:"274",
+                        img1: "./static/images/light/left-red.png",
+                        img2: "./static/images/light/2.png",
+                        img3: "./static/images/light/6.png"
+                    };
+                    lights6.push(lightObj6_1);
+                    this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights6)
                     this.$emit("mapcomplete", this);
                     // dl.viewer.controls.addEventListener("drop", this.onDrop);
                     // dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
@@ -313,6 +322,16 @@
                 model.position.z = z;
                 dl.scene.add(model);
                 this.models[name] = model;
+            },
+            addText: function(name, text, x, y, z) {
+                var text1 = new dl.Text({
+                    text: text,
+                    fontsize: this.fontSize,
+                    borderThickness: 0,
+                    textColor: { r: 0, g: 0, b: 0, a: 1.0 }
+                });
+                dl.scene.add(text1);
+                this.models[name] = text1;
             },
             removeModel: function(name) {
                 let m = this.getModel(name);
@@ -1714,6 +1733,7 @@
                         position[1],
                         this.defualtZ
                     );
+
                 } else {
                     this.models[vid].position.set(position[0], position[1], this.defualtZ);
                     this.models[vid].rotation.set(
@@ -1721,6 +1741,8 @@
                         this.yaw,
                         (-Math.PI / 180) * data.heading
                     );
+
+
                 }
 
                 dl.moveTo({
@@ -1745,9 +1767,25 @@
                         position[1],
                         this.defualtZ
                     );
+
+                    ///
+                    this.addText(vid+"text",vid,position[0],
+                        position[1],
+                        this.defualtZ)
+
+
                 } else {
                     this.models[vid].position.set(position[0], position[1], this.defualtZ);
                     this.models[vid].rotation.set(
+                        this.pitch,
+                        this.yaw,
+                        (-Math.PI / 180) * data.heading
+                    );
+
+
+                    ////////////
+                    this.models[vid+"text"].position.set(position[0], position[1], this.defualtZ+2);
+                    this.models[vid+"text"].rotation.set(
                         this.pitch,
                         this.yaw,
                         (-Math.PI / 180) * data.heading
