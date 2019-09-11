@@ -100,8 +100,8 @@
                 //     "1-1":new Array(),
                 //     "1-2":new Array()
                 // }//旁车模型
-                pmodels: [],
-                pCacheModelNum: 100,
+                pmodels: {},
+                pCacheModelNum: 200,
 
                 matStdObjects: new THREE.MeshStandardMaterial({
                     color: 0xef56e4,
@@ -1460,13 +1460,14 @@
                     return;
                 }
                 let data = this.cacheTrackCarData;
-
                 let json = JSON.parse(data.data);
                 // console.log(json);
                 //处理旁车信息
                 let pcars = json.result.data;
                 if (pcars != null) {
-                    if (this.pmodels.length == 0) {
+
+                    if (Object.getOwnPropertyNames(this.pmodels).length==1) {
+                        // if (this.pmodels.length == 0) {
                         for (let m = 0; m < this.pCacheModelNum; m++) {
                             let mesh1 = new THREE.MeshStandardMaterial({
                                 color: 0xab6604,
@@ -1484,11 +1485,12 @@
                             model1.castShadow = true;
                             model1.receiveShadow = true;
                             dl.scene.add(model1);
-                            this.pmodels.push(model1);
+                            // this.pmodels.push(model1);
+                            this.pmodels["gzc"+m]=model1;
                         }
                     }
-                    for (let i = 0; i < this.pmodels.length; i++) {
-                        var model = this.pmodels[i];
+                    for (let i = 0; i < this.pCacheModelNum; i++) {
+                        let model = this.pmodels["gzc"+i];
                         model.position.set(0, 0, this.defualtZ);
                     }
 
@@ -1499,14 +1501,14 @@
                                 pcar.longitude,
                                 pcar.latitude
                             ]);
-                            let model = this.pmodels[n];
+                            let model = this.pmodels["gzc"+n];
                             model.position.set(dUTM[0], dUTM[1], this.defualtZ);
                             model.rotation.set(
                                 this.pitch,
                                 this.yaw,
                                 (-Math.PI / 180) * pcar.heading
                             );
-                            this.changeModelColor(pcar, model);
+                            // this.changeModelColor(pcar, model);
                         } else {
                             //type=1  平台注册的车
                             // this.animateCar(pcar);
@@ -1523,6 +1525,51 @@
                     this.mainCarVID = data2.vehicleId;
                     this.cacheAndInterpolatePlatformCar(data2);
                     return;
+                    // console.log(data2);
+                    // data2.gpsTime = new Date().getTime();
+                    // this.animateCar(data2);
+                    if (data2.vehicleId == this.mainCarVID) {
+                        // console.log(this.cacheMainCarTrackData.length);
+                        // this.cacheMainCarTrackData.push(data2);
+                        // if(this.cacheMainCarTrackData.length<=2)
+                        // {
+                        //     let data3 = this.cacheMainCarTrackData.shift();
+                        //     this.animateCar3(data3);
+                        // }
+                        // debugger
+                        if (this.cacheMainCarTrackData.length == 0) {
+                            this.cacheMainCarTrackData.push(data2);
+                        } else {
+                            if (data2.gpsTime <= this.lastMainCarData.gpsTime) {
+                                return;
+                            }
+                            let deltaTime = data2.gpsTime - this.lastMainCarData.gpsTime;
+                            if (deltaTime <= this.stepTime) {
+                                this.cacheMainCarTrackData.push(data2);
+                            } else {
+                                //插值处理
+                                let deltaLon = data2.longitude - this.lastMainCarData.longitude;
+                                let deltaLat = data2.latitude - this.lastMainCarData.latitude;
+                                let steps = Math.ceil(deltaTime / this.stepTime);
+                                let timeStep = deltaTime / steps;
+                                let lonStep = deltaLon / steps;
+                                let latStep = deltaLat / steps;
+                                for (let i = 1; i <= steps; i++) {
+                                    let d = {};
+                                    d.longitude = this.lastMainCarData.longitude + lonStep * i;
+                                    d.latitude = this.lastMainCarData.latitude + latStep * i;
+                                    d.gpsTime = this.lastMainCarData.gpsTime + timeStep * i;
+                                    d.heading = data2.heading;
+                                    d.vehicleId = data2.vehicleId;
+
+                                    this.cacheMainCarTrackData.push(d);
+                                }
+                            }
+                        }
+                        this.lastMainCarData = data2;
+                    } else {
+                        // this.animateCar(data2);
+                    }
                 }
             },
             //缓存并且插值平台车轨迹
@@ -1604,7 +1651,7 @@
                                 }else{
                                     this.moveCar2(cardata);
                                 }
-                                
+
                             }
                         }
                     }
