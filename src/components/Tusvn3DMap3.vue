@@ -85,7 +85,7 @@
                 cacheMainCarTrackData: new Array(),
                 lastMainCarData: null,
                 lastMainCarData2: null,
-                stepTime: 50,
+                stepTime: 60,
                 monitorTag: true,
                 time2: 0, //微调移动车的时间间隔
                 intervalIds: new Array(),
