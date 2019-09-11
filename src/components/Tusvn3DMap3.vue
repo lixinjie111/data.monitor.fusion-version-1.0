@@ -68,6 +68,7 @@
                 lastPerceptionMessage: null,
                 platformCars: null,
                 cachePerceptionQueue: new Array(), //缓存感知数据
+                processPerceptionDataIntervalId:null,
                 processPerceptionInterval: 30, //处理缓存数据的间隔
                 waitingProcessPerceptionTime: 0,
                 lastPerceptionData: null,
@@ -99,8 +100,8 @@
                 //     "1-1":new Array(),
                 //     "1-2":new Array()
                 // }//旁车模型
-                pmodels: [],
-                pCacheModelNum: 100,
+                pmodels: {},
+                pCacheModelNum: 200,
 
                 matStdObjects: new THREE.MeshStandardMaterial({
                     color: 0xef56e4,
@@ -206,7 +207,39 @@
                     lights3.push(lightObj5);
                     this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights3)
 
-///this.addModel_light(121.17533995826606,31.282071700494583,30,lights3)
+                    //6路口
+                    let lights6=new Array();
+                    let lightObj6_1={
+                        id:"274",
+                        img1: "./static/images/light/left-red.png",
+                        img2: "./static/images/light/2.png",
+                        img3: "./static/images/light/6.png"
+                    };
+                    lights6.push(lightObj6_1);
+                    this.addModel_light_y(121.17073573444654,31.284232094641546,25,lights6)
+
+
+
+                    let lights7=new Array();
+                    let lightObj7_1={
+                        id:"283",
+                        img1: "./static/images/light/left-red.png",
+                        img2: "./static/images/light/2.png",
+                        img3: "./static/images/light/6.png"
+                    };
+                    lights7.push(lightObj7_1);
+                    this.addModel_light(121.17087729460859,31.28414862604421,25,lights7)
+
+                    let lights8=new Array();
+                    let lightObj8_1={
+                        id:"273",
+                        img1: "./static/images/light/left-red.png",
+                        img2: "./static/images/light/2.png",
+                        img3: "./static/images/light/6.png"
+                    };
+                    lights8.push(lightObj8_1);
+                    this.addModel_light_y_6(121.17120509259806,31.284269933013952,25,lights8)
+
                     this.$emit("mapcomplete", this);
                     // dl.viewer.controls.addEventListener("drop", this.onDrop);
                     // dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
@@ -237,7 +270,7 @@
                 //插值后的平台车处理
                 setTimeout(() => {
                     this.processPlatformCarsTrack();
-                }, 1000);
+                }, 10);
 
             },
             /**
@@ -312,6 +345,16 @@
                 model.position.z = z;
                 dl.scene.add(model);
                 this.models[name] = model;
+            },
+            addText: function(name, text, x, y, z) {
+                var text1 = new dl.Text({
+                    text: text,
+                    fontsize: this.fontSize,
+                    borderThickness: 0,
+                    textColor: { r: 0, g: 0, b: 0, a: 1.0 }
+                });
+                dl.scene.add(text1);
+                this.models[name] = text1;
             },
             removeModel: function(name) {
                 let m = this.getModel(name);
@@ -525,6 +568,79 @@
                     dl.scene.add(group);
                 }
             },
+            addModel_light_y_6: function(x, y, z,cacheLightData) {
+                this.cacheLightData.push(cacheLightData);
+                let utm = this.coordinateTransfer(
+                    "EPSG:4326",
+                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    x,
+                    y
+                );
+                x = utm[0];
+                y = utm[1];
+                for (var i = 0; i < cacheLightData.length; i++) {
+                    var xrotation = 5 * i;
+                    var geometry1 = new THREE.CircleGeometry(1, 32);
+                    var texture = new THREE.TextureLoader().load(
+                        cacheLightData[i].img1
+                    );
+                    var box_metal1 = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        opacity: 1
+                    });
+                    var mesh1 = new THREE.Mesh(geometry1, box_metal1);
+                    mesh1.position.y = y + xrotation;
+                    mesh1.position.x = x;
+                    mesh1.position.z = z;
+                    mesh1.rotation.x = (-Math.PI / 180) * 90;
+                    mesh1.rotation.z = (Math.PI / 180) * 180;
+
+                    mesh1.rotation.y = (-Math.PI / 180) * 90;
+
+                    var geometry2 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var texture2 = new THREE.TextureLoader().load(
+                        cacheLightData[i].img2
+                    );
+                    var box_metal2 = new THREE.MeshBasicMaterial({
+                        map: texture2,
+                        transparent: true,
+                        opacity: 1
+                    });
+                    var mesh2 = new THREE.Mesh(geometry2, box_metal2);
+                    mesh2.position.y = y - 2 + xrotation;
+                    mesh2.position.x = x;
+                    mesh2.position.z = z;
+                    mesh2.rotation.x = (-Math.PI / 180) * 90;
+                    mesh2.rotation.z = (Math.PI / 180) * 180;
+
+                    mesh2.rotation.y= (-Math.PI / 180) * 90;
+
+                    var geometry3 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var texture3 = new THREE.TextureLoader().load(
+                        cacheLightData[i].img3
+                    );
+                    var box_metal3 = new THREE.MeshBasicMaterial({
+                        map: texture3,
+                        transparent: true,
+                        opacity: 1
+                    });
+                    var mesh3 = new THREE.Mesh(geometry3, box_metal3);
+                    mesh3.position.y = y- 3 + xrotation;
+                    mesh3.position.x = x;
+                    mesh3.position.z = z;
+                    mesh3.rotation.x = (-Math.PI / 180) * 90;
+                    mesh3.rotation.z = (Math.PI / 180) * 180;
+
+                    mesh3.rotation.y = (-Math.PI / 180) * 90;
+
+                    var group = new THREE.Group();
+                    group.add(mesh1);
+                    group.add(mesh2);
+                    group.add(mesh3);
+                    group.name = cacheLightData[i].id;
+                    dl.scene.add(group);
+                }
+            },
             addModel_light: function(x, y, z,cacheLightData) {
                 this.cacheLightData.push(cacheLightData);
 //          var ligth = {
@@ -681,48 +797,54 @@
                     delete this.infoLabels["label"][name];
                 }
             },
-            add3DInfoLabel: function(name, text, x, y, z) {
-                var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05,45, 0, 0);
-                var cylinderMat = new THREE.MeshLambertMaterial({
+            add3DInfoLabel: function(name, text, x, y, z) {
+                var cylinderGeo = new THREE.CylinderGeometry(0.05, 0.05,16, 0, 0);
+                var cylinderMat = new THREE.MeshLambertMaterial({
                     //创建材料
-                    color: 0xab6503,
-                    wireframe: false
+                    color: 0xab6503,
+                    wireframe: false
                 });
                 //创建圆柱体网格模型
-                var cylinderMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
+                var cylinderMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
 
-                let utm = this.coordinateTransfer(
+                let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
 
-                cylinderMesh.position.set(utm[0], utm[1], z); //设置圆柱坐标
-                cylinderMesh.rotation.x = Math.PI / 2;
-                cylinderMesh.position.set(utm[0], utm[1], z);
+                cylinderMesh.position.set(utm[0], utm[1],z+8); //设置圆柱坐标
+                cylinderMesh.rotation.x = Math.PI / 2;
+                //cylinderMesh.position.set(utm[0], utm[1], z);
 
-                dl.scene.add(cylinderMesh);
+                //dl.scene.add(cylinderMesh);
 
-                this.infoLabels["gan"][name] = cylinderMesh;
+                this.infoLabels["gan"][name] = cylinderMesh;
 
-                var text1 = new dl.Text({
-                    text: text,
-                    fontsize: 600,
-                    borderThickness: 1
+                var text1 = new dl.Text({
+                    text: text,
+                    fontsize: 200,
+                    borderThickness: 1
                 });
-                text1.setBorderColor({ r: 171, g: 101, b: 3, a: 1.0 });
-                text1.setBackgroundColor({ r: 255, g: 255, b: 255, a: 1 });
-                text1.setTextColor({ r: 171, g: 101, b: 3, a: 1.0 });
+                text1.setBorderColor({ r: 171, g: 101, b: 3, a: 1.0 });
+                text1.setBackgroundColor({ r: 255, g: 255, b: 255, a: 1 });
+                text1.setTextColor({ r: 171, g: 101, b: 3, a: 1.0 });
                 //text1.setPositon([326299.8136019115,3462328.443327571,34.16186920538662]);
 
-                text1.setPositon([utm[0], utm[1], z + 24.4]);
-                this.infoLabels["label"][name] = text1;
-                dl.scene.add(text1);
+                text1.setPositon([utm[0], utm[1], z + 16]);
+                this.infoLabels["label"][name] = text1;
 
-                // text1.setPositon([x, y, z]);
-                //  text1.fontface = this.fontface;
-                // text1.update();
+                var group = new THREE.Group();
+                group.add(cylinderMesh);
+                group.add(text1);
+                dl.scene.add(group);
+
+                this.models[name] = group;
+
+                // text1.setPositon([x, y, z]);
+                //  text1.fontface = this.fontface;
+                // text1.update();
             },
             updateModelPostion: function(modelId, x, y, z, heading) {
                 let model = this.models[modelId];
@@ -936,7 +1058,7 @@
 
             processPerceptionData: function() {
 //      let timeA = new Date().getTime();
-                setInterval(() => {
+                this.processPerceptionDataIntervalId = setInterval(() => {
                     this.timeA = new Date().getTime();
                     //                console.log(this.timeA-this.timeB);
                     //                console.log("2处理感知车辆缓存队列中的数据:"+this.cachePerceptionQueue.length);
@@ -1072,26 +1194,6 @@
             processPlatformCars: function() {
 
                 if (this.platformCars != null) {
-                    for (var key in this.models) {
-                        let tag = false;
-                        for (let i = 0; i < this.platformCars.length; i++) {
-                            let vehid = this.platformCars[i].vehicleId;
-                            if (key == vehid) {
-                                tag = true;
-                                break;
-                            }
-                        }
-                        if (!tag) {
-                            // debugger
-                            // console.log(dl.models);
-                            let model = this.models[key];
-                            // dl.removeModel(model,dl.viewer);
-                            model.position.set(0, 0, 0);
-                            delete this.models[key];
-                            // this.tweens[key].stop();
-                            delete this.tweens[key];
-                        }
-                    }
                     for (let i = 0; i < this.platformCars.length; i++) {
                         //
                         let d = this.platformCars[i];
@@ -1473,13 +1575,14 @@
                     return;
                 }
                 let data = this.cacheTrackCarData;
-
                 let json = JSON.parse(data.data);
                 // console.log(json);
                 //处理旁车信息
                 let pcars = json.result.data;
                 if (pcars != null) {
-                    if (this.pmodels.length == 0) {
+
+                    if (Object.getOwnPropertyNames(this.pmodels).length==1) {
+                        // if (this.pmodels.length == 0) {
                         for (let m = 0; m < this.pCacheModelNum; m++) {
                             let mesh1 = new THREE.MeshStandardMaterial({
                                 color: 0xab6604,
@@ -1497,11 +1600,12 @@
                             model1.castShadow = true;
                             model1.receiveShadow = true;
                             dl.scene.add(model1);
-                            this.pmodels.push(model1);
+                            // this.pmodels.push(model1);
+                            this.pmodels["gzc"+m]=model1;
                         }
                     }
-                    for (let i = 0; i < this.pmodels.length; i++) {
-                        var model = this.pmodels[i];
+                    for (let i = 0; i < this.pCacheModelNum; i++) {
+                        let model = this.pmodels["gzc"+i];
                         model.position.set(0, 0, this.defualtZ);
                     }
 
@@ -1512,14 +1616,14 @@
                                 pcar.longitude,
                                 pcar.latitude
                             ]);
-                            let model = this.pmodels[n];
+                            let model = this.pmodels["gzc"+n];
                             model.position.set(dUTM[0], dUTM[1], this.defualtZ);
                             model.rotation.set(
                                 this.pitch,
                                 this.yaw,
                                 (-Math.PI / 180) * pcar.heading
                             );
-                            this.changeModelColor(pcar, model);
+                            // this.changeModelColor(pcar, model);
                         } else {
                             //type=1  平台注册的车
                             // this.animateCar(pcar);
@@ -1586,11 +1690,6 @@
             //缓存并且插值平台车轨迹
             cacheAndInterpolatePlatformCar:function(pcar){
                 let vid = pcar.vehicleId;
-                if (vid == this.mainCarVID)
-                {
-                    // delete  this.cacheAndInterpolateDataByVid[vid];
-                    // return;
-                }
                 let cdata = this.cacheAndInterpolateDataByVid[vid];
                 if(cdata==null)//没有该车的数据
                 {
@@ -1623,7 +1722,7 @@
                     };
                     cdata.nowRecieveData = d;
 
-                    if (cdata.nowRecieveData.gpsTime <= cdata.lastRecieveData.gpsTime) {
+                    if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime) {
                         console.log("到达顺序错误");
                         return;
                     }
@@ -1667,7 +1766,7 @@
                                 }else{
                                     this.moveCar2(cardata);
                                 }
-                                
+
                             }
                         }
                     }
@@ -1730,6 +1829,7 @@
                         position[1],
                         this.defualtZ
                     );
+
                 } else {
                     this.models[vid].position.set(position[0], position[1], this.defualtZ);
                     this.models[vid].rotation.set(
@@ -1737,6 +1837,8 @@
                         this.yaw,
                         (-Math.PI / 180) * data.heading
                     );
+
+
                 }
 
                 dl.moveTo({
@@ -1761,6 +1863,13 @@
                         position[1],
                         this.defualtZ
                     );
+
+                    ///ceshi
+                    this.addText(vid+"text",vid,position[0],
+                        position[1],
+                        this.defualtZ)
+
+
                 } else {
                     this.models[vid].position.set(position[0], position[1], this.defualtZ);
                     this.models[vid].rotation.set(
@@ -1768,14 +1877,16 @@
                         this.yaw,
                         (-Math.PI / 180) * data.heading
                     );
-                }
 
-                // dl.moveTo({
-                //   position: [position[0], position[1], this.cameraDefualtZ],
-                //   radius: this.cameraDefualtRadius + 10,
-                //   yaw: (-Math.PI / 180) * data.heading,
-                //   pitch: this.cameraDefualtPitch
-                // });
+
+                    ////////////ceshi
+                    this.models[vid+"text"].position.set(position[0], position[1], this.defualtZ+2);
+                    this.models[vid+"text"].rotation.set(
+                        this.pitch,
+                        this.yaw,
+                        (-Math.PI / 180) * data.heading
+                    );
+                }
             },
             changeModelColor: function(data, model) {
                 //ef56e4
@@ -1793,740 +1904,6 @@
                         model.material.color.setStyle("#651399");
                     }
                     model.material.color.setStyle("#bc2cb2");
-                }
-            },
-            animateCar: function(data2, model) {
-                // console.log(data2);
-                if (data2 == null) {
-                    return;
-                }
-                // if(data2.vehicleId=="B21E-00-018")
-                // {
-                //     try{
-                //          console.log(data2);
-                //     }catch(e){
-                //         console.log(e);
-                //         // console.log(data2);
-                //     }
-
-                // }
-
-                if (data2 != null) {
-                    let vid = data2.vehicleId;
-                    let carModel = this.models[vid];
-                    if (carModel == null) {
-                        if (model == undefined) {
-                            this.addModel(
-                                vid,
-                                "./static/map3d/map_photo/car.3DS",
-                                data2.longitude,
-                                data2.latitude,
-                                this.defualtZ
-                            );
-                        } else {
-                            this.models[vid] = model;
-                        }
-                    }
-
-                    let carData = this.carBusinessData[vid];
-                    let lastUtmPosition = null;
-                    if (carData != null) {
-                        lastUtmPosition = this.carBusinessData[vid]["lastUtmPosition"];
-                    } else {
-                        carData = {};
-                        this.carBusinessData[vid] = {};
-                    }
-
-                    if (this.carBusinessData[vid]["lastUtmPosition"] == null) {
-                        this.carBusinessData[vid]["utmposition"] = proj4(
-                            this.sourceProject,
-                            this.destinatePorject,
-                            [data2.longitude, data2.latitude]
-                        );
-                        if (this.models[vid] instanceof dl.Model) {
-                            this.models[vid].position.x = this.carBusinessData[vid][
-                                "utmposition"
-                                ][0];
-                            this.models[vid].position.y = this.carBusinessData[vid][
-                                "utmposition"
-                                ][1];
-                        } else {
-                            this.models[vid].position.set(
-                                this.carBusinessData[vid]["utmposition"][0],
-                                this.carBusinessData[vid]["utmposition"][1],
-                                this.defualtZ
-                            );
-                            this.changeModelColor(data2, this.models[vid]);
-                        }
-
-                        this.carBusinessData[vid]["utmposition"][2] = data2.heading;
-                        this.carBusinessData[vid]["utmposition"][3] = data2.gpsTime;
-                        if (this.models[vid] instanceof dl.Model) {
-                            this.models[vid].setHeading((-Math.PI / 180) * data2.heading);
-                        } else {
-                            this.models[vid].rotation.set(
-                                this.pitch,
-                                this.yaw,
-                                (-Math.PI / 180) * data2.heading
-                            );
-                        }
-                        //vid与设定的主车vid相等则做相机跟随操作
-                        if (this.mainCarVID == vid) {
-                            // this.updateCameraPosition(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.cameraDefualtZ,this.cameraDefualtRadius,this.cameraDefualtPitch,-Math.PI / 180 * (data2.heading));
-                        }
-
-                        this.carBusinessData[vid]["lastUtmPosition"] = {};
-                        this.carBusinessData[vid]["lastUtmPosition"].x = this.carBusinessData[
-                            vid
-                            ]["utmposition"][0];
-                        this.carBusinessData[vid]["lastUtmPosition"].y = this.carBusinessData[
-                            vid
-                            ]["utmposition"][1];
-                        this.carBusinessData[vid][
-                            "lastUtmPosition"
-                            ].rotation = this.carBusinessData[vid]["utmposition"][2];
-                        this.carBusinessData[vid][
-                            "lastUtmPosition"
-                            ].gpstime = this.carBusinessData[vid]["utmposition"][3];
-                    } else {
-                        if (
-                            data2.gpsTime <=
-                            this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                        ) {
-                            return;
-                        }
-                        this.carBusinessData[vid]["nowPosition"] = proj4(
-                            this.sourceProject,
-                            this.destinatePorject,
-                            [data2.longitude, data2.latitude]
-                        );
-                        this.carBusinessData[vid]["nowPosition"][2] = data2.heading;
-                        this.carBusinessData[vid]["nowPosition"][3] = data2.gpsTime;
-                        if (this.tweens[vid] == null) {
-                            this.tweens[vid] = new TWEEN.Tween(
-                                this.carBusinessData[vid]["lastUtmPosition"]
-                            )
-                                .to(
-                                    {
-                                        x: this.carBusinessData[vid]["nowPosition"][0],
-                                        y: this.carBusinessData[vid]["nowPosition"][1],
-                                        rotation: this.carBusinessData[vid]["nowPosition"][2]
-                                    },
-                                    this.carBusinessData[vid]["nowPosition"][3] -
-                                    this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                                )
-                                .delay(0)
-                                .easing(TWEEN.Easing.Linear.None)
-                                .onUpdate(d => {
-                                    this.models[vid].position.set(
-                                        this.carBusinessData[vid]["lastUtmPosition"].x,
-                                        this.carBusinessData[vid]["lastUtmPosition"].y,
-                                        this.defualtZ
-                                    );
-                                    this.models[vid].rotation.set(
-                                        this.pitch,
-                                        this.yaw,
-                                        (-Math.PI / 180) *
-                                        this.carBusinessData[vid]["lastUtmPosition"].rotation
-                                    );
-
-                                    if (this.mainCarVID == vid) {
-                                        dl.moveTo({
-                                            position: [
-                                                this.carBusinessData[vid]["lastUtmPosition"].x,
-                                                this.carBusinessData[vid]["lastUtmPosition"].y,
-                                                this.cameraDefualtZ
-                                            ],
-                                            radius: this.cameraDefualtRadius + 10,
-                                            yaw:
-                                            (-Math.PI / 180) *
-                                            this.carBusinessData[vid]["lastUtmPosition"].rotation,
-                                            pitch: this.cameraDefualtPitch
-                                        });
-                                    }
-                                });
-                        } else {
-                            this.tweens[vid].stop();
-                            this.tweens[vid] = new TWEEN.Tween(
-                                this.carBusinessData[vid]["lastUtmPosition"]
-                            )
-                                .to(
-                                    {
-                                        x: this.carBusinessData[vid]["nowPosition"][0],
-                                        y: this.carBusinessData[vid]["nowPosition"][1],
-                                        rotation: this.carBusinessData[vid]["nowPosition"][2]
-                                    },
-                                    this.carBusinessData[vid]["nowPosition"][3] -
-                                    this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                                )
-                                .delay(0)
-                                .easing(TWEEN.Easing.Linear.None)
-                                .onUpdate(d => {
-                                    this.models[vid].position.set(
-                                        this.carBusinessData[vid]["lastUtmPosition"].x,
-                                        this.carBusinessData[vid]["lastUtmPosition"].y,
-                                        this.defualtZ
-                                    );
-                                    this.models[vid].rotation.set(
-                                        this.pitch,
-                                        this.yaw,
-                                        (-Math.PI / 180) *
-                                        this.carBusinessData[vid]["lastUtmPosition"].rotation
-                                    );
-
-                                    if (this.mainCarVID == vid) {
-                                        dl.moveTo({
-                                            position: [
-                                                this.carBusinessData[vid]["lastUtmPosition"].x,
-                                                this.carBusinessData[vid]["lastUtmPosition"].y,
-                                                this.cameraDefualtZ
-                                            ],
-                                            radius: this.cameraDefualtRadius + 10,
-                                            yaw:
-                                            (-Math.PI / 180) *
-                                            this.carBusinessData[vid]["lastUtmPosition"].rotation,
-                                            pitch: this.cameraDefualtPitch
-                                        });
-                                    }
-                                })
-                                .onComplete(d => {});
-                        }
-                        this.tweens[vid].start();
-
-                        if (this.carBusinessData[vid]["nowUtmPosition"] == null) {
-                            this.carBusinessData[vid]["nowUtmPosition"] = {};
-                        }
-
-                        this.carBusinessData[vid]["nowUtmPosition"].x = this.carBusinessData[
-                            vid
-                            ]["nowPosition"][0];
-                        this.carBusinessData[vid]["nowUtmPosition"].y = this.carBusinessData[
-                            vid
-                            ]["nowPosition"][1];
-                        this.carBusinessData[vid][
-                            "nowUtmPosition"
-                            ].rotation = this.carBusinessData[vid]["nowPosition"][2];
-                        this.carBusinessData[vid][
-                            "nowUtmPosition"
-                            ].gpstime = this.carBusinessData[vid]["nowPosition"][3];
-                        this.carBusinessData[vid]["lastUtmPosition"] = this.carBusinessData[
-                            vid
-                            ]["nowUtmPosition"];
-                    }
-                }
-            },
-            animateCar2: function(data2, model) {
-                // console.log(data2);
-                if (data2 != null) {
-                    // debugger
-                    // data2.gpsTime = new Date().getTime();
-                    let vid = data2.vehicleId;
-                    let carModel = this.models[vid];
-                    if (carModel == null) {
-                        if (model == undefined || model == null) {
-                            this.addModel(
-                                vid,
-                                "./static/map3d/map_photo/car.3DS",
-                                data2.longitude,
-                                data2.latitude,
-                                this.defualtZ
-                            );
-                        } else {
-                            //
-                            this.models[vid] = model;
-                        }
-                        //
-                        this.add3DInfoLabel(
-                            vid,
-                            vid,
-                            data2.longitude,
-                            data2.latitude,
-                            this.defualtZ
-                        );
-                    }
-
-                    let carData = this.carBusinessData[vid];
-                    let lastUtmPosition = null;
-                    if (carData != null) {
-                        lastUtmPosition = this.carBusinessData[vid]["lastUtmPosition"];
-                    } else {
-                        carData = {};
-                        this.carBusinessData[vid] = {};
-                    }
-
-                    if (this.carBusinessData[vid]["lastUtmPosition"] == null) {
-                        this.carBusinessData[vid]["utmposition"] = proj4(
-                            this.sourceProject,
-                            this.destinatePorject,
-                            [data2.longitude, data2.latitude]
-                        );
-                        if (this.models[vid] instanceof dl.Model) {
-                            this.models[vid].position.x = this.carBusinessData[vid][
-                                "utmposition"
-                                ][0];
-                            this.models[vid].position.y = this.carBusinessData[vid][
-                                "utmposition"
-                                ][1];
-                        } else {
-                            this.models[vid].position.set(
-                                this.carBusinessData[vid]["utmposition"][0],
-                                this.carBusinessData[vid]["utmposition"][1],
-                                this.defualtZ
-                            );
-                            this.changeModelColor(data2, this.models[vid]);
-                        }
-
-                        // this.infoLabels["gan"][vid].position.set(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1],this.defualtZ+4);
-                        // this.infoLabels["label"][vid].setPositon([this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1],this.defualtZ+8]);
-                        // this.infoLabels["label"][vid].update();
-
-                        // this.infoLabels[vid].position.y = this.carBusinessData[vid]['utmposition'][1];
-
-                        this.carBusinessData[vid]["utmposition"][2] = data2.heading;
-                        this.carBusinessData[vid]["utmposition"][3] = data2.gpsTime;
-                        if (this.models[vid] instanceof dl.Model) {
-                            this.models[vid].setHeading((-Math.PI / 180) * data2.heading);
-                        } else {
-                            this.models[vid].rotation.set(
-                                this.pitch,
-                                this.yaw,
-                                (-Math.PI / 180) * data2.heading
-                            );
-                        }
-                        //vid与设定的主车vid相等则做相机跟随操作
-                        // if(this.mainCarVID == vid)
-                        // {
-                        //     this.updateCameraPosition(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.cameraDefualtZ,this.cameraDefualtRadius,this.cameraDefualtPitch,-Math.PI / 180 * (data2.heading));
-                        // }
-
-                        this.carBusinessData[vid]["lastUtmPosition"] = {};
-                        this.carBusinessData[vid]["lastUtmPosition"].x = this.carBusinessData[
-                            vid
-                            ]["utmposition"][0];
-                        this.carBusinessData[vid]["lastUtmPosition"].y = this.carBusinessData[
-                            vid
-                            ]["utmposition"][1];
-                        this.carBusinessData[vid][
-                            "lastUtmPosition"
-                            ].rotation = this.carBusinessData[vid]["utmposition"][2];
-                        this.carBusinessData[vid][
-                            "lastUtmPosition"
-                            ].gpstime = this.carBusinessData[vid]["utmposition"][3];
-
-                        // console.log(this.carBusinessData[vid]['lastUtmPosition']);
-                    } else {
-                        // console.log(this.carBusinessData[vid]['lastUtmPosition']);
-                        if (
-                            data2.gpsTime < this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                        ) {
-                            console.log("未按照顺序抵达");
-                            return;
-                        }
-                        // if(this.mainCarVID==vid)
-                        // {
-                        //     dl.moveTo({
-                        //         position: [this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.defualtZ],
-                        //         radius: this.defualtRadius,
-                        //         yaw: -Math.PI / 180 * (this.carBusinessData[vid]['utmposition'][2]),
-                        //         pitch: this.defualtPitch
-
-                        //     });
-                        // }
-                        this.carBusinessData[vid]["nowPosition"] = proj4(
-                            this.sourceProject,
-                            this.destinatePorject,
-                            [data2.longitude, data2.latitude]
-                        );
-                        this.carBusinessData[vid]["nowPosition"][2] = data2.heading;
-                        this.carBusinessData[vid]["nowPosition"][3] = data2.gpsTime;
-                        if (this.tweens[vid] == null) {
-                            this.tweens[vid] = new TWEEN.Tween(
-                                this.carBusinessData[vid]["lastUtmPosition"]
-                            )
-                                .to(
-                                    {
-                                        x: this.carBusinessData[vid]["nowPosition"][0],
-                                        y: this.carBusinessData[vid]["nowPosition"][1],
-                                        rotation: this.carBusinessData[vid]["nowPosition"][2]
-                                    },
-                                    this.carBusinessData[vid]["nowPosition"][3] -
-                                    this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                                )
-                                .delay(0)
-                                // .easing(TWEEN.Easing.Elastic.In)
-                                .easing(TWEEN.Easing.Linear.None)
-                                .onUpdate(d => {
-                                    // console.log("onUpdate");
-                                    // console.log(d);
-                                    if (this.models[vid] instanceof dl.Model) {
-                                        if (
-                                            this.models[vid] != undefined &&
-                                            this.models[vid] != null
-                                        ) {
-                                            this.models[vid].position.x = this.carBusinessData[vid][
-                                                "lastUtmPosition"
-                                                ].x;
-                                            this.models[vid].position.y = this.carBusinessData[vid][
-                                                "lastUtmPosition"
-                                                ].y;
-                                            this.models[vid].setHeading(
-                                                (-Math.PI / 180) *
-                                                this.carBusinessData[vid]["lastUtmPosition"].rotation
-                                            );
-                                        }
-                                    } else {
-                                        if (
-                                            this.models[vid] != undefined &&
-                                            this.models[vid] != null
-                                        ) {
-                                            this.models[vid].position.set(
-                                                this.carBusinessData[vid]["lastUtmPosition"].x,
-                                                this.carBusinessData[vid]["lastUtmPosition"].y,
-                                                this.defualtZ
-                                            );
-                                            // this.changeModelColor(data2,this.models[vid]);
-                                            this.models[vid].rotation.set(
-                                                this.pitch,
-                                                this.yaw,
-                                                (-Math.PI / 180) *
-                                                this.carBusinessData[vid]["lastUtmPosition"].rotation
-                                            );
-                                        }
-                                    }
-
-                                    //    this.infoLabels[vid].position.x = this.carBusinessData[vid]['lastUtmPosition'].x;
-                                    //    this.infoLabels[vid].position.y = this.carBusinessData[vid]['lastUtmPosition'].y;
-
-                                    // this.infoLabels["gan"][vid].position.set(this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y,this.defualtZ+4);
-                                    // this.infoLabels["label"][vid].setPositon([this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y,this.defualtZ+8]);
-                                    // this.infoLabels["label"][vid].update();
-                                });
-                        } else {
-                            this.tweens[vid].stop();
-                            this.tweens[vid] = new TWEEN.Tween(
-                                this.carBusinessData[vid]["lastUtmPosition"]
-                            )
-                                .to(
-                                    {
-                                        x: this.carBusinessData[vid]["nowPosition"][0],
-                                        y: this.carBusinessData[vid]["nowPosition"][1],
-                                        rotation: this.carBusinessData[vid]["nowPosition"][2]
-                                    },
-                                    this.carBusinessData[vid]["nowPosition"][3] -
-                                    this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                                )
-                                .delay(0)
-                                // .easing(TWEEN.Easing.Elastic.In)
-                                .easing(TWEEN.Easing.Linear.None)
-                                .onUpdate(d => {
-                                    // console.log("onUpdate");
-                                    // console.log(d);
-                                    if (this.models[vid] instanceof dl.Model) {
-                                        if (
-                                            this.models[vid] != undefined &&
-                                            this.models[vid] != null
-                                        ) {
-                                            this.models[vid].position.x = this.carBusinessData[vid][
-                                                "lastUtmPosition"
-                                                ].x;
-                                            this.models[vid].position.y = this.carBusinessData[vid][
-                                                "lastUtmPosition"
-                                                ].y;
-                                            this.models[vid].setHeading(
-                                                (-Math.PI / 180) *
-                                                this.carBusinessData[vid]["lastUtmPosition"].rotation
-                                            );
-                                        }
-                                    } else {
-                                        if (
-                                            this.models[vid] != undefined &&
-                                            this.models[vid] != null
-                                        ) {
-                                            this.models[vid].position.set(
-                                                this.carBusinessData[vid]["lastUtmPosition"].x,
-                                                this.carBusinessData[vid]["lastUtmPosition"].y,
-                                                this.defualtZ
-                                            );
-                                            // this.changeModelColor(data2,this.models[vid]);
-                                            this.models[vid].rotation.set(
-                                                this.pitch,
-                                                this.yaw,
-                                                (-Math.PI / 180) *
-                                                this.carBusinessData[vid]["lastUtmPosition"].rotation
-                                            );
-                                        }
-                                    }
-
-                                    // this.infoLabels["gan"][vid].position.set(this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y,this.defualtZ+4);
-                                    // this.infoLabels["label"][vid].setPositon([this.carBusinessData[vid]['lastUtmPosition'].x,this.carBusinessData[vid]['lastUtmPosition'].y,this.defualtZ+8]);
-                                    // this.infoLabels["label"][vid].update();
-                                })
-                                .onComplete(d => {
-                                    // console.log('onComplete', d)
-                                });
-                        }
-                        this.tweens[vid].start();
-                        // this.tweens[vid].update();
-
-                        if (this.carBusinessData[vid]["nowUtmPosition"] == null) {
-                            this.carBusinessData[vid]["nowUtmPosition"] = {};
-                        }
-
-                        this.carBusinessData[vid]["nowUtmPosition"].x = this.carBusinessData[
-                            vid
-                            ]["nowPosition"][0];
-                        this.carBusinessData[vid]["nowUtmPosition"].y = this.carBusinessData[
-                            vid
-                            ]["nowPosition"][1];
-                        this.carBusinessData[vid][
-                            "nowUtmPosition"
-                            ].rotation = this.carBusinessData[vid]["nowPosition"][2];
-                        this.carBusinessData[vid][
-                            "nowUtmPosition"
-                            ].gpstime = this.carBusinessData[vid]["nowPosition"][3];
-
-                        this.carBusinessData[vid]["lastUtmPosition"] = this.carBusinessData[
-                            vid
-                            ]["nowUtmPosition"];
-                        this.carBusinessData[vid]["utmposition"] = this.carBusinessData[vid][
-                            "nowPosition"
-                            ];
-                    }
-                }
-            },
-            animateCar3: function(data2, model) {
-                // console.log(data2);
-                if (data2 == null) {
-                    return;
-                }
-                // if(data2.vehicleId=="B21E-00-018")
-                // {
-                //     try{
-                //          console.log(data2);
-                //     }catch(e){
-                //         console.log(e);
-                //         // console.log(data2);
-                //     }
-
-                // }
-
-                if (data2 != null) {
-                    let vid = data2.vehicleId;
-                    let carModel = this.models[vid];
-                    if (carModel == null) {
-                        if (model == undefined) {
-                            this.addModel(
-                                vid,
-                                "./static/map3d/map_photo/car.3DS",
-                                data2.longitude,
-                                data2.latitude,
-                                this.defualtZ
-                            );
-                        } else {
-                            this.models[vid] = model;
-                        }
-                    }
-
-                    let carData = this.carBusinessData[vid];
-                    let lastUtmPosition = null;
-                    if (carData != null) {
-                        lastUtmPosition = this.carBusinessData[vid]["lastUtmPosition"];
-                    } else {
-                        carData = {};
-                        this.carBusinessData[vid] = {};
-                    }
-
-                    if (this.carBusinessData[vid]["lastUtmPosition"] == null) {
-                        this.carBusinessData[vid]["utmposition"] = proj4(
-                            this.sourceProject,
-                            this.destinatePorject,
-                            [data2.longitude, data2.latitude]
-                        );
-                        if (this.models[vid] instanceof dl.Model) {
-                            this.models[vid].position.x = this.carBusinessData[vid][
-                                "utmposition"
-                                ][0];
-                            this.models[vid].position.y = this.carBusinessData[vid][
-                                "utmposition"
-                                ][1];
-                        } else {
-                            this.models[vid].position.set(
-                                this.carBusinessData[vid]["utmposition"][0],
-                                this.carBusinessData[vid]["utmposition"][1],
-                                this.defualtZ
-                            );
-                            this.changeModelColor(data2, this.models[vid]);
-                        }
-
-                        this.carBusinessData[vid]["utmposition"][2] = data2.heading;
-                        this.carBusinessData[vid]["utmposition"][3] = data2.gpsTime;
-                        if (this.models[vid] instanceof dl.Model) {
-                            this.models[vid].setHeading((-Math.PI / 180) * data2.heading);
-                        } else {
-                            this.models[vid].rotation.set(
-                                this.pitch,
-                                this.yaw,
-                                (-Math.PI / 180) * data2.heading
-                            );
-                        }
-                        //vid与设定的主车vid相等则做相机跟随操作
-                        if (this.mainCarVID == vid) {
-                            // this.updateCameraPosition(this.carBusinessData[vid]['utmposition'][0],this.carBusinessData[vid]['utmposition'][1], this.cameraDefualtZ,this.cameraDefualtRadius,this.cameraDefualtPitch,-Math.PI / 180 * (data2.heading));
-                        }
-
-                        this.carBusinessData[vid]["lastUtmPosition"] = {};
-                        this.carBusinessData[vid]["lastUtmPosition"].x = this.carBusinessData[
-                            vid
-                            ]["utmposition"][0];
-                        this.carBusinessData[vid]["lastUtmPosition"].y = this.carBusinessData[
-                            vid
-                            ]["utmposition"][1];
-                        this.carBusinessData[vid][
-                            "lastUtmPosition"
-                            ].rotation = this.carBusinessData[vid]["utmposition"][2];
-                        this.carBusinessData[vid][
-                            "lastUtmPosition"
-                            ].gpstime = this.carBusinessData[vid]["utmposition"][3];
-                    } else {
-                        if (
-                            data2.gpsTime <=
-                            this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                        ) {
-                            return;
-                        }
-                        this.carBusinessData[vid]["nowPosition"] = proj4(
-                            this.sourceProject,
-                            this.destinatePorject,
-                            [data2.longitude, data2.latitude]
-                        );
-                        this.carBusinessData[vid]["nowPosition"][2] = data2.heading;
-                        this.carBusinessData[vid]["nowPosition"][3] = data2.gpsTime;
-                        if (this.tweens[vid] == null) {
-                            this.tweens[vid] = new TWEEN.Tween(
-                                this.carBusinessData[vid]["lastUtmPosition"]
-                            )
-                                .to(
-                                    {
-                                        x: this.carBusinessData[vid]["nowPosition"][0],
-                                        y: this.carBusinessData[vid]["nowPosition"][1],
-                                        rotation: this.carBusinessData[vid]["nowPosition"][2]
-                                    },
-                                    this.carBusinessData[vid]["nowPosition"][3] -
-                                    this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                                )
-                                .delay(0)
-                                .easing(TWEEN.Easing.Linear.None)
-                                .onUpdate(d => {
-                                    this.models[vid].position.set(
-                                        this.carBusinessData[vid]["lastUtmPosition"].x,
-                                        this.carBusinessData[vid]["lastUtmPosition"].y,
-                                        this.defualtZ
-                                    );
-                                    this.models[vid].rotation.set(
-                                        this.pitch,
-                                        this.yaw,
-                                        (-Math.PI / 180) *
-                                        this.carBusinessData[vid]["lastUtmPosition"].rotation
-                                    );
-
-                                    if (this.mainCarVID == vid) {
-                                        dl.moveTo({
-                                            position: [
-                                                this.carBusinessData[vid]["lastUtmPosition"].x,
-                                                this.carBusinessData[vid]["lastUtmPosition"].y,
-                                                this.cameraDefualtZ
-                                            ],
-                                            radius: this.cameraDefualtRadius + 10,
-                                            yaw:
-                                            (-Math.PI / 180) *
-                                            this.carBusinessData[vid]["lastUtmPosition"].rotation,
-                                            pitch: this.cameraDefualtPitch
-                                        });
-                                    }
-                                })
-                                .onComplete(d => {
-                                    console.log("onComplete1");
-                                    if (this.cacheMainCarTrackData.length > 1) {
-                                        // console.log("onComplete1=========>"+this.cacheMainCarTrackData.length);
-                                        let data3 = this.cacheMainCarTrackData.shift();
-                                        this.animateCar3(data3);
-                                    }
-                                });
-                        } else {
-                            this.tweens[vid].stop();
-                            TWEEN.remove(this.tweens[vid]);
-                            this.tweens[vid] = new TWEEN.Tween(
-                                this.carBusinessData[vid]["lastUtmPosition"]
-                            )
-                                .to(
-                                    {
-                                        x: this.carBusinessData[vid]["nowPosition"][0],
-                                        y: this.carBusinessData[vid]["nowPosition"][1],
-                                        rotation: this.carBusinessData[vid]["nowPosition"][2]
-                                    },
-                                    this.carBusinessData[vid]["nowPosition"][3] -
-                                    this.carBusinessData[vid]["lastUtmPosition"].gpstime
-                                )
-                                .delay(0)
-                                .easing(TWEEN.Easing.Linear.None)
-                                .onUpdate(d => {
-                                    if (this.mainCarVID == vid) {
-                                        dl.moveTo({
-                                            position: [
-                                                this.carBusinessData[vid]["lastUtmPosition"].x,
-                                                this.carBusinessData[vid]["lastUtmPosition"].y,
-                                                this.cameraDefualtZ
-                                            ],
-                                            radius: this.cameraDefualtRadius + 10,
-                                            yaw:
-                                            (-Math.PI / 180) *
-                                            this.carBusinessData[vid]["lastUtmPosition"].rotation,
-                                            pitch: this.cameraDefualtPitch
-                                        });
-                                    }
-                                    this.models[vid].position.set(
-                                        this.carBusinessData[vid]["lastUtmPosition"].x,
-                                        this.carBusinessData[vid]["lastUtmPosition"].y,
-                                        this.defualtZ
-                                    );
-                                    this.models[vid].rotation.set(
-                                        this.pitch,
-                                        this.yaw,
-                                        (-Math.PI / 180) *
-                                        this.carBusinessData[vid]["lastUtmPosition"].rotation
-                                    );
-                                })
-                                .onComplete(d => {
-                                    console.log("onComplete2");
-                                    if (this.cacheMainCarTrackData.length > 1) {
-                                        // console.log("onComplete2=========>"+this.cacheMainCarTrackData.length);
-                                        let data3 = this.cacheMainCarTrackData.shift();
-                                        this.animateCar3(data3);
-                                    }
-                                });
-                        }
-                        this.tweens[vid].start();
-
-                        if (this.carBusinessData[vid]["nowUtmPosition"] == null) {
-                            this.carBusinessData[vid]["nowUtmPosition"] = {};
-                        }
-
-                        this.carBusinessData[vid]["nowUtmPosition"].x = this.carBusinessData[
-                            vid
-                            ]["nowPosition"][0];
-                        this.carBusinessData[vid]["nowUtmPosition"].y = this.carBusinessData[
-                            vid
-                            ]["nowPosition"][1];
-                        this.carBusinessData[vid][
-                            "nowUtmPosition"
-                            ].rotation = this.carBusinessData[vid]["nowPosition"][2];
-                        this.carBusinessData[vid][
-                            "nowUtmPosition"
-                            ].gpstime = this.carBusinessData[vid]["nowPosition"][3];
-                        this.carBusinessData[vid]["lastUtmPosition"] = this.carBusinessData[
-                            vid
-                            ]["nowUtmPosition"];
-                    }
                 }
             },
             pageResize() {
@@ -2672,6 +2049,13 @@
             }
 
             this.cacheAndInterpolateDataByVid = {};
+
+            if(this.processPerceptionDataIntervalId!=null)
+            {
+                clearInterval(this.processPerceptionDataIntervalId);
+                this.processPerceptionDataIntervalId=null;
+            }
+            this.cachePerceptionQueue = new Array();
         }
     };
 </script>

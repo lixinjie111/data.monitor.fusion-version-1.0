@@ -7,6 +7,7 @@ window.config = {
     // socketUrl:'ws://172.17.1.16:49999/ws',  //影子系统
     // dlUrl: 'http://10.0.1.22:8085/', //迪路
     // dlWmsUrl: 'http://10.0.1.22:8080/', //迪路
+    //http://172.17.1.16:9092/icvShadowApp/ws.html  不要给我删掉了！！！
 
     //望京 外网
     url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台

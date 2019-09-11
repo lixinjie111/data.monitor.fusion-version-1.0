@@ -17,7 +17,7 @@ export default {
       mapOption: {
         resizeEnable: false,
         zoom: 18,
-        mapStyle: ""
+        mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
       },
       crossData: {
         roadLights: [], // 红绿灯数据
@@ -32,7 +32,7 @@ export default {
     };
   },
   mounted() {
-    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
+//    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
     this.aMap = new AMap.Map(this.id, this.mapOption);
     this.drawRoadMap();
     let test = {};
