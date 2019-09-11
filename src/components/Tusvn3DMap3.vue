@@ -85,7 +85,7 @@
                 cacheMainCarTrackData: new Array(),
                 lastMainCarData: null,
                 lastMainCarData2: null,
-                stepTime: 150.0,
+                stepTime: 50,
                 monitorTag: true,
                 time2: 0, //微调移动车的时间间隔
                 intervalIds: new Array(),
@@ -101,7 +101,7 @@
                 //     "1-2":new Array()
                 // }//旁车模型
                 pmodels: {},
-                pCacheModelNum: 200,
+                pCacheModelNum: 100,
 
                 matStdObjects: new THREE.MeshStandardMaterial({
                     color: 0xef56e4,
@@ -240,6 +240,8 @@
                     lights8.push(lightObj8_1);
                     this.addModel_light_y_6(121.17120509259806,31.284269933013952,25,lights8)
 
+//this.add3DInfoLabel("1","1",121.17551589465815,31.281617738453047,25);
+//this.removeModel("1");
                     this.$emit("mapcomplete", this);
                     // dl.viewer.controls.addEventListener("drop", this.onDrop);
                     // dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
@@ -270,7 +272,7 @@
                 //插值后的平台车处理
                 setTimeout(() => {
                     this.processPlatformCarsTrack();
-                }, 10);
+                }, 0);
 
             },
             /**
@@ -349,7 +351,7 @@
             addText: function(name, text, x, y, z) {
                 var text1 = new dl.Text({
                     text: text,
-                    fontsize: this.fontSize,
+                    fontsize:this.fontsize,
                     borderThickness: 0,
                     textColor: { r: 0, g: 0, b: 0, a: 1.0 }
                 });
@@ -357,10 +359,18 @@
                 this.models[name] = text1;
             },
             removeModel: function(name) {
+                debugger
                 let m = this.getModel(name);
                 if (m != null) {
-                    dl.removeModel(m, dl.viewer);
-                    delete this.models[name];
+                    try
+                    {
+                        dl.removeModel(m, dl.viewer);
+                        delete this.models[name];
+                    }
+                    catch(err)
+                    {
+
+                    }
                 }
             },
             addGeometry: function(geomModel) {
@@ -697,6 +707,8 @@
                         transparent: true,
                         opacity: 1
                     });
+                    box_metal2.alphaTest = 0.1;
+
                     var mesh2 = new THREE.Mesh(geometry2, box_metal2);
                     mesh2.position.x = x - 2 + xrotation;
                     mesh2.position.y = y;
@@ -838,6 +850,7 @@
                 var group = new THREE.Group();
                 group.add(cylinderMesh);
                 group.add(text1);
+                group.name=name;
                 dl.scene.add(group);
 
                 this.models[name] = group;
@@ -865,8 +878,8 @@
                 });
             },
             animate: function(time) {
-                requestAnimationFrame(animate);
-                TWEEN.update(time);
+                // requestAnimationFrame(animate);
+                // TWEEN.update(time);
             },
             update: function(e) {
                 // console.log("=====================update====================================");
@@ -1053,6 +1066,7 @@
             addPerceptionData: function(data) {
                 //     console.log("===========addPerceptionData=============");
                 //     console.log(new Date().getTime());
+
                 this.cachePerceptionQueue.push(data);
             },
 
@@ -1073,8 +1087,10 @@
                                 this.platformCars = data2.result.vehDataDTO;
                             }
                             let d2 = null;
+                            let d2_vehDataStat = null;
                             try {
                                 d2 = data2.result.vehDataDTO[0];
+                                d2_vehDataStat=data2.result.vehDataStat;
                                 length = data2.result.vehDataDTO.length;
                             } catch (e) {
 //              console.log(data2.result);
@@ -1147,7 +1163,8 @@
 
                                 ss += "  耗时：" + hs;
 
-                                this.$emit("processPerceptionDataTime", ss,d2.gpsTime);
+
+                                this.$emit("processPerceptionDataTime", ss,d2.gpsTime,d2_vehDataStat);
 //                                this.$emit("processDataTime",d2.gpsTime)
                                 // if(this.lastPerceptionData!=null)
                                 // {
@@ -1651,7 +1668,7 @@
                         //     let data3 = this.cacheMainCarTrackData.shift();
                         //     this.animateCar3(data3);
                         // }
-                        // debugger
+                        //
                         if (this.cacheMainCarTrackData.length == 0) {
                             this.cacheMainCarTrackData.push(data2);
                         } else {
