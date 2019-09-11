@@ -64,7 +64,7 @@ function axiosFilter(vm) {
         // vm.$message({
         //     type: 'error',
         //     duration: '1500',
-        //     message: '接口调用失败!',
+        //     message: '网络异常,请稍候重试!',
         //     showClose: true
         // });
         return Promise.reject(error);
