@@ -85,7 +85,7 @@
                 cacheMainCarTrackData: new Array(),
                 lastMainCarData: null,
                 lastMainCarData2: null,
-                stepTime: 50,
+                stepTime: 60,
                 monitorTag: true,
                 time2: 0, //微调移动车的时间间隔
                 intervalIds: new Array(),
@@ -101,7 +101,7 @@
                 //     "1-2":new Array()
                 // }//旁车模型
                 pmodels: {},
-                pCacheModelNum: 100,
+                pCacheModelNum: 200,
 
                 matStdObjects: new THREE.MeshStandardMaterial({
                     color: 0xef56e4,

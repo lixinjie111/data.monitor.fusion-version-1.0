@@ -1,7 +1,7 @@
 <template>
     <div class="fusion-left-style">
         <div class="fusion-header">
-            <img src="@/assets/images/logo.png" class="header-img"/>
+            <img src="static/images/logo.png" class="header-img"/>
             融合感知中心
         </div>
          <div class="left-overview">
