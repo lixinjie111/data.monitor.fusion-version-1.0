@@ -2,7 +2,7 @@
     <div class="fusion-left-style">
         <div class="fusion-header">
             <img src="@/assets/images/logo.png" class="header-img"/>
-            融合感知平台
+            融合感知中心
         </div>
          <div class="left-overview">
                 <ul class="left-item-wrapper">
