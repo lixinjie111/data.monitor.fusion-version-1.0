@@ -1,5 +1,5 @@
 window.config = {
-
+    
     //长沙
     url: 'http://111.23.140.59:9093/monPlatApp/', //监控平台
     operateUrl: 'http://111.23.140.59:9090/operateApp/', //运营平台
