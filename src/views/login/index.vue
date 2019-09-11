@@ -8,7 +8,7 @@
                     <p class="login-left-title">云控，启迪未来</p>
                 </div>
                 <div class="login-card">
-                    <div class="login-title">融合感知平台</div>
+                    <div class="login-title">融合感知中心</div>
                     <div class="login-item-box">
                         <el-form :model="loginForm" :rules="loginRules" ref="loginForm" label-position="right" label-width="105px" class="login-form">
                             <el-form-item prop="userNo" label="用户名" class="login-item">
