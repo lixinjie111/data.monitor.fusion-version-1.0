@@ -101,7 +101,7 @@
                 //     "1-2":new Array()
                 // }//旁车模型
                 pmodels: {},
-                pCacheModelNum: 100,
+                pCacheModelNum: 200,
 
                 matStdObjects: new THREE.MeshStandardMaterial({
                     color: 0xef56e4,
