@@ -61,12 +61,12 @@ function axiosFilter(vm) {
         // }
 
     }, function(error) {
-        vm.$message({
-            type: 'error',
-            duration: '1500',
-            message: '接口调用失败!',
-            showClose: true
-        });
+        // vm.$message({
+        //     type: 'error',
+        //     duration: '1500',
+        //     message: '接口调用失败!',
+        //     showClose: true
+        // });
         return Promise.reject(error);
     });
 }
