@@ -34,10 +34,10 @@ window.config = {
     // dlWmsUrl: 'http://app01:8080/', //迪路
 
     //上海正式环境  外网
-    // url: 'http://116.236.72.204:49093/monPlatApp/', //监控平台
+    // url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
     // operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
-    // websocketUrl:'ws://116.236.72.204:49982/mon',  //监控
-    // socketUrl:'ws://116.236.72.204:49999/icv',  //影子系统
+    // websocketUrl:'ws://116.236.72.206:49982/mon',  //监控
+    // socketUrl:'ws://116.236.72.205:49999/icv',  //影子系统
     // dlUrl: 'http://116.236.72.204:48085/', //迪路
     // dlWmsUrl: 'http://116.236.72.204:48080/', //迪路
 
