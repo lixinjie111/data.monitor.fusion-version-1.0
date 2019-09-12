@@ -21,7 +21,7 @@ window.config = {
     // url: 'http://172.16.1.199:9093/monPlatApp/', //监控平台
     // operateUrl: 'http://172.16.1.197:9090/operateApp/', //运营平台
     // websocketUrl:'ws://172.16.1.199:9982/mon',  //监控
-    // socketUrl:'ws://172.16.1.198:9999/icv',  //影子系统
+    // socketUrl:'ws://172.16.1.198:9999/ws',  //影子系统
     // dlUrl: 'http://172.16.1.197:8085/', //迪路
     // dlWmsUrl: 'http://172.16.1.197:8080/', //迪路
 
@@ -29,7 +29,7 @@ window.config = {
     // url: 'http://app03:9093/monPlatApp/', //监控平台
     // operateUrl: 'http://app01:9090/operateApp/', //运营平台
     // websocketUrl:'ws://app03:9982/mon',  //监控
-    // socketUrl:'ws://app02:9999/icv',  //影子系统
+    // socketUrl:'ws://app02:9999/ws',  //影子系统
     // dlUrl: 'http://app01:8085/', //迪路
     // dlWmsUrl: 'http://app01:8080/', //迪路
 
@@ -37,7 +37,7 @@ window.config = {
     // url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
     // operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
     // websocketUrl:'ws://116.236.72.206:49982/mon',  //监控
-    // socketUrl:'ws://116.236.72.205:49999/icv',  //影子系统
+    // socketUrl:'ws://116.236.72.205:49999/ws',  //影子系统
     // dlUrl: 'http://116.236.72.204:48085/', //迪路
     // dlWmsUrl: 'http://116.236.72.204:48080/', //迪路
 
