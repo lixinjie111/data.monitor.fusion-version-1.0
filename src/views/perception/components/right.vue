@@ -140,15 +140,6 @@
                 lastLightObj:{},
                 processDataTime:'',
                 removeEventObj:{}
-
-               /* pointLeft:10,
-                pointTop:10,
-                pointLeft1:10,
-                pointTop1:10,
-                pointLeft2:10,
-                pointTop2:10,
-                pointLeft3:10,
-                pointTop3:10,*/
             }
         },
         props:{
@@ -1203,7 +1194,7 @@
             },
             onPlatformMessage(mesasge){
                 let _this=this;
-                _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                _this.$refs.perceptionMap.onCarTrackMessage(mesasge);
             },
             onPlatformClose(data){
                 console.log("红绿灯结束连接");
