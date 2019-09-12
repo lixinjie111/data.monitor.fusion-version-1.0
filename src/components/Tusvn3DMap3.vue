@@ -1010,6 +1010,7 @@
                 }
             },
             onPerceptionMessage: function(data) {
+                debugger
                 //            console.log("=======================onPerceptionMessage===================");
                 //            console.log(new Date().getTime());
                 this.lastPerceptionMessage = data;
@@ -1026,6 +1027,7 @@
                 // }
             },
             addPerceptionData: function(data) {
+
                 //     console.log("===========addPerceptionData=============");
                 //     console.log(new Date().getTime());
 
@@ -1118,7 +1120,7 @@
                                 // this.$emit("processPerceptionDataTime",ss)
                                 //不丢包
                                 this.processPerceptionMesage();
-                                this.processPlatformCars();
+                                //  this.processPlatformCars();
                                 this.timeB = new Date().getTime();
 
                                 let hs = this.timeB - this.timeA;
@@ -1413,9 +1415,18 @@
                 // console.log(nowtime-this.lasttime);
                 // this.lasttime = nowtime;
                 this.cacheTrackCarData = data;
-                this.processCarTrackMessage();
+                this.processCarTrackMessage(1);
             },
-            processCarTrackMessage: function() {
+            onCarMessage: function(data) {
+                // console.log(data);
+                // console.log("====================onCarTrackMessage===================");
+                // let nowtime = new Date().getTime();
+                // console.log(nowtime-this.lasttime);
+                // this.lasttime = nowtime;
+                this.cacheTrackCarData = data;
+                this.processCarTrackMessage(0);
+            },
+            processCarTrackMessage: function(isCar) {
                 // console.log("processCarTrackMessage:================>"+this.cacheMainCarTrackData.length);
                 if (this.cacheTrackCarData == null) {
                     return;
@@ -1424,7 +1435,15 @@
                 let json = JSON.parse(data.data);
                 // console.log(json);
                 //处理旁车信息
-                let pcars = json.result.data;
+                let pcars =null;// json.result.data;
+                if(isCar==1)
+                {
+                    pcars= json.result.data;//单车界面
+                }
+                else
+                {
+                    pcars = json.result.vehDataDTO;//路口界面
+                }
                 if (pcars != null) {
 
                     if (Object.getOwnPropertyNames(this.pmodels).length==1) {
