@@ -158,7 +158,7 @@
             bottom: 0;
             width: 310px;
            /* background: #1a1a1a;;*/
-            z-index:1;
+            z-index:3;
         }
         .fusion-layout{
             position: absolute;
