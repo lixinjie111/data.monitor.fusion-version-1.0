@@ -1,8 +1,8 @@
 <template>
     <div class="fusion-left-style">
         <div class="fusion-header">
-            <img src="@/assets/images/logo.png" class="header-img" @click="routeGo"/>
-            融合感知平台
+            <img src="static/images/logo.png" class="header-img" @click="routeGo"/>
+            融合感知中心
         </div>
         <div class="fusion-left-main left-style">
             <p class="c-title" style="margin-top: 0px;">融合结果</p>
@@ -70,8 +70,7 @@
                 perceptionData:{},
                 sideData:{},
                 v2xData:{},
-                warningIdList:[],
-                warningCount:0
+                isFirstCon:true,
 
             }
         },
@@ -89,6 +88,16 @@
             signCount:{
                 type:Number,
                 default:0
+            },
+            perceptionData:{
+                type:Array,
+                default() {
+                    return [];
+                }
+            },
+            warningCount:{
+                type:Number,
+                default:0
             }
         },
         watch:{
@@ -101,118 +110,31 @@
                 immediate: true,
                 deep:true
             }*/
-            currentExtent(newValue,oldValue){
-//                console.log("大小："+this.currentExtent.length);
-                this.warningCount=0;
-                this.initWebSocket();
-                this.initWarningWebSocket();
+            perceptionData:{
+                handler: function (val, oldVal) {
+//                    console.log(val);
+                    if(this.perceptionData.stat){
+                        this.fusionData = this.perceptionData.stat;
+                    }
+                    //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
+                    if(this.perceptionData.cbox){
+                        this.platformData=this.perceptionData.cbox;
+                    }
+                    if(this.perceptionData.vehPer){
+                        this.perceptionData=this.perceptionData.vehPer;
+                    }
+                    if(this.perceptionData.rcu){
+                        this.sideData=this.perceptionData.rcu;
+                    }
+                    if(this.perceptionData.obu){
+                        this.v2xData=this.perceptionData.obu;
+                    }
+                },
+                deep:true
             }
         },
         methods: {
-            initWebSocket(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                    _this.webSocket.onmessage = _this.onmessage;
-                    _this.webSocket.onclose = _this.onclose;
-                    _this.webSocket.onopen = _this.onopen;
-                    _this.webSocket.onerror = _this.onerror;
-                }
-            },
-            onmessage(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let result = json.result;
-                if(result.stat){
-                    _this.fusionData = result.stat;
-                }
-                //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
-                if(result.cbox){
-                    _this.platformData=result.cbox;
-                }
-                if(result.vehPer){
-                    _this.perceptionData=result.vehPer;
-                }
-                if(result.rcu){
-                    _this.sideData=result.rcu;
-                }
-                if(result.obu){
-                    _this.v2xData=result.obu;
-                }
-            },
-            onclose(data){
-                console.log("结束连接");
-            },
-            onopen(data){
-                //获取车辆状态
-                var fusionStatus = {
-                    "action":"road_real_data_stat",
-                    "region": this.currentExtent
-                }
-                var fusionStatusMsg = JSON.stringify(fusionStatus);
-                this.sendMsg(fusionStatusMsg);
-            },
-            sendMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.webSocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            initWarningWebSocket(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                    _this.warningWebsocket.onmessage = _this.onWarningMessage;
-                    _this.warningWebsocket.onclose = _this.onWarningClose;
-                    _this.warningWebsocket.onopen = _this.onWarningOpen;
-                }
-            },
-            onWarningMessage(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let warningData = json.result.data;
-                let type = json.result.type;
-                let warningId;
-                if(type=='CLOUD'){
-                    warningData.forEach(item=>{
-                        warningId = item.warnId;
-                        warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        if(_this.warningIdList.indexOf(warningId)==-1){
-                           /* console.log("warningId:"+warningId);
-                            console.log("索引:"+_this.warningIdList.indexOf(warningId));*/
-                            _this.warningIdList.push(warningId);
-                            _this.warningCount++;
-                        }
-                    })
-                }
-            },
-            onWarningClose(data){
-                console.log("结束连接");
-            },
-            onWarningOpen(data){
-                //旁车
-                var warning = {
-                    "action": "clod_event",
-                    "region": this.currentExtent
-                }
-                var warningMsg = JSON.stringify(warning);
-                this.sendWarningMsg(warningMsg);
-            },
-            sendWarningMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.warningWebsocket.send(msg); //send()发送消息
-                        console.log("warning已发送消息:"+ msg);
-                    }
-                }else{
-                    return;
-                }
-            },
+
             routeGo(){
                 this.$router.push({
                     path: '/overview'
@@ -223,7 +145,6 @@
 
         },
         destroyed(){
-            this.webSocket&&this.webSocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
         }
     }

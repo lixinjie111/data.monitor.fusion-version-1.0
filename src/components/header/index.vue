@@ -1,6 +1,5 @@
 <template>
     <div class="base-info">
-        <span class="base-time">{{formatTime || '--'}}</span>
         <span>
             <em >{{city.district || '--'}}</em>
             <img src="@/assets/images/weather/default.png" class="weather-icon"/>
@@ -15,9 +14,6 @@ export default {
 	name: "Header",
     data() {
         return {
-            responseData: {
-                timestamp: new Date().getTime()
-            },
             city: {},
             weather: {},
             changeCenterPoint: [121.17265957261286,31.284096076877844],
@@ -27,7 +23,6 @@ export default {
     },
     mounted() {
         this.getAddress();
-        this.getTopHead();
     },
     methods: {
         getAddress() {
@@ -49,25 +44,9 @@ export default {
             getTopWeather(this.requestData).then(res => {
                 this.weather = res.data;
             });
-        },
-        getTopHead() {
-            // console.log('获取天气数据、预警故障数量');
-            getTopHead({}).then(res => {
-                this.responseData = res.data;
-                this.time = setInterval(() => {
-                    this.responseData.timestamp += 1000;
-                }, 1000);
-            });
         }
     },
     computed: {
-        formatTime() {
-            if(this.responseData.timestamp){
-                return this.$dateUtil.formatTime(this.responseData.timestamp);
-            }else {
-                return '--'
-            }
-        },
         warningNum() {
             if(this.responseData.warningNum || this.responseData.warningNum == 0){
                 return parseFloat(this.responseData.warningNum).toLocaleString();

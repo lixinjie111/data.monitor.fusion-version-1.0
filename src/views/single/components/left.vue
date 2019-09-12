@@ -1,8 +1,8 @@
 <template>
     <div class="fusion-left-style">
         <div class="fusion-header">
-            <img src="@/assets/images/logo.png" class="header-img" @click="routeGo"/>
-            融合感知平台
+            <img src="static/images/logo.png" class="header-img" @click="routeGo"/>
+            融合感知中心
         </div>
         <div class="fusion-left-main">
             <div class="single-info">
@@ -436,6 +436,7 @@
                 float: right;
                 img{
                     height: 18px;
+                    display: inline-block;
                 }
                 .real-img{
                     display: inline-block;
@@ -493,6 +494,7 @@
             height: 110px;
             img{
                 height:110px;
+                display: inline-block;
             }
         }
     }

@@ -222,6 +222,7 @@ img {
   .header-img{
     vertical-align: middle;
     padding-right: 8px;
+    display: inline-block;
   }
 }
 .fusion-left-main {
@@ -290,3 +291,7 @@ img {
     padding-left: 10px;
   }
 }*/
+
+.weather-icon{
+  display: inline-block;
+}

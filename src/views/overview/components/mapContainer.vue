@@ -22,11 +22,19 @@ export default {
             setFitViewFlag: true,
             count: 0,
             flag: true,
-            prevData: []
+            prevData: [],
+            defaultMapOption :{
+                center: window.mapOption.center, //上海
+                zoom: 11,		// 默认：比例尺显示100m
+                resizeEnable: true, //是否监控地图容器尺寸变化
+                rotateEnable: true,
+                mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
+            }
+
         }
     },
     mounted() {
-        this.AMap = new AMap.Map(this.id, window.defaultMapOption);
+        this.AMap = new AMap.Map(this.id, this.defaultMapOption);
         this.initWebSocket();
     },
     methods: {
@@ -88,8 +96,10 @@ export default {
                 }
 
                 if(_this.setFitViewFlag) {
-                    _this.AMap.setFitView();
-                    _this.setFitViewFlag = false;
+                    setTimeout(()=>{
+                        _this.AMap.setFitView();
+                        _this.setFitViewFlag = false;
+                    },500)
                 }
                 _this.prevData = _filterData;
             } else {
@@ -257,13 +267,16 @@ export default {
         //     }
         // },
         showView(e) {
-            const { href } = this.$router.resolve({
+            /*const { href } = this.$router.resolve({
                 name: 'Single',
                 params: {
                     vehicleId: e.target.get("vehicleId")
                 }
             })
-            window.open(href, '_blank')
+            window.open(href, '_blank')*/
+            this.$router.push({
+                path: "/single/" + e.target.get("vehicleId")
+            });
         },
         onclose(data){
             // console.log("结束--vehicleOnline--连接");

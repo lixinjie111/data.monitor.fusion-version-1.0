@@ -1,22 +1,22 @@
 window.config = {
-
-    // http://172.17.1.13:9092/icvShadowApp/ws.html
-    //望京地址  内网
-    // url: 'http://172.17.1.13:9093/monPlatApp/', //监控平台
-    // websocketUrl:'ws://172.17.1.13:49982/mon',  //监控
-    // socketUrl:'ws://172.17.1.13:49999/ws',  //影子系统
+    
+    //望京 内网
+    // url: 'http://172.17.1.16:9093/monPlatApp/', //监控平台
+    // operateUrl: 'http://172.17.1.16:9090/operateApp/',	//运营平台
+    // websocketUrl:'ws://172.17.1.16:49982/mon',  //监控
+    // socketUrl:'ws://172.17.1.16:49999/ws',  //影子系统
     // dlUrl: 'http://10.0.1.22:8085/', //迪路
     // dlWmsUrl: 'http://10.0.1.22:8080/', //迪路
-    // roadUrl:'http://172.17.1.13:28080/rCUDataApp/', //临时演示地址
+    //http://172.17.1.16:9092/icvShadowApp/ws.html  不要给我删掉了！！！
 
-    //外网
+    //望京 外网
     url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台
+    operateUrl: 'http://120.133.21.14:9090/operateApp/',	//运营平台
     websocketUrl:'ws://120.133.21.14:49982/mon',  //监控
     socketUrl:'ws://120.133.21.14:49999/ws',  //影子系统
     dlUrl: 'http://113.208.118.62:8085/', //迪路
     dlWmsUrl: 'http://113.208.118.62:8080/', //迪路
-    roadUrl:'http://120.133.21.14:28080/rCUDataApp/', //临时演示地址
-    monitorWebsocket:'ws://120.133.21.14:29998/ws',
+
     version: 1.0,       // 版本号
 }
 
@@ -52,8 +52,12 @@ window.defaultMapOption = {
 window.dlWmsOption = {
     'LAYERS_gjlk': 'shanghai_qcc:dl_shcsq_wgs84_gjlk',
     'LAYERS_withoutz': 'shanghai_qcc:dl_shcsq_wgs84_rc_withoutz',
+    'VERSION':'1.1.0',
     'GD_ROAD_CENTERLINE':'gd_road_centerline',
-    'VERSION':'1.1.0'
+
+    'LAYERS_centerline': 'shanghai_qcc:dl_shcsq_wgs84_lane_centerline',
+    'STYLES':'shanghai_qcc:dl_shcsq_wgs84_road_centerline_car_statistics',
+
 }
 window.dlWmsDefaultOption = {
     url:window.config.dlWmsUrl+'geoserver/shanghai_qcc/wms',

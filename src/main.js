@@ -7,7 +7,7 @@ import TDate from '@/utils/date.js'
 Vue.prototype.$dateUtil = TDate;
 
 // 全局静态资源
-import './assets/css/reset.css';
+import './assets/scss/reset.scss';
 import './assets/scss/public.scss';
 
 

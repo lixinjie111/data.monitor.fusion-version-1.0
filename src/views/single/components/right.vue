@@ -80,8 +80,7 @@
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
-    import TusvnMap from '@/components/Tusvn3DMap2'
-    import {getMap} from '@/utils/tusvnMap.js';
+    import TusvnMap from '@/components/Tusvn3DMap3'
     export default {
         data() {
             return {
@@ -103,7 +102,13 @@
                 lightWebsocket:null,
                 rtmp1:'',
                 rtmp2:'',
-                warningWebsocket:null
+                warningWebsocket:null,
+                warningCancleWebsocket:null,
+                carWebsocket:null,
+                sideCarWebsocket:null,
+                alertCount:0,
+                warningData:{},
+                lastLightObj:{}
             }
 
         },
@@ -126,7 +131,7 @@
         props:{
             realData:{
                 type:Object,
-                default() {
+                default(){
                     return {
 
                     };
@@ -280,11 +285,11 @@
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
-                getMap(this.$refs.tusvnMap);
                 this.$refs.tusvnMap.updateCameraPosition(326181.72659014474,3462354.6747002415,737.3642832288795,741.5052736914325,-1.5707963267948966,-0.05266622778143515);
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.config.websocketUrl,this.roadItem1.camSerialNum);*/
-                this.$refs.tusvnMap.changeMainCarId(window.config.websocketUrl,this.vehicleId);
+                this.initCarWebSocket();
+                this.initSideCarWebSocket();
             },
             initLightWebSocket(){
                 let _this=this;
@@ -298,23 +303,236 @@
             onLightMessage(mesasge){
                 var _this=this;
                 var json = JSON.parse(mesasge.data);
-                var lightData = json.result.data;
+                var data = json.result.data;
                 var resultData=[];
-                lightData.forEach(item=>{
-                    let option={
-                        position:new AMap.LngLat(item.longitude, item.latitude),
-                        leftTime:item.leftTime,
-                        light:item.light,
-                        direction:item.direction,
-                        longitude:item.longitude,
-                        latitude:item.latitude
-                    }
-                    resultData.push(option);
-                });
-                resultData.forEach(function (item,index,arr) {
+                if(data&&data.length>0){
+                    data.forEach(item=>{
+                        let option={
+                            position:new AMap.LngLat(item.longitude, item.latitude),
+                            leftTime:item.leftTime,
+                            light:item.light,
+                            direction:item.direction,
+                            longitude:item.longitude,
+                            latitude:item.latitude
+                        }
+                        resultData.push(option);
+                    });
+                    resultData.forEach(function (item,index,arr) {
+                        let light={};
+                        let array=(item.leftTime+"").split("");
+                        let img1;
+                        let img2;
+                        let img3;
+                        let lastItem;
+//                            let keys = Object.keys(_this.lastLightObj);
+//                            if(keys&&keys.length>0){
+//                                lastItem = _this.lastLightObj[item.spatId];
+//                            }
+                        //cross
+                        if(item.direction==1){
+                            //cross red
+                            if(item.light=='RED'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/cross-red.png';
+                                }
+                                img1='./static/images/light/cross-red.png';
+                                img2 = _this.getNumPng('RED',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('RED',array[1]);
+                                }
+                            }
+                            //cross yellow
+                            if(item.light=='YELLOW'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/cross-yellow.png';
+                                }
+                                img2 = _this.getNumPng('YELLOW',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('YELLOW',array[1]);
+                                }
+                            }
+                            //cross green
+                            if(item.light=='GREEN'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/cross-green.png';
+                                }
+                                img2 = _this.getNumPng('GREEN',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('GREEN',array[1]);
+                                }
+                            }
+                        }
+                        //left
+                        if(item.direction==2){
+                            //left red
+                            if(item.light=='RED'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/left-red.png';
+                                }
+                                img2 = _this.getNumPng('RED',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('RED',array[1]);
+                                }
+                            }
+                            //left yellow
+                            if(item.light=='YELLOW'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/left-yellow.png';
+                                }
+                                img2 = _this.getNumPng('YELLOW',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('YELLOW',array[1]);
+                                }
+                            }
+                            //left green
+                            if(item.light=='GREEN'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/left-green.png';
+                                }
+                                img2 = _this.getNumPng('GREEN',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('GREEN',array[1]);
+                                }
+                            }
+                        }
+                        //turn
+                        if(item.direction==3){
+                            //turn red
+                            if(item.light=='RED'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/turn-red.png';
+                                }
+                                img2 = _this.getNumPng('RED',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('RED',array[1]);;
+                                }
+                            }
+                            //turn yellow
+                            if(item.light=='YELLOW'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/turn-yellow.png';
+                                }
+                                img2 = _this.getNumPng('YELLOW',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('YELLOW',array[1]);;
+                                }
+                            }
+                            //turn green
+                            if(item.light=='GREEN'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/turn-green.png';
+                                }
+                                img2 = _this.getNumPng('GREEN',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('GREEN',array[1]);
+                                }
+                            }
+                        }
+                        //right
+                        if(item.direction==4){
+                            //right red
+                            if(item.light=='RED'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/right-red.png';
+                                }
+                                img2 = _this.getNumPng('RED',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('RED',array[1]);
+                                }
+                            }
+                            //right yellow
+                            if(item.light=='YELLOW'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/right-yellow.png';
+                                }
+                                img2 = _this.getNumPng('YELLOW',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('YELLOW',array[1]);
+                                }
+                            }
+                            //right green
+                            if(item.light=='GREEN'){
+                                //每个路灯相位都是固定的
+                                if(lastItem&&lastItem.light==item.light){
+                                    img1="";
+                                }else{
+                                    img1='./static/images/light/right-green.png';
+                                }
+                                img2 = _this.getNumPng('GREEN',array[0]);
+                                if(array[1]){
+                                    img3 = _this.getNumPng('GREEN',array[1]);
+                                }
+                            }
+                        }
+                        light.id=item.spatId;
+                        light.img1=img1;
+                        light.img2=img2;
+                        light.img3=img3;
+                        _this.lastLightObj[item.spatId]=item;
+                        _this.$refs.tusvnMap.addStaticModel_light_1(light);
+//                            let spatId="light_"+item.spatId;
+//                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
+//                            _this.lightList.forEach((item1,index1)=>{
+//                                //相交的
+//                                if(item1.spatId==spatId){
+//                                    item1.spareTime = item.leftTime;
+//                                    item1.lightColor = item.light;
+//                                    item1.flag=true;
+//                                }
+//                            })
+
+                    })
+                   /* resultData.forEach(function (item,index,arr) {
+                        let direction = item.direction + "";
+                        let key = 'key_' + direction;
+                        _this.lightData[key].spareTime = item.leftTime;
+                        _this.lightData[key].lightColor = item.light;
+                        _this.lightData[key].flag = true;
+                        _this.lightData[key].time = null;
+                        //延长时间
+                        clearTimeout(_this.lightData[key].time);
+                        _this.lightData[key].time = setTimeout(item => {
+                            _this.lightData[key].flag = false;
+                        }, 3000)
+                    })*/
+                }
+               /* resultData.forEach(function (item,index,arr) {
                     let direction = item.direction + "";
                     let key = 'key_' + direction;
-                    /*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*/
+                    /!*_this.$set(_this.lightData[direction],'spareTime',item.leftTime);*!/
                     _this.lightData[key].spareTime = item.leftTime;
                     _this.lightData[key].lightColor = item.light;
                     _this.lightData[key].flag = true;
@@ -324,7 +542,108 @@
                     _this.lightData[key].time = setTimeout(item => {
                         _this.lightData[key].flag = false;
                     }, 3000)
-                })
+                })*/
+            },
+            getNumPng(color,num){
+                let img;
+                if(color=='RED'){
+                    if(num==0){
+                        img='./static/images/light/0.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9.png'
+                    }
+                }
+                if(color=='YELLOW'){
+                    if(num==0){
+                        img='./static/images/light/0-2.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1-2.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2-2.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3-2.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4-2.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5-2.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6-2.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7-2.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8-2.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9-2.png'
+                    }
+                }
+                if(color=='GREEN'){
+                    if(num==0){
+                        img='./static/images/light/0-1.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1-1.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2-1.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3-1.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4-1.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5-1.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6-1.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7-1.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8-1.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9-1.png'
+                    }
+                }
+                return img;
+
             },
             onLightClose(data){
                 console.log("结束连接");
@@ -358,26 +677,43 @@
                 }
             },
             onWarningMessage(mesasge){
-
-//        console.log("时间----"+new Date().getTime())
                 let _this=this;
-                /*if(this.i>4){
-                  return;
-                }*/
                 let json = JSON.parse(mesasge.data);
                 let warningData = json.result.data;
                 let type = json.result.type;
-                let count=0;
-                if(warningData.length>0){
-                    if(type=='CLOUD'){
-                        let eventType = json.result.eventType;
-                        warningData.forEach(item=>{
-                            //name,text,x,y
-                            let msg = item.warnMsg+"   "+item.dis;
-                            _this.$refs.tusvnMap.add3DInfoLabel('alert'+count,msg,item.longitude,item.latitude,20);
-                            count++;
-                        })
-                    }
+                let warningId;
+                if(type=='CLOUD'){
+                    warningData.forEach(item=>{
+                        warningId = item.warnId;
+                        warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                        let msg = item.warnMsg+" "+item.dis+"米";
+                        let warningObj={
+                            longitude:item.longitude,
+                            latitude:item.latitude
+                        }
+                        let warningHash = _this.hashcode(JSON.stringify(warningObj));
+                        //如果告警id不存在
+                        if(!_this.warningData[warningId]){
+                            let obj = {
+                                id:'alert'+_this.alertCount,
+                                msg:msg,
+                                longitude:item.longitude,
+                                latitude:item.latitude,
+                                hash:warningHash
+                            }
+                            _this.warningData[warningId]=obj;
+                            _this.alertCount++;
+                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                        }else{
+                            //判断是否需要更新
+                            let obj = _this.warningData[warningId];
+                            if(obj.hash!=warningHash){
+                                //进行更新
+                                _this.$refs.tusvnMap.removeModel(obj.id);
+                                _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                            }
+                        }
+                    })
                 }
 
             },
@@ -404,6 +740,134 @@
                     return;
                 }
             },
+            hashcode(str) {
+                let hash = 0, i, chr, len;
+                if (str.length === 0) return hash;
+                for (i = 0, len = str.length; i < len; i++) {
+                    chr   = str.charCodeAt(i);
+                    hash  = ((hash << 5) - hash) + chr;
+                    hash |= 0; // Convert to 32bit integer
+                }
+                return hash;
+            },
+            //平台车
+            initCarWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.carWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    _this.carWebsocket.onmessage = _this.onCarMessage;
+                    _this.carWebsocket.onclose = _this.onCarClose;
+                    _this.carWebsocket.onopen = _this.onCarOpen;
+                }
+            },
+            onCarMessage(message){
+                this.$refs.tusvnMap.onCarTrackMessage(message);
+            },
+            onCarClose(data){
+                console.log("结束连接");
+            },
+            onCarOpen(data){
+                //旁车
+                var car = {
+                    "action": "sideVehicle",
+                    "vehicleId": this.vehicleId
+                }
+                var carMsg = JSON.stringify(car);
+                this.sendCarMsg(carMsg);
+            },
+            sendCarMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.carWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.carWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
+
+            initWarningCancleWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.warningCancleWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                    _this.warningCancleWebsocket.onmessage = _this.onWarningCancleMessage;
+                    _this.warningCancleWebsocket.onclose = _this.onWarningCancleClose;
+                    _this.warningCancleWebsocket.onopen = _this.onWarningCancleOpen;
+                }
+            },
+            onWarningCancleMessage(mesasge){
+                let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let warningCancleData = json.result;
+                let obj;
+                let warningIds = JSON.parse(warningCancleData);
+                warningIds.forEach(warningId=>{
+                    obj = _this.warningData[warningId];
+                    //防止路口页面和单车页面事件交叉影响
+                    if(obj&&obj.id){
+                        _this.$refs.perceptionMap.removeModel(obj.id);
+                        delete _this.warningData[warningId];
+                    }
+                })
+            },
+            onWarningCancleClose(data){
+                console.log("结束连接");
+            },
+            onWarningCancleOpen(data){
+                //旁车
+                let warningCancel = {
+                    "action": "event_cancel",
+                    "token": "tusvn"
+                }
+                let warningMsg = JSON.stringify(warningCancel);
+                this.sendWarningCancleMsg(warningMsg);
+            },
+            sendWarningCancleMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.warningCancleWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.warningCancleWebsocket.send(msg); //send()发送消息
+                        console.log("warning已发送消息:"+ msg);
+                    }
+                }else{
+                    return;
+                }
+            },
+            //融合车
+            initSideCarWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.sideCarWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                    _this.sideCarWebsocket.onmessage = _this.onSideCarMessage;
+                    _this.sideCarWebsocket.onclose = _this.onSideCarClose;
+                    _this.sideCarWebsocket.onopen = _this.onSideCarOpen;
+                }
+            },
+            onSideCarMessage(message){
+                this.$refs.tusvnMap.onCarTrackMessage(message);
+            },
+            onSideCarClose(data){
+                console.log("结束连接");
+            },
+            onSideCarOpen(data){
+                //旁车
+                var sideCar = {
+                    "action": "fusel_sider_per_veh",
+                    "vehicleId": this.vehicleId
+                }
+                var sideCarMsg = JSON.stringify(sideCar);
+                this.sendSideCarMsg(sideCarMsg);
+            },
+            sendSideCarMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.sideCarWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.sideCarWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
         },
         mounted(){
             this.option1 = this.getOption();
@@ -411,18 +875,23 @@
             this.getDeviceInfo();
             this.initLightWebSocket();
             this.initWarningWebSocket();
+            this.initWarningCancleWebSocket();
         },
         components:{
             TusvnMap
         },
         beforeDestroy(){
+            console.log("单车页面销毁")
             clearTimeout(this.timer1);
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);
             this.timer2 = null;//清除直播报活
             this.lightWebsocket&&this.lightWebsocket.close();
             this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
+            this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
+            this.warningCancleWebsocket&&this.warningCancleWebsocket.close();
+            this.sideCarWebsocket&&this.sideCarWebsocket.close();
         }
     }
 </script>

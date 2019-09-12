@@ -13,6 +13,7 @@ const Single = resolve => require(['@/views/single'], resolve)
 const Perception = resolve => require(['@/views/perception'], resolve)
 const Overview = resolve => require(['@/views/overview'], resolve)
 const Test = resolve => require(['@/views/perception/components/test'], resolve)
+const Map = resolve => require(['@/components/Tusvn3DMap3.vue'], resolve)
 /*Vue.use(Router)*/
 
 export default new VueRouter({
@@ -44,7 +45,7 @@ export default new VueRouter({
       component: Single,
       meta: {}
   },{
-      path: '/perception/:lon/:lat/:crossId/:waitingtime',
+      path: '/perception/:lon/:lat/:crossId/:waitingtime/:isShow',
       name: 'Perception',
       component: Perception,
       meta: {}
@@ -56,7 +57,11 @@ export default new VueRouter({
       path: '/test',
       name: 'Test',
       component: Test
-  }],
+  },{
+    path: '/map',
+    name: 'Map',
+    component: Map
+}],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }
   }

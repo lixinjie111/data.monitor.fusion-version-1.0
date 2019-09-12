@@ -32,6 +32,7 @@ export default {
     };
   },
   mounted() {
+//    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
     this.aMap = new AMap.Map(this.id, this.mapOption);
     this.drawRoadMap();
     let test = {};
@@ -123,6 +124,13 @@ export default {
       if ("spatDataDTO" in result === true) {
         _this.crossData.roadLights = result.spatDataDTO;
         if (_this.crossData.roadLights.length > 0) {
+          // _this.crossData.roadLights.map((x, index) => {
+          //   lightPosition = new AMap.LngLat(
+          //     x.position.longitude,
+          //     x.position.latitude
+          //   );
+          //   _this.crossData.roadLights[index].position = lightPosition;
+          // });
           for (let id in _this.crossData.sideLight) {
             let flag = false;
             // 比对已经打点的id和返回的将要打点的车辆， 有，设置flag = true
@@ -150,7 +158,6 @@ export default {
                 marker: null,
                 flag: true
               };
-              console.log('subItem', subItem);
               _this.crossData.sideLight[
                 subItem.spatId
               ].marker = new AMap.Marker({
@@ -168,119 +175,62 @@ export default {
       }
       // 车辆
       if ("vehDataDTO" in result === true) {
-            _this.crossData.roadSenseCars = result.vehDataDTO;
-            if (_this.crossData.roadSenseCars.length > 0) {
-              _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
-                x => x.targetType === 2 || x.targetType === 5
-              );
-              let _filterData = {};
-              _this.crossData.roadSenseCars.forEach((item, index) => {
-                _filterData[item.vehicleId] = {
-                  longitude: item.longitude,
-                  latitude: item.latitude,
-                  heading: item.heading,
-                  speed: item.speed,
-                  vehicleId: item.vehicleId,
-                  devId: item.devId,
-                  marker: null,
-                };
-              });
-              for (let id in _this.prevData) {
-                if(_filterData[id]) {   //表示有该点，做move
-                  _filterData[id].marker = _this.prevData[id].marker;
-                  let _currentCar = _filterData[id];
-                  // console.log('_currentCar', _currentCar.longitude);
-                  // console.log('_currentCar', _currentCar.latitude);
-                  _filterData[id].marker.setAngle(_currentCar.heading);
-                  _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
-                } else {   //表示没有该点，做remove
-                  _this.prevData[id].marker.stopMove();
-                  _this.aMap.remove(_this.prevData[id].marker);
-                  delete _this.prevData[id];
-                }
-              }
-              for (let id in _filterData) {
-                if(!_this.prevData[id]) {   //表示新增该点，做add
-                    _filterData[id].marker = new AMap.Marker({
-                      position: [_filterData[id].longitude, _filterData[id].latitude],
-                      map: _this.aMap,
-                      icon: "static/images/road/car.png",
-                      angle: _filterData[id].heading,
-                      devId: _filterData[id].devId,
-                      zIndex: 1
-                    });
-                }
-              }
-            
-              _this.prevData = _filterData;
+         _this.crossData.roadSenseCars = result.vehDataDTO;
+        if (_this.crossData.roadSenseCars.length > 0) {
+          _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
+            x => x.targetType === 2 || x.targetType === 5
+          );
+          // console.log('_this.crossData.roadSenseCars', _this.crossData.roadSenseCars);
+          let _filterData = {};
+          _this.crossData.roadSenseCars.forEach((item, index) => {
+            _filterData[item.vehicleId] = {
+              longitude: item.longitude,
+              latitude: item.latitude,
+              heading: item.heading,
+              speed: item.speed,
+              vehicleId: item.vehicleId,
+              devId: item.devId,
+              marker: null,
+            };
+          });
 
-            } else {
-              // 返回的数据为空
-              let obj = Object.values(_this.prevData);
-              for (let key in obj) {
-                obj[key].marker.stopMove();
-                _this.aMap.remove(obj[key].marker);
-                delete obj[key];
-              }
+          for (let id in _this.prevData) {
+            if(_filterData[id]) {   //表示有该点，做move
+              _filterData[id].marker = _this.prevData[id].marker;
+              let _currentCar = _filterData[id];
+              _filterData[id].marker.setAngle(_currentCar.heading);
+              _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
+            } else {   //表示没有该点，做remove
+              _this.prevData[id].marker.stopMove();
+              _this.aMap.remove(_this.prevData[id].marker);
+              delete _this.prevData[id];
             }
           }
-      // if ("vehDataDTO" in result === true) {
-      //    _this.crossData.roadSenseCars = result.vehDataDTO;
-      //   if (_this.crossData.roadSenseCars.length > 0) {
-      //     _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
-      //       x => x.targetType === 2 || x.targetType === 5
-      //     );
-      //     // console.log('_this.crossData.roadSenseCars', _this.crossData.roadSenseCars);
-      //     let _filterData = {};
-      //     _this.crossData.roadSenseCars.forEach((item, index) => {
-      //       _filterData[item.vehicleId] = {
-      //         longitude: item.longitude,
-      //         latitude: item.latitude,
-      //         heading: item.heading,
-      //         speed: item.speed,
-      //         vehicleId: item.vehicleId,
-      //         devId: item.devId,
-      //         marker: null,
-      //       };
-      //     });
+          for (let id in _filterData) {
+            if(!_this.prevData[id]) {   //表示新增该点，做add
+                _filterData[id].marker = new AMap.Marker({
+                  position: [_filterData[id].longitude, _filterData[id].latitude],
+                  map: _this.aMap,
+                  icon: "static/images/road/car.png",
+                  angle: _filterData[id].heading,
+                  devId: _filterData[id].devId,
+                  zIndex: 1
+                });
+            }
+          }
 
-      //     for (let id in _this.prevData) {
-      //       if(_filterData[id]) {   //表示有该点，做move
-      //         _filterData[id].marker = _this.prevData[id].marker;
-      //         let _currentCar = _filterData[id];
-      //         _filterData[id].marker.setAngle(_currentCar.heading);
-      //         _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
-      //       } else {   //表示没有该点，做remove
-      //         _this.prevData[id].marker.stopMove();
-      //         _this.aMap.remove(_this.prevData[id].marker);
-      //         delete _this.prevData[id];
-      //       }
-      //     }
-      //     for (let id in _filterData) {
-      //       if(!_this.prevData[id]) {   //表示新增该点，做add
-      //           _filterData[id].marker = new AMap.Marker({
-      //             position: [_filterData[id].longitude, _filterData[id].latitude],
-      //             map: _this.aMap,
-      //             icon: "static/images/road/car.png",
-      //             angle: _filterData[id].heading,
-      //             devId: _filterData[id].devId,
-      //             zIndex: 1
-      //           });
-      //       }
-      //     }
+          _this.prevData = _filterData;
 
-      //     _this.prevData = _filterData;
-
-      //   } else {
-      //     // 返回的数据为空
-      //     let obj = Object.values(_this.prevData);
-      //     for (let key in obj) {
-      //       obj[key].marker.stopMove();
-      //       _this.aMap.remove(obj[key].marker);
-      //       delete obj[key];
-      //     }
-      //   }
-      // }
+        } else {
+          // 返回的数据为空
+          let obj = Object.values(_this.prevData);
+          for (let key in obj) {
+            obj[key].marker.stopMove();
+            _this.aMap.remove(obj[key].marker);
+            delete obj[key];
+          }
+        }
+      }
     },
     onClose(data) {
       console.log("结束连接");
