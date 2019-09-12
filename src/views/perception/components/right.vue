@@ -291,7 +291,6 @@
                     this.initLightWebSocket();
                     this.initWarningCancleWebSocket();
                     this.getMap();
-//                    this.$emit('getCurrentExtent', this.currentExtent);
                     return;
                 }
              },
@@ -301,13 +300,6 @@
                 this.$refs.map1.zoomTo(10);
                 this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,window.dlWmsOption.GD_ROAD_CENTERLINE,1,true,null); // 上海汽车城
 
-            },
-            getData(){
-//                this.getCurrentExtent();
-//                this.getCenter();
-////                this.getPerceptionAreaInfo();
-//                //地图不连续移动，判断红绿灯的位置受否再可视区
-//                this.typeRoadData();
             },
             getMap(){
                 let overviewMap = this.$refs.map1;

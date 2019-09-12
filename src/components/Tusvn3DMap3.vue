@@ -359,7 +359,6 @@
                 this.models[name] = text1;
             },
             removeModel: function(name) {
-                debugger
                 let m = this.getModel(name);
                 if (m != null) {
                     try
