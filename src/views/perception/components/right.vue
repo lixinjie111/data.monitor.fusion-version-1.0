@@ -107,11 +107,14 @@
                     </div>
                 </div>
         <div id="map" class="c-map">
-            <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
+            <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"  v-if="sideMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
             @mapcomplete="onMapComplete" @CameraChanged='cameraChanged' @mousedrop="mouseUpChanged" @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
+            <div class="map-mask-tip" v-else>
+                {{mapMessage}}
+            </div>
         </div>
         <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
         <div class="point-style" :style="{left:pointLeft1+'px',top:pointTop1+'px'}"></div>
@@ -192,7 +195,9 @@
                 video1Show:false,
                 video2Show:false,
                 waitingtime:this.$route.params.waitingtime,
-                isActive:'1'
+                isActive:'1',
+                mapMessage:'',
+                sideMap:false
 
                /* pointLeft:10,
                 pointTop:10,
@@ -314,7 +319,6 @@
                     },500)*/
                     let param = this.$route.params.crossId;
                     if(param==5){
-                        this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
 //                        this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
                         this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
 //                        this.center=[[121.17548002587952,76.2279931281073]];
@@ -394,14 +398,6 @@
                    this.getMap();
                 /*}*/
                 this.isFirst=false;
-            },
-            getData(){
-                this.getCurrentExtent();
-                this.getCenter();
-                this.$emit('getCurrentExtent', this.currentExtent);
-//                this.getPerceptionAreaInfo();
-                //地图不连续移动，判断红绿灯的位置受否再可视区
-                this.typeRoadData();
             },
             getMap(){
                 let overviewMap = this.$refs.map1;
@@ -529,6 +525,7 @@
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
                         }else{
                             _this.option1.sources[0].src=_this.videoItem1.rtmp;
+                            this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
                         }
                     }
                     if(index==1){
@@ -578,86 +575,6 @@
                 this.center=[121.247,31.242];
                 console.log("中心点："+this.center)
 //                console.log("中心点："+this.center);
-            },
-            typeRoadData(){
-                this.lightList=[];
-                typeRoadData(
-                    [
-                        {
-                            "polygon":this.currentExtent
-                        }
-                    ]
-                ).then(res=>{
-                    let signs = res.data[0].baseData.signs;
-                    let spats = res.data[0].baseData.spats;
-                    this.signCount=0;
-                    this.spatCount=0;
-                    if(signs&&signs.length>0){
-                        signs.forEach(item=>{
-                            this.signCount++;
-                            //将小的转成大的3
-                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
-                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
-                        })
-                    }
-                    if(spats&&spats.length>0){
-                        spats.forEach(item=>{
-                            let spatList = item.spats;
-                            let spatObj={"turn":{},"left":{},"cross":{},"right":{}};
-                            spatList.forEach(spat=>{
-                                let lightDirection = spat.lightDirection;
-                                if(lightDirection==1){
-                                    spatObj["cross"]=spat;
-                                }
-                                if(lightDirection==2){
-                                    spatObj["left"]=spat;
-                                }
-                                if(lightDirection==3){
-                                    spatObj["turn"]=spat;
-                                }
-                                if(lightDirection==4){
-                                    spatObj["right"]=spat;
-                                }
-                            });
-                            let i=0;
-                            let top;
-                            let left;
-                            for(let key in spatObj){
-                                let item1 = spatObj[key];
-                                if(item1.roadId){
-                                    let obj = {};
-                                    let longitude = parseFloat(item1.lightPos.split(",")[0]);
-                                    let latitude = parseFloat(item1.lightPos.split(",")[1]);
-                                    if(i==0){
-                                        //球面坐标转成三维坐标
-                                        let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
-                                        //三维坐标转成平面像素
-                                        let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                                        obj.left = parseInt(pixel[0]);
-                                        obj.top = parseInt(pixel[1]);
-                                        top=obj.top;
-                                        left=obj.left;
-                                    }
-                                    if(i>0){
-                                        obj.left = left+56*i;
-                                        obj.top=top;
-                                    }
-                                    let spatId = "light_"+item1.spatId;
-                                    obj.spatId = spatId;
-                                    obj.key = key;
-                                    obj.spareTime = '';
-                                    obj.lightColor='';
-                                    obj.flag=false;
-                                    this.spatCount++;
-                                    this.lightList.push(obj);
-                                    i++;
-                                }
-                            }
-                        })
-                        this.$emit("count",this.signCount,this.spatCount);
-                        this.initLightWebSocket();
-                    }
-                })
             },
             moveMap(){
                 /*direction:方向 "停",0;"上",1;"下",2;"左",3;"右",4;
@@ -1021,6 +938,9 @@
         position: absolute;
         /*left: 10px;
         top: 10px;*/
+    }
+    .map-mask-tip{
+        @include layoutMode(both);
     }
     .map-time{
         position: absolute;
