@@ -272,11 +272,16 @@
                     let cameraParam;
                     if(this.param==1){
                         cameraParam = JSON.parse(this.videoItem1.cameraParam);
+                        this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }
                     if(this.param==2){
                         cameraParam = JSON.parse(this.videoItem2.cameraParam);
+                        this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }
-                    this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                    if(this.param==3){
+                        this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
+                    }
+
                     this.initPlatformWebSocket();
                     this.initPerceptionWebSocket();
                     this.initSpatWebSocket();
@@ -380,7 +385,7 @@
                         }
                         this.videoItem1.deviceId=camera1.deviceId;
                         this.videoItem1.rsPtName=camera1.rsPtName;
-                        this.videoItem1.cameraParam=camera1.cameraParam;
+//                        this.videoItem1.cameraParam=camera1.cameraParam;
                         this.videoItem2.deviceId=camera2.deviceId;
                         this.videoItem2.rsPtName=camera2.rsPtName;
                         this.videoItem2.cameraParam=camera2.cameraParam;
@@ -415,8 +420,8 @@
                     "serialNum": camera.serialNum
                 }).then(res => {
                     if(index==0){
-                        _this.videoItem1.rtmp = res.data.rtmp;
-//                        _this.videoItem1.rtmp ="";
+//                        _this.videoItem1.rtmp = res.data.rtmp;
+                        _this.videoItem1.rtmp ="";
                         if(_this.videoItem1.rtmp==""){
                             _this.option1.notSupportedMessage="";
                             _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
@@ -961,38 +966,34 @@
                 }
             },
             changeMap(param){
-                let cameraParam;
                 if(param==1){
+                    this.param=1;
+                    this.isActive='1';
                     if(this.videoItem1.cameraParam){
                         this.sideMap=true;
                         this.mapMessage="";
-                        cameraParam = JSON.parse(this.videoItem1.cameraParam);
-                        this.param=1;
-                        this.isActive='1';
-                        this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.sideMap=false;
                         this.mapMessage='该路口没有数据，请稍候再试！';
                     }
                 }
                 if(param==2){
+                    this.param=2;
+                    this.isActive='2';
                     if(this.videoItem2.cameraParam){
                         this.sideMap=true;
                         this.mapMessage="";
-                        cameraParam = JSON.parse(this.videoItem2.cameraParam);
-                        this.param=2;
-                        this.isActive='2';
-                        this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.sideMap=false;
                         this.mapMessage='该路口没有数据，请稍候再试！';
                     }
                 }
                 if(param==3){
+                    this.param=3;
+                    this.isActive='0';
                     if(this.videoItem1.cameraParam){
-                        this.param=3;
-                        this.isActive='0';
-                        this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
+                        this.sideMap=true;
+                        this.mapMessage="";
                     }else{
                         this.sideMap=false;
                         this.mapMessage='该路口没有数据，请稍候再试！';
@@ -1195,7 +1196,7 @@
             },
             onPlatformMessage(mesasge){
                 let _this=this;
-                _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
             },
             onPlatformClose(data){
                 console.log("红绿灯结束连接");
@@ -1240,7 +1241,7 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-               _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
             },
             onPerceptionClose(data){
                 console.log("红绿灯结束连接");
@@ -1285,7 +1286,7 @@
             },
             onSpatMessage(mesasge){
                 let _this=this;
-               _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
 //                let vehData = json.result.vehDataStat;
@@ -1495,7 +1496,7 @@
                         light.img2=img2;
                         light.img3=img3;
                         _this.lastLightObj[item.spatId]=item;
-                        _this.$refs.perceptionMap.addStaticModel_light_1(light);
+                        _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addStaticModel_light_1(light);
 
                     })
                 }
