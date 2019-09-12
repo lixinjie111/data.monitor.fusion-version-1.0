@@ -3,7 +3,7 @@
         <div class="right-road">
             <div class="perception-road" v-for="(item, index) in centerPointData" :key="index"  @click="showRoadDetail(item)">
                 <div class="road-word">
-                    <p>{{item.name}}</p>
+                    <p>{{item.rsName}}</p>
                 </div>
                 <road-section :id="'map' + index" :mapData="item" class="cross-scan"></road-section>
             </div>
@@ -28,8 +28,10 @@ export default {
     },
     methods: {
         showRoadDetail(item) {
+            sessionStorage.setItem(item.rsId,JSON.stringify(item));
+            let centPos = item.centPos.split(",");
             this.$router.push({
-                path: '/perception/' + item.longitude + "/" + item.latitude+"/"+item.id+ "/"+1+ "/"+false,
+                path: '/perception/' + centPos[0] + "/" + centPos[1]+"/"+item.rsId+ "/"+1+ "/"+false,
 //                query:{crossId:item.id}
             });
         },
