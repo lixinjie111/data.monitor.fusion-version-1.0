@@ -276,6 +276,7 @@
 //                        this.center=[[121.1709654293097,76.22695122794798]];
                         this.center=[121.247,31.242];
                     }
+                    this.getPerceptionAreaInfo();
                     this.initPlatformWebSocket();
                     this.initPerceptionWebSocket();
                     this.initSpatWebSocket();
@@ -1194,7 +1195,7 @@
             },
             onPlatformMessage(mesasge){
                 let _this=this;
-                _this.$refs.perceptionMap.onCarTrackMessage(mesasge);
+                _this.$refs.perceptionMap.onCarMessage(mesasge);
             },
             onPlatformClose(data){
                 console.log("红绿灯结束连接");
