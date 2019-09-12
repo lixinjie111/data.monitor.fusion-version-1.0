@@ -46,7 +46,8 @@
                 cacheModelNum: 200,
                 interval: 1,
                 count: 0,
-
+                websocketUrl: "ws://192.168.1.68:9982/mon",
+                hostWebsocket: null,
                 tweens: {},
 
                 mainCarVID: "B21E-00-024",
@@ -89,7 +90,8 @@
                 time2: 0, //微调移动车的时间间隔
                 intervalIds: new Array(),
 
-
+                //车辆监控
+                cartrackwebsocketUrl: "ws://120.133.21.14:49982/mon",
                 carid: "B21E-00-024",
                 carTrackAction: "fusel_sider_veh", //fusel_sider_veh track
                 // ,pmodels:{
@@ -651,6 +653,25 @@
             },
             addModel_light: function(x, y, z,cacheLightData) {
                 this.cacheLightData.push(cacheLightData);
+//          var ligth = {
+//              id: "1",
+//              img1: "./static/images/single/000_03.png",
+//              img2: "./static/images/single/2.png",
+//              img3: "./static/images/single/000_16.png"
+//          };
+//          var ligth2 = {
+//              id: "2",
+//              img1: "./static/images/single/000_03.png",
+//              img2: "./static/images/single/2.png",
+//              img3: "./static/images/single/000_16.png"
+//          };
+//          this.cacheLightData.push(ligth);
+//          this.cacheLightData.push(ligth2);
+
+                //7
+                // var img1= "./static/images/single/000_03.png";
+                // var img2= "./static/images/single/2.png";
+                // var img3="./static/images/single/000_16.png";
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
                     "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
@@ -722,6 +743,13 @@
                 }
             },
             addStaticModel_light_1: function(ligth) {
+
+                /* var ligth = {
+                     id: "1",
+                     img1: "./static/images/single/000_03.png",
+                     img2: "./static/images/single/2.png",
+                     img3: "./static/images/single/000_16.png"
+                 };*/
                 for (var i = 0; i < this.cacheLightData.length; i++) {
                     for (var j = 0; j< this.cacheLightData[i].length; j++) {
                         if (this.cacheLightData[i][j].id == ligth.id) {
@@ -876,7 +904,17 @@
                     -0.7853942219746017
                 );
             },
-
+            initWebsocket: function(url) {
+                if ("WebSocket" in window) {
+                    this.hostWebsocket = new WebSocket(url);
+                    this.hostWebsocket.onmessage = this.onMessage;
+                    this.hostWebsocket.onclose = this.onClose;
+                    this.hostWebsocket.onopen = this.onOpen;
+                    this.hostWebsocket.onerror = this.onError;
+                } else {
+                    console.log("该浏览器不支持WebSocket!");
+                }
+            },
             timetrans: function(timestamp) {
                 var date = new Date(timestamp); //如果date为13位不需要乘1000
                 var Y = date.getFullYear() + "-";
@@ -1010,7 +1048,6 @@
                 }
             },
             onPerceptionMessage: function(data) {
-                debugger
                 //            console.log("=======================onPerceptionMessage===================");
                 //            console.log(new Date().getTime());
                 this.lastPerceptionMessage = data;
@@ -1027,7 +1064,6 @@
                 // }
             },
             addPerceptionData: function(data) {
-
                 //     console.log("===========addPerceptionData=============");
                 //     console.log(new Date().getTime());
 
@@ -1120,7 +1156,7 @@
                                 // this.$emit("processPerceptionDataTime",ss)
                                 //不丢包
                                 this.processPerceptionMesage();
-                                //  this.processPlatformCars();
+                                this.processPlatformCars();
                                 this.timeB = new Date().getTime();
 
                                 let hs = this.timeB - this.timeA;
@@ -1404,10 +1440,143 @@
                         text1.update();
                     }
                 }
-
+                if ("WebSocket" in window) {
+                    if (window.WebSocket) {
+                        if (this.hostWebsocket != null) {
+                            if (this.hostWebsocket.readyState == WebSocket.OPEN) {
+                                //如果WebSocket是打开状态
+                                this.hostWebsocket.close();
+                            }
+                        }
+                        this.hostWebsocket = null;
+                    }
+                } else {
+                    console.log("该浏览器不支持websocket");
+                }
+            },
+            changeRcuId: function(url, rcuid) {
+                this.websocketUrl = url;
+                this.rcuId = rcuid;
+                if ("WebSocket" in window) {
+                    if (window.WebSocket) {
+                        if (this.hostWebsocket != null) {
+                            if (this.hostWebsocket.readyState == WebSocket.OPEN) {
+                                //如果WebSocket是打开状态
+                                this.hostWebsocket.close();
+                            }
+                        }
+                        this.hostWebsocket = null;
+                        this.hostWebsocket = new WebSocket(this.websocketUrl);
+                        this.hostWebsocket.onmessage = this.onMessage;
+                        this.hostWebsocket.onclose = this.onClose;
+                        this.hostWebsocket.onopen = this.onOpen;
+                        this.hostWebsocket.onerror = this.onError;
+                    }
+                } else {
+                    console.log("该浏览器不支持websocket");
+                }
+            },
+            changeRcuId2: function(url, params) {
+                this.websocketUrl = url;
+                // this.rcuId = rcuid;
+                this.perceptionParams = params;
+                this.deviceModels = {};
+                if ("WebSocket" in window) {
+                    if (window.WebSocket) {
+                        if (this.hostWebsocket != null) {
+                            if (this.hostWebsocket.readyState == WebSocket.OPEN) {
+                                //如果WebSocket是打开状态
+                                this.hostWebsocket.close();
+                            }
+                        }
+                        this.hostWebsocket = null;
+                        this.hostWebsocket = new WebSocket(this.websocketUrl);
+                        this.hostWebsocket.onmessage = this.onPerceptionMessage;
+                        this.hostWebsocket.onclose = this.onClose;
+                        this.hostWebsocket.onopen = this.onOpen2;
+                        this.hostWebsocket.onerror = this.onError;
+                    }
+                } else {
+                    console.log("该浏览器不支持websocket");
+                }
+            },
+            onOpen: function() {
+                var hostVehicle = '{"action":"RCUPer","devId":"' + this.rcuId + '"}';
+                this.sendMsg(hostVehicle);
+            },
+            onOpen2: function() {
+                var params = this.perceptionParams;
+                this.sendMsg(params);
+            },
+            sendMsg: function(msg) {
+                if (window.WebSocket) {
+                    if (this.hostWebsocket.readyState == WebSocket.OPEN) {
+                        //如果WebSocket是打开状态
+                        this.hostWebsocket.send(msg); //send()发送消息
+                        console.log("已发送消息:" + msg);
+                    }
+                }
+            },
+            onError: function(e) {
+                console.log(e);
+            },
+            //单车监控改变监控车辆
+            changeMainCarId: function(url, carid) {
+                this.cartrackwebsocketUrl = url;
+                this.carid = carid;
+                this.mainCarVID = carid;
+                if ("WebSocket" in window) {
+                    if (window.WebSocket) {
+                        if (this.carTrackWebsocket != null) {
+                            if (this.carTrackWebsocket.readyState == WebSocket.OPEN) {
+                                //如果WebSocket是打开状态
+                                this.carTrackWebsocket.close();
+                            }
+                        }
+                        this.carTrackWebsocket = null;
+                        this.carTrackWebsocket = new WebSocket(this.cartrackwebsocketUrl);
+                        this.carTrackWebsocket.onmessage = this.onCarTrackMessage;
+                        this.carTrackWebsocket.onclose = this.onCarTrackClose;
+                        this.carTrackWebsocket.onopen = this.onCarTrackOpen;
+                        this.carTrackWebsocket.onerror = this.onError;
+                    }
+                } else {
+                    console.log("该浏览器不支持websocket");
+                }
             },
 
-
+            initCarTrackWebsocket: function(url) {
+                if ("WebSocket" in window) {
+                    this.carTrackWebsocket = new WebSocket(url);
+                    this.carTrackWebsocket.onmessage = this.onCarTrackMessage;
+                    this.carTrackWebsocket.onclose = this.onCarTrackClose;
+                    this.carTrackWebsocket.onopen = this.onCarTrackOpen;
+                    this.carTrackWebsocket.onerror = this.onError;
+                } else {
+                    console.log("该浏览器不支持WebSocket!");
+                }
+            },
+            onCarTrackClose: function(data) {
+                console.log("结束连接");
+            },
+            onCarTrackOpen: function() {
+                console.log("建立连接");
+                var hostVehicle = {
+                    action: this.carTrackAction,
+                    vehicleId: this.carid
+                };
+                var hostVehicleMsg = JSON.stringify(hostVehicle);
+                this.senCarTrackdMsg(hostVehicleMsg);
+            },
+            senCarTrackdMsg: function(msg) {
+                if (window.WebSocket) {
+                    if (this.carTrackWebsocket.readyState == WebSocket.OPEN) {
+                        //如果WebSocket是打开状态
+                        this.carTrackWebsocket.send(msg); //send()发送消息
+                        console.log("已发送消息:" + msg);
+                    }
+                }
+            },
             onCarTrackMessage: function(data) {
                 // console.log(data);
                 // console.log("====================onCarTrackMessage===================");
@@ -1415,18 +1584,9 @@
                 // console.log(nowtime-this.lasttime);
                 // this.lasttime = nowtime;
                 this.cacheTrackCarData = data;
-                this.processCarTrackMessage(1);
+                this.processCarTrackMessage();
             },
-            onCarMessage: function(data) {
-                // console.log(data);
-                // console.log("====================onCarTrackMessage===================");
-                // let nowtime = new Date().getTime();
-                // console.log(nowtime-this.lasttime);
-                // this.lasttime = nowtime;
-                this.cacheTrackCarData = data;
-                this.processCarTrackMessage(0);
-            },
-            processCarTrackMessage: function(isCar) {
+            processCarTrackMessage: function() {
                 // console.log("processCarTrackMessage:================>"+this.cacheMainCarTrackData.length);
                 if (this.cacheTrackCarData == null) {
                     return;
@@ -1435,15 +1595,7 @@
                 let json = JSON.parse(data.data);
                 // console.log(json);
                 //处理旁车信息
-                let pcars =null;// json.result.data;
-                if(isCar==1)
-                {
-                    pcars= json.result.data;//单车界面
-                }
-                else
-                {
-                    pcars = json.result.vehDataDTO;//路口界面
-                }
+                let pcars = json.result.data;
                 if (pcars != null) {
 
                     if (Object.getOwnPropertyNames(this.pmodels).length==1) {
@@ -1888,7 +2040,19 @@
             }, 1000);
         },
         destroyed() {
-
+            if ("WebSocket" in window) {
+                if (window.WebSocket) {
+                    if (this.carTrackWebsocket != null) {
+                        if (this.carTrackWebsocket.readyState == WebSocket.OPEN) {
+                            //如果WebSocket是打开状态
+                            this.carTrackWebsocket.close();
+                        }
+                    }
+                    this.carTrackWebsocket = null;
+                }
+            } else {
+                console.log("该浏览器不支持websocket");
+            }
             this.cacheMainCarTrackData = new Array();
             for (let i = 0; i < this.intervalIds.length; i++) {
                 clearInterval(this.intervalIds[i]);
