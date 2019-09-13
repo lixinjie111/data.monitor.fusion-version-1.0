@@ -1694,6 +1694,10 @@
                         position[1],
                         this.defualtZ
                     );
+                    ///ceshi
+                    this.addText(vid+"text",vid,position[0],
+                        position[1],
+                        this.defualtZ)
 
                 } else {
                     this.models[vid].position.set(position[0], position[1], this.defualtZ);
@@ -1703,7 +1707,13 @@
                         (-Math.PI / 180) * data.heading
                     );
 
-
+                    ////////////ceshi
+                    this.models[vid+"text"].position.set(position[0], position[1], this.defualtZ+2);
+                    this.models[vid+"text"].rotation.set(
+                        this.pitch,
+                        this.yaw,
+                        (-Math.PI / 180) * data.heading
+                    );
                 }
 
                 dl.moveTo({
