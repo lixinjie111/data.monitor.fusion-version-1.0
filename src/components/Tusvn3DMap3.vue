@@ -281,7 +281,7 @@
             {
                 var item=  sessionStorage.getItem("sideList");
                 var itemSide = JSON.parse(item);
-                console.log(item)
+                // console.log(item)
                 if(itemSide!=null&&itemSide.length>0)
                 {
                     for (var i=0;i<itemSide.length;i++)
