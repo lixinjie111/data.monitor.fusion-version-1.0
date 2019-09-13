@@ -248,7 +248,6 @@
                 }
             },
             onMapComplete(){
-                //getMap(this.$refs.perceptionMap);
                 let longitude=parseFloat(this.$route.params.lon);
                 let latitude=parseFloat(this.$route.params.lat);
                 //设置地图的中心点
@@ -261,24 +260,23 @@
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
-                    this.crossId = this.$route.params.crossId;
-                    if(this.crossId==5){
-                        this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
-//                        this.currentExtent=[[121.17301805179359, 31.28296820442101],[121.17794199996544, 31.28296820442101],[121.17794199996544, 31.28081713470981],[121.17301805179359, 31.28081713470981]];
-                        this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-//                        this.center=[[121.17548002587952,76.2279931281073]];
-                        this.center=[121.247,31.242];
-                    }
-                    if(this.crossId==6){
-                        this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
-//                        this.currentExtent=[[121.16850344929297, 31.285399006602997],[121.17342740932644, 31.285399006602997],[121.17342740932644, 31.283247763590165],[121.16850344929297, 31.283247763590165]];
-                        this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-//                        this.center=[[121.1709654293097,76.22695122794798]];
-                        this.center=[121.247,31.242];
-                    }
-                    this.getPerceptionAreaInfo();
+                    this.rsId = this.$route.params.crossId;
+                    let item = sessionStorage.getItem(this.rsId);
+                    let sideRoad =  JSON.parse(item);
+                    let cameraList = sideRoad.camLst;
+                    this.getVideo(cameraList[0].sn,cameraList[0].protocal,0);
+                    this.getVideo(cameraList[1].sn,cameraList[1].protocal,1);
+                    this.videoItem1.deviceId=cameraList[0].devId;
+                    this.videoItem1.rsPtName=sideRoad.rsName;
+                    this.videoItem1.cameraParam=cameraList[0].camParam;
+                    this.videoItem2.deviceId=cameraList[1].devId;
+                    this.videoItem2.rsPtName=sideRoad.rsName;
+                    this.videoItem2.cameraParam=cameraList[1].camParam;
+                    this.$refs.perceptionMap.updateCameraPosition(this.videoItem1.cameraParam.x,this.videoItem1.cameraParam.y,this.videoItem1.cameraParam.z,this.videoItem1.cameraParam.radius,this.videoItem1.cameraParam.pitch,this.videoItem1.cameraParam.yaw);
+
+                    this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+                    this.center=[121.247,31.242];
                     this.initPlatformWebSocket();
-                    this.initPerceptionWebSocket();
                     this.initSpatWebSocket();
                     //地图不连续移动，判断红绿灯的位置受否再可视区
                     this.initWarningWebSocket();
@@ -313,96 +311,6 @@
 
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
-            getPerceptionAreaInfo(){
-                let time = setTimeout(()=>{
-                    if(this.videoItem1.rtmp==''){
-                        this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
-                    }
-                    if(this.videoItem2.rtmp==''){
-                        this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
-                    }
-                    clearTimeout(time);
-                },1000)
-                getPerceptionAreaInfo({
-                    "areaPoints":this.currentExtent,
-                    "centerPoint": {
-                        "latitude": this.center[0][1],
-                        "longitude": this.center[0][0]
-                    }
-                }).then(res=>{
-                    let data = res.data;
-//                    let typicalList=[{"rsPtId":"310114_002","rsPtName":"路侧点1","ptLon":121.1750307,"ptLat":31.2826193,"rspDistcodeProvince":"310000","rspDistcodeCity":"310100","rspDistcodeDistrict":"310114","rspRoadName":"博园路","mecId":"","regionId":"","rsPtPic":"1563762896617.jpg","rspRoadId":"478","rsPtIds":"","distName":"","specialInstructions":"","count":"","cloudName":"","cameraList":[{"deviceId":"N-NJ-0004","type":"N","model":"NJ01","commMode":"5","serialNum":"3402000000132000003001","factory":"NJ","workTemperature":"","voltage":"","outInterface":"","status":0,"ptLon":121.1750307,"ptLat":31.2826193,"scrappedTime":"2019-08-01 21:01:00","appVersion":"","isBind":"2","bindId":"310114_002","videoSvrUrl":"http://140.206.154.130/","protocol":"1","toward":"向前","rsPtId":"310114_002","cloudId":"1022","cloudName":"","rsPtName":"路侧点1","rspDistcode":"310114","rspDistname":"嘉定区","rspRoadName":"博园路","rspRoadId":"478","bindTime":"2019-08-01 15:04:01","cameraRunStatus":"2","cameraMonitorStatus":"0"}]}];
-                    let sideList = [];
-                    let typicalList = data.shortList;
-                    let count=0;
-                    //记录取了几个摄像头
-                    let cameraCount=0;
-                    let camera1={};
-                    let camera2={};
-                    let ele = document.getElementById('fusionRight');
-                    let topPosition = ele.clientHeight;//整个高度减去弹出框的高度
-                    if(typicalList&&typicalList.length>0){
-                        for(let i=0;i<typicalList.length;i++){
-                            let item = typicalList[i];
-                            let cameraList = item.cameraList;
-                            //球面坐标转成三维坐标
-                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
-                            //三维坐标转成平面像素
-                            let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                            //在同一个杆上找
-                            for(let j=0;j<cameraList.length;j++){
-                                if(cameraList[j].priority!=0){
-                                    if(!camera1.serialNum){
-                                        camera1=cameraList[j];
-                                        cameraCount++;
-                                        continue;
-                                    }
-                                    if(!camera2.serialNum){
-                                        camera2=cameraList[j];
-                                        cameraCount++;
-                                    }
-                                    if(cameraCount>=2){
-                                        break;
-                                    }
-                                }
-                            }
-                            //在不同杆找
-                            if(cameraCount>=2){
-                                break;
-                            }
-                        }
-                        if(cameraCount<2){
-                            let item = typicalList[0];
-                            //球面坐标转成三维坐标
-                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.ptLon, item.ptLat);
-                            //三维坐标转成平面像素
-                            let pixel = this.$refs.perceptionMap.worldToScreen(utm[0],utm[1],12.86);
-                            if(!camera1.serialNum){
-                                camera1=typicalList[0].cameraList[0];
-
-                            }
-
-                            if(!camera2.serialNum){
-                                camera2=typicalList[0].cameraList[1];
-                            }
-                        }
-                        this.videoItem1.deviceId=camera1.deviceId;
-                        this.videoItem1.rsPtName=camera1.rsPtName;
-                        this.videoItem1.cameraParam=camera1.cameraParam;
-                        this.videoItem2.deviceId=camera2.deviceId;
-                        this.videoItem2.rsPtName=camera2.rsPtName;
-                        this.videoItem2.cameraParam=camera2.cameraParam;
-                        this.getVideo(camera1,0);
-                        this.getVideo(camera2,1);
-                    }
-                    if(sideList&&sideList.length>0){
-                        sideList.forEach(item=>{
-                            count++;
-                            this.$refs.perceptionMap.addImgOverlay('road'+count, 'static/images/fusion/roadSide.png', 0, item.ptLon, item.ptLat, "{'data':'5'}", [10,10], this.imgClick);
-                        })
-                    }
-                });
-            },
             getTime(time,processTime,vehDataStat){
                 if(time!=''){
                     this.time1=time;
@@ -416,11 +324,11 @@
                 debugger
                 this.processDataTime=time;
             },*/
-            getVideo(camera,index){
+            getVideo(serialNum,protocol,index){
                 let _this = this;
                 getVideoByNum({
-                    "protocal": camera.protocol,
-                    "serialNum": camera.serialNum
+                    "protocal": protocol,
+                    "serialNum": serialNum
                 }).then(res => {
                     if(index==0){
                         _this.videoItem1.rtmp = res.data.rtmp;
@@ -969,7 +877,7 @@
                 let cameraParam;
                 if(param==1){
                     if(this.videoItem1.cameraParam){
-                        cameraParam = JSON.parse(this.videoItem1.cameraParam);
+                        cameraParam = this.videoItem1.cameraParam;
                         this.param=1;
                         this.isActive='1';
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
@@ -979,7 +887,7 @@
                 }
                 if(param==2){
                     if(this.videoItem2.cameraParam){
-                        cameraParam = JSON.parse(this.videoItem2.cameraParam);
+                        cameraParam = this.videoItem2.cameraParam;
                         this.param=2;
                         this.isActive='2';
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
