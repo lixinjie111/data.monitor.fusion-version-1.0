@@ -1,7 +1,7 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
-        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
+        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3&&mapShow"/>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
@@ -78,7 +78,7 @@
     import TusvnMap1 from './TusvnMap.vue';
     import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
-    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData} from '@/api/fusion'
+    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId} from '@/api/fusion'
     export default {
         data() {
             return {
@@ -139,7 +139,8 @@
                 warningCount:0,
                 lastLightObj:{},
                 processDataTime:'',
-                removeEventObj:{}
+                removeEventObj:{},
+                mapShow:false
             }
         },
         props:{
@@ -260,30 +261,37 @@
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
-                    this.rsId = this.$route.params.crossId;
-                    let item = sessionStorage.getItem(this.rsId);
-                    let sideRoad =  JSON.parse(item);
-                    let cameraList = sideRoad.camLst;
-                    this.getVideo(cameraList[0].sn,cameraList[0].protocal,0);
-                    this.getVideo(cameraList[1].sn,cameraList[1].protocal,1);
-                    this.videoItem1.deviceId=cameraList[0].devId;
-                    this.videoItem1.rsPtName=sideRoad.rsName;
-                    this.videoItem1.cameraParam=cameraList[0].camParam;
-                    this.videoItem2.deviceId=cameraList[1].devId;
-                    this.videoItem2.rsPtName=sideRoad.rsName;
-                    this.videoItem2.cameraParam=cameraList[1].camParam;
-                    this.$refs.perceptionMap.updateCameraPosition(this.videoItem1.cameraParam.x,this.videoItem1.cameraParam.y,this.videoItem1.cameraParam.z,this.videoItem1.cameraParam.radius,this.videoItem1.cameraParam.pitch,this.videoItem1.cameraParam.yaw);
-
-                    this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-                    this.center=[121.247,31.242];
-                    this.initPlatformWebSocket();
-                    this.initSpatWebSocket();
-                    //地图不连续移动，判断红绿灯的位置受否再可视区
-                    this.initWarningWebSocket();
-                    this.initLightWebSocket();
-                    this.initWarningCancleWebSocket();
-                    this.getMap();
-                    return;
+                   let count=0;
+                   let flag=false;
+                   //5s没有 默认值
+                   let time = setInterval(()=>{
+                       if(this.videoItem1.cameraParam){
+                           this.$refs.perceptionMap.updateCameraPosition(this.videoItem1.cameraParam.x,this.videoItem1.cameraParam.y,this.videoItem1.cameraParam.z,this.videoItem1.cameraParam.radius,this.videoItem1.cameraParam.pitch,this.videoItem1.cameraParam.yaw);
+                           this.initPlatformWebSocket();
+                           this.initSpatWebSocket();
+                           //地图不连续移动，判断红绿灯的位置受否再可视区
+                           this.initWarningWebSocket();
+                           this.initLightWebSocket();
+                           this.initWarningCancleWebSocket();
+                           this.getMap();
+                           clearInterval(time);
+                           this.mapShow=true;
+                           return;
+                       }
+                       count++;
+                       if(count==5){
+                           this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
+                           this.initPlatformWebSocket();
+                           this.initSpatWebSocket();
+                           //地图不连续移动，判断红绿灯的位置受否再可视区
+                           this.initWarningWebSocket();
+                           this.initLightWebSocket();
+                           this.initWarningCancleWebSocket();
+                           this.getMap();
+                           this.mapShow=true;
+                           clearInterval(time);
+                       }
+                   },1000)
                 }
              },
             map1InitComplete(){
@@ -350,6 +358,18 @@
                         }
                     }
                 })
+            },
+            getCameraByRsId(){
+                getCameraByRsId({"rsId":this.rsId}).then(res => {
+                    let data = res.data;
+                    let cameraList = data.camLst;
+                    this.videoItem1.deviceId=cameraList[0].devId;
+                    this.videoItem1.rsPtName=data.rsName;
+                    this.videoItem1.cameraParam=cameraList[0].camParam;
+                    this.videoItem2.deviceId=cameraList[1].devId;
+                    this.videoItem2.rsPtName=data.rsName;
+                    this.videoItem2.cameraParam=cameraList[1].camParam;
+                });
             },
             getCurrentExtent() {
                 this.currentExtent = [];
@@ -1442,6 +1462,10 @@
         mounted() {
             this.option1 = this.getOption();
             this.option2 = this.getOption();
+            this.rsId = this.$route.params.crossId;
+            this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+            this.center=[121.247,31.242];
+            this.getCameraByRsId();
         },
         destroyed(){
             clearInterval(this.mapTime1);

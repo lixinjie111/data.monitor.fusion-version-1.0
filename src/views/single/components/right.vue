@@ -306,6 +306,8 @@
                 var data = json.result.data;
                 var resultData=[];
                 if(data&&data.length>0){
+                    /*_this.carWebsocket.close();
+                    debugger*/
                     data.forEach(item=>{
                         let option={
                             position:new AMap.LngLat(item.longitude, item.latitude),
@@ -313,7 +315,8 @@
                             light:item.light,
                             direction:item.direction,
                             longitude:item.longitude,
-                            latitude:item.latitude
+                            latitude:item.latitude,
+                            spatId:item.spatId
                         }
                         resultData.push(option);
                     });
@@ -330,6 +333,7 @@
 //                            }
                         //cross
                         if(item.direction==1){
+                            console.log(item.light,item.leftTime)
                             //cross red
                             if(item.light=='RED'){
                                 //每个路灯相位都是固定的
@@ -502,6 +506,8 @@
                         light.img2=img2;
                         light.img3=img3;
                         _this.lastLightObj[item.spatId]=item;
+                        console.log("------------------");
+                        console.log(light);
                         _this.$refs.tusvnMap.addStaticModel_light_1(light);
 //                            let spatId="light_"+item.spatId;
 //                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);

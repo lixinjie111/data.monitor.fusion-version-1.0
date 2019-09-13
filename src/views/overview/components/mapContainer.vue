@@ -1,5 +1,5 @@
 <template>
-    <div class="c-view-map" :id="id"></div>
+    <div class="road-view-map" :id="id"></div>
 </template>
 <script>
 import { getRoadCenterIds, getRoadCenterPoints,getDevDis} from '@/api/overview/index.js';
@@ -314,7 +314,8 @@ export default {
                                 deviceId:item.deviceId,
                                 path:item.path,
                                 longitude:item.longitude,
-                                latitude:item.latitude
+                                latitude:item.latitude,
+                                title:item.devName
                             }
                             resultData.push(option);
                         }
@@ -331,7 +332,8 @@ export default {
                                     var marker = new AMap.Marker({
                                         position: subItem.position,
                                         icon: 'static/images/road/side.png', // 添加 Icon 图标 URL
-                                        offset:new AMap.Pixel(-15, -15)
+                                        offset:new AMap.Pixel(-15, -15),
+                                        title:subItem.title
                                     });
                                     _this.AMap.add(marker);
                                     var item={
@@ -367,8 +369,13 @@ export default {
     }
 }
 </script>
+<style>
+    .road-view-map .amap-container img{
+        cursor: pointer;
+    }
+</style>
 <style scoped lang="scss">
-.c-view-map{
+.road-view-map{
     height: 100%;
     width: 100%;
     z-index: -2;
