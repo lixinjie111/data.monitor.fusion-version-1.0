@@ -2,7 +2,7 @@
     <div class="c-view-map" :id="id"></div>
 </template>
 <script>
-import { getRoadCenterIds, getRoadCenterPoints} from '@/api/overview/index.js';
+import { getRoadCenterIds, getRoadCenterPoints,getDevDis} from '@/api/overview/index.js';
 import ConvertCoord from '@/assets/js/coordConvert.js'
 export default {
     name: "MapContainer",
@@ -23,19 +23,14 @@ export default {
             count: 0,
             flag: true,
             prevData: [],
-            defaultMapOption :{
-                center: window.mapOption.center, //上海
-                zoom: 11,		// 默认：比例尺显示100m
-                resizeEnable: true, //是否监控地图容器尺寸变化
-                rotateEnable: true,
-                mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
-            }
 
         }
     },
     mounted() {
-        this.AMap = new AMap.Map(this.id, this.defaultMapOption);
+        this.AMap = new AMap.Map(this.id, window.defaultMapOption);
         this.initWebSocket();
+        let param = ['2'];
+        this.getDevDis(param);
     },
     methods: {
         initWebSocket(){
@@ -296,7 +291,75 @@ export default {
             }else{
                 return;
             }
-        }
+        },
+        getDevDis(disParams){
+            getDevDis({
+                'devTypes': disParams,
+            }).then(res => {
+                this.deviceMap(res.data);
+                sessionStorage.setItem("sideList",JSON.stringify(res.data));
+            });
+        },
+        deviceMap(data){
+            var _this = this;
+            if(_this.count==0){
+                if(data.length>0) {
+                    var resultData=[];
+                    data.forEach(item=>{
+                        let option;
+                        if(item.longitude|| item.latitude){
+                            option={
+                                position:new AMap.LngLat(item.longitude, item.latitude),
+                                type:item.type,
+                                deviceId:item.deviceId,
+                                path:item.path,
+                                longitude:item.longitude,
+                                latitude:item.latitude
+                            }
+                            resultData.push(option);
+                        }
+                    });
+                    //转成高德地图的坐标
+                    resultData.forEach((item, index, arr)=>{
+                        resultData[index].position = ConvertCoord.wgs84togcj02(item.longitude, item.latitude);
+                        _this.count ++;
+                        if(_this.count == arr.length) {
+                            //绘制线的轨迹
+                            resultData.forEach(function (subItem,subIndex) {
+                                //路侧点
+                                if(subItem.type==2){
+                                    var marker = new AMap.Marker({
+                                        position: subItem.position,
+                                        icon: 'static/images/road/side.png', // 添加 Icon 图标 URL
+                                        offset:new AMap.Pixel(-15, -15)
+                                    });
+                                    _this.AMap.add(marker);
+                                    var item={
+                                        path:subItem.path,
+                                        roadSiderId:subItem.deviceId,
+                                        camSerialNum:"",
+                                        target:'map'
+                                    }
+                                    marker.on('click', function(e) {
+                                        _this.$router.push({
+                                            path: '/perception/' + subItem.longitude + "/" + subItem.latitude+"/"+item.deviceId+ "/"+1+ "/"+false,
+                                        });
+                                    });
+                                }
+                                //绘制完后，重新设置
+                                if(subIndex==resultData.length-1){
+                                    _this.AMap.setFitView();
+//                                    _this.AMap.setZoom(_this.AMap.getZoom()-2);
+                                    _this.count=0;
+                                }
+                            })
+                        }
+                        /*}
+                      });*/
+                    })
+                }
+            }
+        },
     },
     destroyed(){
         //销毁Socket
