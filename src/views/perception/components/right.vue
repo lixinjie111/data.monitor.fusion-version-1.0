@@ -369,6 +369,8 @@
                     this.videoItem2.deviceId=cameraList[1].devId;
                     this.videoItem2.rsPtName=data.rsName;
                     this.videoItem2.cameraParam=cameraList[1].camParam;
+                    this.getVideo(cameraList[0].sn,cameraList[0].protocal,0);
+                    this.getVideo(cameraList[1].sn,cameraList[1].protocal,1);
                 });
             },
             getCurrentExtent() {
