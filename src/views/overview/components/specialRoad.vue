@@ -38,8 +38,9 @@ export default {
         // 路段中心点位置
         fetchTypicalRoad() {
             getTypicalRoadData().then(res => {
+                debugger
                 let data = res.data;
-                this.centerPointData = data.slice(3);
+                this.centerPointData = data.slice(0,4);
             });
         }
     },
