@@ -360,6 +360,16 @@
                 })
             },
             getCameraByRsId(){
+                setTimeout(()=>{
+                    if(this.videoItem1.rtmp==""){
+                        this.option1.notSupportedMessage="";
+                        this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                    }
+                    if(this.videoItem2.rtmp==""){
+                        this.option2.notSupportedMessage="";
+                        this.option2.notSupportedMessage='视频流不存在，请稍候重试';
+                    }
+                },2000)
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
                     let data = res.data;
                     let cameraList = data.camLst;
