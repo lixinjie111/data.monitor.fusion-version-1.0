@@ -55,3 +55,9 @@ export const getTypeRoadData = params => { return axios.post(`${HTTPURL}/ehb/roa
  * I_G3_01
  */
 export const getTopWeather = params => { return axios.post(`${HTTPURL}g/comStat/getTopWeather`, params).then(res => res.data); };
+
+/*
+ * 获取设备分布
+ * I_VL1_01
+ */
+export const getDevDis = params => {return axios.post(`${HTTPURL}lc/baseStat/getDevDis`, params).then(res => res.data); };

@@ -241,6 +241,10 @@
 //this.add3DInfoLabel("1","1",121.17551589465815,31.281617738453047,25);
 //this.removeModel("1");
                     this.$emit("mapcomplete", this);
+                    this.initModel_pole();
+
+
+
                     // dl.viewer.controls.addEventListener("drop", this.onDrop);
                     // dl.viewer.addEventListener("camera_changed", this.onCameraChanged);
                 }, 500);
@@ -271,6 +275,32 @@
                 setTimeout(() => {
                     this.processPlatformCarsTrack();
                 }, 0);
+
+            },
+            initModel_pole:function()//初始化杆
+            {
+                var item=  sessionStorage.getItem("sideList");
+                var itemSide = JSON.parse(item);
+                // console.log(item)
+                if(itemSide!=null&&itemSide.length>0)
+                {
+                    for (var i=0;i<itemSide.length;i++)
+                    {
+                        //     var r=288.70140473015795;
+                        //     if(i==1)
+                        //     {
+                        // r=327.94238242879914;
+                        //     }
+                        //     if(i==2)
+                        //     {
+                        //         r=252.50260398634413;
+                        //     }
+                        // console.log(itemSide[i].deviceId)
+                        this.addStaticModel_pole(itemSide[i].deviceId,itemSide[i].devName,'./static/map3d/models/poleWith2Camera3.3ds',itemSide[i].longitude,itemSide[i].latitude,20,0,0,itemSide[i].heading);
+                    }
+                }
+                //this.addStaticModel_pole('street_lamp_two_opposite_3-78','./static/map3d/models/poleWith2Camera3.3ds',121.17476560362519,31.28278305790619,20,0,0, -(Math.PI / 180.0) * (143.49947));
+                //this.addStaticModel_pole('street_lamp_two_opposite_3-78','./static/map3d/models/poleWith2Camera3.3ds',121.1727923,31.2840917,20,0,0, -(Math.PI / 180.0) * (288.70140473015795-180));
 
             },
             /**
@@ -349,7 +379,7 @@
             addText: function(name, text, x, y, z) {
                 var text1 = new dl.Text({
                     text: text,
-                    fontsize:this.fontsize,
+                    fontsize: this.fontsize,
                     borderThickness: 0,
                     textColor: { r: 0, g: 0, b: 0, a: 1.0 }
                 });
@@ -357,7 +387,7 @@
                 this.models[name] = text1;
             },
             removeModel: function(name) {
-                debugger
+
                 let m = this.getModel(name);
                 if (m != null) {
                     try
@@ -398,6 +428,54 @@
 
                 dl.scene.add(model);
                 this.staticmodels[name] = model;
+            },
+            /**
+             * 导航角度转换为3D角度
+             */
+            getHeading:function(heading)
+            {
+                if(heading>180)
+                {
+                    return  heading=-(Math.PI / 180.0) * (heading-180);
+                }
+                else
+                {
+                    return   heading=-(Math.PI / 180.0) * heading;
+                }
+
+            },
+            addStaticModel_pole: function(id,name, url, x, y, z, pitch, yaw, roll) {
+
+                let utm = this.coordinateTransfer(
+                    "EPSG:4326",
+                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    x,
+                    y
+                );
+                x = utm[0];
+                y = utm[1];
+                let model = new dl.Model({
+                    url: url
+                });
+                model.position.x = x;
+                model.position.y = y;
+                model.position.z = z;
+                let pitch1 = pitch == null ? 0 : pitch;
+                let yaw1 = yaw == null ? 0 : yaw;
+                model.rotation.set(0, 0, this.roll);
+                model.rotation.set(0, 0, this.getHeading(roll));
+                dl.scene.add(model);
+                var text1 = new dl.Text({
+                    text: name,
+                    fontsize:100,
+                    borderThickness: 0,
+                    textColor: { r: 0, g: 0, b: 0, a: 1.0 }
+                });
+                text1.position.set(x,y,z+8);
+                text1.rotation.set(0, 0, this.getHeading(roll));
+                dl.scene.add(text1);
+                this.models[name] = text1;
+
             },
             addStaticModel1: function(name, url, x, y, z, pitch, yaw, roll) {
                 let model = new dl.Model({
@@ -1010,7 +1088,7 @@
                 }
             },
             onPerceptionMessage: function(data) {
-                debugger
+
                 //            console.log("=======================onPerceptionMessage===================");
                 //            console.log(new Date().getTime());
                 this.lastPerceptionMessage = data;
@@ -1209,6 +1287,7 @@
                             //感知车
                             // var model1=myBox.addMyBox(3.8, 1.6, 1.4,0xbc2cb2);
                             var model1 = myBox.addMyBox(1.6, 3.8, 1.4, this.carColor);
+
                             model1.position.set(0, 0, 0);
                             model1.rotation.set(this.pitch, this.yaw, this.roll);
                             model1.castShadow = true;
@@ -1336,6 +1415,7 @@
                                 //  0,
                                 //    (Math.PI / 180.0) * (d.heading-180)
                                 // );
+                                ;
                                 mdl.rotation.set(
                                     0,
                                     0,
@@ -1556,6 +1636,7 @@
             cacheAndInterpolatePlatformCar:function(pcar){
                 let vid = pcar.vehicleId;
                 let cdata = this.cacheAndInterpolateDataByVid[vid];
+
                 if(cdata==null)//没有该车的数据
                 {
                     cdata = {
@@ -1578,6 +1659,7 @@
                     cdata.nowRecieveData = d;
                     this.cacheAndInterpolateDataByVid[vid]=cdata;
                 }else{//存在该车的数据
+
                     let d = {
                         vehicleId: vid,
                         longitude: pcar.longitude,
@@ -1587,10 +1669,11 @@
                     };
                     cdata.nowRecieveData = d;
 
-                    if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime) {
-                        console.log("到达顺序错误");
+                    if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime&&cdata.nowRecieveData.gpsTime== cdata.lastRecieveData.gpsTime) {
+                        console.log("到达顺序错误或重复数据");
                         return;
                     }
+
                     let deltaTime = cdata.nowRecieveData.gpsTime - cdata.lastRecieveData.gpsTime;
                     if (deltaTime <= this.stepTime) {
                         cdata.cacheData.push(cdata.nowRecieveData);
@@ -1613,10 +1696,12 @@
                         }
                     }
                     cdata.lastRecieveData=cdata.nowRecieveData;
+                    this.$emit("pcarDataTime",cdata.nowRecieveData.gpsTime,cdata.lastRecieveData.gpsTime);
                 }
             },
             processPlatformCarsTrack:function(){
                 this.processPlatformCarsTrackIntervalId=setInterval(() => {
+
                     for(var vid in this.cacheAndInterpolateDataByVid)
                     {
                         let carCacheData = this.cacheAndInterpolateDataByVid[vid];
@@ -1624,6 +1709,7 @@
                         {
                             if(carCacheData.cacheData.length>0)
                             {
+                                //缓存数据
                                 let cardata = this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
                                 if(this.mainCarVID == cardata.vehicleId)
                                 {

@@ -14,7 +14,7 @@
             <tusvn-map :target-id="'mapMonitor'" ref="tusvnMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
             maxX=326681.125700  maxY=3462723.022400  maxZ=80
-            @mapcomplete="onMapComplete">
+            @mapcomplete="onMapComplete" @pcarDataTime="getProcessTime">
             </tusvn-map>
         </div>
         <div class="spat-detail clearfix">
@@ -108,7 +108,8 @@
                 sideCarWebsocket:null,
                 alertCount:0,
                 warningData:{},
-                lastLightObj:{}
+                lastLightObj:{},
+                processTime:''
             }
 
         },
@@ -176,6 +177,9 @@
                     }
                 }
                 return option;
+            },
+            getProcessTime(time1,time2){
+                this.processTime=time2;
             },
             //视频报错的方法
             playerError1(e) {
@@ -306,6 +310,8 @@
                 var data = json.result.data;
                 var resultData=[];
                 if(data&&data.length>0){
+                    /*_this.carWebsocket.close();
+                    debugger*/
                     data.forEach(item=>{
                         let option={
                             position:new AMap.LngLat(item.longitude, item.latitude),
@@ -313,7 +319,8 @@
                             light:item.light,
                             direction:item.direction,
                             longitude:item.longitude,
-                            latitude:item.latitude
+                            latitude:item.latitude,
+                            spatId:item.spatId
                         }
                         resultData.push(option);
                     });
@@ -330,6 +337,7 @@
 //                            }
                         //cross
                         if(item.direction==1){
+                            console.log(item.light,item.leftTime)
                             //cross red
                             if(item.light=='RED'){
                                 //每个路灯相位都是固定的
@@ -502,6 +510,8 @@
                         light.img2=img2;
                         light.img3=img3;
                         _this.lastLightObj[item.spatId]=item;
+                        console.log("------------------");
+                        console.log(light);
                         _this.$refs.tusvnMap.addStaticModel_light_1(light);
 //                            let spatId="light_"+item.spatId;
 //                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
@@ -557,7 +567,7 @@
                         img='./static/images/light/2.png'
                     }
                     if(num==3){
-                        img='./static/images/light/3.png'
+                        img='./static/images/light/side.png'
                     }
                     if(num==4){
                         img='./static/images/light/4.png'
