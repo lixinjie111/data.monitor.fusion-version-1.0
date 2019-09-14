@@ -1,7 +1,7 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
-        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3"/>
+        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3&&mapShow"/>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
@@ -78,7 +78,7 @@
     import TusvnMap1 from './TusvnMap.vue';
     import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
-    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData} from '@/api/fusion'
+    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId} from '@/api/fusion'
     export default {
         data() {
             return {
@@ -139,7 +139,9 @@
                 warningCount:0,
                 lastLightObj:{},
                 processDataTime:'',
-                removeEventObj:{}
+                removeEventObj:{},
+                mapShow:false,
+                mapInitTime:''
             }
         },
         props:{
@@ -260,30 +262,39 @@
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
-                    this.rsId = this.$route.params.crossId;
-                    let item = sessionStorage.getItem(this.rsId);
-                    let sideRoad =  JSON.parse(item);
-                    let cameraList = sideRoad.camLst;
-                    this.getVideo(cameraList[0].sn,cameraList[0].protocal,0);
-                    this.getVideo(cameraList[1].sn,cameraList[1].protocal,1);
-                    this.videoItem1.deviceId=cameraList[0].devId;
-                    this.videoItem1.rsPtName=sideRoad.rsName;
-                    this.videoItem1.cameraParam=cameraList[0].camParam;
-                    this.videoItem2.deviceId=cameraList[1].devId;
-                    this.videoItem2.rsPtName=sideRoad.rsName;
-                    this.videoItem2.cameraParam=cameraList[1].camParam;
-                    this.$refs.perceptionMap.updateCameraPosition(this.videoItem1.cameraParam.x,this.videoItem1.cameraParam.y,this.videoItem1.cameraParam.z,this.videoItem1.cameraParam.radius,this.videoItem1.cameraParam.pitch,this.videoItem1.cameraParam.yaw);
-
-                    this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-                    this.center=[121.247,31.242];
-                    this.initPlatformWebSocket();
-                    this.initSpatWebSocket();
-                    //地图不连续移动，判断红绿灯的位置受否再可视区
-                    this.initWarningWebSocket();
-                    this.initLightWebSocket();
-                    this.initWarningCancleWebSocket();
-                    this.getMap();
-                    return;
+                   let count=0;
+                   let flag=false;
+                   //5s没有 默认值
+                   this.mapInitTime = setInterval(()=>{
+                       if(this.videoItem1.cameraParam){
+                           this.$refs.perceptionMap.updateCameraPosition(this.videoItem1.cameraParam.x,this.videoItem1.cameraParam.y,this.videoItem1.cameraParam.z,this.videoItem1.cameraParam.radius,this.videoItem1.cameraParam.pitch,this.videoItem1.cameraParam.yaw);
+                           this.typeRoadData();
+                           this.initPlatformWebSocket();
+                           this.initPerceptionWebSocket();
+                           this.initSpatWebSocket();
+                           //地图不连续移动，判断红绿灯的位置受否再可视区
+                           this.initWarningWebSocket();
+                           this.initWarningCancleWebSocket();
+                           this.getMap();
+                           clearInterval(this.mapInitTime);
+                           this.mapShow=true;
+                           return;
+                       }
+                       count++;
+                       if(count==5){
+                           this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
+                           this.typeRoadData();
+                           this.initPlatformWebSocket();
+                           this.initPerceptionWebSocket();
+                           this.initSpatWebSocket();
+                           //地图不连续移动，判断红绿灯的位置受否再可视区
+                           this.initWarningWebSocket();
+                           this.initWarningCancleWebSocket();
+                           this.getMap();
+                           this.mapShow=true;
+                           clearInterval(this.mapInitTime);
+                       }
+                   },500)
                 }
              },
             map1InitComplete(){
@@ -351,6 +362,30 @@
                     }
                 })
             },
+            getCameraByRsId(){
+                setTimeout(()=>{
+                    if(this.videoItem1.rtmp==""){
+                        this.option1.notSupportedMessage="";
+                        this.option1.notSupportedMessage='视频流不存在，请稍候重试';
+                    }
+                    if(this.videoItem2.rtmp==""){
+                        this.option2.notSupportedMessage="";
+                        this.option2.notSupportedMessage='视频流不存在，请稍候重试';
+                    }
+                },2000)
+                getCameraByRsId({"rsId":this.rsId}).then(res => {
+                    let data = res.data;
+                    let cameraList = data.camLst;
+                    this.videoItem1.deviceId=cameraList[0].devId;
+                    this.videoItem1.rsPtName=data.rsName;
+                    this.videoItem1.cameraParam=cameraList[0].camParam;
+                    this.videoItem2.deviceId=cameraList[1].devId;
+                    this.videoItem2.rsPtName=data.rsName;
+                    this.videoItem2.cameraParam=cameraList[1].camParam;
+                    this.getVideo(cameraList[0].sn,cameraList[0].protocal,0);
+                    this.getVideo(cameraList[1].sn,cameraList[1].protocal,1);
+                });
+            },
             getCurrentExtent() {
                 this.currentExtent = [];
                 let result = this.$refs.perceptionMap.getExtent();
@@ -387,6 +422,37 @@
                 this.center=[121.247,31.242];
                 console.log("中心点："+this.center)
 //                console.log("中心点："+this.center);
+            },
+            typeRoadData(){
+                typeRoadData(
+                    [
+                        {
+                            "polygon":this.currentExtent
+                        }
+                    ]
+                ).then(res=>{
+                    let signs = res.data[0].baseData.signs;
+                    let spats = res.data[0].baseData.spats;
+                    this.signCount=0;
+                    this.spatCount=0;
+                    if(signs&&signs.length>0){
+                        signs.forEach(item=>{
+                            this.signCount++;
+                            //将小的转成大的3
+                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
+                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
+                        })
+                    }
+                    if(spats&&spats.length>0) {
+                        spats.forEach(item => {
+                            let spatList = item.spats;
+                            spatList.forEach(spat => {
+                                this.spatCount++;
+                            });
+                        })
+                    }
+                    this.$emit("count", this.signCount, this.spatCount);
+                })
             },
             moveMap(){
                 /*direction:方向 "停",0;"上",1;"下",2;"左",3;"右",4;
@@ -529,7 +595,7 @@
                         img='./static/images/light/2.png'
                     }
                     if(num==3){
-                        img='./static/images/light/3.png'
+                        img='./static/images/light/side.png'
                     }
                     if(num==4){
                         img='./static/images/light/4.png'
@@ -616,262 +682,6 @@
                 }
                 return img;
 
-            },
-            initLightWebSocket(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.lightWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                    _this.lightWebsocket.onmessage = _this.onLightMessage;
-                    _this.lightWebsocket.onclose = _this.onLightClose;
-                    _this.lightWebsocket.onopen = _this.onLightOpen;
-                }
-            },
-            onLightMessage(mesasge){
-                let _this=this;
-                _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
-                let json = JSON.parse(mesasge.data);
-                let data = json.result.spatDataDTO;
-//                let vehData = json.result.vehDataStat;
-//                _this.$emit("getPerceptionData",vehData);
-//                _this.vehData.push(vehData);
-                _this.time=json.time;
-                /*if(_this.param==3){*/
-                    let resultData=[];
-                    if(data&&data.length>0){
-                        data.forEach(item=>{
-                            let option={
-                                leftTime:item.leftTime,
-                                light:item.status,
-                                direction:item.direction,
-                                spatId:item.spatId
-
-                            }
-                            resultData.push(option);
-                        });
-                        resultData.forEach(function (item,index,arr) {
-                            let light={
-                                /*id: "1",
-                                img1: "./static/images/single/000_03.png",
-                                img2: "./static/images/single/2.png",
-                                img3: "./static/images/single/000_16.png"*/
-                            };
-                            let array=(item.leftTime+"").split("");
-                            let img1;
-                            let img2;
-                            let img3;
-                            let lastItem;
-//                            let keys = Object.keys(_this.lastLightObj);
-//                            if(keys&&keys.length>0){
-//                                lastItem = _this.lastLightObj[item.spatId];
-//                            }
-                            //cross
-                            if(item.direction==1){
-                                //cross red
-                                if(item.light=='RED'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/cross-red.png';
-                                    }
-                                    img1='./static/images/light/cross-red.png';
-                                    img2 = _this.getNumPng('RED',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('RED',array[1]);
-                                    }
-                                }
-                                //cross yellow
-                                if(item.light=='YELLOW'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/cross-yellow.png';
-                                    }
-                                    img2 = _this.getNumPng('YELLOW',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('YELLOW',array[1]);
-                                    }
-                                }
-                                //cross green
-                                if(item.light=='GREEN'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/cross-green.png';
-                                    }
-                                    img2 = _this.getNumPng('GREEN',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('GREEN',array[1]);
-                                    }
-                                }
-                            }
-                            //left
-                            if(item.direction==2){
-                                //left red
-                                if(item.light=='RED'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/left-red.png';
-                                    }
-                                    img2 = _this.getNumPng('RED',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('RED',array[1]);
-                                    }
-                                }
-                                //left yellow
-                                if(item.light=='YELLOW'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/left-yellow.png';
-                                    }
-                                    img2 = _this.getNumPng('YELLOW',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('YELLOW',array[1]);
-                                    }
-                                }
-                                //left green
-                                if(item.light=='GREEN'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/left-green.png';
-                                    }
-                                    img2 = _this.getNumPng('GREEN',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('GREEN',array[1]);
-                                    }
-                                }
-                            }
-                            //turn
-                            if(item.direction==3){
-                                //turn red
-                                if(item.light=='RED'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/turn-red.png';
-                                    }
-                                    img2 = _this.getNumPng('RED',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('RED',array[1]);;
-                                    }
-                                }
-                                //turn yellow
-                                if(item.light=='YELLOW'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/turn-yellow.png';
-                                    }
-                                    img2 = _this.getNumPng('YELLOW',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('YELLOW',array[1]);;
-                                    }
-                                }
-                                //turn green
-                                if(item.light=='GREEN'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/turn-green.png';
-                                    }
-                                    img2 = _this.getNumPng('GREEN',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('GREEN',array[1]);
-                                    }
-                                }
-                            }
-                            //right
-                            if(item.direction==4){
-                                //right red
-                                if(item.light=='RED'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/right-red.png';
-                                    }
-                                    img2 = _this.getNumPng('RED',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('RED',array[1]);
-                                    }
-                                }
-                                //right yellow
-                                if(item.light=='YELLOW'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/right-yellow.png';
-                                    }
-                                    img2 = _this.getNumPng('YELLOW',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('YELLOW',array[1]);
-                                    }
-                                }
-                                //right green
-                                if(item.light=='GREEN'){
-                                    //每个路灯相位都是固定的
-                                    if(lastItem&&lastItem.light==item.light){
-                                        img1="";
-                                    }else{
-                                        img1='./static/images/light/right-green.png';
-                                    }
-                                    img2 = _this.getNumPng('GREEN',array[0]);
-                                    if(array[1]){
-                                        img3 = _this.getNumPng('GREEN',array[1]);
-                                    }
-                                }
-                            }
-                            light.id=item.spatId;
-                            light.img1=img1;
-                            light.img2=img2;
-                            light.img3=img3;
-                            _this.lastLightObj[item.spatId]=item;
-                            _this.$refs.perceptionMap.addStaticModel_light_1(light);
-
-                        })
-                    }
-            },
-            onLightClose(data){
-                console.log("红绿灯结束连接");
-            },
-            onLightOpen(data){
-                //旁车
-                var light = {
-                    "action": "road_real_data",
-                    "data": {
-                        /*"polygon": [
-                            [121.17979423666091, 31.279518991604288],
-                            [121.16305725240798, 31.279518991604288],
-                            [121.16305725240798, 31.289571910992105],
-                            [121.17979423666091, 31.289571910992105]
-                        ]*/
-                        "polygon":this.currentExtent
-                    }
-                }
-                var lightMsg = JSON.stringify(light);
-                this.sendLightMsg(lightMsg);
-            },
-            sendLightMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.lightWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.lightWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
             },
             changeMap(param){
                 let cameraParam;
@@ -966,7 +776,11 @@
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                        for(let key in _this.removeEventObj){
+                            console.log("交通事件："+_this.removeEventObj[key]);
+                        }
                         if(_this.removeEventObj[warningId]){
+                            debugger
                             return;
                         }
                         let msg = item.warnMsg;
@@ -1442,6 +1256,10 @@
         mounted() {
             this.option1 = this.getOption();
             this.option2 = this.getOption();
+            this.rsId = this.$route.params.crossId;
+            this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+            this.center=[121.247,31.242];
+            this.getCameraByRsId();
         },
         destroyed(){
             clearInterval(this.mapTime1);
@@ -1449,6 +1267,7 @@
             clearInterval(this.mapTime3);
             clearInterval(this.mapTime4);
             clearTimeout(this.time);
+            clearInterval(this.mapInitTime);
             this.lightWebsocket&&this.lightWebsocket.close();
             this.$refs.perceptionMap&&this.$refs.perceptionMap.reset3DMap();
             this.warningWebsocket&&this.warningWebsocket.close();

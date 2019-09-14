@@ -15,3 +15,8 @@ export const getVideoByNum = params => {return axios.post(`${HTTPURL}lc/realData
 * 标识牌和红绿灯信息
 */
 export const typeRoadData = params => {return axios.post(`${HTTPURL}ehb/road/typeRoadData`, params).then(res => res.data); };
+
+/**
+ * 根据路侧点id获取摄像头参数
+ */
+export const getCameraByRsId = params => {return axios.post(`${HTTPURL}/ehb/road/sTypeRoad`, params).then(res => res.data); };

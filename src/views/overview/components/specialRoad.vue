@@ -28,7 +28,7 @@ export default {
     },
     methods: {
         showRoadDetail(item) {
-            sessionStorage.setItem(item.rsId,JSON.stringify(item));
+//            sessionStorage.setItem(item.rsId,JSON.stringify(item));
             let centPos = item.centPos.split(",");
             this.$router.push({
                 path: '/perception/' + centPos[0] + "/" + centPos[1]+"/"+item.rsId+ "/"+1+ "/"+false,
@@ -57,6 +57,7 @@ export default {
         margin-bottom: 20px;
         top:33px;
         overflow: hidden;
+        cursor: pointer;
         .road-word {
             // position: relative;
             position: absolute;
