@@ -160,6 +160,7 @@ export default {
     margin-right: 10px;
     cursor: pointer;
     background-color: rgba(94, 89, 112, 0.3);
+    z-index:3;
     .car-index {
       text-align: center;
       width: 40px;

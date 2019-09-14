@@ -16,7 +16,7 @@ window.config = {
     socketUrl:'ws://120.133.21.14:49999/ws',  //影子系统
     dlUrl: 'http://113.208.118.62:8085/', //迪路
     dlWmsUrl: 'http://113.208.118.62:8080/', //迪路
-
+    
     //上海正式环境  内网-IP
     // url: 'http://172.16.1.199:9093/monPlatApp/', //监控平台
     // operateUrl: 'http://172.16.1.197:9090/operateApp/', //运营平台
