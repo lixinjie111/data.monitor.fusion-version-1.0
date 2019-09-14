@@ -10,8 +10,9 @@
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2"></video-player>
             </div>
         </div>
-        <div class="map-time">{{processTime|dateFormat}}</div>
-        <div class="map-time map-time1">{{lightTime|dateFormat}} 缓存：{{cacheLength}}</div>
+        <div class="map-real-time" >{{processTime|dateFormat}}</div>
+        <!--<div class="map-time">{{processTime|dateFormat}}</div>
+        <div class="map-time map-time1">{{lightTime|dateFormat}}</div>-->
         <div class="c-map">
             <tusvn-map :target-id="'mapMonitor'" ref="tusvnMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
@@ -939,6 +940,17 @@
 </style>
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
+    .map-real-time{
+        position: absolute;
+        width: 300px;
+        font-size: 20px;
+        z-index: 2;
+        margin-top: 50px;
+        left:50%;
+        margin-left:-150px;
+        text-align: left;
+
+    }
     .map-time{
         position: absolute;
         top: 10px;
