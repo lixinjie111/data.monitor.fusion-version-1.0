@@ -10,6 +10,8 @@
                 <video-player class="vjs-custom-skin" :options="option2" @error="playerError2"></video-player>
             </div>
         </div>
+        <div class="map-time">{{processTime|dateFormat}}</div>
+        <div class="map-time map-time1">{{lightTime|dateFormat}} 缓存：{{cacheLength}}</div>
         <div class="c-map">
             <tusvn-map :target-id="'mapMonitor'" ref="tusvnMap"
                        background="black" minX=325295.155400   minY=3461941.703700  minZ=50
@@ -81,6 +83,7 @@
     const isProduction = process.env.NODE_ENV === 'production'
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
     import TusvnMap from '@/components/Tusvn3DMap3'
+    import DateFormat from '@/utils/date.js'
     export default {
         data() {
             return {
@@ -99,7 +102,7 @@
                 timer1:0,
                 timer2:0,
                 vehicleId:this.$route.params.vehicleId,
-                lightWebsocket:null,
+                spatWebsocket:null,
                 rtmp1:'',
                 rtmp2:'',
                 warningWebsocket:null,
@@ -110,7 +113,10 @@
                 warningData:{},
                 lastLightObj:{},
                 processTime:'',
-                lightList:[]
+                lightTime:'',
+                lightList:[],
+                warningList:[],
+                cacheLength:0
 
             }
 
@@ -181,29 +187,35 @@
                 return option;
             },
             getProcessTime(time1,time2){
-                this.processTime=time1;
-                if(this.lightList.length>0){
-                    let message = this.lightList.shift();
+                let _this = this;
+                _this.processTime=time2;
+                if(_this.lightList.length>0){
+                    let message = _this.lightList.shift();
                     let json = JSON.parse(message.data);
-                    let data = json.result.data;
+                    _this.lightTime = json.time;
+                    _this.cacheLength = _this.lightList.length;
+                    let time = Math.abs(time2-json.time);
+//                    console.log(time,time1,time2,json.time);
+                    let data = json.result.spatDataDTO;
                     let resultData=[];
-                    if(data&&data.length>0){
-                        /*_this.carWebsocket.close();
-                        debugger*/
+                    if(time<1000&&data&&data.length>0){
                         data.forEach(item=>{
                             let option={
-                                position:new AMap.LngLat(item.longitude, item.latitude),
                                 leftTime:item.leftTime,
-                                light:item.light,
+                                light:item.status,
                                 direction:item.direction,
-                                longitude:item.longitude,
-                                latitude:item.latitude,
                                 spatId:item.spatId
+
                             }
                             resultData.push(option);
                         });
                         resultData.forEach(function (item,index,arr) {
-                            let light={};
+                            let light={
+                                /*id: "1",
+                                img1: "./static/images/single/000_03.png",
+                                img2: "./static/images/single/2.png",
+                                img3: "./static/images/single/000_16.png"*/
+                            };
                             let array=(item.leftTime+"").split("");
                             let img1;
                             let img2;
@@ -215,7 +227,6 @@
 //                            }
                             //cross
                             if(item.direction==1){
-                                console.log(item.light,item.leftTime)
                                 //cross red
                                 if(item.light=='RED'){
                                     //每个路灯相位都是固定的
@@ -387,35 +398,60 @@
                             light.img1=img1;
                             light.img2=img2;
                             light.img3=img3;
-                            _this.lastLightObj[item.spatId]=item;
-                            console.log("------------------");
-                            console.log(light);
+//                        _this.lastLightObj[item.spatId]=item;
+//                            console.log(light);
                             _this.$refs.tusvnMap.addStaticModel_light_1(light);
-//                            let spatId="light_"+item.spatId;
-//                            let key = item.direction.substring(item.direction.lastIndexOf("_")+1);
-//                            _this.lightList.forEach((item1,index1)=>{
-//                                //相交的
-//                                if(item1.spatId==spatId){
-//                                    item1.spareTime = item.leftTime;
-//                                    item1.lightColor = item.light;
-//                                    item1.flag=true;
-//                                }
-//                            })
 
                         })
-                        /* resultData.forEach(function (item,index,arr) {
-                             let direction = item.direction + "";
-                             let key = 'key_' + direction;
-                             _this.lightData[key].spareTime = item.leftTime;
-                             _this.lightData[key].lightColor = item.light;
-                             _this.lightData[key].flag = true;
-                             _this.lightData[key].time = null;
-                             //延长时间
-                             clearTimeout(_this.lightData[key].time);
-                             _this.lightData[key].time = setTimeout(item => {
-                                 _this.lightData[key].flag = false;
-                             }, 3000)
-                         })*/
+                    }
+                }
+                if(_this.warningList.length>0){
+                    let warningMessage = _this.warningList.shift();
+                    let warningJson = JSON.parse(warningMessage.data);
+                    let warningData = warningJson.result.data;
+                    let type = warningJson.result.type;
+                    let warningTime = Math.abs(time2-warningJson.time);
+                    let warningId;
+                    if(type=='CLOUD'&&warningTime<1000){
+                        warningData.forEach(item=>{
+                            warningId = item.warnId;
+                            warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                            console.log("距离："+item.dis);
+                            let msg = item.warnMsg+" "+item.dis+"米";
+                            let warningObj={
+                                longitude:item.longitude,
+                                latitude:item.latitude
+                            }
+                            let warningHash = _this.hashcode(JSON.stringify(warningObj));
+                            //如果告警id不存在
+                            if(!_this.warningData[warningId]){
+                                let obj = {
+                                    id:'alert'+_this.alertCount,
+                                    msg:msg,
+                                    longitude:item.longitude,
+                                    latitude:item.latitude,
+                                    hash:warningHash,
+                                    warningObj:warningObj,
+                                    dist:item.dis
+
+                            }
+                                _this.warningData[warningId]=obj;
+                                _this.alertCount++;
+                                _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                            }else{
+                                //判断是否需要更新
+                                let obj = _this.warningData[warningId];
+                                /*if(obj.hash!=warningHash){*/
+                                    console.log("提示信息："+msg,item.dis,obj.dist);
+                                    /*if(item.dis>obj.dist){
+                                        return;
+                                    }*/
+                                    //进行更新
+                                    _this.$refs.tusvnMap.removeModel(obj.id);
+                                    _this.$refs.tusvnMap.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
+                               /* }*/
+                            }
+                        })
                     }
                 }
             },
@@ -532,20 +568,11 @@
                 this.$refs.tusvnMap1.changeRcuId(window.config.websocketUrl,this.roadItem1.camSerialNum);*/
                 this.initCarWebSocket();
                 this.initSideCarWebSocket();
+                this.initSpatWebSocket();
+                this.initWarningWebSocket();
+                this.initWarningCancleWebSocket();
             },
-            initLightWebSocket(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.lightWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                    _this.lightWebsocket.onmessage = _this.onLightMessage;
-                    _this.lightWebsocket.onclose = _this.onLightClose;
-                    _this.lightWebsocket.onopen = _this.onLightOpen;
-                }
-            },
-            onLightMessage(message){
-                let _this=this;
-                _this.lightList.push(message);
-            },
+
             getNumPng(color,num){
                 let img;
                 if(color=='RED'){
@@ -647,28 +674,53 @@
                 return img;
 
             },
-            onLightClose(data){
-                console.log("结束连接");
-            },
-            onLightOpen(data){
-                //旁车
-                var light = {
-                    "action": "spat",
-                    "vehicleId": this.vehicleId
+            //红绿灯
+            initSpatWebSocket(){
+                let _this=this;
+                if ('WebSocket' in window) {
+                    _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                    _this.spatWebsocket.onmessage = _this.onSpatMessage;
+                    _this.spatWebsocket.onclose = _this.onSpatClose;
+                    _this.spatWebsocket.onopen = _this.onSpatOpen;
                 }
-                var lightMsg = JSON.stringify(light);
-                this.sendLightMsg(lightMsg);
             },
-            sendLightMsg(msg) {
+            onSpatMessage(message){
+                let _this=this;
+                _this.lightList.push(message);
+
+            },
+            onSpatClose(data){
+                console.log("红绿灯结束连接");
+            },
+            onSpatOpen(data){
+                //旁车
+                var spat = {
+                    "action": "road_real_data_spat",
+                    "data": {
+                        /*"polygon": [
+                            [121.17979423666091, 31.279518991604288],
+                            [121.16305725240798, 31.279518991604288],
+                            [121.16305725240798, 31.289571910992105],
+                            [121.17979423666091, 31.289571910992105]
+                        ]*/
+                        "polygon":[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
+                    }
+                }
+                var spatMsg = JSON.stringify(spat);
+                this.sendSpatMsg(spatMsg);
+            },
+            sendSpatMsg(msg) {
                 let _this=this;
                 if(window.WebSocket){
-                    if(_this.lightWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.lightWebsocket.send(msg); //send()发送消息
+                    if(_this.spatWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.spatWebsocket.send(msg); //send()发送消息
                     }
                 }else{
                     return;
                 }
             },
+
+
             initWarningWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
@@ -678,46 +730,9 @@
                     _this.warningWebsocket.onopen = _this.onWarningOpen;
                 }
             },
-            onWarningMessage(mesasge){
+            onWarningMessage(message){
                 let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let warningData = json.result.data;
-                let type = json.result.type;
-                let warningId;
-                if(type=='CLOUD'){
-                    warningData.forEach(item=>{
-                        warningId = item.warnId;
-                        warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        let msg = item.warnMsg+" "+item.dis+"米";
-                        let warningObj={
-                            longitude:item.longitude,
-                            latitude:item.latitude
-                        }
-                        let warningHash = _this.hashcode(JSON.stringify(warningObj));
-                        //如果告警id不存在
-                        if(!_this.warningData[warningId]){
-                            let obj = {
-                                id:'alert'+_this.alertCount,
-                                msg:msg,
-                                longitude:item.longitude,
-                                latitude:item.latitude,
-                                hash:warningHash
-                            }
-                            _this.warningData[warningId]=obj;
-                            _this.alertCount++;
-                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
-                        }else{
-                            //判断是否需要更新
-                            let obj = _this.warningData[warningId];
-                            if(obj.hash!=warningHash){
-                                //进行更新
-                                _this.$refs.tusvnMap.removeModel(obj.id);
-                                _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
-                            }
-                        }
-                    })
-                }
-
+                _this.warningList.push(message);
             },
             onWarningClose(data){
                 console.log("结束连接");
@@ -807,7 +822,7 @@
                     obj = _this.warningData[warningId];
                     //防止路口页面和单车页面事件交叉影响
                     if(obj&&obj.id){
-                        _this.$refs.perceptionMap.removeModel(obj.id);
+                        _this.$refs.tusvnMap.removeModel(obj.id);
                         delete _this.warningData[warningId];
                     }
                 })
@@ -875,12 +890,20 @@
             this.option1 = this.getOption();
             this.option2 = this.getOption();
             this.getDeviceInfo();
-            this.initLightWebSocket();
-            this.initWarningWebSocket();
-            this.initWarningCancleWebSocket();
+//            this.initLightWebSocket();
         },
         components:{
             TusvnMap
+        },
+        filters: {
+            dateFormat: function (value) {
+                /*debugger*/
+                if(value!=''){
+                    let ms = value%1000;
+                    let time = DateFormat.formatTime(value);
+                    return time+"."+ms;
+                }
+            }
         },
         beforeDestroy(){
             console.log("单车页面销毁")
@@ -888,7 +911,7 @@
             this.timer1 = null;//清除直播报活
             clearTimeout(this.timer2);
             this.timer2 = null;//清除直播报活
-            this.lightWebsocket&&this.lightWebsocket.close();
+            this.spatWebsocket&&this.spatWebsocket.close();
             this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
             this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
@@ -916,6 +939,21 @@
 </style>
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
+    .map-time{
+        position: absolute;
+        top: 10px;
+        left:50%;
+        margin-left: -125px;
+        width: 250px;
+        text-align: left;
+        display: block;
+        font-size: 14px;
+        z-index:2;
+        background: #969090;
+    }
+    .map-time1{
+        top:50px!important;
+    }
     .fusion-video{
         border:1px solid rgba(211, 134, 0, 0.5);
         margin: 20px 0px;

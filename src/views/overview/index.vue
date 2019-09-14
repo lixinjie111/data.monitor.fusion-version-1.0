@@ -150,7 +150,6 @@ export default {
         top: 0;
         right: 0;
         bottom: 0;
-        cursor: pointer;
         background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
         // width:327px; 
     }

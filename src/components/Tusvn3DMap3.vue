@@ -206,37 +206,37 @@
                     this.addModel_light_x(121.17533995826606,31.282071700494583,25,lights3)
 
                     //6路口
-                    let lights6=new Array();
-                    let lightObj6_1={
-                        id:"274",
-                        img1: "./static/images/light/left-red.png",
-                        img2: "./static/images/light/2.png",
-                        img3: "./static/images/light/6.png"
-                    };
-                    lights6.push(lightObj6_1);
-                    this.addModel_light_y(121.17073573444654,31.284232094641546,25,lights6)
-
-
-
-                    let lights7=new Array();
-                    let lightObj7_1={
-                        id:"283",
-                        img1: "./static/images/light/left-red.png",
-                        img2: "./static/images/light/2.png",
-                        img3: "./static/images/light/6.png"
-                    };
-                    lights7.push(lightObj7_1);
-                    this.addModel_light(121.17087729460859,31.28414862604421,25,lights7)
-
-                    let lights8=new Array();
-                    let lightObj8_1={
-                        id:"273",
-                        img1: "./static/images/light/left-red.png",
-                        img2: "./static/images/light/2.png",
-                        img3: "./static/images/light/6.png"
-                    };
-                    lights8.push(lightObj8_1);
-                    this.addModel_light_y_6(121.17120509259806,31.284269933013952,25,lights8)
+//                    let lights6=new Array();
+//                    let lightObj6_1={
+//                        id:"274",
+//                        img1: "./static/images/light/left-red.png",
+//                        img2: "./static/images/light/2.png",
+//                        img3: "./static/images/light/6.png"
+//                    };
+//                    lights6.push(lightObj6_1);
+//                    this.addModel_light_y(121.17073573444654,31.284232094641546,25,lights6)
+//
+//
+//
+//                    let lights7=new Array();
+//                    let lightObj7_1={
+//                        id:"283",
+//                        img1: "./static/images/light/left-red.png",
+//                        img2: "./static/images/light/2.png",
+//                        img3: "./static/images/light/6.png"
+//                    };
+//                    lights7.push(lightObj7_1);
+//                    this.addModel_light(121.17087729460859,31.28414862604421,25,lights7)
+//
+//                    let lights8=new Array();
+//                    let lightObj8_1={
+//                        id:"273",
+//                        img1: "./static/images/light/left-red.png",
+//                        img2: "./static/images/light/2.png",
+//                        img3: "./static/images/light/6.png"
+//                    };
+//                    lights8.push(lightObj8_1);
+//                    this.addModel_light_y_6(121.17120509259806,31.284269933013952,25,lights8)
 
 //this.add3DInfoLabel("1","1",121.17551589465815,31.281617738453047,25);
 //this.removeModel("1");
@@ -1649,6 +1649,7 @@
                     };
                     let d = {
                         vehicleId: vid,
+                        plateNo:pcar.plateNo,
                         longitude: pcar.longitude,
                         latitude: pcar.latitude,
                         gpsTime: pcar.gpsTime,
@@ -1695,8 +1696,8 @@
                             cdata.cacheData.push(d2);
                         }
                     }
-                    cdata.lastRecieveData=cdata.nowRecieveData;
                     this.$emit("pcarDataTime",cdata.nowRecieveData.gpsTime,cdata.lastRecieveData.gpsTime);
+                    cdata.lastRecieveData=cdata.nowRecieveData;
                 }
             },
             processPlatformCarsTrack:function(){
@@ -1767,6 +1768,7 @@
             },
             moveCar: function(data) {
                 let vid = data.vehicleId;
+                let plateNo = data.plateNo;
                 let carModel = this.models[vid];
                 let position = proj4(this.sourceProject, this.destinatePorject, [
                     data.longitude,
@@ -1781,7 +1783,7 @@
                         this.defualtZ
                     );
                     ///ceshi
-                    this.addText(vid+"text",vid,position[0],
+                    this.addText(vid+"text",plateNo,position[0],
                         position[1],
                         this.defualtZ)
 
@@ -1811,6 +1813,7 @@
             },
             moveCar2: function(data) {
                 let vid = data.vehicleId;
+                let plateNo = data.plateNo;
                 let carModel = this.models[vid];
                 let position = proj4(this.sourceProject, this.destinatePorject, [
                     data.longitude,
@@ -1826,7 +1829,7 @@
                     );
 
                     ///ceshi
-                    this.addText(vid+"text",vid,position[0],
+                    this.addText(vid+"text",plateNo,position[0],
                         position[1],
                         this.defualtZ)
 

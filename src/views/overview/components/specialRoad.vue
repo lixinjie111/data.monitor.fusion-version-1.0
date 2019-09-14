@@ -57,6 +57,7 @@ export default {
         margin-bottom: 20px;
         top:33px;
         overflow: hidden;
+        cursor: pointer;
         .road-word {
             // position: relative;
             position: absolute;
