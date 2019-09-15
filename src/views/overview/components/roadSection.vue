@@ -28,14 +28,27 @@ export default {
       },
       mapPointData: [],
       roadWebSocket: null,
+      carWebSocket: null,
       prevData: {}
     };
+  },
+  watch:{
+    "crossData.finalFourPosition"(newVal, oldVal) {
+        if(!this.roadWebSocket) {
+          this.initWebsocket();
+        }
+        if(this.carWebSocket) {
+          this.onCarOpen();
+        }else {
+          this.initCarWebsocket();
+        }
+    }
   },
   mounted() {
 //    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
     this.aMap = new AMap.Map(this.id, this.mapOption);
     this.drawRoadMap();
-    let test = {};
+    this.aMap.on('moveend', this.getFourPosition);
   },
   methods: {
     drawRoadMap() {
@@ -103,8 +116,8 @@ export default {
       //   rectangle.setMap(this.aMap);
       //   this.aMap.setFitView([rectangle]);
       this.crossData.finalFourPosition = finalFourPosition;
-      this.initWebsocket();
-      this.initCarWebsocket();
+      // this.initWebsocket();
+      // this.initCarWebsocket();
     },
 
       // 获取平台车
@@ -171,11 +184,10 @@ export default {
 
               } else {
                   // 返回的数据为空
-                  let obj = Object.values(_this.prevData);
-                  for (let key in obj) {
-                      obj[key].marker.stopMove();
-                      _this.aMap.remove(obj[key].marker);
-                      delete obj[key];
+                  for (let id in _this.prevData) {
+                      _this.prevData[id].marker.stopMove();
+                      _this.aMap.remove(_this.prevData[id].marker);
+                      delete _this.prevData[id];
                   }
               }
           }
@@ -198,9 +210,9 @@ export default {
       sendCarMsg(msg) {
           let _this = this;
           if (window.WebSocket) {
-              if (_this.roadWebSocket.readyState == WebSocket.OPEN) {
+              if (_this.carWebSocket.readyState == WebSocket.OPEN) {
                   //如果WebSocket是打开状态
-                  _this.roadWebSocket.send(msg); //send()发送消息
+                  _this.carWebSocket.send(msg); //send()发送消息
               }
           } else {
               return;
