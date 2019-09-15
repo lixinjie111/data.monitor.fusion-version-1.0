@@ -94,7 +94,7 @@ export function getMap(map){
     // map.addStaticModel('street_lamp_two_opposite_2-4','./static/map3d/models/icgvzl8hyw3k-cctv-camera/camera.obj',326334.33667123236,3462268.758218471,20.5);
     // map.addStaticModel('street_lamp_two_opposite_3-78','./static/map3d/models/model/camera.obj',326317.32345508446,3462265.5895430204,20.5);
     // map.addStaticModel('street_lamp_two_opposite_3-78','./static/map3d/models/poleWith2Camera1.3ds',326320.4451977463,3462281.583116995,20);
-    map.addStaticModel1('street_lamp_two_opposite_3-78','./static/map3d/models/poleWith2Camera3.3ds',326277.821,3462359.693,20,0,0,(Math.PI/180.0)*210);
+    // map.addStaticModel1('street_lamp_two_opposite_3-78','./static/map3d/models/poleWith2Camera3.3ds',326277.821,3462359.693,20,0,0,(Math.PI/180.0)*210);
 
     //添加路灯杆和信息牌
     let data = [[2340,5,326263.1536280000,3462381.9079600000,19.4429998472],
