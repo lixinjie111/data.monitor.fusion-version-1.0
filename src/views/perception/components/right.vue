@@ -589,7 +589,7 @@
                         img='./static/images/light/2.png'
                     }
                     if(num==3){
-                        img='./static/images/light/side.png'
+                        img='./static/images/light/3.png'
                     }
                     if(num==4){
                         img='./static/images/light/4.png'

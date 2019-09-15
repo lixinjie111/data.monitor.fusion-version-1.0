@@ -68,7 +68,7 @@
                 platformCars: null,
                 cachePerceptionQueue: new Array(), //缓存感知数据
                 processPerceptionDataIntervalId:null,
-                processPerceptionInterval: 30, //处理缓存数据的间隔
+                processPerceptionInterval: 50, //处理缓存数据的间隔
                 waitingProcessPerceptionTime: 0,
                 lastPerceptionData: null,
                 person: new THREE.MeshStandardMaterial({
