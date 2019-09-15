@@ -141,7 +141,8 @@
                 processDataTime:'',
                 removeEventObj:{},
                 mapShow:false,
-                mapInitTime:''
+                mapInitTime:'',
+                currentExtent:[]
             }
         },
         props:{
@@ -250,13 +251,7 @@
                 }
             },
             onMapComplete(){
-                let longitude=parseFloat(this.$route.params.lon);
-                let latitude=parseFloat(this.$route.params.lat);
-                //设置地图的中心点
-                if(longitude||latitude){
-                    let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",longitude,latitude);
-                    this.x=utm[0];
-                    this.y=utm[1];
+
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                    /* setInterval(()=>{
                         let camera = this.$refs.perceptionMap.getCamera();
@@ -295,7 +290,6 @@
                            clearInterval(this.mapInitTime);
                        }
                    },500)
-                }
              },
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
@@ -439,8 +433,8 @@
                         signs.forEach(item=>{
                             this.signCount++;
                             //将小的转成大的3
-                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
-                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
+//                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
+//                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
                         })
                     }
                     if(spats&&spats.length>0) {
@@ -780,7 +774,6 @@
                             console.log("交通事件："+_this.removeEventObj[key]);
                         }
                         if(_this.removeEventObj[warningId]){
-                            debugger
                             return;
                         }
                         let msg = item.warnMsg;
@@ -1252,13 +1245,35 @@
                     return;
                 }
             },
+            getExtend(x,y,r){
+                let x0=x+r;
+                let y0=y+r;
+                let x1=x-r;
+                let y1=y-r;
+                this.currentExtent.push([x1, y0]);
+                this.currentExtent.push([x0, y0]);
+                this.currentExtent.push([x0, y1]);
+                this.currentExtent.push([x1, y1]);
+            }
         },
         mounted() {
             this.option1 = this.getOption();
             this.option2 = this.getOption();
             this.rsId = this.$route.params.crossId;
-            this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-            this.center=[121.247,31.242];
+
+            let longitude=parseFloat(this.$route.params.lon);
+            let latitude=parseFloat(this.$route.params.lat);
+            //设置地图的中心点
+            if(longitude||latitude) {
+                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
+                this.x = utm[0];
+                this.y = utm[1];
+                this.getExtend(longitude,latitude,0.002);
+                this.center=[longitude ,latitude];
+            }else{
+                this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+                this.center=[121.247,31.242];
+            }
             this.getCameraByRsId();
         },
         destroyed(){

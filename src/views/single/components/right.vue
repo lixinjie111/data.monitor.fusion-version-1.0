@@ -949,7 +949,6 @@
         left:50%;
         margin-left:-150px;
         text-align: left;
-
     }
     .map-time{
         position: absolute;
