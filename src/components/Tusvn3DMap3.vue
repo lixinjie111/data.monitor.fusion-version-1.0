@@ -1386,6 +1386,10 @@
                         //平台车
                         continue;
                     }
+                    if (d.heading >=360) {
+                        // 不处理大于360的的数据
+                        continue;
+                    }
 
                     let dUTM = proj4(this.sourceProject, this.destinatePorject, [
                         d.longitude,
@@ -1418,7 +1422,7 @@
                                 //  0,
                                 //    (Math.PI / 180.0) * (d.heading-180)
                                 // );
-                                ;
+                                // ;
                                 mdl.rotation.set(
                                     0,
                                     0,
