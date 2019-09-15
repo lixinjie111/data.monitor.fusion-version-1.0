@@ -68,7 +68,7 @@
                 platformCars: null,
                 cachePerceptionQueue: new Array(), //缓存感知数据
                 processPerceptionDataIntervalId:null,
-                processPerceptionInterval: 30, //处理缓存数据的间隔
+                processPerceptionInterval: 50, //处理缓存数据的间隔
                 waitingProcessPerceptionTime: 0,
                 lastPerceptionData: null,
                 person: new THREE.MeshStandardMaterial({
@@ -1386,6 +1386,10 @@
                         //平台车
                         continue;
                     }
+                    if (d.heading >=360) {
+                        // 不处理大于360的的数据
+                        continue;
+                    }
 
                     let dUTM = proj4(this.sourceProject, this.destinatePorject, [
                         d.longitude,
@@ -1418,7 +1422,7 @@
                                 //  0,
                                 //    (Math.PI / 180.0) * (d.heading-180)
                                 // );
-                                ;
+                                // ;
                                 mdl.rotation.set(
                                     0,
                                     0,

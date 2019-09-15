@@ -76,7 +76,7 @@ export function getMap(map){
     //画圆  326279.672803747 3462360.84818288   600m
     let circle = new dl.Circle({
         redius:600.0,
-        center:[326279.672803747,3462360.84818288,13.618],
+        center:[325535.061,3462402.816,13.618],
         color:"#ffffff",
         outline:false,
         outlineColor:"#ff0000",
