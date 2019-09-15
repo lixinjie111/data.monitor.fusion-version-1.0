@@ -238,6 +238,9 @@
 //                    lights8.push(lightObj8_1);
 //                    this.addModel_light_y_6(121.17120509259806,31.284269933013952,25,lights8)
 
+                    //17号路口
+
+
 //this.add3DInfoLabel("1","1",121.17551589465815,31.281617738453047,25);
 //this.removeModel("1");
                     this.$emit("mapcomplete", this);

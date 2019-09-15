@@ -268,7 +268,7 @@
                    this.mapInitTime = setInterval(()=>{
                        if(this.videoItem1.cameraParam){
                            this.$refs.perceptionMap.updateCameraPosition(this.videoItem1.cameraParam.x,this.videoItem1.cameraParam.y,this.videoItem1.cameraParam.z,this.videoItem1.cameraParam.radius,this.videoItem1.cameraParam.pitch,this.videoItem1.cameraParam.yaw);
-                           this.typeRoadData();
+//                           this.typeRoadData();
                            this.initPlatformWebSocket();
                            this.initPerceptionWebSocket();
                            this.initSpatWebSocket();
@@ -283,7 +283,7 @@
                        count++;
                        if(count==5){
                            this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
-                           this.typeRoadData();
+//                           this.typeRoadData();
                            this.initPlatformWebSocket();
                            this.initPerceptionWebSocket();
                            this.initSpatWebSocket();
@@ -474,7 +474,7 @@
                         this.isConMov=false;
                         console.log("停止------")
                         this.getPerceptionAreaInfo();
-                        this.typeRoadData();
+//                        this.typeRoadData();
                         return;
                         //
                     }
