@@ -774,7 +774,6 @@
                             console.log("交通事件："+_this.removeEventObj[key]);
                         }
                         if(_this.removeEventObj[warningId]){
-                            debugger
                             return;
                         }
                         let msg = item.warnMsg;
