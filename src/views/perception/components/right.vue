@@ -309,10 +309,10 @@
                 }
                 let currentExtend = this.currentExtent;
                 console.log("currentExtent:"+this.currentExtent)
-                /*overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
+                overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
-                    null, 1, overviewLayerId);*/
+                    null, 1, overviewLayerId);
 
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
@@ -1263,12 +1263,13 @@
 
             let longitude=parseFloat(this.$route.params.lon);
             let latitude=parseFloat(this.$route.params.lat);
+            let extend = parseFloat(this.$route.params.extend);
             //设置地图的中心点
             if(longitude||latitude) {
                 let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
                 this.x = utm[0];
                 this.y = utm[1];
-                this.getExtend(longitude,latitude,0.002);
+                this.getExtend(longitude,latitude,extend);
                 this.center=[longitude ,latitude];
             }else{
                 this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
