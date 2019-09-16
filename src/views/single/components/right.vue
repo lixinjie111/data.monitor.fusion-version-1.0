@@ -420,7 +420,7 @@
                             warningId = item.warnId;
                             warningId = warningId.substring(0,warningId.lastIndexOf("_"));
                             console.log("距离："+item.dis);
-                            let msg = item.warnMsg;
+                            let msg = item.warnMsg+"  "+item.dis;
                             let warningObj={
                                 longitude:item.longitude,
                                 latitude:item.latitude
@@ -722,7 +722,6 @@
                     return;
                 }
             },
-
 
             initWarningWebSocket(){
                 let _this=this;
