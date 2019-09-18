@@ -193,7 +193,7 @@
                 if(_this.lightList.length>0){
                     let message = _this.lightList.shift();
                     let json = JSON.parse(message.data);
-                    _this.lightTime = json.time;
+
                     _this.cacheLength = _this.lightList.length;
                     let time = Math.abs(time2-json.time);
 //                    console.log(time,time1,time2,json.time);
@@ -412,13 +412,15 @@
                     let warningData = warningJson.result.data;
                     let type = warningJson.result.type;
                     let warningTime = Math.abs(time2-warningJson.time);
+                    _this.lightTime = warningJson.time;
                     let warningId;
-                    if(type=='CLOUD'&&warningTime<1000){
+                    console.log(_this.lightTime,warningTime)
+                    if(type=='CLOUD'){
                         warningData.forEach(item=>{
                             warningId = item.warnId;
                             warningId = warningId.substring(0,warningId.lastIndexOf("_"));
                             console.log("距离："+item.dis);
-                            let msg = item.warnMsg+" "+item.dis+"米";
+                            let msg = item.warnMsg+"  "+item.dis;
                             let warningObj={
                                 longitude:item.longitude,
                                 latitude:item.latitude
@@ -721,7 +723,6 @@
                 }
             },
 
-
             initWarningWebSocket(){
                 let _this=this;
                 if ('WebSocket' in window) {
@@ -734,6 +735,53 @@
             onWarningMessage(message){
                 let _this=this;
                 _this.warningList.push(message);
+                /*let warningJson = JSON.parse(message.data);
+                let warningData = warningJson.result.data;
+                let type = warningJson.result.type;
+//                let warningTime = Math.abs(time2-warningJson.time);
+                _this.lightTime = warningJson.time;
+                let warningId;
+                if(type=='CLOUD'){
+                    warningData.forEach(item=>{
+                        warningId = item.warnId;
+                        warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                        console.log("距离："+item.dis);
+                        let msg = item.warnMsg+" "+item.dis+"米";
+                        let warningObj={
+                            longitude:item.longitude,
+                            latitude:item.latitude
+                        }
+                        let warningHash = _this.hashcode(JSON.stringify(warningObj));
+                        //如果告警id不存在
+                        if(!_this.warningData[warningId]){
+                            let obj = {
+                                id:'alert'+_this.alertCount,
+                                msg:msg,
+                                longitude:item.longitude,
+                                latitude:item.latitude,
+                                hash:warningHash,
+                                warningObj:warningObj,
+                                dist:item.dis
+
+                            }
+                            _this.warningData[warningId]=obj;
+                            _this.alertCount++;
+                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                        }else{
+                            //判断是否需要更新
+                            let obj = _this.warningData[warningId];
+                            /!*if(obj.hash!=warningHash){*!/
+                            console.log("提示信息："+msg,item.dis,obj.dist);
+                            /!*if(item.dis>obj.dist){
+                                return;
+                            }*!/
+                            //进行更新
+                            _this.$refs.tusvnMap.removeModel(obj.id);
+                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
+                            /!* }*!/
+                        }
+                    })
+                }*/
             },
             onWarningClose(data){
                 console.log("结束连接");
