@@ -195,7 +195,7 @@
             getOption(){
                 let option = {
                     overNative: true,
-                    autoplay: true,
+                    autoplay: false,
                     controls: true,
                     fluid: true,
                     techOrder: ['flash', 'html5'],
@@ -213,7 +213,7 @@
                     width:'100%',
                     height:'100%',
                     notSupportedMessage: '数据正在加载，请稍候...',
-                      bigPlayButton : false,
+                      bigPlayButton : true,
                     /*errorDisplay : false,*/
                     controlBar: {
                         timeDivider: false,
