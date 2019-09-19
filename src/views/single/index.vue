@@ -1,6 +1,6 @@
 <template>
     <div class="fusion-layout">
-        <div class="fusion-left">
+        <div class="c-fusion-left fusion-left">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
                     <left :realData="realData"></left>
@@ -164,13 +164,7 @@
 </script>
 <style lang="scss" scoped>
     .fusion-left{
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
         width: 310px;
-       /* background: #1a1a1a;*/
-        z-index:1;
     }
     .fusion-layout{
         position: fixed;
