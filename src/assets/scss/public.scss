@@ -218,11 +218,18 @@ img {
   font-size: 22px;
   line-height: 60px;
   margin-left: 24px;
+  white-space: nowrap;
  /* @include layoutMode(both);*/
   .header-img{
     vertical-align: middle;
     padding-right: 8px;
     display: inline-block;
+  }
+  .header-title{
+    vertical-align: middle;
+    padding-left: 10px;
+    display: inline-block;
+    height: 22px;
   }
 }
 .fusion-left-main {

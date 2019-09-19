@@ -3,6 +3,7 @@
         <div class="fusion-header">
             <img src="static/images/logo.png" class="header-img"/>
             融合感知中心
+            <img src="static/images/logo-title.png" class="header-title"/>
         </div>
          <div class="left-overview">
                 <ul class="left-item-wrapper">
