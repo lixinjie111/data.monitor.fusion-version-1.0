@@ -85,6 +85,24 @@
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
     import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
+    //websocket心跳检测
+    let wsHeartCheck = {
+        timeout: 5000,
+        timeId: -1,
+        wsObj: null,
+        init(ws) {
+            this.wsObj = ws;
+        },
+        reset() {
+            clearTimeout(this.timeId);
+            this.start();
+        },
+        start() {
+            this.timeId = setTimeout(() => {
+                this.wsObj.send('HeartBeat');
+            }, this.timeout);
+        }
+    };
     export default {
         data() {
             return {
