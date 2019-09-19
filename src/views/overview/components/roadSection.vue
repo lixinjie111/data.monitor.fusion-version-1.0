@@ -46,7 +46,8 @@ export default {
   },
   mounted() {
 //    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
-    this.aMap = new AMap.Map(this.id, this.mapOption);
+    this.aMap = new AMap.Map(this.id, window.mapOption);
+    this.aMap.setMapStyle(window.mapOption.mapStyleEmpty);
     this.drawRoadMap();
     this.aMap.on('moveend', this.getFourPosition);
   },

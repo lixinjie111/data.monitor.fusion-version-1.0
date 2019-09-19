@@ -357,6 +357,8 @@
         mounted() {
             this.mapOption=window.defaultMapOption;
             this.distanceMap = new AMap.Map('singleMap', this.mapOption);
+            //避免加载空白地图
+            this.distanceMap.setMapStyle(window.defaultMapOption.mapStyle);
             this.getBaseData();
             this.getRouteDataByVehId();
         },

@@ -15,8 +15,8 @@
         <div class="map-time map-time1">{{lightTime|dateFormat}}</div>-->
         <div class="c-map">
             <tusvn-map :target-id="'mapMonitor'" ref="tusvnMap"
-                       background="black" minX=325295.155400   minY=3461941.703700  minZ=50
-            maxX=326681.125700  maxY=3462723.022400  maxZ=80
+                       background="mapParam.background" minX="mapParam.minX"   minY="mapParam.minY" minZ="mapParam.minZ"
+            maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
             @mapcomplete="onMapComplete" @pcarDataTime="getProcessTime">
             </tusvn-map>
         </div>
@@ -117,7 +117,8 @@
                 lightTime:'',
                 lightList:[],
                 warningList:[],
-                cacheLength:0
+                cacheLength:0,
+                mapParam:{}
 
             }
 
@@ -420,7 +421,7 @@
                             warningId = item.warnId;
                             warningId = warningId.substring(0,warningId.lastIndexOf("_"));
                             console.log("距离："+item.dis);
-                            let msg = item.warnMsg;
+                            let msg = item.warnMsg+"  "+item.dis;
                             let warningObj={
                                 longitude:item.longitude,
                                 latitude:item.latitude
@@ -589,7 +590,7 @@
                         img='./static/images/light/2.png'
                     }
                     if(num==3){
-                        img='./static/images/light/side.png'
+                        img='./static/images/light/3.png'
                     }
                     if(num==4){
                         img='./static/images/light/4.png'
@@ -722,7 +723,6 @@
                     return;
                 }
             },
-
 
             initWarningWebSocket(){
                 let _this=this;
@@ -937,6 +937,7 @@
             },
         },
         mounted(){
+            this.mapParam=window.mapParam;
             this.option1 = this.getOption();
             this.option2 = this.getOption();
             this.getDeviceInfo();

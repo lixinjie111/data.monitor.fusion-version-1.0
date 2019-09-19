@@ -62,8 +62,8 @@
         <div class="map-left"></div>
         <div id="map" class="c-map">
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
-                       background="black" minX=325295.155400   minY=3461941.703700  minZ=50
-            maxX=326681.125700  maxY=3462723.022400  maxZ=80
+                       background="mapParam.background" minX="mapParam.minX"   minY="mapParam.minY" minZ="mapParam.minZ"
+                       maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
             @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
         </div>
@@ -121,7 +121,6 @@
                 lightWebsocket:null,
                 warningCancleWebsocket:null,
                 isMapFirst:true,
-                time:0,
                 param:1, //平面 俯视
                 time:'',
                 time1:'',
@@ -142,7 +141,8 @@
                 removeEventObj:{},
                 mapShow:false,
                 mapInitTime:'',
-                currentExtent:[]
+                currentExtent:[],
+                mapParam:{}
             }
         },
         props:{
@@ -253,12 +253,13 @@
             onMapComplete(){
 
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                   /* setInterval(()=>{
+                    /*setInterval(()=>{
                         let camera = this.$refs.perceptionMap.getCamera();
                         console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                     },500)*/
                    let count=0;
                    let flag=false;
+//                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                    //5s没有 默认值
                    this.mapInitTime = setInterval(()=>{
                        if(this.videoItem1.cameraParam){
@@ -267,7 +268,7 @@
                            this.initPlatformWebSocket();
                            this.initPerceptionWebSocket();
                            this.initSpatWebSocket();
-                           //地图不连续移动，判断红绿灯的位置受否再可视区
+//                           //地图不连续移动，判断红绿灯的位置受否再可视区
                            this.initWarningWebSocket();
                            this.initWarningCancleWebSocket();
                            this.getMap();
@@ -282,7 +283,7 @@
                            this.initPlatformWebSocket();
                            this.initPerceptionWebSocket();
                            this.initSpatWebSocket();
-                           //地图不连续移动，判断红绿灯的位置受否再可视区
+//                           //地图不连续移动，判断红绿灯的位置受否再可视区
                            this.initWarningWebSocket();
                            this.initWarningCancleWebSocket();
                            this.getMap();
@@ -422,7 +423,9 @@
                     [
                         {
                             "polygon":this.currentExtent
+//                            "polygon":[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
                         }
+
                     ]
                 ).then(res=>{
                     let signs = res.data[0].baseData.signs;
@@ -920,13 +923,8 @@
                 var platform = {
                     "action": "road_real_data_reg",
                     "data": {
-                        /*"polygon": [
-                            [121.17979423666091, 31.279518991604288],
-                            [121.16305725240798, 31.279518991604288],
-                            [121.16305725240798, 31.289571910992105],
-                            [121.17979423666091, 31.289571910992105]
-                        ]*/
-                        "polygon":this.currentExtent
+                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
+//                        "polygon":this.currentExtent
                     }
                 }
                 var platformMsg = JSON.stringify(platform);
@@ -1257,9 +1255,11 @@
             }
         },
         mounted() {
+            this.mapParam=window.mapParam;
             this.option1 = this.getOption();
             this.option2 = this.getOption();
             this.rsId = this.$route.params.crossId;
+           /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
             let longitude=parseFloat(this.$route.params.lon);
             let latitude=parseFloat(this.$route.params.lat);

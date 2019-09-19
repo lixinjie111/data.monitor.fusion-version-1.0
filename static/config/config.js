@@ -40,8 +40,8 @@ window.config = {
     // socketUrl:'ws://116.236.72.205:49999/ws',  //影子系统
     // dlUrl: 'http://116.236.72.204:48085/', //迪路
     // dlWmsUrl: 'http://116.236.72.204:48080/', //迪路
-    //
-    // version: 1.0,       // 版本号
+    
+     version: 1.0,       // 版本号
 }
 
 //地图额外配置项添加
@@ -57,6 +57,10 @@ window.defaultMapOption = {
     resizeEnable: true, //是否监控地图容器尺寸变化
     rotateEnable: true,
     mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
+}
+//天气
+window.weatherCenter={
+    center:[121.17265957261286,31.284096076877844]
 }
 
 //路网配置参数
@@ -75,4 +79,31 @@ window.dlWmsDefaultOption = {
     blend: false,
     tileSize: 256,
     params:{}
+<<<<<<< HEAD
 }
+=======
+}
+
+window.mapParam={
+    minX:325295.155400,
+    minY:3461941.703700,
+    minZ:50,
+    maxX:326681.125700,
+    maxY:3462723.022400,
+    maxZ:80,
+    background:"black"
+}
+//	调用
+// let _optionWms = Object.assign(
+// 	{},
+// 	window.dlWmsDefaultOption,
+// 	{
+// 		params:{'LAYERS': window.dlWmsOption.LAYERS_centerline,'STYLES': window.dlWmsOption.STYLES, 'VERSION': window.dlWmsOption.VERSION}
+// 	}
+// );
+// this.wms = new AMap.TileLayer.WMS(_optionWms);
+// this.distanceMap.add(this.wms);
+
+
+// ws://120.133.21.14:29998/ws
+>>>>>>> dev

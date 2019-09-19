@@ -16,12 +16,13 @@ export default {
         return {
             city: {},
             weather: {},
-            changeCenterPoint: [121.17265957261286,31.284096076877844],
+            changeCenterPoint: [],
             time:null,
             requestData:{}
         }
     },
     mounted() {
+	    this.changeCenterPoint=window.weatherCenter.center;
         this.getAddress();
     },
     methods: {
