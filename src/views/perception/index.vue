@@ -1,11 +1,7 @@
 <template>
     <div class="fusion-style">
-        <!--头部-->
-        <div class="header-style">
-            <header-top></header-top>
-        </div>
         <div class="fusion-layout">
-            <div class="fusion-left">
+            <div class="c-fusion-left fusion-left">
                 <div class="c-scroll-wrap">
                     <div class="c-scroll-inner">
                         <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount"></left>
@@ -146,26 +142,10 @@
 <style lang="scss" scoped>
 
     .fusion-style{
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        width: 100%;
+        height: 100%;
         .fusion-left{
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
             width: 310px;
-           /* background: #1a1a1a;;*/
-            z-index:1;
-        }
-        .fusion-layout{
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
         }
     }
 </style>

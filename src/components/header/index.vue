@@ -1,10 +1,15 @@
 <template>
-    <div class="base-info">
-        <span>
-            <em >{{city.district || '--'}}</em>
-            <img src="@/assets/images/weather/default.png" class="weather-icon"/>
-            <em class="c-middle">{{weather.wendu || '--'}}°</em>
-        </span>
+    <div id="header">
+        <router-link tag="a" class="logo-wrap" to="/overview">
+            <img src="static/images/logo.png" class="logo"/>
+            <em class="name">融合感知中心</em>
+        </router-link>
+        <div class="sub-info clearfix" v-if="$parent.isHeaderShow">
+            <span class="tip">
+                <em class="c-middle">{{city.district || '--'}}</em>
+                <img src="@/assets/images/weather/default.png" class="weather-icon" /><em class="c-middle">{{weather.wendu || '--'}}°</em>
+            </span>
+        </div>
     </div>
 </template>
 <script>
@@ -71,7 +76,7 @@ export default {
 </script>
 <style scoped lang="scss">
 @import '@/assets/scss/theme.scss';
-.header {
+#header {
     position: absolute;
     left: 0;
     right: 0;
@@ -91,37 +96,17 @@ export default {
         padding: 5px 0;
         cursor: pointer;
         height: 30px;
+        @include layoutMode(align);
         .logo {
             height: 100%;
-            vertical-align: top;
+            margin-right: 10px;
         }
-        .logo-wrap {
-            display: inline-block;
-            height: 29px;
-            font-size: 30px;
-            line-height: 40px;
-            letter-spacing: 3px;
+        .name {
+            font-size: 24px;
+            line-height: 30px;
             color: #fff;
-        }
-    }
-    .menu-box{
-        display: inline-block;
-        white-space: nowrap;
-        .menu-list {
-            float: left;
-            margin:0px 46px;
-            height:100%;
-            font-size: 20px;
-            line-height:40px;
-            vertical-align: middle;
-            cursor: pointer;
-            &:hover {
-                border-bottom: 3px solid #925d00;
-            }
-            &.is-active {
-                border-bottom: 3px solid #925d00;
-                cursor: default;
-            }
+            letter-spacing: 3px;
+            margin-right: 10px;
         }
     }
     .sub-info {
@@ -145,11 +130,5 @@ export default {
             }
         }
     }
-    // .userinfo {
-    //     font-size: 12px;
-    //     height: 100%;
-    //     color: #fff;
-    //     @include layoutMode();
-    // }
 }
 </style>
