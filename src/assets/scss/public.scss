@@ -37,7 +37,7 @@ img {
 
 .c-scroll-inner {
     // padding-right: 5px;
-    height: 100%;
+    // min-height: 100%;
 }
 
 .c-scroll-inner::-webkit-scrollbar { /*滚动条整体样式*/
@@ -212,18 +212,16 @@ img {
     background-color: #d38600;
   }
 }
-.fusion-header{
-  height: 60px;
-  letter-spacing: 3px;
-  font-size: 22px;
-  line-height: 60px;
-  margin-left: 24px;
-  white-space: nowrap;
- /* @include layoutMode(both);*/
-  .header-img{
-    vertical-align: middle;
-    padding-right: 8px;
-    display: inline-block;
+.c-fusion-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  padding-top: 100px;
+  background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
+  .c-scroll-wrap {
+    height: calc(100% - 20px);
   }
   .header-title{
     vertical-align: middle;
@@ -232,19 +230,22 @@ img {
     height: 22px;
   }
 }
-.fusion-left-main {
-  padding: 40px 20px;
-}
-.map-right{
+.c-fusion-right { 
   position: absolute;
-  top: 0;
   right: 0;
+  top: 0;
   bottom: 0;
-  padding: 20px 30px;
-  background:linear-gradient(90deg,transparent 0%,rgb(0,0,0) 100%);
-  z-index:1;
-  width: 270px;
+  z-index: 2;
+  padding: 60px 30px 0;
+  background: linear-gradient(to left, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0)); /* 标准的语法 */
+  .c-scroll-wrap {
+    height: calc(100% - 20px);
+  }
 }
+.fusion-left-main {
+  padding: 20px 20px;
+}
+
 .map-left{
   position: absolute;
   top: 0;
@@ -265,39 +266,12 @@ img {
   left: 0;
   right:0;
 }
-.right-road{
-  position: absolute;
-  top: 38px;
-  right: 0;
-  bottom: 0;
-  padding: 0px 30px;
-  background:linear-gradient(90deg,transparent 0%,rgb(0,0,0) 100%);
-  z-index:1;
-}
 .header-style{
   position: absolute;
   z-index:2;
   right: 30px;
   top: 20px;
 }
-/*
-.base-info {
-  position:absolute;
-  right: 30px;
-  top:20px;
-  height: 30px;
-  // background-color: red;
-  bottom: 33px;
-  z-index: 2;
-  .base-time{
-    display: inline-block;
-    margin-right: 4px;
-  }
-  .weather-icon{
-    vertical-align: middle;
-    padding-left: 10px;
-  }
-}*/
 
 .weather-icon{
   display: inline-block;
