@@ -4,8 +4,8 @@ window.config = {
     // operateUrl: 'http://111.23.140.59:9090/operateApp/', //运营平台
     // websocketUrl:'ws://111.23.140.59:9982/mon',  //监控
     // socketUrl:'ws://111.23.140.59:9999/ws',  //影子系统
-    // dlUrl: 'http://111.23.140.59:8085/', //迪路
-    // dlWmsUrl: 'http://111.23.140.59:48080/', //迪路
+    // dlUrl: 'http://218.76.44.22:8085/', //迪路
+    // dlWmsUrl: 'http://218.76.44.22:48080/', //迪路
 
     //长沙 正式地址
     url: 'http://218.76.44.22:9093/monPlatApp/', //监控平台
