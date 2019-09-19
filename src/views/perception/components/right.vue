@@ -923,13 +923,8 @@
                 var platform = {
                     "action": "road_real_data_reg",
                     "data": {
-                        /*"polygon": [
-                            [121.17979423666091, 31.279518991604288],
-                            [121.16305725240798, 31.279518991604288],
-                            [121.16305725240798, 31.289571910992105],
-                            [121.17979423666091, 31.289571910992105]
-                        ]*/
-                        "polygon":this.currentExtent
+                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
+//                        "polygon":this.currentExtent
                     }
                 }
                 var platformMsg = JSON.stringify(platform);
