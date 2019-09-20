@@ -47,6 +47,15 @@ window.weatherCenter={
     center:[121.17265957261286,31.284096076877844]
 }
 
+window.defaultMapParam = {
+    x:326299.8136019115,
+    y:3462328.443327571,
+    z:34.16186920538662,
+    radius:31.40011218302981,
+    pitch:-0.1440529053876541,
+    yaw:-2.7068034133160297
+}
+
 // 调用
 // this.distanceMap = new AMap.Map('map-container', window.defaultMapOption);
 // let _option = Object.assign(
