@@ -58,11 +58,11 @@ window.dlWmsDefaultOption = {
 }
 
 window.mapParam={
-    minX=679622
-    minY=3108707
-    minZ=50
-    maxX=704758
-    maxY=3135874  
-    maxZ=80
+    minX: 679622,
+    minY: 3108707,
+    minZ: 270,
+    maxX: 704758,
+    maxY: 3135874, 
+    maxZ: 290,
     background:"black"
 }
