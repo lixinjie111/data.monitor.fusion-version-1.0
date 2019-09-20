@@ -1,5 +1,5 @@
 export function getMap(map){
-    map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08")
+   // map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08")
     //map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08",null,null,null,null,null,null)
     //map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08",3,null,null,null,null,22)
     //路口
@@ -8,8 +8,8 @@ export function getMap(map){
     map.addShape("lane_marking","./static/map3d/dl_shcsq_zc/Lane_marking.shp",dl.styles.lane_marking.color)
     //路标志
     map.addShape("lane_arrow","./static/map3d/dl_shcsq_zc/Direction_arrow.shp","#f3f3f3")
-    map.addShape("lane_boundary","./static/map3d/dl_shcsq_zc/Lane_boundary.shp","#7c7c7c")
-    map.addShape("lane_centerline","./static/map3d/dl_shcsq_zc/Lane_centerline.shp","#153641")
+    // map.addShape("lane_boundary","./static/map3d/dl_shcsq_zc/Lane_boundary.shp","#7c7c7c")
+    // map.addShape("lane_centerline","./static/map3d/dl_shcsq_zc/Lane_centerline.shp","#153641")
     // map.addShape("greenbelts","./static/map3d/dl_shcsq_zc/greenbelts.shp","#73b273")
     // map.addShape("rcu_view","./static/map3d/dl_shcsq_zc/dl_shcsq_utm51_view.shp","rgba(182,255,0)")
     // debugger
@@ -75,7 +75,7 @@ export function getMap(map){
 
     //画圆  326279.672803747 3462360.84818288   600m
     let circle = new dl.Circle({
-        redius:600.0,
+        redius:1000.0,
         center:[325535.061,3462402.816,13.618],
         color:"#ffffff",
         outline:false,
