@@ -1,12 +1,12 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param=='mapOverLook'"/>
-        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('mapOverLook')" v-show="param!='mapOverLook'&&mapShow"/>
+        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
+        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
-            <div v-for="(item,index) in camList" class="video-position" v-if="camList.length">
+            <div v-for="(item,index) in camList" class="video-position" v-if="camList.length>0">
                 <div class="style">
                     <div class="video-mask" @click="screenMagnify(index)"></div>
                     <live-player
@@ -39,7 +39,7 @@
                     </live-player>
                 </div>
             </div>
-            <div v-for="item in new Array(2)" class="video-position style" v-else>
+            <div v-for="item in new Array(2)" class="video-position style" v-if="camList.length==0">
                 <div class="c-video-16-9 ">
                     <div class="video-tip">
                         暂无数据
@@ -172,26 +172,6 @@
             }
         },
         methods: {
-            playerError1(e) {
-                console.log("playerError1");
-                if(this.option1.sources[0].src != '') {
-                    let _videoUrl = this.option1.sources[0].src;
-                    this.option1.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option1.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
-            playerError2(e) {
-                console.log("playerError2");
-                if(this.option2.sources[0].src != '') {
-                    let _videoUrl = this.option2.sources[0].src;
-                    this.option2.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option2.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
             onMapComplete(){
 
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
@@ -595,8 +575,8 @@
 
             },
             changeMap(param){
-                if(param=='mapOverLook'){
-                    this.param='mapOverLook';
+                if(param==-1){
+                    this.param=-1;
                     this.isActive=-1;
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
                     return;
@@ -820,10 +800,10 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-                console.log("########");
-                console.log(_this.tabIsExist);
+              /*  console.log("########");
+                console.log(_this.tabIsExist);*/
                 if(_this.tabIsExist){
-                    console.log("..............");
+                    /*console.log("..............");*/
                     _this.$refs.perceptionMap.addPerceptionData(mesasge);
                 }else{
                     let cacheList = _this.$refs.perceptionMap.cachePerceptionQueue;
@@ -1160,14 +1140,6 @@
                     _this.tabIsExist=true;
                 }
             });
-            window.onsize=function () {
-                if (window.outerWidth != undefined) {
-                    _this.isMin = window.outerWidth <= 160 && window.outerHeight <= 27;
-                }
-                else {
-                    _this.isMin = window.screenTop < -30000 && window.screenLeft < -30000;
-                }
-            }
         },
         destroyed(){
             clearInterval(this.mapTime1);
