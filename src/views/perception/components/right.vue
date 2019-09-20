@@ -253,10 +253,10 @@
             onMapComplete(){
 
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                    /*setInterval(()=>{
-                        let camera = this.$refs.perceptionMap.getCamera();
-                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
-                    },500)*/
+//                    setInterval(()=>{
+//                        let camera = this.$refs.perceptionMap.getCamera();
+//                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
+//                    },500)
                    let count=0;
                    let flag=false;
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
