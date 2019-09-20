@@ -998,7 +998,7 @@
             },
             onSpatMessage(mesasge){
                 let _this=this;
-               _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                _this.$refs.perceptionMap&&_this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
 //                let vehData = json.result.vehDataStat;
@@ -1390,9 +1390,10 @@
         box-sizing: border-box;
         cursor: pointer;
         line-height: 30px;
+        display: flex;
+        justify-content: space-between;
         .device-num{
             padding-left: 10px;
-            padding-right: 70px;
         }
        /* @include layoutMode(between);*/
     }

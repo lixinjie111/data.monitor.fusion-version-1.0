@@ -1,5 +1,5 @@
 export function getMap(map){
-    map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08")
+    // map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08")
     //map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08",null,null,null,null,null,null)
     //map.addShape1("road_boundary","./static/map3d/dl_shcsq_zc/road_boundary.shp","#ffca08",3,null,null,null,null,22)
     //路口
