@@ -819,8 +819,10 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-                console.log("切换标签页不要传值："+_this.tabIsExist)
+                console.log("########");
+                console.log(_this.tabIsExist);
                 if(_this.tabIsExist){
+                    console.log("..............");
                     _this.$refs.perceptionMap.addPerceptionData(mesasge);
                 }
             },
@@ -1145,11 +1147,10 @@
             this.getCameraByRsId();
             //判断当前标签页是否被隐藏
             document.addEventListener("visibilitychange", () => {
-                console.log(document.visibilityState);
                 if(document.visibilityState == "hidden") {
                     this.tabIsExist=false;
                 } else if (document.visibilityState == "visible") {
-                    this.tabIsExist=true;
+//                    this.tabIsExist=true;
                 }
             });
         },
