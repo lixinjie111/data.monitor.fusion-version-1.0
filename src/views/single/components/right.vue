@@ -1,6 +1,6 @@
 <template>
     <div class="fusion-right-style">
-        <div class="map-right">
+        <div class="c-fusion-right map-right">
             <p class="c-title">前向摄像头</p>
             <div class="fusion-video">
                 <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
@@ -85,6 +85,24 @@
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
     import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
+    //websocket心跳检测
+    let wsHeartCheck = {
+        timeout: 5000,
+        timeId: -1,
+        wsObj: null,
+        init(ws) {
+            this.wsObj = ws;
+        },
+        reset() {
+            clearTimeout(this.timeId);
+            this.start();
+        },
+        start() {
+            this.timeId = setTimeout(() => {
+                this.wsObj.send('HeartBeat');
+            }, this.timeout);
+        }
+    };
     export default {
         data() {
             return {
@@ -421,7 +439,7 @@
                             warningId = item.warnId;
                             warningId = warningId.substring(0,warningId.lastIndexOf("_"));
                             console.log("距离："+item.dis);
-                            let msg = item.warnMsg+"  "+item.dis;
+                            let msg = item.warnMsg;
                             let warningObj={
                                 longitude:item.longitude,
                                 latitude:item.latitude
@@ -990,6 +1008,10 @@
 </style>
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
+    .map-right {
+        width: 270px;
+        padding-top: 20px !important;
+    }
     .map-real-time{
         position: absolute;
         width: 300px;

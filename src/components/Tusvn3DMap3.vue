@@ -133,7 +133,7 @@
                 sourceProject: "EPSG:4326",
                 // ,destinatePorject:"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//北京
                 destinatePorject:
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //上海
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //上海
                 timeA: 0,
                 timeB: 0,
                 //按照vid缓存插值的小车轨迹
@@ -451,7 +451,7 @@
 
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -508,7 +508,7 @@
                 this.cacheLightData.push(cacheLightData);
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -588,7 +588,7 @@
                 this.cacheLightData.push(cacheLightData);
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -661,7 +661,7 @@
                 this.cacheLightData.push(cacheLightData);
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -734,7 +734,7 @@
                 this.cacheLightData.push(cacheLightData);
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -874,7 +874,7 @@
 
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );

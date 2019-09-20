@@ -1,5 +1,5 @@
 <template>
-    <div class="fusion-right-style" id="fusionRight">
+    <div class="fusion-right-style">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3&&mapShow"/>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
@@ -47,7 +47,7 @@
             </div>
             <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer4"></video-player>
         </div>
-        <div class="map-right">
+        <div class="c-fusion-right map-right">
             <div class="perception-road" id="mapRoad">
                 <tusvn-map1
                         ref="map1"
@@ -384,8 +384,8 @@
             getCurrentExtent() {
                 this.currentExtent = [];
                 let result = this.$refs.perceptionMap.getExtent();
-                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
 
                 let x1 = utm1[0];
                 let y1 = utm1[1];
@@ -403,8 +403,8 @@
             getCenter(){
                 this.center= [];
                 let result = this.$refs.perceptionMap.getExtent();
-                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
                 /*let utm1 = [121.16305725240798,31.279518991604288];
                 let utm2 = [121.17979423666091,31.289571910992105];*/
                 let x1 = utm1[0];
@@ -436,7 +436,7 @@
                         signs.forEach(item=>{
                             this.signCount++;
                             //将小的转成大的3
-//                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
+//                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
 //                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
                         })
                     }
@@ -1266,7 +1266,7 @@
             let extend = parseFloat(this.$route.params.extend);
             //设置地图的中心点
             if(longitude||latitude) {
-                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
+                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
                 this.x = utm[0];
                 this.y = utm[1];
                 this.getExtend(longitude,latitude,extend);
@@ -1310,6 +1310,9 @@
 </style>
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
+    .map-right{
+      width: 270px;
+    }
     .point-style{
         width: 10px;
         height: 10px;

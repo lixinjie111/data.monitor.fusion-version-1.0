@@ -1,12 +1,10 @@
 <template>
-    <div class="fusion-right-style">
-        <div class="right-road">
-            <div class="perception-road" v-for="(item, index) in centerPointData" :key="index"  @click="showRoadDetail(item)">
-                <div class="road-word">
-                    <p>{{item.rsName}}</p>
-                </div>
-                <road-section :id="'map' + index" :mapData="item" class="cross-scan"></road-section>
+    <div class="c-fusion-right right-road">
+        <div class="perception-road" v-for="(item, index) in centerPointData" :key="index"  @click="showRoadDetail(item)">
+            <div class="road-word">
+                <p>{{item.rsName}}</p>
             </div>
+            <road-section :id="'map' + index" :mapData="item" class="cross-scan"></road-section>
         </div>
     </div>
 </template>
