@@ -120,7 +120,8 @@
                 currentExtent:[],
                 mapParam:{},
                 camList:[],
-                requestVideoUrl:getVideoByNum
+                requestVideoUrl:getVideoByNum,
+                tabIsExist:true
             }
         },
         props:{
@@ -170,44 +171,6 @@
             }
         },
         methods: {
-            getOption(){
-                let option = {
-                    overNative: true,
-                    autoplay: true,
-                    controls: true,
-                    fluid: true,
-                    techOrder: ['flash', 'html5'],
-                    sourceOrder: true,
-                    flash: {
-                        swf: isProduction ? '/fusionMonitor/static/media/video-js.swf' : '/static/media/video-js.swf'
-                    },
-                    sources: [
-                        {
-                            type: 'rtmp/flv',
-                            src: ''
-                        }
-                    ],
-                    muted:true,
-                    width:'100%',
-                    height:'100%',
-                    notSupportedMessage: '数据正在加载，请稍候...',
-                      bigPlayButton : false,
-                    /*errorDisplay : false,*/
-                    controlBar: {
-                        timeDivider: false,
-                        durationDisplay: false,
-                        remainingTimeDisplay: false,
-                        currentTimeDisplay:false,
-                        fullscreenToggle: true, //全屏按钮
-                        captionsButton : false,
-                        chaptersButton: false,
-                        subtitlesButton:false,
-                        liveDisplay:false,
-                        playbackRateMenuButton:false
-                    }
-                }
-                return option;
-            },
             playerError1(e) {
                 console.log("playerError1");
                 if(this.option1.sources[0].src != '') {
@@ -856,7 +819,10 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-               _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                console.log("切换标签页不要传值："+_this.tabIsExist)
+                if(_this.tabIsExist){
+                    _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                }
             },
             onPerceptionClose(data){
                 console.log("红绿灯结束连接");
@@ -901,7 +867,7 @@
             },
             onSpatMessage(mesasge){
                 let _this=this;
-               _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                _this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
 //                let vehData = json.result.vehDataStat;
@@ -1159,8 +1125,6 @@
         },
         mounted() {
             this.mapParam=window.mapParam;
-            this.option1 = this.getOption();
-            this.option2 = this.getOption();
             this.rsId = this.$route.params.crossId;
            /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
@@ -1179,6 +1143,15 @@
                 this.center=[121.247,31.242];
             }
             this.getCameraByRsId();
+            //判断当前标签页是否被隐藏
+            document.addEventListener("visibilitychange", () => {
+                console.log(document.visibilityState);
+                if(document.visibilityState == "hidden") {
+                    this.tabIsExist=false;
+                } else if (document.visibilityState == "visible") {
+                    this.tabIsExist=true;
+                }
+            });
         },
         destroyed(){
             clearInterval(this.mapTime1);
@@ -1276,9 +1249,10 @@
         box-sizing: border-box;
         cursor: pointer;
         line-height: 30px;
+        display: flex;
+        justify-content: space-between;
         .device-num{
             padding-left: 10px;
-            padding-right: 70px;
         }
     }
     .img-style{
