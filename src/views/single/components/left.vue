@@ -1,9 +1,5 @@
 <template>
     <div class="fusion-left-style">
-        <div class="fusion-header">
-            <img src="static/images/logo.png" class="header-img" @click="routeGo"/>
-            融合感知中心
-        </div>
         <div class="fusion-left-main">
             <div class="single-info">
                 <div class="single-info-header">
@@ -347,11 +343,6 @@
                     this.markers.markerEnd.setAngle(_this.wholePath[_this.count].angle-90);
                 }
                 /*console.log("缩放级别:"+this.distanceMap.getZoom())*/
-            },
-            routeGo(){
-                this.$router.push({
-                    path: '/overview'
-                });
             }
         },
         mounted() {
