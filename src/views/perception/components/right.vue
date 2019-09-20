@@ -30,6 +30,8 @@
                             :params="item.params"
                             type="flvUrl"
                             :autoplay="false"
+                            :ref="'bigPlayer'+index"
+
                     >
                         <div class="video-num" @click="changeMap(index)">
                             <span class="device-num">摄像头编号:{{item.devId}}</span>
@@ -598,6 +600,8 @@
                this.camList[param].videoShow=true;
             },
             screenShrink(param){
+                let player = this.$refs['bigPlayer'+param];
+                player[0].player.pause();
                 this.camList[param].videoShow=false;
             },
             initWarningWebSocket(){
