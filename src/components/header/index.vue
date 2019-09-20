@@ -20,8 +20,13 @@ export default {
 	name: "Header",
     data() {
         return {
-            city: {},
-            weather: {},
+            city: {
+                province: '',
+                district: ''
+            },
+            weather: {
+                wendu: ''
+            },
             changeCenterPoint: [],
             time:null,
             requestData:{}
@@ -48,9 +53,10 @@ export default {
         },
         // 获取天气
         getTopWeather() {
-            getTopWeather(this.requestData).then(res => {
-                this.weather = res.data;
-            });
+            // getTopWeather(this.requestData).then(res => {
+            //     this.weather = res.data;
+            // });
+            this.weather.wendu = 23;
         }
     },
     computed: {
