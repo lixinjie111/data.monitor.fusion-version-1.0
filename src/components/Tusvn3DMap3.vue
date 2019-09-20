@@ -12,7 +12,15 @@
     import _ from "lodash";
 
     import * as myBox from "../utils/myBox";
-    import { getMap } from "@/utils/tusvnMap.js";
+    import { getMap } from "@/utils/tusvnMap2.js";
+
+    import THREEUtls from "@/utils/three.utils";
+
+    //数据
+    import road_boundary_json from  "@/assets/json/road_boundary.json"
+
+    import Lane_centerline_json from "@/assets/json/Lane_centerline.json";
+    import Lane_boundary_json from "@/assets/json/Lane_boundary.json";
 
     export default {
         name: "Tusvn3DMap2",
@@ -134,6 +142,8 @@
                 // ,destinatePorject:"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//北京
                 destinatePorject:
                     "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //上海
+//                destinatePorject:
+//                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //长沙
                 timeA: 0,
                 timeB: 0,
                 //按照vid缓存插值的小车轨迹
@@ -144,6 +154,14 @@
         },
         watch: {},
         methods: {
+            /**
+             *初始化地图
+             */
+            initData:function () {
+                THREEUtls.AddShpToScene(dl.scene,road_boundary_json,0xffca08);
+                THREEUtls.AddShpToScene(dl.scene,Lane_centerline_json,"#153641");
+                THREEUtls.AddShpToScene(dl.scene,Lane_boundary_json,"#7c7c7c");
+            },
             initMap: function() {
                 // dl.init({ doc: "dl-shp", background:"#000000", navMode: Pt.EarthControls });
 
@@ -157,6 +175,7 @@
                 );
 
                 setTimeout(() => {
+                    this.initData();
                     getMap(this);
                     let lights=new Array();
                     let lightObj={
@@ -1390,6 +1409,10 @@
                         // 不处理大于360的的数据
                         continue;
                     }
+                    if (d.heading<0) {
+                        // 不处理小于0的的数据
+                        continue;
+                    }
 
                     let dUTM = proj4(this.sourceProject, this.destinatePorject, [
                         d.longitude,
@@ -1563,6 +1586,13 @@
 
                     for (let n = 0; n < pcars.length; n++) {
                         let pcar = pcars[n];
+
+                        if(pcar.vehicleId!="B21E0005")
+                            continue;
+                        if (pcar.heading<0) {
+                            // 不处理小于0的的数据
+                            continue;
+                        }
                         if (pcar.type != 1) {
                             let dUTM = proj4(this.sourceProject, this.destinatePorject, [
                                 pcar.longitude,
@@ -1851,6 +1881,8 @@
 
 
                     ////////////ceshi
+
+                    //console.log(vid+"..."+data.heading+".."+data.longitude+".."+data.latitude);
                     this.models[vid+"text"].position.set(position[0], position[1], this.defualtZ+2);
                     this.models[vid+"text"].rotation.set(
                         this.pitch,
