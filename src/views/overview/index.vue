@@ -1,11 +1,7 @@
 <template>
     <div class="fusion-style">
-        <!--头部-->
-        <div class="header-style">
-            <header-top></header-top>
-        </div>
         <!-- 左侧 -->
-        <div class="fusion-left">
+        <div class="c-fusion-left fusion-left">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
                     <left-overview></left-overview>
@@ -14,10 +10,9 @@
         </div>
         <!-- 地图 -->
         <map-container></map-container>
-        <!-- 右侧 -->
-        <div class="fusion-right">
-            <special-road></special-road>
-        </div>
+        <!-- 右侧  -->
+        <special-road></special-road>
+        
         <div class="fusion-bottom">
             <!-- 底部车辆信息 -->
             <bottom-overview></bottom-overview>
@@ -135,23 +130,7 @@ export default {
     bottom: 0;
     // overflow: scroll;
     .fusion-left{
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
         width: 330px;
-        // background: #1a1a1a;
-        // background-image: linear-gradient(90deg, #000 0%, #000 100%);
-        // opacity: 0.5;
-        background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
-    }
-    .fusion-right{
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to right, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
-        // width:327px; 
     }
 
     .style{

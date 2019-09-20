@@ -1,5 +1,7 @@
 <template>
     <div id="app">
+        <!-- 头部 -->
+        <header-bar></header-bar>
         <div class="app-container">
             <router-view></router-view>
         </div>
@@ -7,11 +9,16 @@
 </template>
 
 <script>
+import HeaderBar from '@/components/header/index.vue'
 import {getTopWeather} from '@/api/overview/index.js';
 export default {
     name: 'App',
+    components: {
+        HeaderBar
+    },
     data() {
         return {
+            isHeaderShow: true,
             changeCenterPoint: window.mapOption.center,
             requestData: {
                 disCode: ''
@@ -20,6 +27,17 @@ export default {
             weather: {},
             time:0,
 
+        }
+    },
+    watch: {
+        deep: true,
+        $route(newVal, oldVal) {
+            console.log(newVal);
+            if(newVal.name == 'Single') {
+                this.isHeaderShow = false;
+            }else {
+                this.isHeaderShow = true;
+            }
         }
     },
     mounted() {},
@@ -65,9 +83,8 @@ export default {
         overflow: hidden;
         .app-container {
             position: relative;
-            width:100%;
+            width: 100%;
             height: 100%;
-            overflow:hidden;
         }
     }
 </style>

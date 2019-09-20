@@ -1,9 +1,5 @@
 <template>
     <div class="fusion-left-style">
-        <div class="fusion-header">
-            <img src="static/images/logo.png" class="header-img"/>
-            融合感知中心
-        </div>
          <div class="left-overview">
                 <ul class="left-item-wrapper">
                     <li class="left-item-list clearfix">
@@ -83,7 +79,7 @@
 @import '@/assets/scss/theme.scss';
 .left-overview {
     .left-item-wrapper {
-    margin-top: 55px;
+    margin-top: 20px;
     .left-item-list {
         margin-bottom: 60px;
         margin-left: 45px;

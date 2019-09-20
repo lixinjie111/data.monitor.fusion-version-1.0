@@ -1,7 +1,7 @@
 <template>
-    <div class="fusion-right-style" id="fusionRight">
-        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param=='mapOverLook'"/>
-        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('mapOverLook')" v-show="param!='mapOverLook'&&mapShow"/>
+    <div class="fusion-right-style">
+        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
+        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3&&mapShow"/>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
@@ -47,7 +47,7 @@
                 </div>
             </div>
         </div>
-        <div class="map-right">
+        <div class="c-fusion-right map-right">
             <div class="perception-road" id="mapRoad">
                 <tusvn-map1
                         ref="map1"
@@ -1200,6 +1200,9 @@
 
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
+    .map-right{
+      width: 270px;
+    }
     .point-style{
         width: 10px;
         height: 10px;
