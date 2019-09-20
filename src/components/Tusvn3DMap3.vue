@@ -552,7 +552,7 @@
 
                     mesh1.rotation.y = (Math.PI / 180) * 180;
 
-                    var geometry2 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var geometry2 = new THREE.PlaneBufferGeometry(1.28, 1.28, 0);
                     var texture2 = new THREE.TextureLoader().load(
                         cacheLightData[i].img2
                     );
@@ -570,7 +570,7 @@
 
                     mesh2.rotation.y = (Math.PI / 180) * 180;
 
-                    var geometry3 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var geometry3 = new THREE.PlaneBufferGeometry(1.28, 1.28, 0);
                     var texture3 = new THREE.TextureLoader().load(
                         cacheLightData[i].img3
                     );
@@ -580,7 +580,7 @@
                         opacity: 1
                     });
                     var mesh3 = new THREE.Mesh(geometry3, box_metal3);
-                    mesh3.position.x = x + 3 + xrotation;
+                    mesh3.position.x = x + 2.8 + xrotation;
                     mesh3.position.y = y;
                     mesh3.position.z = z;
                     mesh3.rotation.x = (-Math.PI / 180) * 90;
@@ -632,7 +632,7 @@
 
                     mesh1.rotation.y = (Math.PI / 180) * 90;
 
-                    var geometry2 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var geometry2 = new THREE.PlaneBufferGeometry(1.28, 1.28, 0);
                     var texture2 = new THREE.TextureLoader().load(
                         cacheLightData[i].img2
                     );
@@ -650,7 +650,7 @@
 
                     mesh2.rotation.y= (Math.PI / 180) * 90;
 
-                    var geometry3 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var geometry3 = new THREE.PlaneBufferGeometry(1.28, 1.28, 0);
                     var texture3 = new THREE.TextureLoader().load(
                         cacheLightData[i].img3
                     );
@@ -660,7 +660,7 @@
                         opacity: 1
                     });
                     var mesh3 = new THREE.Mesh(geometry3, box_metal3);
-                    mesh3.position.y = y + 3 + xrotation;
+                    mesh3.position.y = y + 2.8 + xrotation;
                     mesh3.position.x = x;
                     mesh3.position.z = z;
                     mesh3.rotation.x = (-Math.PI / 180) * 90;
@@ -705,7 +705,7 @@
 
                     mesh1.rotation.y = (-Math.PI / 180) * 90;
 
-                    var geometry2 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var geometry2 = new THREE.PlaneBufferGeometry(1.28, 1.28, 0);
                     var texture2 = new THREE.TextureLoader().load(
                         cacheLightData[i].img2
                     );
@@ -723,7 +723,7 @@
 
                     mesh2.rotation.y= (-Math.PI / 180) * 90;
 
-                    var geometry3 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var geometry3 = new THREE.PlaneBufferGeometry(1.28, 1.28, 0);
                     var texture3 = new THREE.TextureLoader().load(
                         cacheLightData[i].img3
                     );
@@ -733,7 +733,7 @@
                         opacity: 1
                     });
                     var mesh3 = new THREE.Mesh(geometry3, box_metal3);
-                    mesh3.position.y = y- 3 + xrotation;
+                    mesh3.position.y = y- 2.8 + xrotation;
                     mesh3.position.x = x;
                     mesh3.position.z = z;
                     mesh3.rotation.x = (-Math.PI / 180) * 90;
@@ -777,7 +777,7 @@
                     mesh1.rotation.z = (Math.PI / 180) * 180;
                     // mesh1.rotation.y = (Math.PI / 180) * 90;
 
-                    var geometry2 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var geometry2 = new THREE.PlaneBufferGeometry(1.28, 1.28, 0);
                     var texture2 = new THREE.TextureLoader().load(
                         cacheLightData[i].img2
                     );
@@ -795,7 +795,7 @@
                     mesh2.rotation.x = (-Math.PI / 180) * 90;
                     mesh2.rotation.z = (Math.PI / 180) * 180;
                     // mesh2.rotation.y = (Math.PI / 180) * 90;
-                    var geometry3 = new THREE.PlaneBufferGeometry(0.8, 1.28, 0);
+                    var geometry3 = new THREE.PlaneBufferGeometry(1.28, 1.28, 0);
                     var texture3 = new THREE.TextureLoader().load(
                         cacheLightData[i].img3
                     );
@@ -805,7 +805,7 @@
                         opacity: 1
                     });
                     var mesh3 = new THREE.Mesh(geometry3, box_metal3);
-                    mesh3.position.x = x - 3 + xrotation;
+                    mesh3.position.x = x - 2.8 + xrotation;
                     mesh3.position.y = y;
                     mesh3.position.z = z;
                     mesh3.rotation.x = (-Math.PI / 180) * 90;
