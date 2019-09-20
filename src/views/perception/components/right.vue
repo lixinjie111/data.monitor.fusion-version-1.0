@@ -121,7 +121,8 @@
                 mapParam:{},
                 camList:[],
                 requestVideoUrl:getVideoByNum,
-                tabIsExist:true
+                tabIsExist:true,
+                isMin:false
             }
         },
         props:{
@@ -824,6 +825,11 @@
                 if(_this.tabIsExist){
                     console.log("..............");
                     _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                }else{
+                    let cacheList = _this.$refs.perceptionMap.cachePerceptionQueue;
+                    if(cacheList.length>0){
+                        _this.$refs.perceptionMap.cachePerceptionQueue = new Array();
+                    }
                 }
             },
             onPerceptionClose(data){
@@ -1126,33 +1132,42 @@
             }
         },
         mounted() {
-            this.mapParam=window.mapParam;
-            this.rsId = this.$route.params.crossId;
+            let _this = this;
+            _this.mapParam=window.mapParam;
+            _this.rsId = _this.$route.params.crossId;
            /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
-            let longitude=parseFloat(this.$route.params.lon);
-            let latitude=parseFloat(this.$route.params.lat);
-            let extend = parseFloat(this.$route.params.extend);
+            let longitude=parseFloat(_this.$route.params.lon);
+            let latitude=parseFloat(_this.$route.params.lat);
+            let extend = parseFloat(_this.$route.params.extend);
             //设置地图的中心点
             if(longitude||latitude) {
-                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
-                this.x = utm[0];
-                this.y = utm[1];
-                this.getExtend(longitude,latitude,extend);
-                this.center=[longitude ,latitude];
+                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
+                _this.x = utm[0];
+                _this.y = utm[1];
+                _this.getExtend(longitude,latitude,extend);
+                _this.center=[longitude ,latitude];
             }else{
-                this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-                this.center=[121.247,31.242];
+                _this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+                _this.center=[121.247,31.242];
             }
-            this.getCameraByRsId();
+            _this.getCameraByRsId();
             //判断当前标签页是否被隐藏
             document.addEventListener("visibilitychange", () => {
                 if(document.visibilityState == "hidden") {
-                    this.tabIsExist=false;
+                    _this.tabIsExist=false;
                 } else if (document.visibilityState == "visible") {
-//                    this.tabIsExist=true;
+                    _this.tabIsExist=true;
                 }
             });
+            window.onsize=function () {
+                if (window.outerWidth != undefined) {
+                    _this.isMin = window.outerWidth <= 160 && window.outerHeight <= 27;
+                }
+                else {
+                    _this.isMin = window.screenTop < -30000 && window.screenLeft < -30000;
+                }
+            }
         },
         destroyed(){
             clearInterval(this.mapTime1);
