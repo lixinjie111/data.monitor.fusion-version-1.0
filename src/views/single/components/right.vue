@@ -585,7 +585,7 @@
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
-                this.$refs.tusvnMap.updateCameraPosition(326181.72659014474,3462354.6747002415,737.3642832288795,741.5052736914325,-1.5707963267948966,-0.05266622778143515);
+                this.$refs.tusvnMap.updateCameraPosition(window.defaultSingleParam.x,window.defaultSingleParam.y,window.defaultSingleParam.z,window.defaultSingleParam.radius,window.defaultSingleParam.pitch,window.defaultSingleParam.yaw);
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.config.websocketUrl,this.roadItem1.camSerialNum);*/
                 this.initCarWebSocket();
