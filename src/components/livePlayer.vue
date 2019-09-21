@@ -16,6 +16,7 @@
                 ref="livePlayer" 
                 :videoUrl="videoUrl" 
                 autoplay
+                :muted="true"
                 :fluent="true" 
                 :live="true"
                 @message="onPlayerMessage"

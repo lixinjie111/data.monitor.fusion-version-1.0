@@ -14,6 +14,8 @@ const Perception = resolve => require(['@/views/perception'], resolve)
 const Overview = resolve => require(['@/views/overview'], resolve)
 const Test = resolve => require(['@/views/perception/components/test'], resolve)
 const Map = resolve => require(['@/components/Tusvn3DMap3.vue'], resolve)
+const LiveTest = resolve => require(['@/views/test/liveTest'], resolve)
+
 /*Vue.use(Router)*/
 
 export default new VueRouter({
@@ -61,7 +63,11 @@ export default new VueRouter({
     path: '/map',
     name: 'Map',
     component: Map
-}],
+    },{
+      path: '/liveTest',
+      name: 'LiveTest',
+      component: LiveTest
+  }],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }
   }

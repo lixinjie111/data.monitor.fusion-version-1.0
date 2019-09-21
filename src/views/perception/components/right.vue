@@ -124,7 +124,8 @@
                 camList:[],
                 requestVideoUrl:getVideoByNum,
                 tabIsExist:true,
-                isMin:false
+                isMin:false,
+                src: 'http://192.168.1.70:8082/#/liveTest'
             }
         },
         props:{
