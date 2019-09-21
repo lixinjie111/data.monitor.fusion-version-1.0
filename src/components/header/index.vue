@@ -52,10 +52,9 @@ export default {
         },
         // 获取天气
         getTopWeather() {
-            // getTopWeather(this.requestData).then(res => {
-            //     this.weather = res.data;
-            // });
-            this.weather.wendu = 23;
+            getTopWeather(this.requestData).then(res => {
+                this.weather = res.data;
+            });
         }
     },
     computed: {

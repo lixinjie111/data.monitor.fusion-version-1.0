@@ -13,7 +13,7 @@ window.config = {
 
 //地图额外配置项添加
 window.mapOption = {
-    center: [112.857703,28.20041], // 雄安 -- 高德地图坐标点
+    center: [115.912987,39.049487], // 雄安雄安市民服务中心 -- 高德地图坐标点
     mapStyleEmpty: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00", // 纯灰色背景地图
 };
 //单车
@@ -43,20 +43,20 @@ window.dlWmsDefaultOption = {
 }
 
 window.mapParam={
-    minX: 694986.6877441636,
-    minY: 3134299.1691652327,
-    minZ: 17657.736291098932,
-    maxX: 695986.6877441636,
-    maxY: 3135874.0,
-    maxZ: 17757.736291098932,
+    minX: 0,
+    minY: 0,
+    minZ: 0,
+    maxX: 0,
+    maxY: 0,
+    maxZ: 0,
     background: "black"
 };
 
 window.defaultMapParam = {
-    x:695789.386349502,
-    y:3121338.7382139494,
-    z:36493.00646310004,
-    radius:36783.216059128914,
-    pitch:-1.5707963267948966,
-    yaw:-0.16236538804906267
+    x: 0,
+    y: 0,
+    z: 0,
+    radius: 0,
+    pitch: 0,
+    yaw: 0
 }
