@@ -89,3 +89,10 @@ window.defaultSingleParam = {
     pitch:-1.5707963267948966,
     yaw:-0.16236538804906267
 }
+
+window.defaultRoadParam={
+    z:36493.00646310004,
+    radius:36783.216059128914,
+    pitch:-1.5707963267948966,
+    yaw:-0.16236538804906267
+}

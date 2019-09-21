@@ -705,7 +705,7 @@
                 if(param==3){
                     this.param=3;
                     this.isActive='0';
-                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
+                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
 //                    this.$refs.perceptionMap.updateCameraPosition(326308.49072616524,3462302.055910501,217.21056139773134,204.19919321851978,-1.440593551981663,-2.555594554715729);
                 }
 //                /*if(param==4){
