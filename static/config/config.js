@@ -34,11 +34,6 @@ window.defaultMapOption = {
     rotateEnable: true,
     mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
 }
-//天气
-window.weatherCenter={
-    // center:[121.17265957261286,31.284096076877844]
-    center: [112.857703,28.20041]
-}
 //路网配置参数
 window.dlWmsOption = {
     'LAYERS_gjlk': 'shanghai_qcc:dl_shcsq_wgs84_gjlk',
