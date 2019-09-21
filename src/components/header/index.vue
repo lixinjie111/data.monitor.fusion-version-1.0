@@ -3,7 +3,6 @@
         <router-link tag="a" class="logo-wrap" to="/overview">
             <img src="static/images/logo.png" class="logo"/>
             <em class="name">融合感知中心</em>
-            <img src="static/images/logo-title.png" class="logo-title"/>
         </router-link>
         <div class="sub-info clearfix" v-if="$parent.isHeaderShow">
             <span class="tip">
@@ -114,9 +113,6 @@ export default {
             color: #fff;
             letter-spacing: 3px;
             margin-right: 10px;
-        }
-        .logo-title {
-            height: 22px;
         }
     }
     .sub-info {
