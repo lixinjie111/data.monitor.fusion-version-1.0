@@ -79,9 +79,6 @@ window.dlWmsDefaultOption = {
     blend: false,
     tileSize: 256,
     params:{}
-<<<<<<< HEAD
-}
-=======
 }
 
 window.mapParam={
@@ -93,17 +90,3 @@ window.mapParam={
     maxZ:80,
     background:"black"
 }
-//	调用
-// let _optionWms = Object.assign(
-// 	{},
-// 	window.dlWmsDefaultOption,
-// 	{
-// 		params:{'LAYERS': window.dlWmsOption.LAYERS_centerline,'STYLES': window.dlWmsOption.STYLES, 'VERSION': window.dlWmsOption.VERSION}
-// 	}
-// );
-// this.wms = new AMap.TileLayer.WMS(_optionWms);
-// this.distanceMap.add(this.wms);
-
-
-// ws://120.133.21.14:29998/ws
->>>>>>> dev
