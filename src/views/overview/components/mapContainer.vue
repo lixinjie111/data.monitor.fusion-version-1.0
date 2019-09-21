@@ -11,7 +11,7 @@ export default {
             id: "car-map-container",
             AMap: null,
             // 获取在驶车辆实时数据（辆）
-            webSocket:{},
+            webSocket:null,
             webSocketData: {
                 action: "vehicleOnline",
                 token: 'fpx',
@@ -28,7 +28,9 @@ export default {
     },
     mounted() {
         this.AMap = new AMap.Map(this.id, window.defaultMapOption);
-        this.AMap.setMapStyle(window.defaultMapOption.mapStyle);
+        setTimeout(()=>{
+            this.AMap.setMapStyle(window.defaultMapOption.mapStyle);
+        },0)
         this.initWebSocket();
         let param = ['2'];
         this.getDevDis(param);
@@ -366,7 +368,7 @@ export default {
     },
     destroyed(){
         //销毁Socket
-        this.webSocket.close();
+        this.webSocket&&this.webSocket.close();
     }
 }
 </script>

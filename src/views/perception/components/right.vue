@@ -581,7 +581,7 @@
                 if(param==-1){
                     this.param=-1;
                     this.isActive=-1;
-                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
+                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
                     return;
                 }
                 if(this.camList.length>0){
@@ -1131,10 +1131,10 @@
                 _this.y = utm[1];
                 _this.getExtend(longitude,latitude,extend);
                 _this.center=[longitude ,latitude];
-            }else{
+            }/*else{
                 _this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
                 _this.center=[121.247,31.242];
-            }
+            }*/
             _this.getCameraByRsId();
             //判断当前标签页是否被隐藏
             document.addEventListener("visibilitychange", () => {
