@@ -97,4 +97,4 @@ window.defaultRoadParam={
     yaw:-0.16236538804906267
 }
 
-window.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+window.currentExtent=[window.mapOption.center,window.mapOption.center,window.mapOption.center,window.mapOption.center];
