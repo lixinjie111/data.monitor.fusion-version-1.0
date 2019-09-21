@@ -895,14 +895,7 @@
                 // });
             },
             resetCamera: function() {
-                this.updateCameraPosition(
-                    442456.0905737311,
-                    4427223.965503679,
-                    60.22107514430958,
-                    2.4329173138415072,
-                    -0.6747685185185206,
-                    -0.7853942219746017
-                );
+                this.$refs.perceptionMap.updateCameraPosition(window.defaultSingleParam.x,window.defaultSingleParam.y,window.defaultSingleParam.z,window.defaultSingleParam.radius,window.defaultSingleParam.pitch,window.defaultSingleParam.yaw);
             },
             initWebsocket: function(url) {
                 if ("WebSocket" in window) {

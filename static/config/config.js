@@ -52,6 +52,16 @@ window.dlWmsDefaultOption = {
     params:{}
 }
 
+window.circleParam = {
+    redius: 17000,
+    center: [692384,3122050,13.618],
+    color: "#000",
+    outline: false,
+    outlineColor: "#ff0000",
+    opacity: 0.1,
+    rotate: [0, 0, 0]
+};
+
 window.mapParam={
     minX: 694986.6877441636,
     minY: 3134299.1691652327,
@@ -63,6 +73,15 @@ window.mapParam={
 };
 
 window.defaultMapParam = {
+    x:695789.386349502,
+    y:3121338.7382139494,
+    z:36493.00646310004,
+    radius:36783.216059128914,
+    pitch:-1.5707963267948966,
+    yaw:-0.16236538804906267
+}
+
+window.defaultSingleParam = {
     x:695789.386349502,
     y:3121338.7382139494,
     z:36493.00646310004,
