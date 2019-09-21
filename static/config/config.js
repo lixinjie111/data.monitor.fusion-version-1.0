@@ -82,6 +82,15 @@ window.dlWmsDefaultOption = {
 // this.wms = new AMap.TileLayer.WMS(_optionWms);
 // this.distanceMap.add(this.wms);
 // ws://120.133.21.14:29998/ws
+window.circleParam = {
+    redius:1000.0,
+    center:[325535.061,3462402.816,13.618],
+    color:"#ffffff",
+    outline:false,
+    outlineColor:"#ff0000",
+    opacity:0.1,
+    rotate:[0,0,0]
+};
 
 window.mapParam={
     minX:325295.155400,
