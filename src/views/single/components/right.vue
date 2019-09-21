@@ -585,7 +585,7 @@
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
-                this.$refs.tusvnMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                this.$refs.tusvnMap.updateCameraPosition(window.defaultSingleParam.x,window.defaultSingleParam.y,window.defaultSingleParam.z,window.defaultSingleParam.radius,window.defaultSingleParam.pitch,window.defaultSingleParam.yaw);
                 this.initCarWebSocket();
                 this.initSideCarWebSocket();
                 this.initSpatWebSocket();

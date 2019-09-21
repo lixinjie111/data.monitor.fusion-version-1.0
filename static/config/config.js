@@ -42,6 +42,16 @@ window.dlWmsDefaultOption = {
     params:{}
 }
 
+window.circleParam = {
+    redius: 0,
+    center: [0,0,0],
+    color: "#000",
+    outline: false,
+    outlineColor: "#ff0000",
+    opacity: 0.1,
+    rotate: [0, 0, 0]
+};
+
 window.mapParam={
     minX: 0,
     minY: 0,
@@ -53,6 +63,15 @@ window.mapParam={
 };
 
 window.defaultMapParam = {
+    x: 0,
+    y: 0,
+    z: 0,
+    radius: 0,
+    pitch: 0,
+    yaw: 0
+}
+
+window.defaultSingleParam = {
     x: 0,
     y: 0,
     z: 0,
