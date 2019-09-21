@@ -33,7 +33,7 @@ export default {
         }
     },
     mounted() {
-	    this.changeCenterPoint=window.weatherCenter.center;
+	    this.changeCenterPoint=window.mapOption.center;
         this.getAddress();
     },
     methods: {
