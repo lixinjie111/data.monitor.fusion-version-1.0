@@ -418,6 +418,18 @@
                 console.log("中心点："+this.center)
 //                console.log("中心点："+this.center);
             },
+            getExtentCenter(){
+                let extent = window.currentExtent;
+                this.center = [];
+                let x0 = extent[1][0];
+                let x1 = extent[3][0];
+                let y0 = extent[1][1];
+                let y1 = extent[3][1];
+                let centerX = (x0+x1)/2;
+                let centerY = (y0+y1)/2;
+                this.center.push(centerX);
+                this.center.push(centerY);
+            },
             typeRoadData(){
                 typeRoadData(
                     [
@@ -922,8 +934,8 @@
                 var platform = {
                     "action": "road_real_data_reg",
                     "data": {
-                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
-//                        "polygon":this.currentExtent
+                        // "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
+                       "polygon":window.currentExtent
                     }
                 }
                 var platformMsg = JSON.stringify(platform);
@@ -1271,8 +1283,9 @@
                 this.getExtend(longitude,latitude,extend);
                 this.center=[longitude ,latitude];
             }else{
-                this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-                this.center=[121.247,31.242];
+                _this.currentExtent=window.currentExtent;
+//                _this.center=[121.247,31.242];
+                _this.getExtentCenter();
             }
             this.getCameraByRsId();
         },

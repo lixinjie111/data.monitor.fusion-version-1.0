@@ -79,3 +79,5 @@ window.defaultSingleParam = {
     pitch: 0,
     yaw: 0
 }
+
+window.currentExtent=[window.mapOption.center,window.mapOption.center,window.mapOption.center,window.mapOption.center];
