@@ -174,6 +174,37 @@
                 }
             }
         },
+        mounted() {
+            let _this = this;
+            _this.mapParam=window.mapParam;
+            _this.rsId = _this.$route.params.crossId;
+            /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
+
+            let longitude=parseFloat(_this.$route.params.lon);
+            let latitude=parseFloat(_this.$route.params.lat);
+            let extend = parseFloat(_this.$route.params.extend);
+            //设置地图的中心点
+            if(longitude||latitude) {
+                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
+                _this.x = utm[0];
+                _this.y = utm[1];
+                _this.getExtend(longitude,latitude,extend);
+                _this.center=[longitude ,latitude];
+            }else{
+                _this.currentExtent=window.currentExtent;
+//                _this.center=[121.247,31.242];
+                _this.getExtentCenter();
+            }
+            _this.getCameraByRsId();
+            //判断当前标签页是否被隐藏
+            document.addEventListener("visibilitychange", () => {
+                if(document.visibilityState == "hidden") {
+                    _this.tabIsExist=false;
+                } else if (document.visibilityState == "visible") {
+                    _this.tabIsExist=true;
+                }
+            });
+        },
         methods: {
             onMapComplete(){
 
@@ -1126,38 +1157,6 @@
                 this.currentExtent.push([x0, y1]);
                 this.currentExtent.push([x1, y1]);
             }
-        },
-        mounted() {
-//            console.log("切换到感知页面")
-            let _this = this;
-            _this.mapParam=window.mapParam;
-            _this.rsId = _this.$route.params.crossId;
-           /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
-
-            let longitude=parseFloat(_this.$route.params.lon);
-            let latitude=parseFloat(_this.$route.params.lat);
-            let extend = parseFloat(_this.$route.params.extend);
-            //设置地图的中心点
-            if(longitude||latitude) {
-                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
-                _this.x = utm[0];
-                _this.y = utm[1];
-                _this.getExtend(longitude,latitude,extend);
-                _this.center=[longitude ,latitude];
-            }else{
-                _this.currentExtent=window.currentExtent;
-//                _this.center=[121.247,31.242];
-                _this.getExtentCenter();
-            }
-            _this.getCameraByRsId();
-            //判断当前标签页是否被隐藏
-            document.addEventListener("visibilitychange", () => {
-                if(document.visibilityState == "hidden") {
-                    _this.tabIsExist=false;
-                } else if (document.visibilityState == "visible") {
-                    _this.tabIsExist=true;
-                }
-            });
         },
         destroyed(){
             clearInterval(this.mapTime1);
