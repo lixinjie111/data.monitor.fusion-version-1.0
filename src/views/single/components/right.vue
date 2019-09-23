@@ -398,7 +398,7 @@
                                 //判断是否需要更新
                                 let obj = _this.warningData[warningId];
                                 /*if(obj.hash!=warningHash){*/
-                                    console.log("提示信息："+msg,item.dis,obj.dist);
+//                                    console.log("提示信息："+msg,item.dis,obj.dist);
                                     /*if(item.dis>obj.dist){
                                         return;
                                     }*/
