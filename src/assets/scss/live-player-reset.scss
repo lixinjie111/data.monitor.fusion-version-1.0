@@ -72,6 +72,7 @@
 		height: 40px;
 		color: #fff;
 		@include layoutMode(all);
+		background: linear-gradient(to bottom, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0)); /* 标准的语法 */
 		padding: 0 10px;
 		.title {
 			color: #fff;
