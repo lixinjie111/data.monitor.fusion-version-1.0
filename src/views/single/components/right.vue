@@ -78,7 +78,7 @@
             clearTimeout(this.timeId);
             this.start();
         },
-        start() {
+        start(){
             this.timeId = setTimeout(() => {
                 this.wsObj.send('HeartBeat');
             }, this.timeout);
