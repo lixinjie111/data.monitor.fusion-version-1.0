@@ -40,11 +40,20 @@
 .c-video-4-3 {
   position: relative;
   width: 100%;
-  padding-bottom: 75%;
+  padding-bottom: 68%;
   background: #000;
 }
+.c-video-4-3{
+	[class^="el-icon"],
+	[class*=" el-icon"] {
+		font-size: 40px!important;
+	}
+	.el-icon-refresh {
+		font-size: 20px!important;
+	}
 
-.c-video-16-9, .c-video-4-3 {
+}
+.c-video-16-9,.c-video-4-3 {
 	.c-video {
 		position: absolute;
 		left: 0;
@@ -101,10 +110,6 @@
 			font-weight: normal;
 			cursor: pointer;
 		}
-
-		.el-icon-video-play {
-			font-size: 50px;
-		}
 		.el-icon-refresh {
 			font-size: 20px;
 			margin-left: 10px;
@@ -120,6 +125,7 @@
 		}
 	}
 }
+
 
 
 

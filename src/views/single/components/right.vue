@@ -8,6 +8,8 @@
                         :params="forwardParam"
                         type="flvUrl"
                         :autoplay="false"
+                        @videoLoadCompleted="videoLoadCompleted"
+                        :isBig="false"
                 >
                 </live-player>
             </div>
@@ -18,6 +20,8 @@
                         :params="inParam"
                         type="flvUrl"
                         :autoplay="false"
+                        @videoLoadCompleted="videoLoadCompleted"
+                        :isBig="false"
                 >
                 </live-player>
             </div>
@@ -61,7 +65,7 @@
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
     import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
-    import c from '@/components/livePlayer'
+    import LivePlayer from '@/components/livePlayer'
     //websocket心跳检测
     let wsHeartCheck = {
         timeout: 5000,
@@ -83,8 +87,6 @@
     export default {
         data() {
             return {
-                timer1:0,
-                timer2:0,
                 vehicleId:this.$route.params.vehicleId,
                 spatWebsocket:null,
                 warningWebsocket:null,
@@ -104,7 +106,8 @@
                 forwardParam:{},
                 inParam:{},
                 forwardShow:false,
-                inShow:false
+                inShow:false,
+                timeObj:{}
             }
 
         },
@@ -433,6 +436,7 @@
                 }).then(res => {
                     let result = res.data;
                     result.forEach(item=>{
+                        debugger
                         let param;
                         //前向摄像头
                         if(item.toward==0){
@@ -456,30 +460,8 @@
                     })
                 });
             },
-            getStream(option,item,index){
-                startStream({
-                    'vehicleId': this.vehicleId,
-                    'camId':item.serialNum,
-                    'protocal':item.protocol
-                }).then(res => {
-                    let streamInfo = res.streamInfoRes;
-                    if(index==0){
-                        this.rtmp1=streamInfo.rtmp;
-                    }else{
-                        this.rtmp2=streamInfo.rtmp;
-                    }
-                    //获取视频地址并赋值
-                    let rtmp = streamInfo.rtmp;
-                    if(rtmp&&rtmp!=''){
-                        option.sources[0].src = rtmp;
-//                        option.bigPlayButton=true;
-                        //直播报活调用
-                        this.repeatFn(item);//拉取流后，保活
-                    }else {
-                        option.notSupportedMessage='视频流不存在，请稍候再试！';
-//                        option.bigPlayButton=false;
-                    }
-                });
+            videoLoadCompleted(param){
+                this.repeatFn(param);
             },
             keepStream(item){
                 sendStreamHeart({
@@ -492,20 +474,13 @@
             repeatFn(item){//每5秒直播报活一次
                 let _this = this;
                 _this.keepStream(item);
-                if(item.toward==0){
-                    clearTimeout(_this.timer1);
-                    _this.timer1 = null;//清除直播报活
-                    _this.timer1 = setTimeout(function(){
-                        _this.repeatFn(item);
-                    },5000)
-                }
-                if(item.toward==4){
-                    clearTimeout(_this.timer2);
-                    _this.timer2 = null;//清除直播报活
-                    _this.timer2 = setTimeout(function(){
-                        _this.repeatFn(item);
-                    },5000)
-                }
+               if(_this.timeObj[item.camId]){
+                   clearTimeout(_this.timeObj[item.camId]);
+               }
+                let time = setTimeout(function(){
+                    _this.repeatFn(item);
+                },5000)
+                _this.timeObj[item.camId] = time;
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
@@ -897,11 +872,11 @@
             }
         },
         beforeDestroy(){
-            console.log("单车页面销毁")
-            clearTimeout(this.timer1);
-            this.timer1 = null;//清除直播报活
-            clearTimeout(this.timer2);
-            this.timer2 = null;//清除直播报活
+            console.log("单车页面销毁");
+            //释放定时器
+            for(let key in this.timeObj){
+                clearTimeout(this.timeObj[key]);
+            }
             this.spatWebsocket&&this.spatWebsocket.close();
             this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
             this.carWebsocket&&this.carWebsocket.close();

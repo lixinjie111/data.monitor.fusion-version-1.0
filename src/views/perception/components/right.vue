@@ -1128,6 +1128,7 @@
             }
         },
         mounted() {
+//            console.log("切换到感知页面")
             let _this = this;
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
@@ -1249,11 +1250,11 @@
     .video-num{
         position: absolute;
         z-index:2;
-        width:100%;
+        left: 0;
+        right: 0;
         padding: 0px 10px;
-        box-sizing: border-box;
         cursor: pointer;
-        line-height: 30px;
+        height: 100%;
         display: flex;
         justify-content: space-between;
         .device-num{
@@ -1292,7 +1293,8 @@
             border-radius: 50%;
             position: absolute;
             left: 4px;
-            top: 10px;
+            top:50%;
+            transform: translate(0,-50%);
 
         }
         .active-style{

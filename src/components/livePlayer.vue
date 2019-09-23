@@ -1,5 +1,5 @@
 <template> 
-    <div class="c-video-16-9">
+    <div :class="[isBig?'c-video-16-9':'c-video-4-3']">
         <div class="c-video">
             <div class="c-video-title">
                 <!-- <span class="title">路侧点：16:9</span> -->
@@ -42,11 +42,15 @@ export default {
         params: Object, //请求视频参数
         type: String,   //视频字段名
         refreshFlag: {     //是否显示标题栏的刷新按钮
-            default: true,
+            default: false,
             type: Boolean
         },
         autoplay: {     //是否自动加载视频，true-自动加载视频，false-手动加载视频
             default: false,
+            type: Boolean
+        },
+        isBig: {
+            default: true,
             type: Boolean
         }
     },
@@ -163,6 +167,8 @@ export default {
                         if(res.status == 200) {
                             if(res.data[this.type]) {
                                 this.videoUrl = res.data[this.type];
+                                this.params.videoUrl=this.videoUrl;
+                                this.$emit("videoLoadCompleted",this.params);
                             }else {
                                 this.videoUrl = '';
                                 this.setVideoOptionError("暂无视频数据");
@@ -176,7 +182,7 @@ export default {
                 }else {
                     if(this.requestVideoUrl) {
                         this.videoUrl = this.requestVideoUrl;
-//                        this.params.videoUrl = this.videoUrl;
+                        this.params.videoUrl=this.videoUrl;
                         this.$emit("videoLoadCompleted",this.params);
                     }else {
                         this.setVideoOptionError("暂无视频数据");
