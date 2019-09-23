@@ -630,7 +630,6 @@
                 if(this.camList.length>0){
                     let cameraParam = this.camList[param].camParam;
                     if(cameraParam){
-                        this.isActive=param;
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
                         this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
@@ -638,6 +637,7 @@
                 }else{
                     this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
                 }
+                this.isActive=param;
                 this.param=param;
             },
             screenMagnify(param){
