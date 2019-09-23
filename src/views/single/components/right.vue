@@ -2,7 +2,7 @@
     <div class="fusion-right-style">
         <div class="c-fusion-right map-right">
             <p class="c-title">前向摄像头</p>
-            <div class="fusion-video" v-if="forwardShow">
+            <div class="fusion-video">
                 <live-player
                         :requestVideoUrl="requestVideoUrl"
                         :params="forwardParam"
@@ -10,11 +10,12 @@
                         :autoplay="false"
                         @videoLoadCompleted="videoLoadCompleted"
                         :isBig="false"
+                        v-if="forwardShow"
                 >
                 </live-player>
             </div>
             <p class="c-title">车内摄像头</p>
-            <div class="fusion-video" v-if="inShow">
+            <div class="fusion-video">
                 <live-player
                         :requestVideoUrl="requestVideoUrl"
                         :params="inParam"
@@ -22,6 +23,7 @@
                         :autoplay="false"
                         @videoLoadCompleted="videoLoadCompleted"
                         :isBig="false"
+                        v-if="inShow"
                 >
                 </live-player>
             </div>
@@ -365,12 +367,12 @@
                     let warningTime = Math.abs(time2-warningJson.time);
                     _this.lightTime = warningJson.time;
                     let warningId;
-                    console.log(_this.lightTime,warningTime)
+//                    console.log(_this.lightTime,warningTime)
                     if(type=='CLOUD'){
                         warningData.forEach(item=>{
                             warningId = item.warnId;
                             warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                            console.log("距离："+item.dis);
+//                            console.log("距离："+item.dis);
                             let msg = item.warnMsg;
                             let warningObj={
                                 longitude:item.longitude,
@@ -436,7 +438,6 @@
                 }).then(res => {
                     let result = res.data;
                     result.forEach(item=>{
-                        debugger
                         let param;
                         //前向摄像头
                         if(item.toward==0){
