@@ -9,7 +9,10 @@
             <div class="c-video-mask" v-if="videoOption.videoMaskFlag">
                 <i class="el-icon-video-play" v-if="videoOption.playFlag" @click="requestVideo"></i>
                 <i class="el-icon-loading" v-if="videoOption.loadingFlag"></i>
-                <span class="c-video-tip" v-if="videoOption.playError">{{videoOption.videoText}}</span>
+                <span class="c-video-tip" v-if="videoOption.playError">
+                    {{videoOption.videoText}}
+                    <i class="el-icon-refresh" @click="refreshVideo"></i>
+                </span>
             </div>
             <live-player 
                 class="c-live-player" 
