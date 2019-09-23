@@ -412,26 +412,6 @@
                 }
             },
             //视频报错的方法
-            playerError1(e) {
-                console.log("playerError");
-                if(this.option1.sources[0].src != '') {
-                    let _videoUrl = this.option1.sources[0].src;
-                    this.option1.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option1.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
-            playerError2(e) {
-                console.log("playerError");
-                if(this.option2.sources[0].src != '') {
-                    let _videoUrl = this.option2.sources[0].src;
-                    this.option2.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option2.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
             getDeviceInfo(){
                 getLiveDeviceInfo({
                     'vehicleId': this.vehicleId,
@@ -599,7 +579,7 @@
             //红绿灯
             initSpatWebSocket(){
                 let _this=this;
-                if ('WebSocket' in window) {
+                if ('WebSocket' in window){
                     _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                     _this.spatWebsocket.onmessage = _this.onSpatMessage;
                     _this.spatWebsocket.onclose = _this.onSpatClose;
@@ -609,7 +589,6 @@
             onSpatMessage(message){
                 let _this=this;
                 _this.lightList.push(message);
-
             },
             onSpatClose(data){
                 console.log("红绿灯结束连接");
