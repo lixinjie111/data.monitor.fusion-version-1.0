@@ -12,7 +12,7 @@
     import _ from "lodash";
 
     import * as myBox from "../utils/myBox";
-    import { getMap } from "@/utils/tusvnMap2.js";
+    import { getMap } from "@/utils/tusvnMap.js";
 
     import THREEUtls from "@/utils/three.utils";
 
@@ -172,7 +172,7 @@
                 );
 
                 setTimeout(() => {
-                    this.initData();
+                   // this.initData();
                     getMap(this);
                     let lights=new Array();
                     let lightObj={
