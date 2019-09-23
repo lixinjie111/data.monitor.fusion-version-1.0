@@ -4,7 +4,7 @@
             <div class="c-fusion-left fusion-left">
                 <div class="c-scroll-wrap">
                     <div class="c-scroll-inner">
-                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount"></left>
+                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount" v-show="leftShow"></left>
                     </div>
                 </div>
             </div>
@@ -25,8 +25,8 @@
                 signCount:0,
                 realData:{},
                 time:0,
-
-                perceptionData:{}
+                perceptionData:{},
+                leftShow:true
             }
         },
         components:{
@@ -130,7 +130,12 @@
             _this.socket.onclose = _this.onclose1;
             _this.socket.onopen = _this.onopen1;
             _this.socket.onerror = _this.onerror1;
-
+            let leftShow = _this.$route.params.leftShow;
+            if(leftShow=='true'){
+                _this.leftShow=true;
+            }else{
+                _this.leftShow=false;
+            }
         },
         destroyed(){
             //销毁Socket

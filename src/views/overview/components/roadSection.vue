@@ -121,104 +121,104 @@ export default {
       // this.initCarWebsocket();
     },
 
-      // 获取平台车
-      initCarWebsocket() {
-          let _this = this;
-          if ("WebSocket" in window) {
-              _this.carWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
-              _this.carWebSocket.onmessage = _this.onCarMessage;
-              _this.carWebSocket.onclose = _this.onCarClose;
-              _this.carWebSocket.onopen = _this.onCarOpen;
-          }
-      },
-      onCarMessage(message) {
-          let _this = this;
-          let jsonData = JSON.parse(message.data);
-          let result = jsonData.result;
-          // 车辆
-          if ("vehDataDTO" in result === true) {
-              _this.crossData.roadSenseCars = result.vehDataDTO;
-              if (_this.crossData.roadSenseCars.length > 0) {
-                  _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
-                      x => x.targetType === 2 || x.targetType === 5
-                  );
-                  // console.log('_this.crossData.roadSenseCars', _this.crossData.roadSenseCars);
-                  let _filterData = {};
-                  _this.crossData.roadSenseCars.forEach((item, index) => {
-                      _filterData[item.vehicleId] = {
-                          longitude: item.longitude,
-                          latitude: item.latitude,
-                          heading: item.heading,
-                          speed: item.speed,
-                          vehicleId: item.vehicleId,
-                          devId: item.devId,
-                          marker: null,
-                      };
-                  });
+    // 获取平台车
+    initCarWebsocket() {
+        let _this = this;
+        if ("WebSocket" in window) {
+            _this.carWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
+            _this.carWebSocket.onmessage = _this.onCarMessage;
+            _this.carWebSocket.onclose = _this.onCarClose;
+            _this.carWebSocket.onopen = _this.onCarOpen;
+        }
+    },
+    onCarMessage(message) {
+        let _this = this;
+        let jsonData = JSON.parse(message.data);
+        let result = jsonData.result;
+        // 车辆
+        if ("vehDataDTO" in result === true) {
+            _this.crossData.roadSenseCars = result.vehDataDTO;
+            if (_this.crossData.roadSenseCars.length > 0) {
+                _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
+                    x => x.targetType === 2 || x.targetType === 5
+                );
+                // console.log('_this.crossData.roadSenseCars', _this.crossData.roadSenseCars);
+                let _filterData = {};
+                _this.crossData.roadSenseCars.forEach((item, index) => {
+                    _filterData[item.vehicleId] = {
+                        longitude: item.longitude,
+                        latitude: item.latitude,
+                        heading: item.heading,
+                        speed: item.speed,
+                        vehicleId: item.vehicleId,
+                        devId: item.devId,
+                        marker: null,
+                    };
+                });
 
-                  for (let id in _this.prevData) {
-                      if(_filterData[id]) {   //表示有该点，做move
-                          _filterData[id].marker = _this.prevData[id].marker;
-                          let _currentCar = _filterData[id];
-                          _filterData[id].marker.setAngle(_currentCar.heading);
-                          _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
-                      } else {   //表示没有该点，做remove
-                          _this.prevData[id].marker.stopMove();
-                          _this.aMap.remove(_this.prevData[id].marker);
-                          delete _this.prevData[id];
-                      }
-                  }
-                  for (let id in _filterData) {
-                      if(!_this.prevData[id]) {   //表示新增该点，做add
-                          _filterData[id].marker = new AMap.Marker({
-                              position: [_filterData[id].longitude, _filterData[id].latitude],
-                              map: _this.aMap,
-                              icon: "static/images/road/car.png",
-                              angle: _filterData[id].heading,
-                              devId: _filterData[id].devId,
-                              zIndex: 1
-                          });
-                      }
-                  }
+                for (let id in _this.prevData) {
+                    if(_filterData[id]) {   //表示有该点，做move
+                        _filterData[id].marker = _this.prevData[id].marker;
+                        let _currentCar = _filterData[id];
+                        _filterData[id].marker.setAngle(_currentCar.heading);
+                        _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
+                    } else {   //表示没有该点，做remove
+                        _this.prevData[id].marker.stopMove();
+                        _this.aMap.remove(_this.prevData[id].marker);
+                        delete _this.prevData[id];
+                    }
+                }
+                for (let id in _filterData) {
+                    if(!_this.prevData[id]) {   //表示新增该点，做add
+                        _filterData[id].marker = new AMap.Marker({
+                            position: [_filterData[id].longitude, _filterData[id].latitude],
+                            map: _this.aMap,
+                            icon: "static/images/road/car.png",
+                            angle: _filterData[id].heading,
+                            devId: _filterData[id].devId,
+                            zIndex: 1
+                        });
+                    }
+                }
 
-                  _this.prevData = _filterData;
+                _this.prevData = _filterData;
 
-              } else {
-                  // 返回的数据为空
-                  for (let id in _this.prevData) {
-                      _this.prevData[id].marker.stopMove();
-                      _this.aMap.remove(_this.prevData[id].marker);
-                      delete _this.prevData[id];
-                  }
-              }
-          }
-      },
-      onCarClose(data) {
-          console.log("结束连接");
-      },
-      onCarOpen(data) {
-          // 获取红绿灯
-          let _params = {
-              action: "road_real_data_reg",
-              data: {
-                  polygon: this.crossData.finalFourPosition,
-                  fuselType: 1
-              }
-          };
-          let carParams = JSON.stringify(_params);
-          this.sendCarMsg(carParams);
-      },
-      sendCarMsg(msg) {
-          let _this = this;
-          if (window.WebSocket) {
-              if (_this.carWebSocket.readyState == WebSocket.OPEN) {
-                  //如果WebSocket是打开状态
-                  _this.carWebSocket.send(msg); //send()发送消息
-              }
-          } else {
-              return;
-          }
-      },
+            } else {
+                // 返回的数据为空
+                for (let id in _this.prevData) {
+                    _this.prevData[id].marker.stopMove();
+                    _this.aMap.remove(_this.prevData[id].marker);
+                    delete _this.prevData[id];
+                }
+            }
+        }
+    },
+    onCarClose(data) {
+        console.log("结束连接");
+    },
+    onCarOpen(data) {
+        // 获取红绿灯
+        let _params = {
+            action: "road_real_data_reg",
+            data: {
+                polygon: this.crossData.finalFourPosition,
+                fuselType: 1
+            }
+        };
+        let carParams = JSON.stringify(_params);
+        this.sendCarMsg(carParams);
+    },
+    sendCarMsg(msg) {
+        let _this = this;
+        if (window.WebSocket) {
+            if (_this.carWebSocket.readyState == WebSocket.OPEN) {
+                //如果WebSocket是打开状态
+                _this.carWebSocket.send(msg); //send()发送消息
+            }
+        } else {
+            return;
+        }
+    },
 
 
     // 第一个路段

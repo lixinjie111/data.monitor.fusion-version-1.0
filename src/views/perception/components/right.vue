@@ -207,7 +207,6 @@
         },
         methods: {
             onMapComplete(){
-
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
 //                    setInterval(()=>{
 //                        let camera = this.$refs.perceptionMap.getCamera();
@@ -1324,6 +1323,7 @@
         box-sizing: border-box;
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
+        height: 226px;
     }
     .video-mask{
         position: absolute;
