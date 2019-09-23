@@ -30,88 +30,95 @@
 }
 
 // 视频盒子
-// .c-video-16-9 {
-//   position: relative;
-//   width: 100%;
-//   padding-bottom: 56.25%;
-//   background: #000;
-// }
+.c-video-16-9 {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  background: #000;
+}
 
-// .c-video-4-3 {
-//   position: relative;
-//   width: 100%;
-//   padding-bottom: 75%;
-//   background: #000;
-// }
+.c-video-4-3 {
+  position: relative;
+  width: 100%;
+  padding-bottom: 75%;
+  background: #000;
+}
 
-// .c-video-16-9, .c-video-4-3 {
-// 	.c-video {
-// 		position: absolute;
-// 		left: 0;
-// 		right: 0;
-// 		top: 0;
-// 		bottom: 0;
-// 		width: 100%;
-// 		height: 100%;
-// 		background-color: transparent;
+.c-video-16-9, .c-video-4-3 {
+	.c-video {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		width: 100%;
+		height: 100%;
+		background-color: transparent;
 
-// 		&:hover {
-// 			.el-icon-refresh {
-// 				opacity: 1;
-// 			}
-// 		}
-// 	}
+		&:hover {
+			.el-icon-refresh {
+				opacity: 1;
+			}
+		}
+	}
 
-// 	.c-video-title {
-// 		position: absolute;
-// 		top: 0;
-// 		left: 0;
-// 		right: 0;
-// 		z-index: 3;
-// 		font-size: 14px;
-// 		height: 40px;
-// 		color: #fff;
-// 		@include layoutMode(all);
-// 		padding: 0 10px;
-// 		.title {
-// 			color: #fff;
-// 		}
-// 		.el-icon-refresh {
-// 			opacity: 0;
-// 			cursor: pointer;
-// 		}
-// 	}
+	.c-video-title {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 3;
+		font-size: 14px;
+		height: 40px;
+		color: #fff;
+		@include layoutMode(all);
+		padding: 0 10px;
+		.title {
+			color: #fff;
+		}
+		.el-icon-refresh {
+			opacity: 0;
+			cursor: pointer;
+		}
+	}
 
-// 	.c-video-mask {
-// 		position: absolute;
-// 		top: 0;
-// 		left: 0;
-// 		bottom: 0;
-// 		right: 0;
-// 		z-index: 2;
-// 		background-color: #000;
-// 		@include layoutMode(both);
-// 		font-size: 18px;
-// 		color: #fff;
+	.c-video-mask {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		z-index: 2;
+		background-color: #000;
+		@include layoutMode(both);
+		font-size: 18px;
+		color: #fff;
 
-// 		[class^="el-icon"],
-// 		[class*=" el-icon"] {
-// 			font-size: 50px;
-// 			font-weight: normal;
-// 		}
+		[class^="el-icon"],
+		[class*=" el-icon"] {
+			font-size: 50px;
+			font-weight: normal;
+			cursor: pointer;
+		}
 
-// 		.el-icon-video-play {
-// 			cursor: pointer;
-// 		}
+		.el-icon-video-play {
+			font-size: 50px;
+		}
+		.el-icon-refresh {
+			font-size: 20px;
+			margin-left: 10px;
+		}
 
-// 		.c-video-tip {
-// 			font-size: 14px;
-// 		}
+		.c-video-tip {
+			font-size: 14px;
+		}
 
-// 		.c-empty-box {
-// 			font-size: 14px;
-// 			color: #fff;
-// 		}
-// 	}
-// }
+		.c-empty-box {
+			font-size: 14px;
+			color: #fff;
+		}
+	}
+}
+
+
 

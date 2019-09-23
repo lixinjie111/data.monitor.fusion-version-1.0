@@ -4,12 +4,13 @@
             <div class="c-video-title">
                 <!-- <span class="title">路侧点：16:9</span> -->
                 <slot></slot>
-                <i class="el-icon-refresh" @click="refreshVideo"></i>
+                <i class="el-icon-refresh" v-if="refreshFlag" @click="refreshVideo"></i>
             </div>
             <div class="c-video-mask" v-if="videoOption.videoMaskFlag">
                 <i class="el-icon-video-play" v-if="videoOption.playFlag" @click="requestVideo"></i>
                 <i class="el-icon-loading" v-if="videoOption.loadingFlag"></i>
                 <span class="c-video-tip" v-if="videoOption.playError">{{videoOption.videoText}}</span>
+                <i class="el-icon-refresh" v-if="videoOption.playError" @click="refreshVideo"></i>
             </div>
             <live-player 
                 class="c-live-player" 
@@ -40,6 +41,10 @@ export default {
         requestVideoUrl: [Function, String],  //请求视频axios封装方法/视频地址
         params: Object, //请求视频参数
         type: String,   //视频字段名
+        refreshFlag: {     //是否显示标题栏的刷新按钮
+            default: true,
+            type: Boolean
+        },
         autoplay: {     //是否自动加载视频，true-自动加载视频，false-手动加载视频
             default: false,
             type: Boolean
