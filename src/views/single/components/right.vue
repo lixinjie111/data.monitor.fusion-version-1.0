@@ -2,12 +2,28 @@
     <div class="fusion-right-style">
         <div class="c-fusion-right map-right">
             <p class="c-title">前向摄像头</p>
-            <div class="fusion-video">
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1"></video-player>
+            <div class="fusion-video" v-if="forwardShow">
+                <live-player
+                        :requestVideoUrl="requestVideoUrl"
+                        :params="forwardParam"
+                        type="flvUrl"
+                        :autoplay="false"
+                        @videoLoadCompleted="videoLoadCompleted"
+                        :isBig="false"
+                >
+                </live-player>
             </div>
             <p class="c-title">车内摄像头</p>
-            <div class="fusion-video">
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2"></video-player>
+            <div class="fusion-video" v-if="inShow">
+                <live-player
+                        :requestVideoUrl="requestVideoUrl"
+                        :params="inParam"
+                        type="flvUrl"
+                        :autoplay="false"
+                        @videoLoadCompleted="videoLoadCompleted"
+                        :isBig="false"
+                >
+                </live-player>
             </div>
         </div>
         <div class="map-real-time" >{{processTime|dateFormat}}</div>
@@ -19,42 +35,6 @@
             maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
             @mapcomplete="onMapComplete" @pcarDataTime="getProcessTime">
             </tusvn-map>
-        </div>
-        <div class="spat-detail clearfix">
-            <div  v-for="(item,key) in lightData" class="spat-layout" :key="key">
-                <div v-show="key=='key_3'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img" >
-                        <img src="@/assets/images/single/light/turn-yellow.png" v-show="item.lightColor=='YELLOW'" class="turn-img"/>
-                        <img src="@/assets/images/single/light/turn-red.png" v-show="item.lightColor=='RED'"  class="turn-img"/>
-                        <img src="@/assets/images/single/light/turn-green.png" v-show="item.lightColor=='GREEN'"  class="turn-img"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>
-                <div v-show="key=='key_2'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img">
-                        <img src="@/assets/images/single/light/left-yellow.png" class="left-img" v-show="item.lightColor=='YELLOW'"/>
-                        <img src="@/assets/images/single/light/left-red.png" class="left-img" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" class="left-img" v-show="item.lightColor=='GREEN'"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>
-                <div v-show="key=='key_1'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img spat-straight">
-                        <img src="@/assets/images/single/light/left-yellow.png" class="straight-img" v-show="item.lightColor=='YELLOW'" />
-                        <img src="@/assets/images/single/light/left-red.png" class="straight-img" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" class="straight-img" v-show="item.lightColor=='GREEN'"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>
-                <div v-show="key=='key_4'&&item.flag" class="spat-detail-style">
-                    <div class="spat-detail-img spat-right">
-                        <img src="@/assets/images/single/light/left-yellow.png" class="right-img" v-show="item.lightColor=='YELLOW'"/>
-                        <img src="@/assets/images/single/light/left-red.png"  class="right-img" v-show="item.lightColor=='RED'"/>
-                        <img src="@/assets/images/single/light/left-green.png" class="right-img" v-show="item.lightColor=='GREEN'"/>
-                    </div>
-                    <span class="spat-detail-font" :class="[item.lightColor=='YELLOW' ? 'light-yellow' : item.lightColor=='RED'?'light-red':'light-green']">{{item.spareTime}}</span>
-                </div>
-            </div>
         </div>
         <div class="travel-detail">
             <div class="detail1">
@@ -85,6 +65,7 @@
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
     import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
+    import LivePlayer from '@/components/livePlayer'
     //websocket心跳检测
     let wsHeartCheck = {
         timeout: 5000,
@@ -106,24 +87,8 @@
     export default {
         data() {
             return {
-                option1:{},
-                option2:{},
-                lightData:{
-                     /*'key_3':{spareTime:10,time:null,lightColor:'GREEN',flag:true},
-                     'key_2':{spareTime:10,time:null,lightColor:'RED',flag:true},
-                     'key_1':{spareTime:10,time:null,lightColor:'YELLOW',flag:true},
-                     'key_4':{spareTime:10,time:null,lightColor:'RED',flag:true},*/
-                    'key_3':{},
-                    'key_2':{},
-                    'key_1':{},
-                    'key_4':{},
-                },
-                timer1:0,
-                timer2:0,
                 vehicleId:this.$route.params.vehicleId,
                 spatWebsocket:null,
-                rtmp1:'',
-                rtmp2:'',
                 warningWebsocket:null,
                 warningCancleWebsocket:null,
                 carWebsocket:null,
@@ -136,8 +101,13 @@
                 lightList:[],
                 warningList:[],
                 cacheLength:0,
-                mapParam:{}
-
+                mapParam:{},
+                requestVideoUrl:startStream,
+                forwardParam:{},
+                inParam:{},
+                forwardShow:false,
+                inShow:false,
+                timeObj:{}
             }
 
         },
@@ -168,44 +138,6 @@
             }
         },
         methods: {
-            getOption(){
-                let option={
-                    overNative: true,
-                        autoplay: true,
-                        controls: true,
-                        fluid: true,
-                        techOrder: ['flash', 'html5'],
-                        sourceOrder: true,
-                        flash: {
-                        swf: isProduction ? '/fusionMonitor/static/media/video-js.swf' : '/static/media/video-js.swf'
-                    },
-                    sources: [
-                        {
-                            type: 'rtmp/flv',
-                            src: ''
-                        }
-                    ],
-                        muted:true,
-                        width:'100%',
-                        height:'100%',
-                        notSupportedMessage: '数据正在加载，请稍候...',
-                        bigPlayButton : false,
-                        /*errorDisplay : false,*/
-                        controlBar: {
-                        timeDivider: false,
-                            durationDisplay: false,
-                            remainingTimeDisplay: false,
-                            currentTimeDisplay:false,
-                            fullscreenToggle: true, //全屏按钮
-                            captionsButton : false,
-                            chaptersButton: false,
-                            subtitlesButton:false,
-                            liveDisplay:false,
-                            playbackRateMenuButton:false
-                    }
-                }
-                return option;
-            },
             getProcessTime(time1,time2){
                 let _this = this;
                 _this.processTime=time2;
@@ -499,63 +431,37 @@
                 }
             },
             getDeviceInfo(){
-               let time = setTimeout(()=>{
-                    if(this.rtmp1==''){
-                        this.option1.notSupportedMessage='视频流不存在，请稍候再试！';
-                    }
-                    if(this.rtmp2==''){
-                        this.option2.notSupportedMessage='视频流不存在，请稍候再试！';
-                    }
-                    clearTimeout(time);
-                },1000)
                 getLiveDeviceInfo({
                     'vehicleId': this.vehicleId,
                 }).then(res => {
                     let result = res.data;
                     result.forEach(item=>{
+                        debugger
+                        let param;
                         //前向摄像头
                         if(item.toward==0){
-                            if(item.serialNum==''){
-                                this.option1.sources[0].src='';
-                            }else{
-                                this.getStream(this.option1,item,0);
-                            }
+                            this.forwardParam ={
+                               'vehicleId': this.vehicleId,
+                                'camId':item.serialNum,
+                                'protocal':item.protocol
+                           }
+                           this.forwardShow=true;
                         }
                         //车内摄像头
                         if(item.toward==4){
-                            if(item.serialNum==''){
-                                this.option2.sources[0].src='';
-                            }else{
-                                this.getStream(this.option2,item,1);
+                            this.inParam = {
+                                'vehicleId': this.vehicleId,
+                                'camId':item.serialNum,
+                                'protocal':item.protocol
                             }
+                            this.inShow=true;
+
                         }
                     })
                 });
             },
-            getStream(option,item,index){
-                startStream({
-                    'vehicleId': this.vehicleId,
-                    'camId':item.serialNum,
-                    'protocal':item.protocol
-                }).then(res => {
-                    let streamInfo = res.streamInfoRes;
-                    if(index==0){
-                        this.rtmp1=streamInfo.rtmp;
-                    }else{
-                        this.rtmp2=streamInfo.rtmp;
-                    }
-                    //获取视频地址并赋值
-                    let rtmp = streamInfo.rtmp;
-                    if(rtmp&&rtmp!=''){
-                        option.sources[0].src = rtmp;
-//                        option.bigPlayButton=true;
-                        //直播报活调用
-                        this.repeatFn(item);//拉取流后，保活
-                    }else {
-                        option.notSupportedMessage='视频流不存在，请稍候再试！';
-//                        option.bigPlayButton=false;
-                    }
-                });
+            videoLoadCompleted(param){
+                this.repeatFn(param);
             },
             keepStream(item){
                 sendStreamHeart({
@@ -568,20 +474,13 @@
             repeatFn(item){//每5秒直播报活一次
                 let _this = this;
                 _this.keepStream(item);
-                if(item.toward==0){
-                    clearTimeout(_this.timer1);
-                    _this.timer1 = null;//清除直播报活
-                    _this.timer1 = setTimeout(function(){
-                        _this.repeatFn(item);
-                    },5000)
-                }
-                if(item.toward==4){
-                    clearTimeout(_this.timer2);
-                    _this.timer2 = null;//清除直播报活
-                    _this.timer2 = setTimeout(function(){
-                        _this.repeatFn(item);
-                    },5000)
-                }
+               if(_this.timeObj[item.camId]){
+                   clearTimeout(_this.timeObj[item.camId]);
+               }
+                let time = setTimeout(function(){
+                    _this.repeatFn(item);
+                },5000)
+                _this.timeObj[item.camId] = time;
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
@@ -956,13 +855,11 @@
         },
         mounted(){
             this.mapParam=window.mapParam;
-            this.option1 = this.getOption();
-            this.option2 = this.getOption();
             this.getDeviceInfo();
 //            this.initLightWebSocket();
         },
         components:{
-            TusvnMap
+            TusvnMap,LivePlayer
         },
         filters: {
             dateFormat: function (value) {
@@ -975,11 +872,11 @@
             }
         },
         beforeDestroy(){
-            console.log("单车页面销毁")
-            clearTimeout(this.timer1);
-            this.timer1 = null;//清除直播报活
-            clearTimeout(this.timer2);
-            this.timer2 = null;//清除直播报活
+            console.log("单车页面销毁");
+            //释放定时器
+            for(let key in this.timeObj){
+                clearTimeout(this.timeObj[key]);
+            }
             this.spatWebsocket&&this.spatWebsocket.close();
             this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
             this.carWebsocket&&this.carWebsocket.close();

@@ -131,6 +131,7 @@
     #login-warpper {
         font-family: MicrosoftYaHei;
         position: relative;
+        z-index: 999;
         height: 100%;
         background-color: #f2f2f2;
         letter-spacing: 2px;
