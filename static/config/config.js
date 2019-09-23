@@ -56,7 +56,7 @@ window.dlWmsDefaultOption = {
 
 window.circleParam = {
     redius: 17000,
-    center: [692384,3122050,13.618],
+    center: [695984,3122050,13.618],
     color: "#000",
     outline: false,
     outlineColor: "#ff0000",
