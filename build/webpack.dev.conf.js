@@ -63,7 +63,10 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         from: path.resolve(__dirname, '../static'),
         to: config.dev.assetsSubDirectory,
         ignore: ['.*']
-      }
+      },
+      { from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'},
+      { from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'},
+      { from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js', to: 'js/'}
     ])
   ]
 })
