@@ -1010,7 +1010,7 @@
     }
     .travel-detail{
         position: absolute;
-        left: -350px;
+        transform: translate(-50%,0);
         margin-left:50%;
         bottom: 10px;
         font-size: 16px;
