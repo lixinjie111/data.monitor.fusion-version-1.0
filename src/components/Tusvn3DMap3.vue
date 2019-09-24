@@ -1217,7 +1217,7 @@
 
                                 ss += "  耗时：" + hs;
 
-                                console.log("gps时间："+d2.gpsTime+",----航向角"+d2.heading);
+//                                console.log("gps时间："+d2.gpsTime+",----航向角"+d2.heading);
 
                                 this.$emit("processPerceptionDataTime", ss,d2.gpsTime,d2_vehDataStat);
 //                                this.$emit("processDataTime",d2.gpsTime)
