@@ -1217,6 +1217,7 @@
 
                                 ss += "  耗时：" + hs;
 
+                                console.log("gps时间："+d2.gpsTime+",----航向角"+d2.heading);
 
                                 this.$emit("processPerceptionDataTime", ss,d2.gpsTime,d2_vehDataStat);
 //                                this.$emit("processDataTime",d2.gpsTime)
@@ -1277,7 +1278,6 @@
                 }
             },
             processPerceptionMesage: function() {
-
                 let data = null;
                 if (this.lastPerceptionMessage == null) {
                     return;
@@ -1298,7 +1298,7 @@
                             // var model1 = new THREE.Mesh(geoBox1, this.matStdObjects);
                             //感知车
                             // var model1=myBox.addMyBox(3.8, 1.6, 1.4,0xbc2cb2);
-                            var model1 = myBox.addMyBox(1.6, 3.8, 1.4, this.carColor);
+                            var model1 = myBox.addMyBox(1.60, 3.80, 1.4, this.carColor);
 
                             model1.position.set(0, 0, 0);
                             model1.rotation.set(this.pitch, this.yaw, this.roll);
@@ -1395,10 +1395,10 @@
                         //平台车
                         continue;
                     }
-                    if (d.heading >=360) {
-                        // 不处理大于360的的数据
-                        continue;
-                    }
+//                    if (d.heading >=360) {
+//                        // 不处理大于360的的数据
+//                        continue;
+//                    }
                     if (d.heading<0) {
                         // 不处理小于0的的数据
                         continue;
@@ -1408,6 +1408,8 @@
                         d.longitude,
                         d.latitude
                     ]);
+                    console.log(d.longitude);
+                   // console.log(dUTM[0]);
                     if (d.targetType == 0 || d.targetType == 1 || d.targetType == 3) {
                         if (i < this.deviceModels[deviceid].persons.length) {
                             let mdl = this.deviceModels[deviceid].persons[i];
