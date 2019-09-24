@@ -1947,7 +1947,7 @@
                 this.addShape(
                     "lane_centerline",
                     "./static/map3d/dl_shcsq_zc/Lane_centerline.shp",
-                    "#153641"
+                    "#c7b57c"
                 );
             },
             /**
