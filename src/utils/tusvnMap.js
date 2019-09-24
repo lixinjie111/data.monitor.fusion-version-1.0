@@ -8,7 +8,7 @@ export function getMap(map){
     map.addShape("lane_centerline","./static/map3d/dl_shcsq_zc/Lane_centerline.shp","#153641")
 
     // //斑马线
-    map.addShape("Crosswalk","./static/map3d/dl_shcsq_zc/Crosswalk.shp","#f3f3f3")
+    // map.addShape("Crosswalk","./static/map3d/dl_shcsq_zc/Crosswalk.shp","#f3f3f3")
 
 
     //画圆  326279.672803747 3462360.84818288   600m

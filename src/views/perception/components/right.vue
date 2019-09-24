@@ -124,8 +124,7 @@
                 camList:[],
                 requestVideoUrl:getVideoByNum,
                 tabIsExist:true,
-                isMin:false,
-                src: 'http://192.168.1.70:8082/#/liveTest'
+                isMin:false
             }
         },
         props:{
@@ -185,10 +184,9 @@
             let extend = parseFloat(_this.$route.params.extend);
             //设置地图的中心点
             if(longitude||latitude) {
-                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
+                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
                 _this.x = utm[0];
                 _this.y = utm[1];
-                console.log(_this.x ,_this.y )
                 _this.getExtend(longitude,latitude,extend);
                 _this.center=[longitude ,latitude];
             }else{
@@ -209,10 +207,10 @@
         methods: {
             onMapComplete(){
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                    setInterval(()=>{
-                        let camera = this.$refs.perceptionMap.getCamera();
-                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
-                    },500)
+//                    setInterval(()=>{
+//                        let camera = this.$refs.perceptionMap.getCamera();
+//                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
+//                    },500)
                    let count=0;
                    let flag=false;
                    let camParam;
@@ -624,8 +622,8 @@
                 if(param==-1){
                     this.param=-1;
                     this.isActive=-1;
-//                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
-                    this.$refs.perceptionMap.updateCameraPosition(window.defaultRoadParam.x,window.defaultRoadParam.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
+                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
+//                    this.$refs.perceptionMap.updateCameraPosition(window.defaultRoadParam.x,window.defaultRoadParam.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
                     return;
                 }
                 if(this.camList.length>0){

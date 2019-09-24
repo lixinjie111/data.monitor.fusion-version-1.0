@@ -95,11 +95,10 @@ window.defaultSingleParam = {
 window.defaultRoadParam={
     x:703107.8554066379,
     y:3134156.7025534217,
-    z:507.27478379813056,
-    radius:470.8646483310546,
+    z:507.07915985094644,
+    radius:503.0964010162716,
     pitch:-1.4534003822911599,
     yaw:-6.6197325184937625
 }
-
 // 703107.8554066379 3134156.7025534217 507.27478379813056 470.8646483310546 -1.4534003822911599 -6.6197325184937625
 window.currentExtent=[window.mapOption.center,window.mapOption.center,window.mapOption.center,window.mapOption.center];
