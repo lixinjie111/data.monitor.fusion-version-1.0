@@ -467,7 +467,7 @@
 
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -524,7 +524,7 @@
                 this.cacheLightData.push(cacheLightData);
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -604,7 +604,7 @@
                 this.cacheLightData.push(cacheLightData);
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -677,7 +677,7 @@
                 this.cacheLightData.push(cacheLightData);
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -750,7 +750,7 @@
                 this.cacheLightData.push(cacheLightData);
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
@@ -890,7 +890,7 @@
 
                 let utm = this.coordinateTransfer(
                     "EPSG:4326",
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
                     x,
                     y
                 );
