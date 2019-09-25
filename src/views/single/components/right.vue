@@ -13,7 +13,7 @@
                         v-if="forwardShow"
                 >
                 </live-player>
-                <p class="video-position">暂无数据</p>
+                <p class="video-position" v-if="!forwardShow">暂无数据</p>
             </div>
             <p class="c-title">车内摄像头</p>
             <div class="fusion-video">
@@ -27,7 +27,7 @@
                         v-if="inShow"
                 >
                 </live-player>
-                <p class="video-position">暂无数据</p>
+                <p class="video-position"  v-if="!inShow">暂无数据</p>
             </div>
         </div>
         <div class="map-real-time" >{{processTime|dateFormat}}</div>
