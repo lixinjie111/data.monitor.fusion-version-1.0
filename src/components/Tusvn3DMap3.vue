@@ -1577,8 +1577,7 @@
                     for (let n = 0; n < pcars.length; n++) {
                         let pcar = pcars[n];
 
-                        if(pcar.vehicleId!="B21E0005")
-                            continue;
+
                         if (pcar.heading<0) {
                             // 不处理小于0的的数据
                             continue;
@@ -1801,6 +1800,7 @@
                     data.longitude,
                     data.latitude
                 ]);
+//                console.log("经纬度："+data.longitude, data.latitude,data.heading);
                 if (carModel == null) {
                     this.addModel(
                         vid,
@@ -1830,7 +1830,9 @@
                         (-Math.PI / 180) * data.heading
                     );
                 }
-
+                if(data.heading==0){
+                    data.heading = 1;
+                }
                 dl.moveTo({
                     position: [position[0], position[1], this.cameraDefualtZ],
                     radius: this.cameraDefualtRadius + 10,
