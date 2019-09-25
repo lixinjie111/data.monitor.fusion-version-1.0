@@ -1,12 +1,12 @@
 window.config = {
 
     //雄安 外网地址
-    url: 'http://144.7.122.19:9093/monPlatApp/', //监控平台
+    url: 'http://144.7.127.19:9093/monPlatApp/', //监控平台
     operateUrl: 'http://144.7.122.89:9090/operateApp/', //运营平台
-    websocketUrl:'ws://144.7.122.19:9982/mon',  //监控
+    websocketUrl:'ws://144.7.127.19:9982/mon',  //监控
     socketUrl:'ws://144.7.122.84:9999/ws',  //影子系统
-    dlUrl: 'http://144.7.122.19:8085/', //迪路
-    dlWmsUrl: 'http://144.7.122.19:8080/', //迪路
+    dlUrl: 'http://144.7.127.19:8085/', //迪路
+    dlWmsUrl: 'http://144.7.127.19:8080/', //迪路
 
     version: 1.0,       // 版本号
 }
