@@ -97,7 +97,7 @@
                     if (valid) {
                         this.loading = true;
                         this.loginFunc(this.loginForm);
-                    } else {
+                    }else {
                         this.loading = false;
                         return false;
                     }
