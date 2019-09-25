@@ -1,51 +1,53 @@
 <template>
-    <div class="fusion-right-style">
-        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap('1')" v-show="param==3"/>
-        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap('3')" v-show="param!=3&&mapShow"/>
+    <div class="fusion-right-style" id="fusionRight">
+        <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
+        <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
-            <div class="style video-position" id="message1">
-                <div class="video-mask" @click="screenMagnify('1')"></div>
-                <div class="video-num" @click="changeMap('1')">
-                    <span class="device-num">摄像头编号:{{videoItem1.deviceId}}</span>
-                    <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
-                    <span>{{videoItem1.rsPtName}}</span>
+            <div v-for="(item,index) in camList" class="video-position" v-if="camList.length>0">
+                <div class="style">
+                    <div class="video-mask" @click="screenMagnify(index)"></div>
+                    <live-player
+                            :requestVideoUrl="requestVideoUrl"
+                            :params="item.params"
+                            type="flvUrl"
+                            :autoplay="false"
+                    >
+                        <div class="video-num" @click="changeMap(index)">
+                            <span class="device-num">摄像头编号:{{item.devId}}</span>
+                            <span class="active-circle" :class="{'active-style':isActive==index}"></span>
+                            <span>{{item.rsPtName}}</span>
+                        </div>
+                        <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
+                    </live-player>
                 </div>
-                <!--<div class="active-block">
-                    <span class="active-circle" :class="{'active-style':isActive=='1'}"></span>
-                </div>-->
-                <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer1"></video-player>
-            </div>
-            <div class="style" id="message2">
-                <div class="video-mask" @click="screenMagnify('2')"></div>
-                <div class="video-num" @click="changeMap('2')">
-                    <span class="device-num">摄像头编号:{{videoItem2.deviceId}}</span>
-                    <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
-                    <span>{{videoItem2.rsPtName}}</span>
+                <div class="big-video" v-show="item.videoShow">
+                    <div class="video-mask" @click="screenShrink(index)"></div>
+                    <live-player
+                            :requestVideoUrl="requestVideoUrl"
+                            :params="item.params"
+                            type="flvUrl"
+                            :autoplay="false"
+                            :ref="'bigPlayer'+index"
+
+                    >
+                        <div class="video-num" @click="changeMap(index)">
+                            <span class="device-num">摄像头编号:{{item.devId}}</span>
+                            <span>{{item.rsPtName}}</span>
+                        </div>
+                        <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
+                    </live-player>
                 </div>
-                <!--<div class="active-block">
-                    <span class="active-circle" :class="{'active-style':isActive=='2'}"></span>
-                </div>-->
-                <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer2"></video-player>
             </div>
-        </div>
-        <div class="big-video" v-show="video1Show">
-            <div class="video-mask" @click="screenShrink('1')"></div>
-            <div class="video-num" @click="changeMap('1')">
-                <span>摄像头编号:{{videoItem1.deviceId}}</span>
-                <span>{{videoItem1.rsPtName}}</span>
+            <div v-for="item in new Array(2)" class="video-position style" v-if="camList.length==0">
+                <div class="c-video-16-9 ">
+                    <div class="video-tip">
+                        暂无数据
+                    </div>
+                </div>
             </div>
-            <video-player class="vjs-custom-skin" :options="option1" @error="playerError1" ref="videoPlayer3"></video-player>
-        </div>
-        <div class="big-video" v-show="video2Show">
-            <div class="video-mask" @click="screenShrink('2')"></div>
-            <div class="video-num" @click="changeMap('1')">
-                <span>摄像头编号:{{videoItem1.deviceId}}</span>
-                <span>{{videoItem1.rsPtName}}</span>
-            </div>
-            <video-player class="vjs-custom-skin" :options="option2" @error="playerError2" ref="videoPlayer4"></video-player>
         </div>
         <div class="c-fusion-right map-right">
             <div class="perception-road" id="mapRoad">
@@ -67,10 +69,6 @@
             @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
         </div>
-        <!--<div class="point-style" :style="{left:pointLeft+'px',top:pointTop+'px'}"></div>
-        <div class="point-style" :style="{left:pointLeft1+'px',top:pointTop1+'px'}"></div>
-        <div class="point-style" :style="{left:pointLeft2+'px',top:pointTop2+'px'}"></div>
-        <div class="point-style" :style="{left:pointLeft3+'px',top:pointTop3+'px'}"></div>-->
     </div>
 </template>
 <script>
@@ -78,27 +76,11 @@
     import TusvnMap1 from './TusvnMap.vue';
     import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
+    import LivePlayer from '@/components/livePlayer'
     import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId} from '@/api/fusion'
     export default {
         data() {
             return {
-                videoItem1:{
-                    rtmp:'',
-                    serialNum:'',
-                    cameraParam:'',
-                    rsPtName:'',
-                    deviceId:''
-                },
-                videoItem2:{
-                    rtmp:'',
-                    serialNum:'',
-                    cameraParam:'',
-                    rsPtName:'',
-                    deviceId:''
-                },
-                option1:{},
-                option2:{},
-                count:0,
                 spatCount:0,
                 signCount:0,
                 center:[],
@@ -120,18 +102,14 @@
                 source:'',
                 lightWebsocket:null,
                 warningCancleWebsocket:null,
-                isMapFirst:true,
                 param:1, //平面 俯视
                 time:'',
                 time1:'',
                 x:0,
                 y:0,
-                video1Show:false,
-                video2Show:false,
                 waitingtime:this.$route.params.waitingtime,
-                isActive:'1',
+                isActive:0,
                 crossId:'',
-                count:0,
                 vehData:[],
                 alertCount:0,
                 warningData:{},
@@ -142,7 +120,12 @@
                 mapShow:false,
                 mapInitTime:'',
                 currentExtent:[],
-                mapParam:{}
+                mapParam:{},
+                camList:[],
+                requestVideoUrl:getVideoByNum,
+                tabIsExist:true,
+                isMin:false,
+                src: 'http://192.168.1.70:8082/#/liveTest'
             }
         },
         props:{
@@ -163,7 +146,7 @@
                 }
             },
         },
-        components: { TusvnMap,TusvnMap1},
+        components: { TusvnMap,TusvnMap1,LivePlayer},
         watch: {
             realData: {
                 handler(newName, oldName) {
@@ -191,65 +174,38 @@
                 }
             }
         },
+        mounted() {
+            let _this = this;
+            _this.mapParam=window.mapParam;
+            _this.rsId = _this.$route.params.crossId;
+            /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
+
+            let longitude=parseFloat(_this.$route.params.lon);
+            let latitude=parseFloat(_this.$route.params.lat);
+            let extend = parseFloat(_this.$route.params.extend);
+            //设置地图的中心点
+            if(longitude||latitude) {
+                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
+                _this.x = utm[0];
+                _this.y = utm[1];
+                _this.getExtend(longitude,latitude,extend);
+                _this.center=[longitude ,latitude];
+            }else{
+                _this.currentExtent=window.currentExtent;
+//                _this.center=[121.247,31.242];
+                _this.getExtentCenter();
+            }
+            _this.getCameraByRsId();
+            //判断当前标签页是否被隐藏
+            document.addEventListener("visibilitychange", () => {
+                if(document.visibilityState == "hidden") {
+                    _this.tabIsExist=false;
+                } else if (document.visibilityState == "visible") {
+                    _this.tabIsExist=true;
+                }
+            });
+        },
         methods: {
-            getOption(){
-                let option = {
-                    overNative: true,
-                    autoplay: true,
-                    controls: true,
-                    fluid: true,
-                    techOrder: ['flash', 'html5'],
-                    sourceOrder: true,
-                    flash: {
-                        swf: isProduction ? '/fusionMonitor/static/media/video-js.swf' : '/static/media/video-js.swf'
-                    },
-                    sources: [
-                        {
-                            type: 'rtmp/flv',
-                            src: ''
-                        }
-                    ],
-                    muted:true,
-                    width:'100%',
-                    height:'100%',
-                    notSupportedMessage: '数据正在加载，请稍候...',
-                      bigPlayButton : false,
-                    /*errorDisplay : false,*/
-                    controlBar: {
-                        timeDivider: false,
-                        durationDisplay: false,
-                        remainingTimeDisplay: false,
-                        currentTimeDisplay:false,
-                        fullscreenToggle: true, //全屏按钮
-                        captionsButton : false,
-                        chaptersButton: false,
-                        subtitlesButton:false,
-                        liveDisplay:false,
-                        playbackRateMenuButton:false
-                    }
-                }
-                return option;
-            },
-            playerError1(e) {
-                console.log("playerError1");
-                if(this.option1.sources[0].src != '') {
-                    let _videoUrl = this.option1.sources[0].src;
-                    this.option1.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option1.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
-            playerError2(e) {
-                console.log("playerError2");
-                if(this.option2.sources[0].src != '') {
-                    let _videoUrl = this.option2.sources[0].src;
-                    this.option2.sources[0].src = '';
-                    setTimeout(() => {
-                        this.option2.sources[0].src = _videoUrl;
-                    }, 2000);
-                }
-            },
             onMapComplete(){
 
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
@@ -259,11 +215,13 @@
                     },500)*/
                    let count=0;
                    let flag=false;
+                   let camParam;
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                    //5s没有 默认值
                    this.mapInitTime = setInterval(()=>{
-                       if(this.videoItem1.cameraParam){
-                           this.$refs.perceptionMap.updateCameraPosition(this.videoItem1.cameraParam.x,this.videoItem1.cameraParam.y,this.videoItem1.cameraParam.z,this.videoItem1.cameraParam.radius,this.videoItem1.cameraParam.pitch,this.videoItem1.cameraParam.yaw);
+                       if(this.camList.length>0&&this.camList[0].camParam){
+                           camParam = this.camList[0].camParam;
+                           this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
                            this.typeRoadData();
                            this.initPlatformWebSocket();
                            this.initPerceptionWebSocket();
@@ -277,8 +235,8 @@
                            return;
                        }
                        count++;
-                       if(count==5){
-                           this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
+                       if(count==10){
+                           this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
                            this.typeRoadData();
                            this.initPlatformWebSocket();
                            this.initPerceptionWebSocket();
@@ -290,7 +248,7 @@
                            this.mapShow=true;
                            clearInterval(this.mapInitTime);
                        }
-                   },500)
+                   },100)
              },
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
@@ -326,59 +284,29 @@
                 }
                 this.$emit("getPerceptionData",vehDataStat);
             },
-           /* processDataTime(time){
-                debugger
-                this.processDataTime=time;
-            },*/
-            getVideo(serialNum,protocol,index){
-                let _this = this;
-                getVideoByNum({
-                    "protocal": protocol,
-                    "serialNum": serialNum
-                }).then(res => {
-                    if(index==0){
-                        _this.videoItem1.rtmp = res.data.rtmp;
-                        if(_this.videoItem1.rtmp==""){
-                            _this.option1.notSupportedMessage="";
-                            _this.option1.notSupportedMessage='视频流不存在，请稍候重试';
-                        }else{
-//                            _this.option1.sources[0].src=_this.videoItem1.rtmp;
-                            _this.option1.sources[0].src=_this.videoItem1.rtmp;
-                        }
-                    }
-                    if(index==1){
-                        _this.videoItem2.rtmp = res.data.rtmp;
-                        if(_this.videoItem2.rtmp==""){
-                            _this.option2.notSupportedMessage="";
-                            _this.option2.notSupportedMessage='视频流不存在，请稍候重试';
-                        }else{
-                            _this.option2.sources[0].src=_this.videoItem2.rtmp;
-                        }
-                    }
-                })
-            },
             getCameraByRsId(){
-                setTimeout(()=>{
-                    if(this.videoItem1.rtmp==""){
-                        this.option1.notSupportedMessage="";
-                        this.option1.notSupportedMessage='视频流不存在，请稍候重试';
-                    }
-                    if(this.videoItem2.rtmp==""){
-                        this.option2.notSupportedMessage="";
-                        this.option2.notSupportedMessage='视频流不存在，请稍候重试';
-                    }
-                },2000)
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
                     let data = res.data;
                     let cameraList = data.camLst;
-                    this.videoItem1.deviceId=cameraList[0].devId;
-                    this.videoItem1.rsPtName=data.rsName;
-                    this.videoItem1.cameraParam=cameraList[0].camParam;
-                    this.videoItem2.deviceId=cameraList[1].devId;
-                    this.videoItem2.rsPtName=data.rsName;
-                    this.videoItem2.cameraParam=cameraList[1].camParam;
-                    this.getVideo(cameraList[0].sn,cameraList[0].protocal,0);
-                    this.getVideo(cameraList[1].sn,cameraList[1].protocal,1);
+                    this.camList = cameraList;
+                    this.camList.forEach(item=>{
+                        let params={
+                            "serialNum": item.sn,
+                            "protocal": item.protocal
+                        }
+                        item.params = params;
+                        item.rsPtName=data.rsName;
+                        this.$set(item,"videoShow",false);
+//                        item.videoShow=false;
+                    })
+
+                });
+            },
+            loadComplete(param){
+                this.camList.forEach((item,index)=>{
+                    if(param.serialNum==item.serialNum){
+                        item.videoUrl = params.videoUrl;
+                    }
                 });
             },
             getCurrentExtent() {
@@ -417,6 +345,18 @@
                 this.center=[121.247,31.242];
                 console.log("中心点："+this.center)
 //                console.log("中心点："+this.center);
+            },
+            getExtentCenter(){
+                let extent = window.currentExtent;
+                this.center = [];
+                let x0 = extent[1][0];
+                let x1 = extent[3][0];
+                let y0 = extent[1][1];
+                let y1 = extent[3][1];
+                let centerX = (x0+x1)/2;
+                let centerY = (y0+y1)/2;
+                this.center.push(centerX);
+                this.center.push(centerY);
             },
             typeRoadData(){
                 typeRoadData(
@@ -681,78 +621,32 @@
 
             },
             changeMap(param){
-                let cameraParam;
-                if(param==1){
-                    if(this.videoItem1.cameraParam){
-                        cameraParam = this.videoItem1.cameraParam;
-                        this.param=1;
-                        this.isActive='1';
+                if(param==-1){
+                    this.param=-1;
+                    this.isActive=-1;
+                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
+                    return;
+                }
+                if(this.camList.length>0){
+                    let cameraParam = this.camList[param].camParam;
+                    if(cameraParam){
                         this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                     }else{
-                        this.$refs.perceptionMap.updateCameraPosition(326299.8136019115,3462328.443327571,34.16186920538662,31.40011218302981,-0.1440529053876541,-2.7068034133160297);
+                        this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
                     }
+                }else{
+                    this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
                 }
-                if(param==2){
-                    if(this.videoItem2.cameraParam){
-                        cameraParam = this.videoItem2.cameraParam;
-                        this.param=2;
-                        this.isActive='2';
-                        this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
-                    }else{
-                        this.$refs.perceptionMap.updateCameraPosition(326304.2090037432,3462331.4820984467,32.32807236656733,28.285918865915978,-0.2021040680279308,0.973473709325485);
-                    }
-                }
-                if(param==3){
-                    this.param=3;
-                    this.isActive='0';
-//                    this.$refs.perceptionMap.updateCameraPosition(this.initCameraParam.x,this.initCameraParam.y,this.initCameraParam.z,this.initCameraParam.radius,this.initCameraParam.pitch,this.initCameraParam.yaw);
-                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,217.16763677929166,0,-1.5707963267948966,-0.16236538804906267);
-//                    this.$refs.perceptionMap.updateCameraPosition(326308.49072616524,3462302.055910501,217.21056139773134,204.19919321851978,-1.440593551981663,-2.555594554715729);
-                }
-//                /*if(param==4){
-//                    this.param=4;
-//                    this.$refs.perceptionMap.updateCameraPosition(326338.49419362197,3462214.5819509593,34.454129283572335,33.17105953424258,-0.24528938976181205,0.32988267396644116);
-//                }*/
+                this.isActive=param;
+                this.param=param;
             },
             screenMagnify(param){
-                if(param==1){
-                    this.video1Show=true;
-                    if(!this.$refs.videoPlayer3.player){
-                        this.$refs.videoPlayer3.initialize();
-                        this.$refs.videoPlayer3.player.options(this.option1);
-
-                    }
-                    if(this.videoItem1.rtmp==""){
-                        this.option1.notSupportedMessage="";
-                        this.option1.notSupportedMessage='视频流不存在，请稍候重试';
-                    }else{
-                        this.option1.sources[0].src=this.videoItem1.rtmp;
-                    }
-                }
-                if(param==2){
-                    this.video2Show=true;
-                    if(!this.$refs.videoPlayer4.player){
-                        this.$refs.videoPlayer4.initialize();
-                        this.$refs.videoPlayer4.player.options(this.option2);
-
-                    }
-                    if(this.videoItem2.rtmp==""){
-                        this.option2.notSupportedMessage="";
-                        this.option2.notSupportedMessage='视频流不存在，请稍候重试';
-                    }else{
-                        this.option2.sources[0].src=this.videoItem2.rtmp;
-                    }
-                }
+               this.camList[param].videoShow=true;
             },
             screenShrink(param){
-                if(param==1){
-                    this.video1Show=false;
-                    this.$refs.videoPlayer3.dispose();
-                }
-                if(param==2){
-                    this.video2Show=false;
-                    this.$refs.videoPlayer4.dispose();
-                }
+                let player = this.$refs['bigPlayer'+param];
+                player[0].player.pause();
+                this.camList[param].videoShow=false;
             },
             initWarningWebSocket(){
                 let _this=this;
@@ -923,8 +817,8 @@
                 var platform = {
                     "action": "road_real_data_reg",
                     "data": {
-                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
-//                        "polygon":this.currentExtent
+//                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
+                        "polygon":window.currentExtent
                     }
                 }
                 var platformMsg = JSON.stringify(platform);
@@ -953,7 +847,17 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-               _this.$refs.perceptionMap.addPerceptionData(mesasge);
+              /*  console.log("########");
+                console.log(_this.tabIsExist);*/
+                if(_this.tabIsExist){
+                    /*console.log("..............");*/
+                    _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                }else{
+                    let cacheList = _this.$refs.perceptionMap.cachePerceptionQueue;
+                    if(cacheList.length>0){
+                        _this.$refs.perceptionMap.cachePerceptionQueue = new Array();
+                    }
+                }
             },
             onPerceptionClose(data){
                 console.log("红绿灯结束连接");
@@ -998,7 +902,7 @@
             },
             onSpatMessage(mesasge){
                 let _this=this;
-               _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                _this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
 //                let vehData = json.result.vehDataStat;
@@ -1254,29 +1158,6 @@
                 this.currentExtent.push([x1, y1]);
             }
         },
-        mounted() {
-            this.mapParam=window.mapParam;
-            this.option1 = this.getOption();
-            this.option2 = this.getOption();
-            this.rsId = this.$route.params.crossId;
-           /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
-
-            let longitude=parseFloat(this.$route.params.lon);
-            let latitude=parseFloat(this.$route.params.lat);
-            let extend = parseFloat(this.$route.params.extend);
-            //设置地图的中心点
-            if(longitude||latitude) {
-                let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
-                this.x = utm[0];
-                this.y = utm[1];
-                this.getExtend(longitude,latitude,extend);
-                this.center=[longitude ,latitude];
-            }else{
-                this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-                this.center=[121.247,31.242];
-            }
-            this.getCameraByRsId();
-        },
         destroyed(){
             clearInterval(this.mapTime1);
             clearInterval(this.mapTime2);
@@ -1294,20 +1175,7 @@
         }
 }
 </script>
-<style>
-    .style .vjs-error .vjs-error-display:before{
-        font-size: 3em;
-        color: #ccc;
-        top:60%;
-        display: none;
-    }
-    .style .vjs-modal-dialog-content{
-        padding-top:80px!important;
-    }
-    .style .vjs-custom-skin > .video-js .vjs-big-play-button{
-        font-size: 0.5em!important;
-    }
-</style>
+
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
     .map-right{
@@ -1377,36 +1245,21 @@
     }
     .style{
         position: relative;
-        z-index:1;
-        box-sizing: border-box;
-        /*border:1px solid rgba(234, 233, 229, 0.1);*/
-        border:1px solid rgba(211, 134, 0, 0.5)!important;
     }
     .video-num{
         position: absolute;
         z-index:2;
-        width:100%;
+        left: 0;
+        right: 0;
         padding: 0px 10px;
-        box-sizing: border-box;
         cursor: pointer;
-        line-height: 30px;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
         .device-num{
             padding-left: 10px;
-            padding-right: 70px;
         }
-       /* @include layoutMode(between);*/
     }
- /*   .style:before{
-        position: absolute;
-        content: '';
-        width: 0;
-        height: 0;
-        border-top:20px solid #666666;
-        border-right:16px solid transparent;
-        bottom: -20px;
-        left:16px;
-
-    }*/
     .img-style{
         position: absolute;
         top: 86px;
@@ -1421,6 +1274,16 @@
         right: 10px;
         z-index:3;
         width: 400px;
+        .video-tip{
+            @include layoutMode(both);
+            font-size: 16px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0px;
+        }
+
       /*  transition: all 2s ease-in-out;*/
         .active-circle{
             display: inline-block;
@@ -1429,7 +1292,8 @@
             border-radius: 50%;
             position: absolute;
             left: 4px;
-            top: 10px;
+            top:50%;
+            transform: translate(0,-50%);
 
         }
         .active-style{
@@ -1448,8 +1312,8 @@
     }
     .big-video{
         position: absolute;
-        top: 84px;
-        right: 10px;
+        top: 0px;
+        right: 0px;
         z-index:4;
         width: 900px;
         border:1px solid rgba(211, 134, 0, 0.5);
@@ -1457,96 +1321,18 @@
     }
     .video-position{
         margin-bottom: 16px;
+        box-sizing: border-box;
+        /*border:1px solid rgba(234, 233, 229, 0.1);*/
+        border:1px solid rgba(211, 134, 0, 0.5)!important;
     }
     .video-mask{
         position: absolute;
-        right: 0;
+        right: 50px;
         bottom: 0;
-        width: 46px;
+        width: 80px;
         height: 46px;
         z-index: 3;
         cursor: pointer;
     }
-    .spat-detail{
-        position: absolute;
-        z-index: 2;
-        padding:4px;
-        background: #333333;
-        border-radius: 4px;
-        .spat-layout{
-            float: left;
-            margin-left: 8px;
-        }
-        .spat-detail-style{
-            width: 54px;
-            height: 30px;
-            border-radius: 20px;
-            background-color:#333333;
-            box-sizing: border-box;
-            @include layoutMode(align);
 
-            .spat-detail-img{
-                width: 24px;
-                height: 24px;
-                background-color: #4e4d4d;
-                border-radius: 50%;
-                display: inline-block;
-                position: relative;
-                img{
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                }
-                .turn-img{
-                    width: 16px;
-                    height: 18px;
-                    margin-left: -8px;
-                    margin-top: -9px;
-                }
-                .left-img{
-                    width: 18px;
-                    height: 14px;
-                    margin-left: -10px;
-                    margin-top: -8px;
-                }
-                .straight-img{
-                    width: 16px;
-                    height: 14px;
-                    margin-left: -8px;
-                    margin-top: -7px;
-                }
-                .right-img{
-                    width: 18px;
-                    height: 14px;
-                    margin-left: -9px;
-                    margin-top: -7px;
-                }
-            }
-            .spat-detail-font{
-                letter-spacing: 0px;
-                color: #c8360f;
-                font-size: 20px;
-                display: inline-block;
-                margin-left: 4px;
-            }
-            .spat-detail-color{
-                color: #23b318;
-            }
-            .spat-straight{
-                transform: rotate(90deg);
-            }
-            .spat-right{
-                transform: rotate(180deg);
-            }
-            .light-yellow{
-                color: #d99f04;
-            }
-            .light-red{
-                color: #c93710;
-            }
-            .light-green{
-                color: #28b51d;
-            }
-        }
-    }
 </style>

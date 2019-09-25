@@ -12,7 +12,7 @@
 </template>
 
 <script>
-    import TusvnMap from '@/components/Tusvn3DMap2'
+    import TusvnMap from '@/components/Tusvn3DMap3'
     import {getMap} from '@/utils/tusvnMap.js';
     export default {
         data() {
