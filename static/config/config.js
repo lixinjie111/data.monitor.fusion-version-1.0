@@ -10,12 +10,12 @@ window.config = {
     //http://172.17.1.16:9092/icvShadowApp/ws.html  不要给我删掉了！！！
 
     //望京 外网
-    url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台
-    operateUrl: 'http://120.133.21.14:9090/operateApp/',	//运营平台
-    websocketUrl:'ws://120.133.21.14:49982/mon',  //监控
-    socketUrl:'ws://120.133.21.14:49999/ws',  //影子系统
-    dlUrl: 'http://113.208.118.62:8085/', //迪路
-    dlWmsUrl: 'http://113.208.118.62:8080/', //迪路
+    // url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台
+    // operateUrl: 'http://120.133.21.14:9090/operateApp/',	//运营平台
+    // websocketUrl:'ws://120.133.21.14:49982/mon',  //监控
+    // socketUrl:'ws://120.133.21.14:49999/ws',  //影子系统
+    // dlUrl: 'http://113.208.118.62:8085/', //迪路
+    // dlWmsUrl: 'http://113.208.118.62:8080/', //迪路
     
     //上海正式环境  内网-IP
     // url: 'http://172.16.1.199:9093/monPlatApp/', //监控平台
@@ -34,12 +34,12 @@ window.config = {
     // dlWmsUrl: 'http://app01:8080/', //迪路
 
     //上海正式环境  外网
-    // url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
-    // operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
-    // websocketUrl:'ws://116.236.72.206:49982/mon',  //监控
-    // socketUrl:'ws://116.236.72.205:49999/ws',  //影子系统
-    // dlUrl: 'http://116.236.72.204:48085/', //迪路
-    // dlWmsUrl: 'http://116.236.72.204:48080/', //迪路
+    url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
+    operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
+    websocketUrl:'ws://116.236.72.206:49982/mon',  //监控
+    socketUrl:'ws://116.236.72.205:49999/ws',  //影子系统
+    dlUrl: 'http://116.236.72.204:48085/', //迪路
+    dlWmsUrl: 'http://116.236.72.204:48080/', //迪路
 
      version: 1.0,       // 版本号
 }
