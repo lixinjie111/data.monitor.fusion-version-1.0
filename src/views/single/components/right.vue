@@ -13,6 +13,7 @@
                         v-if="forwardShow"
                 >
                 </live-player>
+                <p class="video-position" v-if="!forwardShow">暂无数据</p>
             </div>
             <p class="c-title">车内摄像头</p>
             <div class="fusion-video">
@@ -26,6 +27,7 @@
                         v-if="inShow"
                 >
                 </live-player>
+                <p class="video-position"  v-if="!inShow">暂无数据</p>
             </div>
         </div>
         <div class="map-real-time" >{{processTime|dateFormat}}</div>
@@ -921,92 +923,9 @@
         box-sizing: border-box;
        /* padding-top: 10px;*/
     }
-    .spat-detail{
-        position: absolute;
-        top: 30px;
-        /*left: 0;
-        text-align: center;*/
-        z-index: 1;
-        left:-190px;
-        margin-left:50%;
-        .spat-layout{
-            float: left;
-            margin-left: 8px;
-        }
-        .spat-detail-style{
-            width: 86px;
-            height: 40px;
-            border-radius: 20px;
-            background-color:rgba(99,99,99,0.3);
-            box-sizing: border-box;
-            padding:6px 2px;
-            /*float: left;
-            margin-left: 20px;*/
-            @include layoutMode(align);
-
-            .spat-detail-img{
-                width: 32px;
-                height: 32px;
-                background-color: rgba(99,99,99,0.4);
-                border-radius: 50%;
-                display: inline-block;
-                position: relative;
-                img{
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                }
-                .left-img{
-                    width: 20px;
-                    height: 18px;
-                    margin-left: -10px;
-                    margin-top: -9px;
-                }
-                .turn-img{
-                    width: 16px;
-                    height: 18px;
-                    margin-left: -8px;
-                    margin-top: -9px;
-                }
-                .straight-img{
-                    width: 20px;
-                    height: 16px;
-                    margin-left: -10px;
-                    margin-top: -8px;
-                }
-                .right-img{
-                    width: 20px;
-                    height: 18px;
-                    margin-left: -10px;
-                    margin-top: -9px;
-                }
-            }
-            .spat-detail-font{
-                letter-spacing: 4px;
-                color: #c8360f;
-                font-size: 24px;
-                display: inline-block;
-                margin-left: 12px;
-            }
-            .spat-detail-color{
-                color: #23b318;
-            }
-            .spat-straight{
-                transform: rotate(90deg);
-            }
-            .spat-right{
-                transform: rotate(180deg);
-            }
-            .light-yellow{
-                color: #d99f04;
-            }
-            .light-red{
-                color: #c93710;
-            }
-            .light-green{
-                color: #28b51d;
-            }
-        }
+    .video-position{
+        @include layoutMode(both);
+        height:100%;
     }
     .travel-detail{
         position: absolute;
