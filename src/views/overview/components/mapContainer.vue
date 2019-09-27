@@ -419,7 +419,7 @@ export default {
     .amap-marker-label{
         border:1px solid #ccc!important;
         color: #2a2a2a!important;
-        width: 110px;
+        min-width: 110px;
         text-align: center;
     }
 </style>

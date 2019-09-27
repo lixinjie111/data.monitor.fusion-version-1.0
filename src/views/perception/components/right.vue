@@ -300,17 +300,18 @@
                     let data = res.data;
                     let cameraList = data.camLst;
                     this.camList = cameraList;
-                    this.camList.forEach(item=>{
-                        let params={
-                            "serialNum": item.sn,
-                            "protocal": item.protocal
-                        }
-                        item.params = params;
-                        item.rsPtName=data.rsName;
-                        this.$set(item,"videoShow",false);
+                    if(this.camList.length>0){
+                        this.camList.forEach(item=>{
+                            let params={
+                                "serialNum": item.sn,
+                                "protocal": item.protocal
+                            }
+                            item.params = params;
+                            item.rsPtName=data.rsName;
+                            this.$set(item,"videoShow",false);
 //                        item.videoShow=false;
-                    })
-
+                        })
+                    }
                 });
             },
             loadComplete(param){
