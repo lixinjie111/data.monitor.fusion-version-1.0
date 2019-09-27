@@ -14,6 +14,7 @@
                             :params="item.params"
                             type="flvUrl"
                             :autoplay="false"
+                            @videoLoadCompleted="videoLoadCompleted"
                     >
                         <div class="video-num" @click="changeMap(index)">
                             <span class="device-num">摄像头编号:{{item.devId}}</span>
@@ -26,7 +27,7 @@
                 <div class="big-video" v-show="item.videoShow">
                     <div class="video-mask" @click="screenShrink(index)"></div>
                     <live-player
-                            :requestVideoUrl="requestVideoUrl"
+                            :requestVideoUrl="item.videoUrl"
                             :params="item.params"
                             type="flvUrl"
                             :autoplay="false"
@@ -205,6 +206,15 @@
             });
         },
         methods: {
+            videoLoadCompleted(params){
+                for(let i=0;i<this.camList.length;i++){
+                    let item = this.camList[i];
+                    if(item.sn==params.serialNum){
+                        item.videoUrl = params.videoUrl;
+                        break;
+                    }
+                }
+            },
             onMapComplete(){
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
 //                    setInterval(()=>{
@@ -215,19 +225,19 @@
                    let flag=false;
                    let camParam;
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
-                   //5s没有 默认值
+                if(this.camList.length>0&&this.camList[0].camParam){
+                    camParam = this.camList[0].camParam;
+                    this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+                    this.getData();
+                    this.mapShow=true;
+                    return;
+                }
+                //5s没有 默认值
                    this.mapInitTime = setInterval(()=>{
                        if(this.camList.length>0&&this.camList[0].camParam){
                            camParam = this.camList[0].camParam;
                            this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-                           this.typeRoadData();
-                           this.initPlatformWebSocket();
-                           this.initPerceptionWebSocket();
-                           this.initSpatWebSocket();
-//                           //地图不连续移动，判断红绿灯的位置受否再可视区
-                           this.initWarningWebSocket();
-                           this.initWarningCancleWebSocket();
-                           this.getMap();
+                           this.getData();
                            clearInterval(this.mapInitTime);
                            this.mapShow=true;
                            return;
@@ -235,19 +245,22 @@
                        count++;
                        if(count==10){
                            this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-                           this.typeRoadData();
-                           this.initPlatformWebSocket();
-                           this.initPerceptionWebSocket();
-                           this.initSpatWebSocket();
-//                           //地图不连续移动，判断红绿灯的位置受否再可视区
-                           this.initWarningWebSocket();
-                           this.initWarningCancleWebSocket();
-                           this.getMap();
+                           this.getData();
                            this.mapShow=true;
                            clearInterval(this.mapInitTime);
                        }
                    },100)
              },
+            getData(){
+                this.typeRoadData();
+                this.initPlatformWebSocket();
+                this.initPerceptionWebSocket();
+                this.initSpatWebSocket();
+//                           //地图不连续移动，判断红绿灯的位置受否再可视区
+                this.initWarningWebSocket();
+                this.initWarningCancleWebSocket();
+                this.getMap();
+            },
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.centerAt(window.mapOption.center);
@@ -640,7 +653,10 @@
                 this.param=param;
             },
             screenMagnify(param){
-               this.camList[param].videoShow=true;
+                let videoUrl = this.camList[param].videoUrl;
+                if(videoUrl!=''){
+                    this.camList[param].videoShow=true;
+                }
             },
             screenShrink(param){
                 let player = this.$refs['bigPlayer'+param];
@@ -1331,7 +1347,7 @@
         bottom: 0;
         width: 80px;
         height: 46px;
-        z-index: 3;
+        z-index: 999;
         cursor: pointer;
     }
 

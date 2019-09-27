@@ -1406,7 +1406,7 @@
                         d.longitude,
                         d.latitude
                     ]);
-                    console.log(d.longitude);
+//                    console.log(d.longitude);
                    // console.log(dUTM[0]);
                     if (d.targetType == 0 || d.targetType == 1 || d.targetType == 3) {
                         if (i < this.deviceModels[deviceid].persons.length) {
