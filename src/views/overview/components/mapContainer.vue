@@ -378,14 +378,16 @@ export default {
                     });
                    mass.setMap(_this.AMap);
 
-                    let marker = new AMap.Marker({content: ' ', map: _this.AMap});
 
+                    let marker = new AMap.Marker({content: ' ', map: _this.AMap, offset: new AMap.Pixel(10, 0)});
+                    marker.hide();
                     mass.on('mouseover', function (e) {
-                        marker.show();
                         marker.setPosition(e.data.lnglat);
-                        marker.setLabel({content: e.data.name,direction:'bottom', offset: new AMap.Pixel(55, 11)});
+                        marker.setLabel({content: e.data.name,direction:'bottom', offset: new AMap.Pixel(10, -15)});
+                        marker.show();
 
                     });
+
                     mass.on('mouseout', function (e) {
                         marker.hide();
 //                        marker.setPosition(e.data.lnglat);
