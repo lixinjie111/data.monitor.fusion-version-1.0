@@ -6,7 +6,7 @@
                 <live-player
                         :requestVideoUrl="requestVideoUrl"
                         :params="forwardParam"
-                        type="flvUrl"
+                        type="rtmp"
                         :autoplay="false"
                         @videoLoadCompleted="videoLoadCompleted"
                         :isBig="false"
@@ -20,7 +20,7 @@
                 <live-player
                         :requestVideoUrl="requestVideoUrl"
                         :params="inParam"
-                        type="flvUrl"
+                        type="rtmp"
                         :autoplay="false"
                         @videoLoadCompleted="videoLoadCompleted"
                         :isBig="false"

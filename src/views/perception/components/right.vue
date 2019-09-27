@@ -217,19 +217,19 @@
                    let flag=false;
                    let camParam;
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
-                   //5s没有 默认值
+                if(this.camList.length>0&&this.camList[0].camParam){
+                    camParam = this.camList[0].camParam;
+                    this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+                    this.getData();
+                    this.mapShow=true;
+                    return;
+                }
+                //5s没有 默认值
                    this.mapInitTime = setInterval(()=>{
                        if(this.camList.length>0&&this.camList[0].camParam){
                            camParam = this.camList[0].camParam;
                            this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-                           this.typeRoadData();
-                           this.initPlatformWebSocket();
-                           this.initPerceptionWebSocket();
-                           this.initSpatWebSocket();
-//                           //地图不连续移动，判断红绿灯的位置受否再可视区
-                           this.initWarningWebSocket();
-                           this.initWarningCancleWebSocket();
-                           this.getMap();
+                           this.getData();
                            clearInterval(this.mapInitTime);
                            this.mapShow=true;
                            return;
@@ -237,19 +237,22 @@
                        count++;
                        if(count==10){
                            this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-                           this.typeRoadData();
-                           this.initPlatformWebSocket();
-                           this.initPerceptionWebSocket();
-                           this.initSpatWebSocket();
-//                           //地图不连续移动，判断红绿灯的位置受否再可视区
-                           this.initWarningWebSocket();
-                           this.initWarningCancleWebSocket();
-                           this.getMap();
+                           this.getData();
                            this.mapShow=true;
                            clearInterval(this.mapInitTime);
                        }
                    },100)
              },
+            getData(){
+                this.typeRoadData();
+                this.initPlatformWebSocket();
+                this.initPerceptionWebSocket();
+                this.initSpatWebSocket();
+//                           //地图不连续移动，判断红绿灯的位置受否再可视区
+                this.initWarningWebSocket();
+                this.initWarningCancleWebSocket();
+                this.getMap();
+            },
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.centerAt(window.mapOption.center);
