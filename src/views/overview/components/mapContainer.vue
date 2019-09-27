@@ -304,27 +304,30 @@ export default {
             });
         },
         deviceMap(data){
-            var _this = this;
+            let _this = this;
             if(_this.count==0){
                 if(data.length>0) {
-                    var resultData=[];
+                    let resultData=[];
                     data.forEach(item=>{
                         let option;
                         if(item.longitude|| item.latitude){
                             option={
-                                position:new AMap.LngLat(item.longitude, item.latitude),
-                                type:item.type,
-                                deviceId:item.deviceId,
-                                path:item.path,
-                                longitude:item.longitude,
-                                latitude:item.latitude,
-                                title:item.devName
+//                                position:new AMap.LngLat(item.longitude, item.latitude),
+//                                type:item.type,
+//                                deviceId:item.deviceId,
+//                                path:item.path,
+//                                longitude:item.longitude,
+//                                latitude:item.latitude,
+//                                title:item.devName,
+                                id:item.deviceId,
+                                name:item.devName,
+                                lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude)
                             }
                             resultData.push(option);
                         }
                     });
                     //转成高德地图的坐标
-                    resultData.forEach((item, index, arr)=>{
+                   /* resultData.forEach((item, index, arr)=>{
                         resultData[index].position = ConvertCoord.wgs84togcj02(item.longitude, item.latitude);
                         _this.count ++;
                         if(_this.count == arr.length) {
@@ -359,9 +362,37 @@ export default {
                                 }
                             })
                         }
-                        /*}
-                      });*/
-                    })
+                        /!*}
+                      });*!/
+                    })*/
+                   let style = {
+                       url: 'static/images/road/side.png',
+                       anchor: new AMap.Pixel(15, 15),
+                       size: new AMap.Size(30, 30)
+                   }
+                    let mass = new AMap.MassMarks(resultData, {
+                        opacity: 0.8,
+                        zIndex: 111,
+                        cursor: 'pointer',
+                        style: style
+                    });
+                   mass.setMap(_this.AMap);
+
+                    let marker = new AMap.Marker({content: ' ', map: _this.AMap});
+
+                    mass.on('mouseover', function (e) {
+                        marker.show();
+                        marker.setPosition(e.data.lnglat);
+                        marker.setLabel({content: e.data.name,direction:'bottom', offset: new AMap.Pixel(55, 11)});
+
+                    });
+                    mass.on('mouseout', function (e) {
+                        marker.hide();
+//                        marker.setPosition(e.data.lnglat);
+//                        marker.setLabel({content: e.data.name});
+
+                    });
+
                 }
             }
         },
@@ -375,6 +406,16 @@ export default {
 <style>
     .road-view-map .amap-container img{
         cursor: pointer;
+    }
+    .info{
+        background: none!important;
+        border:#ccc;
+    }
+    .amap-marker-label{
+        border:1px solid #ccc!important;
+        color: #2a2a2a!important;
+        width: 110px;
+        text-align: center;
     }
 </style>
 <style scoped lang="scss">
