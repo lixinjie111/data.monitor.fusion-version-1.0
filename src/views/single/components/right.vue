@@ -641,7 +641,7 @@
                 var spatMsg = JSON.stringify(spat);
                 this.sendSpatMsg(spatMsg);
             },
-            sendSpatMsg(msg) {
+            sendSpatMsg(msg){
                 let _this=this;
                 if(window.WebSocket){
                     if(_this.spatWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
@@ -651,7 +651,7 @@
                     return;
                 }
             },
-            spatReconnect() {
+            spatReconnect(){
                 let _this = this;
                 _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                 _this.spatObj.count++;

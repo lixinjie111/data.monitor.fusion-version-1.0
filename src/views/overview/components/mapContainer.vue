@@ -392,6 +392,11 @@ export default {
 //                        marker.setLabel({content: e.data.name});
 
                     });
+                    mass.on('click', function (e) {
+                        _this.$router.push({
+                            path: '/perception/' +e.data.lnglat.lng + "/" +e.data.lnglat.lat+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002+"/"+true,
+                        });
+                    });
 
                 }
             }
