@@ -14,6 +14,7 @@
                             :params="item.params"
                             type="flvUrl"
                             :autoplay="false"
+                            @videoLoadCompleted="videoLoadCompleted"
                     >
                         <div class="video-num" @click="changeMap(index)">
                             <span class="device-num">摄像头编号:{{item.devId}}</span>
@@ -26,7 +27,7 @@
                 <div class="big-video" v-show="item.videoShow">
                     <div class="video-mask" @click="screenShrink(index)"></div>
                     <live-player
-                            :requestVideoUrl="requestVideoUrl"
+                            :requestVideoUrl="item.videoUrl"
                             :params="item.params"
                             type="flvUrl"
                             :autoplay="false"
@@ -205,6 +206,15 @@
             });
         },
         methods: {
+            videoLoadCompleted(params){
+                for(let i=0;i<this.camList.length;i++){
+                    let item = this.camList[i];
+                    if(item.sn==params.serialNum){
+                        item.videoUrl = params.videoUrl;
+                        break;
+                    }
+                }
+            },
             onMapComplete(){
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
 //                    setInterval(()=>{
@@ -643,7 +653,10 @@
                 this.param=param;
             },
             screenMagnify(param){
-               this.camList[param].videoShow=true;
+                let videoUrl = this.camList[param].videoUrl;
+                if(videoUrl!=''){
+                    this.camList[param].videoShow=true;
+                }
             },
             screenShrink(param){
                 let player = this.$refs['bigPlayer'+param];
@@ -1334,7 +1347,7 @@
         bottom: 0;
         width: 80px;
         height: 46px;
-        z-index: 3;
+        z-index: 999;
         cursor: pointer;
     }
 
