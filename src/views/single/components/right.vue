@@ -6,7 +6,7 @@
                 <live-player
                         :requestVideoUrl="requestVideoUrl"
                         :params="forwardParam"
-                        type="flvUrl"
+                        type="rtmp"
                         :autoplay="false"
                         @videoLoadCompleted="videoLoadCompleted"
                         :isBig="false"
@@ -20,7 +20,7 @@
                 <live-player
                         :requestVideoUrl="requestVideoUrl"
                         :params="inParam"
-                        type="flvUrl"
+                        type="rtmp"
                         :autoplay="false"
                         @videoLoadCompleted="videoLoadCompleted"
                         :isBig="false"
@@ -111,7 +111,12 @@
                 inParam:{},
                 forwardShow:false,
                 inShow:false,
-                timeObj:{}
+                timeObj:null,
+                spatObj:{
+                    connectCount:0,
+//                    isConnect:false
+                }
+
             }
 
         },
@@ -465,6 +470,7 @@
                 },5000)
                 _this.timeObj[item.camId] = time;
             },
+
             onMapComplete:function(){
                 console.log("onMapComplete");
                 this.$refs.tusvnMap.updateCameraPosition(window.defaultSingleParam.x,window.defaultSingleParam.y,window.defaultSingleParam.z,window.defaultSingleParam.radius,window.defaultSingleParam.pitch,window.defaultSingleParam.yaw);
@@ -581,12 +587,22 @@
             //红绿灯
             initSpatWebSocket(){
                 let _this=this;
-                if ('WebSocket' in window){
-                    _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                    _this.spatWebsocket.onmessage = _this.onSpatMessage;
-                    _this.spatWebsocket.onclose = _this.onSpatClose;
-                    _this.spatWebsocket.onopen = _this.onSpatOpen;
+                try {
+                    if ('WebSocket' in window){
+                        _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                        _this.spatWebsocket.onmessage = _this.onSpatMessage;
+                        _this.spatWebsocket.onclose = _this.onSpatClose;
+                        _this.spatWebsocket.onopen = _this.onSpatOpen;
+                        _this.spatWebsocket.onerror = _this.onSpatError;
+                    }
+                    else{
+                        _this.$message("此浏览器不支持websocket")
+                    }
+                } catch (e) {
+                    _this.spatReconnect();
                 }
+
+
             },
             onSpatMessage(message){
                 let _this=this;
@@ -594,6 +610,19 @@
             },
             onSpatClose(data){
                 console.log("红绿灯结束连接");
+                //重连不能超过5次
+                if(this.spatObj.count>=5){
+                    return;
+                }
+                this.spatReconnect();
+            },
+            onSpatError(){
+                console.log("红绿灯连接error");
+                //重连不能超过5次
+                if(this.spatObj.count>=5){
+                    return;
+                }
+                this.spatReconnect();
             },
             onSpatOpen(data){
                 //旁车
@@ -621,6 +650,11 @@
                 }else{
                     return;
                 }
+            },
+            spatReconnect() {
+                let _this = this;
+                _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                _this.spatObj.count++;
             },
 
             initWarningWebSocket(){
