@@ -321,7 +321,9 @@ export default {
 //                                title:item.devName,
                                 id:item.deviceId,
                                 name:item.devName,
-                                lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude)
+                                lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude),
+                                longitude:item.longitude,
+                                latitude:item.latitude,
                             }
                             resultData.push(option);
                         }
@@ -396,7 +398,7 @@ export default {
                     });
                     mass.on('click', function (e) {
                         _this.$router.push({
-                            path: '/perception/' +e.data.lnglat.lng + "/" +e.data.lnglat.lat+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002+"/"+true,
+                            path: '/perception/' +e.data.longitude + "/" +e.data.latitude+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002,
                         });
                     });
 
