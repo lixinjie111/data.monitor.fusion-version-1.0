@@ -398,7 +398,7 @@ export default {
                     });
                     mass.on('click', function (e) {
                         _this.$router.push({
-                            path: '/perception/' +e.data.longitude + "/" +e.data.latitude+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002,
+                            path: '/perception/' +e.data.longitude + "/" +e.data.latitude+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002+ "/"+true,
                         });
                     });
 
