@@ -312,22 +312,22 @@ export default {
                         let option;
                         if(item.longitude|| item.latitude){
                             option={
-//                                position:new AMap.LngLat(item.longitude, item.latitude),
-//                                type:item.type,
-//                                deviceId:item.deviceId,
-//                                path:item.path,
-//                                longitude:item.longitude,
-//                                latitude:item.latitude,
-//                                title:item.devName,
-                                id:item.deviceId,
-                                name:item.devName,
-                                lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude)
+                               position:new AMap.LngLat(item.longitude, item.latitude),
+                               type:item.type,
+                               deviceId:item.deviceId,
+                               path:item.path,
+                               longitude:item.longitude,
+                               latitude:item.latitude,
+                               title:item.devName,
+                                // id:item.deviceId,
+                                // name:item.devName,
+                                // lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude),
                             }
                             resultData.push(option);
                         }
                     });
                     //转成高德地图的坐标
-                   /* resultData.forEach((item, index, arr)=>{
+                   resultData.forEach((item, index, arr)=>{
                         resultData[index].position = ConvertCoord.wgs84togcj02(item.longitude, item.latitude);
                         _this.count ++;
                         if(_this.count == arr.length) {
@@ -362,43 +362,41 @@ export default {
                                 }
                             })
                         }
-                        /!*}
-                      });*!/
-                    })*/
-                   let style = {
-                       url: 'static/images/road/side.png',
-                       anchor: new AMap.Pixel(15, 15),
-                       size: new AMap.Size(30, 30)
-                   }
-                    let mass = new AMap.MassMarks(resultData, {
-                        opacity: 0.8,
-                        zIndex: 111,
-                        cursor: 'pointer',
-                        style: style
-                    });
-                   mass.setMap(_this.AMap);
+                    })
+//                    let style = {
+//                        url: 'static/images/road/side.png',
+//                        anchor: new AMap.Pixel(15, 15),
+//                        size: new AMap.Size(30, 30)
+//                    }
+//                     let mass = new AMap.MassMarks(resultData, {
+//                         opacity: 0.8,
+//                         zIndex: 111,
+//                         cursor: 'pointer',
+//                         style: style
+//                     });
+//                    mass.setMap(_this.AMap);
 
 
-                    let marker = new AMap.Marker({content: ' ', map: _this.AMap, offset: new AMap.Pixel(10, 0)});
-                    marker.hide();
-                    mass.on('mouseover', function (e) {
-                        marker.setPosition(e.data.lnglat);
-                        marker.setLabel({content: e.data.name,direction:'bottom', offset: new AMap.Pixel(10, -15)});
-                        marker.show();
+//                     let marker = new AMap.Marker({content: ' ', map: _this.AMap, offset: new AMap.Pixel(10, 0)});
+//                     marker.hide();
+//                     mass.on('mouseover', function (e) {
+//                         marker.setPosition(e.data.lnglat);
+//                         marker.setLabel({content: e.data.name,direction:'bottom', offset: new AMap.Pixel(10, -15)});
+//                         marker.show();
 
-                    });
+//                     });
 
-                    mass.on('mouseout', function (e) {
-                        marker.hide();
-//                        marker.setPosition(e.data.lnglat);
-//                        marker.setLabel({content: e.data.name});
+//                     mass.on('mouseout', function (e) {
+//                         marker.hide();
+// //                        marker.setPosition(e.data.lnglat);
+// //                        marker.setLabel({content: e.data.name});
 
-                    });
-                    mass.on('click', function (e) {
-                        _this.$router.push({
-                            path: '/perception/' +e.data.lnglat.lng + "/" +e.data.lnglat.lat+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002+"/"+true,
-                        });
-                    });
+                    // });
+                    // mass.on('click', function (e) {
+                    //     _this.$router.push({
+                    //         path: '/perception/' +e.data.longitude + "/" +e.data.latitude+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002+ "/"+true,
+                    //     });
+                    // });
 
                 }
             }
