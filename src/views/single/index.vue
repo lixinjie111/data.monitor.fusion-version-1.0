@@ -25,7 +25,8 @@
                     turnLight:'',
                     gpsTime:''
                 },
-                vehicleId:this.$route.params.vehicleId
+                vehicleId:this.$route.params.vehicleId,
+                canConnectCount:0
             }
         },
         watch:{
@@ -36,13 +37,19 @@
         methods: {
             initWebSocket(){
                 let _this=this;
-                if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                try{
+                    if ('WebSocket' in window) {
+                        _this.webSocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                        _this.webSocket.onmessage = _this.onmessage;
+                        _this.webSocket.onclose = _this.onclose;
+                        _this.webSocket.onopen = _this.onopen;
+                        _this.webSocket.onerror = _this.onerror;
+                    }else{
+                        _this.$message("此浏览器不支持websocket");
+                    }
+                }catch (e){
+                    _this.canReconnect();
                 }
-                _this.webSocket.onmessage = _this.onmessage;
-                _this.webSocket.onclose = _this.onclose;
-                _this.webSocket.onopen = _this.onopen;
-                _this.webSocket.onerror = _this.onerror;
             },
             onmessage(mesasge){
                 let _this=this;
@@ -58,7 +65,12 @@
                 }
             },
             onclose(data){
-                console.log("结束连接");
+                console.log("can数据结束连接");
+                this.canReconnect();
+            },
+            onerror(){
+                console.log("can数据连接error");
+                this.canReconnect();
             },
             onopen(data){
                 var real = {
@@ -78,9 +90,21 @@
                     return;
                 }
             },
-            onerror(event){
-                console.error("WebSocket error observed:", event);
+            canReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.canConnectCount>=10){
+                    return;
+                }
+                this.initWebSocket();
+                //重连不能超过5次
+                this.canConnectCount++;
             },
+
+
             onmessage1(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
