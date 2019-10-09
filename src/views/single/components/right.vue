@@ -112,10 +112,7 @@
                 forwardShow:false,
                 inShow:false,
                 timeObj:null,
-                spatObj:{
-                    connectCount:0,
-//                    isConnect:false
-                }
+                spatConnectCount:0,
 
             }
 
@@ -610,18 +607,10 @@
             },
             onSpatClose(data){
                 console.log("红绿灯结束连接");
-                //重连不能超过5次
-                if(this.spatObj.count>=5){
-                    return;
-                }
                 this.spatReconnect();
             },
             onSpatError(){
                 console.log("红绿灯连接error");
-                //重连不能超过5次
-                if(this.spatObj.count>=5){
-                    return;
-                }
                 this.spatReconnect();
             },
             onSpatOpen(data){
@@ -652,9 +641,13 @@
                 }
             },
             spatReconnect(){
-                let _this = this;
-                _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                _this.spatObj.count++;
+                //重连不能超过10次
+                if(this.spatConnectCount>=10){
+                    return;
+                }
+                this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                //重连不能超过5次
+                this.spatConnectCount++;
             },
 
             initWarningWebSocket(){
