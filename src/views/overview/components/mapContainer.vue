@@ -312,22 +312,22 @@ export default {
                         let option;
                         if(item.longitude|| item.latitude){
                             option={
-//                                position:new AMap.LngLat(item.longitude, item.latitude),
-//                                type:item.type,
-//                                deviceId:item.deviceId,
-//                                path:item.path,
-//                                longitude:item.longitude,
-//                                latitude:item.latitude,
-//                                title:item.devName,
-                                id:item.deviceId,
-                                name:item.devName,
-                                lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude)
+                                position:new AMap.LngLat(item.longitude, item.latitude),
+                                type:item.type,
+                                deviceId:item.deviceId,
+                                path:item.path,
+                                longitude:item.longitude,
+                                latitude:item.latitude,
+                                title:item.devName,
+//                                id:item.deviceId,
+//                                name:item.devName,
+//                                lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude)
                             }
                             resultData.push(option);
                         }
                     });
                     //转成高德地图的坐标
-                   /* resultData.forEach((item, index, arr)=>{
+                    resultData.forEach((item, index, arr)=>{
                         resultData[index].position = ConvertCoord.wgs84togcj02(item.longitude, item.latitude);
                         _this.count ++;
                         if(_this.count == arr.length) {
@@ -362,10 +362,10 @@ export default {
                                 }
                             })
                         }
-                        /!*}
-                      });*!/
-                    })*/
-                   let style = {
+                        /*}
+                      });*/
+                    })
+                   /*let style = {
                        url: 'static/images/road/side.png',
                        anchor: new AMap.Pixel(15, 15),
                        size: new AMap.Size(30, 30)
@@ -399,7 +399,7 @@ export default {
                             path: '/perception/' +e.data.lnglat.lng + "/" +e.data.lnglat.lat+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002+"/"+true,
                         });
                     });
-
+*/
                 }
             }
         },
