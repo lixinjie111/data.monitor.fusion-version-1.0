@@ -302,7 +302,7 @@
                 if(processTime!=''){
                     this.processDataTime=processTime;
                 }
-                this.$emit("getPerceptionData",vehDataStat);
+                this.$parent.perceptionData=vehDataStat;
             },
             getCameraByRsId(){
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
@@ -409,7 +409,9 @@
                             });
                         })
                     }
-                    this.$emit("count", this.signCount, this.spatCount);
+                    this.$parent.spatCount = this.spatCount;
+                    this.$parent.signCount = this.signCount;
+//                    this.$emit("count", this.signCount, this.spatCount);
                 })
             },
             moveMap(){
@@ -735,7 +737,7 @@
                         }
                     })
                     //此次告警结束，将总数传递出去
-                    _this.$emit("getWarningCount",_this.warningCount);
+                    _this.$parent.warningCount = _this.warningCount;
                 }
             },
             onWarningClose(data){
@@ -895,6 +897,9 @@
             onPlatformMessage(mesasge){
                 let _this=this;
                 _this.$refs.perceptionMap.onCarMessage(mesasge);
+                let json = JSON.parse(mesasge.data);
+                _this.$parent.vehData = json.result.vehDataStat;
+//                _this.$emit("getPlatformData",json.result.vehDataStat);
             },
             onPlatformClose(data){
                 console.log("平台车结束连接");

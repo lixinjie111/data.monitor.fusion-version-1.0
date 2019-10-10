@@ -791,7 +791,6 @@
                 }catch(e){
                     _this.carReconnect();
                 }
-
             },
             onCarMessage(message){
                 let _this = this;
