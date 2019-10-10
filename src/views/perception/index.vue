@@ -4,11 +4,11 @@
             <div class="c-fusion-left fusion-left">
                 <div class="c-scroll-wrap">
                     <div class="c-scroll-inner">
-                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount"></left>
+                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount" :vehData="vehData"></left>
                     </div>
                 </div>
             </div>
-            <right  @count="count" :realData="realData" @getPerceptionData="getPerceptionData" @getWarningCount="getWarningCount"></right>
+            <right  :realData="realData"></right>
         </div>
     </div>
 </template>
@@ -26,7 +26,8 @@
                 realData:{},
                 time:0,
 
-                perceptionData:{}
+                perceptionData:{},
+                vehData:{}
             }
         },
         components:{
@@ -36,16 +37,9 @@
             '$route.params':function (newValue,oldValue) {
 //                console.log(newValue.lon,newValue.lat);
                 this.$router.replace("/refresh");
-            }
+            },
         },
         methods: {
-            count(signCount,spatCount){
-                this.spatCount = spatCount;
-                this.signCount = signCount;
-            },
-            getPerceptionData(result){
-                this.perceptionData = result;
-            },
             initWebSocket1(){
                 let _this=this;
                 if ('WebSocket' in window) {
@@ -120,9 +114,6 @@
                     return;
                 }
             },
-            getWarningCount(result){
-                this.warningCount=result;
-            }
         },
         mounted() {
             let _this = this;

@@ -61,12 +61,12 @@
             return {
                 webSocket:null,
                 warningWebsocket:null,
-                fusionData:{},
                 platformData:{},
                 perceptionData:{},
                 sideData:{},
                 v2xData:{},
                 isFirstCon:true,
+                fusionData:{}
 
             }
         },
@@ -86,14 +86,20 @@
                 default:0
             },
             perceptionData:{
-                type:Array,
+                type:Object,
                 default() {
-                    return [];
+                    return {};
                 }
             },
             warningCount:{
                 type:Number,
                 default:0
+            },
+            vehData:{
+                type:Object,
+                default() {
+                    return {};
+                }
             }
         },
         watch:{
@@ -106,34 +112,52 @@
                 immediate: true,
                 deep:true
             }*/
-            perceptionData:{
+           vehData:{
+               handler:function (val,oldVal) {
+                   if(this.vehData.cbox){
+                       this.platformData=this.vehData.cbox;
+                   }
+                   if(this.vehData.obu){
+                       this.v2xData=this.vehData.obu;
+                   }
+               },
+               deep:true
+           },
+           perceptionData:{
                 handler: function (val, oldVal) {
-//                    console.log(val);
-                    if(this.perceptionData.stat){
-                        this.fusionData = this.perceptionData.stat;
+                    let vehCount=0;
+                    let noMotorCount=0;
+                    let personCount=0;
+                    if(this.vehData.cbox){
+                        vehCount=vehCount+this.vehData.cbox.veh;
                     }
-                    //"person":"行人"，"noMotor":"非机动车"，"veh":"车辆"
-                    if(this.perceptionData.cbox){
-                        this.platformData=this.perceptionData.cbox;
+                    //v2x通讯
+                    if(this.vehData.obu){
+                        vehCount=vehCount+this.vehData.obu.veh;
                     }
+                    //车辆感知
                     if(this.perceptionData.vehPer){
                         this.perceptionData=this.perceptionData.vehPer;
+                        vehCount=vehCount+this.perceptionData.vehPer.veh;
+                        noMotorCount=noMotorCount+this.perceptionData.vehPer.noMotor;
+                        personCount=personCount+this.perceptionData.vehPer.person;
                     }
+                    //路侧识别车
                     if(this.perceptionData.rcu){
                         this.sideData=this.perceptionData.rcu;
+                        vehCount=vehCount+this.perceptionData.rcu.veh;
+                        noMotorCount=noMotorCount+this.perceptionData.rcu.noMotor;
+                        personCount=personCount+this.perceptionData.rcu.person;
                     }
-                    if(this.perceptionData.obu){
-                        this.v2xData=this.perceptionData.obu;
-                    }
+                    this.fusionData.veh = vehCount;
+                    this.fusionData.nonMotor = noMotorCount;
+                    this.fusionData.person = personCount;
                 },
                 deep:true
             }
         },
-        methods: {
-        },
-        mounted() {
-
-        },
+        methods: {},
+        mounted(){},
         destroyed(){
             this.warningWebsocket&&this.warningWebsocket.close();
         }

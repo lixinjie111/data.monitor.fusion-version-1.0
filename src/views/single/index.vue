@@ -16,7 +16,7 @@
     export default {
         data() {
             return {
-                webSocket:{},
+                webSocket:null,
                 socket:this.$parent.socket,
                 realData:{
                     oilDoor:0,
@@ -181,7 +181,7 @@
         },
         destroyed(){
             //销毁Socket
-            this.webSocket.close();
+            this.webSocket&&this.webSocket.close();
 //            this.socket.close();
         }
     }
