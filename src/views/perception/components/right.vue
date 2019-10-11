@@ -287,7 +287,6 @@
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
                 let currentExtend = this.currentExtent;
-                console.log("currentExtent:"+this.currentExtent)
                 overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
@@ -762,7 +761,6 @@
                 if(window.WebSocket){
                     if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
                         _this.warningWebsocket.send(msg); //send()发送消息
-                        console.log("warning已发送消息:"+ msg);
                     }
                 }else{
                     return;
@@ -844,7 +842,6 @@
                 if(window.WebSocket){
                     if(_this.warningCancelWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
                         _this.warningCancelWebsocket.send(msg); //send()发送消息
-                        console.log("warning已发送消息:"+ msg);
                     }
                 }else{
                     return;

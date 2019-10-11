@@ -33,7 +33,7 @@ export default {
     watch: {
         deep: true,
         $route(newVal, oldVal) {
-            console.log(newVal);
+//            console.log(newVal);
             if(newVal.name == 'Single') {
                 this.isHeaderShow = false;
             }else {
