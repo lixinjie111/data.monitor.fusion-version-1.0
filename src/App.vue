@@ -12,6 +12,7 @@
 import HeaderBar from '@/components/header/index.vue'
 import {getTopWeather} from '@/api/overview/index.js';
 import {mapActions} from 'vuex';
+
 export default {
     name: 'App',
     components: {

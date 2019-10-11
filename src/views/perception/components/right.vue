@@ -1044,7 +1044,6 @@
             },
             onSpatMessage(mesasge){
                 let _this=this;
-                _this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
 //                let vehData = json.result.vehDataStat;
