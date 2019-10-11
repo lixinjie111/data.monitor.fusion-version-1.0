@@ -102,6 +102,9 @@
                 }
             }
         },
+        computed:{
+
+        },
         watch:{
            /* currentExtent: {
                 handler: function (val, oldVal) {

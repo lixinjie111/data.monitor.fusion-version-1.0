@@ -17,7 +17,6 @@
         data() {
             return {
                 webSocket:null,
-                socket:this.$parent.socket,
                 realData:{
                     oilDoor:0,
                     brakePedal:0,
@@ -103,86 +102,12 @@
                 //重连不能超过5次
                 this.canConnectCount++;
             },
-
-
-            onmessage1(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let type = json.result.type;
-                let data = json.result.data;
-                let currentRoute = _this.$router.currentRoute.path;
-                let path;
-                if(type=='home'){
-                    path = '/overview';
-                    /*if(path==currentRoute){
-                        return;
-                    }*/
-                    this.$router.push({
-                        path: path
-                    });
-                }
-                if(type=='vehicle'){
-                    path = '/single';
-                    /*if(path==currentRoute){
-                        return;
-                    }*/
-                    this.$router.push({
-                        path: path+"/"+data.id
-                    });
-                }
-                if(type=='road'){
-                    path = '/perception';
-                    /* if(name==currentRoute){
-                         return;
-                     }*/
-                    this.$router.push({
-//                        path: path+"/"+data.position.longitude+"/"+data.position.latitude,
-//                        query:{crossId:data.id}
-                        path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1+ "/"+false,
-                    });
-                }
-                if(type=='map'){
-                    this.realData = data;
-                }
-
-
-            },
-            onclose1(data){
-                console.log("结束连接");
-            },
-            onopen1(data){
-                //获取车辆状态
-                var operationStatus = {
-                    "action":"operation_command"
-                }
-                var operationStatusMsg = JSON.stringify(operationStatus);
-                this.sendMsg1(operationStatusMsg);
-            },
-            sendMsg1(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.socket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.socket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            }
         },
         components:{Left,Right},
-        mounted() {
-//            console.log("切换车")
-            this.initWebSocket();
-            this.socket.onmessage = this.onmessage1;
-            this.socket.onclose = this.onclose1;
-            this.socket.onopen = this.onopen1;
-            this.socket.onerror = this.onerror1;
-
-        },
+        mounted() {},
         destroyed(){
             //销毁Socket
             this.webSocket&&this.webSocket.close();
-//            this.socket.close();
         }
     }
 </script>

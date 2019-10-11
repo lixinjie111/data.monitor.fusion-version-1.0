@@ -156,7 +156,7 @@
         },
         components: { TusvnMap,TusvnMap1,LivePlayer},
         watch: {
-            realData: {
+            '$store.getters.getRealData': {
                 handler(newName, oldName) {
                     this.moveMap();
                 },
