@@ -5,7 +5,7 @@
             <ul class="perception-style">
                 <li>
                     <span class="overview-sign fusion-sign"></span>
-                    <span>融合后感知车辆：{{fusionData.veh || 0}}</span>
+                    <span>融合后感知车辆：{{fusionData.platVeh+fusionData.perVeh || 0}}</span>
                 </li>
                 <li>
                     <span class="overview-sign fusion-sign"></span>
@@ -66,7 +66,12 @@
                 sideData:{},
                 v2xData:{},
                 isFirstCon:true,
-                fusionData:{}
+                fusionData:{
+                    platVeh:0,
+                    perVeh:0,
+                    nonMotor:0,
+                    person:0
+                }
 
             }
         },
@@ -117,12 +122,16 @@
             }*/
            vehData:{
                handler:function (val,oldVal) {
+                   let vehCount=0;
                    if(this.vehData.cbox){
                        this.platformData=this.vehData.cbox;
+                       vehCount=vehCount+this.vehData.cbox.veh;
                    }
                    if(this.vehData.obu){
                        this.v2xData=this.vehData.obu;
+                       vehCount=vehCount+this.vehData.obu.veh;
                    }
+                   this.fusionData.platVeh = vehCount;
                },
                deep:true
            },
@@ -131,13 +140,6 @@
                     let vehCount=0;
                     let noMotorCount=0;
                     let personCount=0;
-                    if(this.vehData.cbox){
-                        vehCount=vehCount+this.vehData.cbox.veh;
-                    }
-                    //v2x通讯
-                    if(this.vehData.obu){
-                        vehCount=vehCount+this.vehData.obu.veh;
-                    }
                     //车辆感知
                     if(this.perceptionData.vehPer){
                         this.perceptionData=this.perceptionData.vehPer;
@@ -152,7 +154,7 @@
                         noMotorCount=noMotorCount+this.perceptionData.rcu.noMotor;
                         personCount=personCount+this.perceptionData.rcu.person;
                     }
-                    this.fusionData.veh = vehCount;
+                    this.fusionData.perVeh = vehCount;
                     this.fusionData.nonMotor = noMotorCount;
                     this.fusionData.person = personCount;
                 },
