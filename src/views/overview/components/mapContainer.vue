@@ -335,14 +335,14 @@ export default {
                             resultData.forEach(function (subItem,subIndex) {
                                 //路侧点
                                 if(subItem.type==2){
-                                    var marker = new AMap.Marker({
+                                    let marker = new AMap.Marker({
                                         position: subItem.position,
                                         icon: 'static/images/road/side.png', // 添加 Icon 图标 URL
                                         offset:new AMap.Pixel(-15, -15),
                                         title:subItem.title
                                     });
                                     _this.AMap.add(marker);
-                                    var item={
+                                    let item={
                                         path:subItem.path,
                                         roadSiderId:subItem.deviceId,
                                         camSerialNum:"",

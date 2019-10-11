@@ -750,11 +750,11 @@
             },
             onWarningOpen(data){
                 //旁车
-                var warning = {
+                let warning = {
                     "action": "clod_event",
                     "region": this.currentExtent
                 }
-                var warningMsg = JSON.stringify(warning);
+                let warningMsg = JSON.stringify(warning);
                 this.sendWarningMsg(warningMsg);
             },
             sendWarningMsg(msg) {
@@ -911,14 +911,14 @@
             },
             onPlatformOpen(data){
                 //旁车
-                var platform = {
+                let platform = {
                     "action": "road_real_data_reg",
                     "data": {
 //                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
                         "polygon":window.currentExtent
                     }
                 }
-                var platformMsg = JSON.stringify(platform);
+                let platformMsg = JSON.stringify(platform);
                 this.sendPlatformMsg(platformMsg);
             },
             sendPlatformMsg(msg) {
@@ -987,7 +987,7 @@
             },
             onPerceptionOpen(data){
                 //旁车
-                var perception = {
+                let perception = {
                     "action": "road_real_data_per",
                     "data": {
                         /*"polygon": [
@@ -999,7 +999,7 @@
                         "polygon":this.currentExtent
                     }
                 }
-                var perceptionMsg = JSON.stringify(perception);
+                let perceptionMsg = JSON.stringify(perception);
                 this.sendPerceptionMsg(perceptionMsg);
             },
             sendPerceptionMsg(msg) {
@@ -1272,7 +1272,7 @@
             },
             onSpatOpen(data){
                 //旁车
-                var spat = {
+                let spat = {
                     "action": "road_real_data_spat",
                     "data": {
                         /*"polygon": [
@@ -1284,7 +1284,7 @@
                         "polygon":this.currentExtent
                     }
                 }
-                var spatMsg = JSON.stringify(spat);
+                let spatMsg = JSON.stringify(spat);
                 this.sendSpatMsg(spatMsg);
             },
             sendSpatMsg(msg) {

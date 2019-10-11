@@ -52,8 +52,8 @@
             },
             onmessage(mesasge){
                 let _this=this;
-                var json = JSON.parse(mesasge.data);
-                /*var type = json.action;*/
+                let json = JSON.parse(mesasge.data);
+                /*let type = json.action;*/
                 // console.log("data.transmission========"+data.transmission);
                 if(json.result.transmission=='P'){
                     this.realData.transmission='P';
@@ -72,11 +72,11 @@
                 this.canReconnect();
             },
             onopen(data){
-                var real = {
+                let real = {
                     'action':'can_real_data',
                     'vehicleIds':this.vehicleId
                 }
-                var realMsg = JSON.stringify(real);
+                let realMsg = JSON.stringify(real);
                 this.sendMsg(realMsg);
             },
             sendMsg(msg) {

@@ -618,7 +618,7 @@
             },
             onSpatOpen(data){
                 //旁车
-                var spat = {
+                let spat = {
                     "action": "road_real_data_spat",
                     "data": {
                         /*"polygon": [
@@ -630,7 +630,7 @@
                         "polygon":[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
                     }
                 }
-                var spatMsg = JSON.stringify(spat);
+                let spatMsg = JSON.stringify(spat);
                 this.sendSpatMsg(spatMsg);
             },
             sendSpatMsg(msg){
@@ -734,11 +734,11 @@
             },
             onWarningOpen(data){
                 //旁车
-                var warning = {
+                let warning = {
                     "action": "warning",
                     "vehicleId": this.vehicleId
                 }
-                var warningMsg = JSON.stringify(warning);
+                let warningMsg = JSON.stringify(warning);
                 this.sendWarningMsg(warningMsg);
             },
             sendWarningMsg(msg) {
@@ -806,11 +806,11 @@
             },
             onCarOpen(data){
                 //旁车
-                var car = {
+                let car = {
                     "action": "sideVehicle",
                     "vehicleId": this.vehicleId
                 }
-                var carMsg = JSON.stringify(car);
+                let carMsg = JSON.stringify(car);
                 this.sendCarMsg(carMsg);
             },
             sendCarMsg(msg) {
@@ -947,11 +947,11 @@
             },
             onSideCarOpen(data){
                 //旁车
-                var sideCar = {
+                let sideCar = {
                     "action": "fusel_sider_per_veh",
                     "vehicleId": this.vehicleId
                 }
-                var sideCarMsg = JSON.stringify(sideCar);
+                let sideCarMsg = JSON.stringify(sideCar);
                 this.sendSideCarMsg(sideCarMsg);
             },
             sendSideCarMsg(msg) {

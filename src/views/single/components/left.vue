@@ -132,7 +132,7 @@
         methods: {
             getBaseData(){
                 console.log("id:"+this.$route.params.id);
-                var _this = this;
+                let _this = this;
                 getVehicleBaseData({
                     'vehicleId': this.vehicleId,
                 }).then(res => {
@@ -177,14 +177,14 @@
                 this.countTimer = setInterval(() => {
                     this.countTime += 1000;
                 }, 1000);*/
-                var _this=this;
-                var json  = {};
+                let _this=this;
+                let json  = {};
                 if(typeof message.data == "string") {
                     json = JSON.parse(message.data);
                 }else {
                     json = message;
                 }
-                var pointList = [];
+                let pointList = [];
                 if(this.all == 1){
                     if(json.data.pointList && json.data.pointList.length > 0){
                         pointList = json.data.pointList;
@@ -226,7 +226,7 @@
                         this.prevLastPointPath = [pointList[pointList.length-1].gnss_LONG, pointList[pointList.length-1].gnss_LAT];
                     }
 
-                    var handlePointList = [];
+                    let handlePointList = [];
                     pointList.forEach((item, index) => {
                         if(item.gnss_LONG && item.gnss_LAT){
                             // let lnglatArr = new AMap.LngLat(item.gnss_LONG, item.gnss_LAT);
@@ -247,7 +247,7 @@
                 }
             },
             changeLngLat(){
-                var _this = this;
+                let _this = this;
                 if(this.flag && _this.count < this.wholePath.length){
                     // console.log("----------------------------------");
                     this.flag = false;
@@ -352,7 +352,7 @@
             distanceMapEnd(){
                 let _this = this;
                 if(!this.markers.markerEnd) {
-                    var _pointPath = _this.pointPath;
+                    let _pointPath = _this.pointPath;
                     this.markers.markerEnd = new AMap.Marker({
                         position: _pointPath[_pointPath.length-1],
                         icon:'static/images/single/end.png',
