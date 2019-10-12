@@ -1409,7 +1409,6 @@
     }
     .video-num{
         position: absolute;
-        z-index:2;
         left: 0;
         right: 0;
         padding: 0px 10px;
@@ -1494,7 +1493,7 @@
         bottom: 0;
         width: 80px;
         height: 46px;
-        z-index: 999;
+        z-index: 3;
         cursor: pointer;
     }
 
