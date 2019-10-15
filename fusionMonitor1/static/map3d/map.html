@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DL SDK</title>
+</head>
+
+<body>
+<script src="./libs/browser-polyfill.js"></script>
+<script src="./libs/jquery-3.1.1.min.js"></script>
+<script src="./libs/three.min.js"></script>
+<script src="./libs/earcut.js"></script>
+<script src="./libs/TDSLoader.js"></script>
+<script src="./libs/BinaryHeap.js"></script>
+<script src="./libs/tween.min.js"></script>
+<script src="./libs/pt/pt.min.js"></script>
+<script src="./libs/laslaz.js"></script>
+<script src="./libs/shapefile.min.js"></script>
+<script src="./libs/proj4.js"></script>
+<script src="./libs/core.min.js"></script>
+
+<div class="container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
+    <div id="render_area" style="width: 100%;height: 100%;"></div>
+</div>
+
+<script>
+
+    //三维展示
+    let options = {
+        doc: "render_area",
+        background:"black",
+        navMode: Pt.OrbitControls
+    };
+    dl.init(options);
+
+    let intersection = new dl.Shape({
+        url: "./suzhou_CityRoad_utm51/Intersection.shp",
+        name: "intersection",
+        color: dl.styles.intersection.color
+    });
+
+    let crosswalk = new dl.Shape({
+        url: "./suzhou_CityRoad_utm51/Crosswalk.shp",
+        name: "Crosswalk",
+        color: dl.styles.crosswalk.color
+    });
+
+    let lane_marking = new dl.Shape({
+        url: "./suzhou_CityRoad_utm51/Lane_marking.shp",
+        name: "lane_marking",
+        color: dl.styles.lane_marking.color
+    });
+
+    let lane_arrow = new dl.Shape({
+        url: "./suzhou_CityRoad_utm51/Direction_arrow.shp",
+        name: "Direction_arrow",
+        color: dl.styles.lane_arrow.color
+    });
+
+    let lane_boundary = new dl.Shape({
+        url: "./suzhou_CityRoad_utm51/Lane_boundary.shp",
+        name: "lane_boundary",
+        color: dl.styles.lane_boundary.color
+    });
+
+    // let lane_centerline = new dl.Shape({
+    //     url: "../resources/shp/suzhou_CityRoad_utm51/Lane_centerline.shp",
+    //     name: "lane_centerline",
+    //     color: dl.styles.lanemarking_polyline.color
+    // });
+
+    dl.scene.add(intersection);
+    dl.scene.add(crosswalk);
+    dl.scene.add(lane_marking);
+    dl.scene.add(lane_arrow);
+
+    dl.scene.add(lane_boundary);
+
+    // dl.scene.add(lane_centerline);
+
+    let bbox = new THREE.Box3(new THREE.Vector3(287406.0, 3463772, 50), new THREE.Vector3(287707.0, 3463835.0, 80.0));
+    dl.initView(bbox);
+
+    let model = new dl.Model({url: "./map_photo/car.3DS"});
+
+    model.position.x = 0;
+    model.position.y = 0;
+    model.position.z = 12.816;
+    dl.scene.add(model);
+
+    var onScrollListener = function (e) {
+        // console.log(dl.getRadius())
+        // console.log(dl.getScale(dl.viewer))
+        var scale = dl.getScale(dl.viewer);
+        if (scale > 1800) {
+            parent.vmObj.$data.mapType="TusvnMap";
+        }
+    }
+    var dom_render_area = document.getElementById("render_area");
+    /*注册事件*/
+    if (dom_render_area.addEventListener) {
+        dom_render_area.addEventListener('DOMMouseScroll', onScrollListener, false);
+    }//W3C
+    dom_render_area.onmousewheel = onScrollListener;
+
+    //保存原始角度
+    let origin_angle = -Math.PI / 2;
+
+    var  hostWebsocket=null;
+    var  tween = null;
+    var  lastUtmPosition = null;
+    var  nowUtmPosition = null;
+    var  utmposition = null;
+
+    function rotationMap(start,end)
+    {
+        
+        let realtime_angle = end.rotation-start.rotation;
+
+        origin_angle += realtime_angle;
+
+        //保证摄像机旋转角度在-2*Math.PI 到2*Math.PI之间
+        if (Math.abs(origin_angle)>=2*Math.PI) {
+            if (origin_angle<0){
+                origin_angle+=2*Math.PI;
+            }else {
+                origin_angle-=2*Math.PI;
+            }
+        }
+
+        let yaw=origin_angle;
+        let offset_x=Math.abs(Math.sin(origin_angle))*6;
+        let offset_y=Math.abs(Math.cos(origin_angle))*6;
+        
+
+        dl.moveTo({
+            position: [end.x,end.y,12.816],
+            radius: 20,
+            yaw: yaw,
+            pitch: -0.8
+        });   
+    }
+    function update() {
+        model.position.x = lastUtmPosition.x;
+        model.position.y = lastUtmPosition.y;
+        model.setHeading(-Math.PI / 180 * (lastUtmPosition.rotation));
+        dl.moveTo({
+                position: [lastUtmPosition.x+6,lastUtmPosition.y, 12.816],
+                radius: 80,
+                yaw: -Math.PI / 180 * (lastUtmPosition.rotation),
+                pitch: -0.8
+        });
+        // console.log(lastUtmPosition);
+        // rotationMap(lastUtmPosition,nowUtmPosition);
+    }
+    function animate( time ) {
+        // console.log("执行animate");
+        // console.log(lastUtmPosition);
+        requestAnimationFrame( animate );
+        TWEEN.update( time );
+    }
+
+    onmessage=function(data)
+    {
+        var json = JSON.parse(data.data);
+        var data2 = json.result;
+        console.log(data2);
+
+        var firstProjection = 'EPSG:4326';
+        var secondProjection = "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+        
+        if(lastUtmPosition == null)
+        {
+            utmposition = proj4(firstProjection,secondProjection,[data2.longitude,data2.latitude]);
+            model.position.x = utmposition[0];
+            model.position.y = utmposition[1];
+            utmposition[2] = data2.heading;
+            utmposition[3] = data2.gpsTime;
+            model.setHeading(-Math.PI / 180 * (data2.heading));
+
+            dl.moveTo({
+                position: [utmposition[0]+6,utmposition[1], 12.816],
+                radius: 80,
+                yaw: -Math.PI / 180 * (data2.heading),
+                pitch: -0.8
+            });
+
+            lastUtmPosition = {};
+            lastUtmPosition.x=utmposition[0];
+            lastUtmPosition.y=utmposition[1];
+            lastUtmPosition.rotation=utmposition[2];
+
+            console.log(lastUtmPosition);
+
+        }else{
+            console.log(lastUtmPosition);
+            var nowPosition = proj4(firstProjection,secondProjection,[data2.longitude,data2.latitude]);
+            nowPosition[2] = data2.heading;
+            nowPosition[3] = data2.gpsTime;
+            tween = new TWEEN.Tween(lastUtmPosition)
+                .to({x: nowPosition[0], y: nowPosition[1], rotation: data2.heading}, nowPosition[3]-utmposition[3])
+                .delay(0)
+                // .easing(TWEEN.Easing.Elastic.In)
+                .easing(TWEEN.Easing.Linear.None)
+                .onUpdate(update);
+            tween.start();
+            if(nowUtmPosition == null)
+            {
+                nowUtmPosition = {};
+            }
+
+            nowUtmPosition.x = nowPosition[0];
+            nowUtmPosition.y = nowPosition[1];
+            nowUtmPosition.rotation = nowPosition[2];
+            lastUtmPosition = nowUtmPosition;
+            utmposition = nowPosition;
+        }
+        
+        
+    }
+    onclose=function(data)
+    {
+        console.log("结束连接");
+    }
+    onopen=function(data)
+    {
+        console.log("建立连接,,,,,,");
+        //自车
+        var hostVehicle = {
+          "action": "hostVehicle",
+          "vehicleId": "B21E-00-017"
+        }
+        var hostVehicleMsg = JSON.stringify(hostVehicle);
+        sendMsg(hostVehicleMsg);
+    }
+    sendMsg=function(msg) 
+    {
+        if(window.WebSocket){
+          if(hostWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+            hostWebsocket.send(msg); //send()发送消息
+            console.log("已发送消息:"+ msg);
+          }
+        }
+    }
+    initWebSocket=function()
+    {
+        if ('WebSocket' in window) {
+          hostWebsocket = new WebSocket("ws://10.0.1.57:9999/ws");  //获得WebSocket对象
+        }
+        hostWebsocket.onmessage = onmessage;
+        hostWebsocket.onclose = onclose;
+        hostWebsocket.onopen = onopen;
+        hostWebsocket.onerror = onerror;
+    }
+      
+
+    $(function(){
+        initWebSocket();
+        animate(10);
+    })
+</script>
+
+
+</body>
+</html>

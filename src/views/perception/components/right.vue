@@ -6,7 +6,7 @@
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
-            <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'shrink-style']">
+            <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
                 <div class="style">
                     <div class="video-mask" @click="screenMagnify(item)"></div>
                     <live-player
@@ -1279,6 +1279,7 @@
 
 
             getExtend(x,y,r){
+                this.currentExtent=[];
                 let x0=x+r;
                 let y0=y+r;
                 let x1=x-r;
@@ -1448,7 +1449,7 @@
         border:1px solid rgba(211, 134, 0, 0.5);
         background: #000;
     }
-    .shrink-style{
+    .video-position{
         margin-bottom: 16px;
         box-sizing: border-box;
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
