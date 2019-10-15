@@ -187,7 +187,6 @@ export default {
                               icon: "static/images/road/car.png",
                               angle: _filterData[id].heading,
                               devId: _filterData[id].devId,
-                              offset:new AMap.Pixel(-4, -9),
                               zIndex: 1
                           });
                       }
