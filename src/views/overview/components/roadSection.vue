@@ -53,7 +53,7 @@ export default {
         this.aMap.setMapStyle(window.mapOption.mapStyleEmpty);
     },0)
     this.drawRoadMap();
-    this.aMap.on('moveend', this.getFourPosition);
+//    this.aMap.on('moveend', this.getFourPosition);
   },
   methods: {
     drawRoadMap() {
@@ -237,16 +237,16 @@ export default {
       },
       carReconnect(){
           //实例销毁后不进行重连
-          if(this._isDestroyed){
-              return;
-          }
-          //重连不能超过10次
-          if(this.platformConnectCount>=10){
-              return;
-          }
-          this.initCarWebsocket();
-          //重连不能超过5次
-          this.platformConnectCount++;
+//          if(this._isDestroyed){
+//              return;
+//          }
+//          //重连不能超过10次
+//          if(this.platformConnectCount>=10){
+//              return;
+//          }
+//          this.initCarWebsocket();
+//          //重连不能超过5次
+//          this.platformConnectCount++;
       },
 
 

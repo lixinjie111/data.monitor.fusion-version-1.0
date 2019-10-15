@@ -6,36 +6,18 @@
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
-            <div v-for="(item,index) in camList" class="video-position" v-if="camList.length>0">
+            <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'shrink-style']">
                 <div class="style">
-                    <div class="video-mask" @click="screenMagnify(index)"></div>
+                    <div class="video-mask" @click="screenMagnify(item)"></div>
                     <live-player
                             :requestVideoUrl="requestVideoUrl"
                             :params="item.params"
                             type="flvUrl"
                             :autoplay="false"
-                            @videoLoadCompleted="videoLoadCompleted"
                     >
                         <div class="video-num" @click="changeMap(index)">
                             <span class="device-num">摄像头编号:{{item.devId}}</span>
                             <span class="active-circle" :class="{'active-style':isActive==index}"></span>
-                            <span>{{item.rsPtName}}</span>
-                        </div>
-                        <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
-                    </live-player>
-                </div>
-                <div class="big-video" v-show="item.videoShow">
-                    <div class="video-mask" @click="screenShrink(index)"></div>
-                    <live-player
-                            :requestVideoUrl="item.videoUrl"
-                            :params="item.params"
-                            type="flvUrl"
-                            :autoplay="false"
-                            :ref="'bigPlayer'+index"
-
-                    >
-                        <div class="video-num" @click="changeMap(index)">
-                            <span class="device-num">摄像头编号:{{item.devId}}</span>
                             <span>{{item.rsPtName}}</span>
                         </div>
                         <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
@@ -214,15 +196,6 @@
             });
         },
         methods: {
-            videoLoadCompleted(params){
-                for(let i=0;i<this.camList.length;i++){
-                    let item = this.camList[i];
-                    if(item.sn==params.serialNum){
-                        item.videoUrl = params.videoUrl;
-                        break;
-                    }
-                }
-            },
             onMapComplete(){
 
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
@@ -316,7 +289,7 @@
                             }
                             item.params = params;
                             item.rsPtName=data.rsName;
-                            this.$set(item,"videoShow",false);
+                            this.$set(item,"magnify",false);
 //                        item.videoShow=false;
                         })
                     }
@@ -662,16 +635,12 @@
                 this.isActive=param;
                 this.param=param;
             },
-            screenMagnify(param){
-                let videoUrl = this.camList[param].videoUrl;
-                if(videoUrl!=''){
-                    this.camList[param].videoShow=true;
-                }
-            },
-            screenShrink(param){
-                let player = this.$refs['bigPlayer'+param];
-                player[0].player.pause();
-                this.camList[param].videoShow=false;
+            screenMagnify(item){
+                item.magnify = !item.magnify;
+//                let videoUrl = this.camList[param].videoUrl;
+//                if(videoUrl!=''){
+//                    this.camList[param].videoShow=true;
+//                }
             },
             initWarningWebSocket(){
                 let _this=this;
@@ -1470,16 +1439,16 @@
             }*/
         }
     }
-    .big-video{
+    .magnify-style{
         position: absolute;
         top: 0px;
         right: 0px;
-        z-index:4;
+        z-index:6;
         width: 900px;
         border:1px solid rgba(211, 134, 0, 0.5);
         background: #000;
     }
-    .video-position{
+    .shrink-style{
         margin-bottom: 16px;
         box-sizing: border-box;
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
