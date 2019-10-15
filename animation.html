@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <div style="height: 30px;width:300px;" class="animation" id="animation"></div>
+</div>
+</body>
+<script>
+    let count = 0;
+    let timer1=0;
+    let timer2=0;
+    let ele = document.getElementById('animation');
+    function shrink(width,height){
+        clearTimeout(timer1);
+        timer1 = setTimeout(()=>{
+            if(count<5){
+                width = width*0.8;
+                height = height*0.8;
+                ele.style.width=width+"px";
+                ele.style.height=height+"px";
+                ele.style.left="-"+width/2+"px";
+                ele.style.top="-"+height/2+"px";
+                count++;
+                shrink(width,height);
+            }else {
+                clearTimeout(timer1);
+                count=0;
+                let timer3 = setTimeout(()=>{
+                    scale(width,height);
+                },500)
+            }
+        },100)
+    }
+    function scale(width,height) {
+        clearTimeout(timer2);
+        timer2 = setTimeout(()=>{
+            if(count<5){
+                width = width*1.2;
+                height = height*1.2;
+                ele.style.width=width+"px";
+                ele.style.height=height+"px";
+                ele.style.left="-"+width/2+"px";
+                ele.style.top="-"+height/2+"px";
+                scale(width,height);
+                count++;
+            }else {
+                ele.style.left=width/2+"px";
+                ele.style.top=height/2+"px";
+                clearTimeout(timer2);
+                count=0;
+            }
+        },100)
+    }
+    shrink(300,30)
+   /* let ele = document.getElementById('animation');
+    setTimeout(()=>{
+        ele.className='animation move'
+    },1000)*/
+</script>
+<style>
+    .animation{
+        background:orangered;
+        border-radius: 4px;
+        margin-top: 400px;
+        margin-left: 200px;
+        position: relative;
+       /* opacity: 1;*/
+        animation-fill-mode:forwards;
+        animation: mymove 2s ease-in-out;
+       /* transition: all 2s ease-in-out;*/
+       /* display: none;*/
+
+
+    }
+    .move{
+        margin-top:0;
+        margin-left:0;
+    }
+
+   /* @keyframes mymove{
+        from{
+            opacity: 1;
+            display: block;
+        }
+        to{
+            opacity: 0;
+            display: none;
+        }
+    }
+*/
+   /* .animation{
+        background:orangered;
+        border-radius: 4px;
+        margin-top: 400px;
+        margin-left: 200px;
+        position: relative;
+        animation: mymove 2s ease-in-out;
+        !*left: -150px;
+        top:-15px;*!
+
+    }*/
+    /*.animation{
+        position:relative;
+        animation:mymove 5s ease-in-out 3s;
+        animation-fill-mode:forwards;
+    }
+    @keyframes mymove
+    {
+        0%{
+            transform: scale(1);  !*开始为原始大小*!
+        }
+        50%{
+            transform: scale(0.5);
+        }
+        75%{
+            transform: scale(1);
+        }
+        100%{
+            transform: scale(2);
+        }
+
+    }
+
+    .container{
+        width: 200px;
+        height: 200px;
+        background: yellow;
+        !*transform:scale(2) ;
+        transition: width 2s ease-in 3s;*!
+        animation: myZoom 3s ease-in 2s;
+        animation-fill-mode:forwards;!* 如果把animation-fill-mode 改成 forwards 则动画结束后元素的样式会变成动画最后一个关键帧所规定的样式。*!
+      !*  transform: rotateZ(0deg);*!
+    }
+    !*@keyframes zoom {
+        0%{
+            opacity: 0;
+            top:60%;
+            transform: rotateZ(0deg);
+       !*初始透明度为0,位于顶部-60%位置,旋转Z轴为0*!
+        }
+        50%{
+            transform: rotateZ(-10deg);
+        !*!/动画进行一半的时候,规定旋转Z轴为-10度
+        //此时透明度和顶部位置都会自动计算*!
+        }
+        100%{
+            opacity: 1;
+            top:50%;
+            transform: rotateZ(10deg);
+        !*!/动画结束后的最终参数*!
+        }
+    }*!
+
+    .container:hover{
+        width: 500px;
+    }*/
+   /* @keyframes mymove
+    {
+        0%{
+            width: 0px;
+        }
+        100%{
+            width:500px;
+        }
+    }*/
+    @keyframes mymove
+    {
+        0%{
+            transform: scale(1);
+        }
+        50%{
+            transform: scale(0.5);
+        }
+        75%{
+            transform: scale(1);
+        }
+        100%{
+            transform: scale(2);
+        }
+
+    }
+</style>
+</html>

@@ -76,7 +76,7 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		z-index: 3;
+		z-index: 5;
 		font-size: 14px;
 		height: 40px;
 		color: #fff;
@@ -98,7 +98,7 @@
 		left: 0;
 		bottom: 0;
 		right: 0;
-		z-index: 2;
+		z-index: 4;
 		background-color: #000;
 		@include layoutMode(both);
 		font-size: 18px;

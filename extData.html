@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>title</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link href="img/wechat.jpg" rel="shortcut icon">
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+    <script src="https://webapi.amap.com/maps?v=1.4.14&key=8bf04484a44d846096c9ab84730e88b8&plugin=ElasticMarker,AMap.Geocoder,AMap.Geolocation"></script>
+    <!--<link rel="stylesheet" href="css/fz_gaode.css"/>-->
+</head>
+
+<body style="margin: 0px; padding: 0px;">
+<div id="container"></div>
+<div id="panel"></div>
+</body>
+
+<script>
+    var lnglats = [
+        [120.111111,30.11111],
+        [120.22222,30.44444],
+        [120.222224,30.44444],
+        [120.333337,30.015774]
+    ];
+
+
+    var icon = [
+        'http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png',
+        'http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png',
+        'http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png',
+        'http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png'
+    ];
+
+    var titles = [
+        '123<span style="font-size:11px;color:#F00;">价格:108</span>',
+        '1234',
+        '12345',
+        '123456'
+    ];
+
+
+    var contents = [
+        "<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：11111<br/>电话：0571-82003745<br/><a href='javascript:;' οnclick='walk(["+lnglats[0]+"]);'>去这里</a>",
+        "<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：11111<br/>电话：0571-82003745<br/><a href='javascript:;' οnclick='walk(["+lnglats[1]+"]);'>去这里</a>",
+        "<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：11111<br/>电话：0571-82003745<br/><a href='javascript:;' οnclick='walk(["+lnglats[2]+"]);'>去这里</a>",
+        "<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：11111<br/>电话：0571-82003745<br/><a href='javascript:;' οnclick='walk(["+lnglats[3]+"]);'>去这里</a>"
+    ];
+    var map = new AMap.Map('container', {
+        zoom : 17,
+        point : [ 3, 19 ],
+        center : [120.123,30.123],
+        zoomEnable : true,
+        doubleClickZoom : true,
+        mapStyle:'dark',
+        features : [ 'bg', 'road' ]
+    });
+
+    var markerloc = new AMap.Marker( {
+        position : [120.123,30.123],
+        icon : "gaode_loc1.gif",
+        map : map
+    });
+
+
+    for (var i = 0, marker; i < lnglats.length; i++) {
+        var temp = "var marker";
+        var exp = "new AMap.Marker({position:["+lnglats[i]+"],icon:'"+icon[i]+"', map: map});";
+        eval(temp+i+" = "+exp);
+        eval("marker"+i).setExtData(titles[i]+"?"+contents[i]);
+
+        eval("marker"+i).on('click', markerClick);
+
+    }
+
+    function markerClick(e) {
+        new AMap.InfoWindow({
+            isCustom: true,  //使用自定义窗体
+            content: createInfoWindow(e.target.getExtData().split("?")[0], e.target.getExtData().split("?")[1]),
+            offset: new AMap.Pixel(16, -45)
+        }).open(map, e.target.getPosition())
+    }
+
+
+
+    function createInfoWindow(title, content) {
+        var info = document.createElement("div");
+        info.className = "info";
+
+        //可以通过下面的方式修改自定义窗体的宽高
+        //info.style.width = "400px";
+        // 定义顶部标题
+        var top = document.createElement("div");
+        var titleD = document.createElement("div");
+        var closeX = document.createElement("img");
+        top.className = "info-top";
+        titleD.innerHTML = title;
+        closeX.src = "http://webapi.amap.com/images/close2.gif";
+        closeX.onclick = closeInfoWindow;
+
+        top.appendChild(titleD);
+        top.appendChild(closeX);
+        info.appendChild(top);
+
+        // 定义中部内容
+        var middle = document.createElement("div");
+        middle.className = "info-middle";
+        middle.style.backgroundColor = 'white';
+        middle.innerHTML = content;
+        info.appendChild(middle);
+
+        // 定义底部内容
+        var bottom = document.createElement("div");
+        bottom.className = "info-bottom";
+        bottom.style.position = 'relative';
+        bottom.style.top = '0px';
+        bottom.style.margin = '0 auto';
+        var sharp = document.createElement("img");
+        sharp.src = "http://webapi.amap.com/images/sharp.png";
+        bottom.appendChild(sharp);
+        info.appendChild(bottom);
+        return info;
+    }
+
+    function closeInfoWindow() {
+        map.clearInfoWindow();
+    }
+
+    var walking = new AMap.Walking({
+        map: map,
+        panel: "panel"
+    });
+    function walk(dest){
+        walking.clear();
+        walking.search(markerloc.getPosition(), dest);
+        closeInfoWindow();
+    }
+</script>
+</html>

@@ -1333,6 +1333,7 @@
                             this.deviceModels[deviceid].persons[m] = pmodel1;
                             dl.scene.add(pmodel1);
 
+
                             //融合车辆
                             // var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
                             //var model_out = new THREE.Mesh(geoBox_out, this.matStdObjects);
@@ -1418,13 +1419,12 @@
                             mdl.position.y = dUTM[1];
                             mdl.position.z = this.defualtZ;
                             //test
-                            //  let text = this.deviceModels[deviceid].texts[i];
-                            //  text.setText(d.vehicleId.substr(0,8));
-                            //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
-                            // let text1 = this.deviceModels[deviceid].texts[i];
-
-                            //        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
-                            //      text1.update()
+                            let text1 = this.deviceModels[deviceid].texts[i];
+                            let h = d.heading.toFixed(1);
+                            let s = d.speed.toFixed(1);
+                            text1.setText("[" + h + ", " + s + "]");
+                            text1.setPositon([dUTM[0], dUTM[1], this.defualtZ + 2]);
+                            text1.update();
                         }
                     } else {
                         if (i < this.deviceModels[deviceid].cars.length) {

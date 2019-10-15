@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    let data=[{"taskCode":"1","value":"小利"}]
+    /*data.map(x=>{
+        let obj={
+            name:
+        }
+    });
+*/
+    data.map(x => {
+        debugger
+            let name = (_ => {
+                if (x.taskCode !== '') {
+                    return '信息编码';
+                }
+            })()
+        let value =  (_ => {
+            if (name !== '') {
+                return '1';
+            }
+        })()
+     });
+  /*  data.map(x => {
+        return{
+            name:(_ => {
+                if (x.taskCode !== '') {
+                    return '信息编码';
+                }
+            })(),
+            value:
+
+        }
+    });*/
+</script>
+</html>

@@ -29,7 +29,9 @@ export default {
       mapPointData: [],
       roadWebSocket: null,
       carWebSocket: null,
-      prevData: {}
+      prevData: {},
+      platformConnectCount:0,
+      spatConnectCount:0
     };
   },
   watch:{
@@ -51,7 +53,7 @@ export default {
         this.aMap.setMapStyle(window.mapOption.mapStyleEmpty);
     },0)
     this.drawRoadMap();
-    this.aMap.on('moveend', this.getFourPosition);
+//    this.aMap.on('moveend', this.getFourPosition);
   },
   methods: {
     drawRoadMap() {
@@ -126,11 +128,18 @@ export default {
       // 获取平台车
       initCarWebsocket() {
           let _this = this;
-          if ("WebSocket" in window) {
-              _this.carWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
-              _this.carWebSocket.onmessage = _this.onCarMessage;
-              _this.carWebSocket.onclose = _this.onCarClose;
-              _this.carWebSocket.onopen = _this.onCarOpen;
+          try{
+              if ("WebSocket" in window) {
+                  _this.carWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
+                  _this.carWebSocket.onmessage = _this.onCarMessage;
+                  _this.carWebSocket.onclose = _this.onCarClose;
+                  _this.carWebSocket.onopen = _this.onCarOpen;
+                  _this.carWebSocket.onerror = _this.onCarError;
+              }else{
+                  _this.$message("此浏览器不支持websocket");
+              }
+          }catch (e){
+              this.carReconnect();
           }
       },
       onCarMessage(message) {
@@ -178,6 +187,7 @@ export default {
                               icon: "static/images/road/car.png",
                               angle: _filterData[id].heading,
                               devId: _filterData[id].devId,
+                              offset:new AMap.Pixel(-4, -9),
                               zIndex: 1
                           });
                       }
@@ -196,7 +206,12 @@ export default {
           }
       },
       onCarClose(data) {
-          console.log("结束连接");
+          console.log("平台车结束连接");
+          this.carReconnect();
+      },
+      onCarError(data) {
+          console.log("平台车连接error");
+          this.carReconnect();
       },
       onCarOpen(data) {
           // 获取红绿灯
@@ -221,17 +236,36 @@ export default {
               return;
           }
       },
+      carReconnect(){
+          //实例销毁后不进行重连
+          if(this._isDestroyed){
+              return;
+          }
+          //重连不能超过10次
+          if(this.platformConnectCount>=10){
+              return;
+          }
+          this.initCarWebsocket();
+          //重连不能超过5次
+          this.platformConnectCount++;
+      },
 
 
-    // 第一个路段
+    // 获取红绿灯
     initWebsocket() {
       let _this = this;
-      if ("WebSocket" in window) {
-        _this.roadWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
-          _this.roadWebSocket.onmessage = _this.onMessage;
-          _this.roadWebSocket.onclose = _this.onClose;
-          _this.roadWebSocket.onopen = _this.onOpen;
-          _this.roadWebSocket.onerror = _this.onError;
+      try{
+          if ("WebSocket" in window) {
+              _this.roadWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
+              _this.roadWebSocket.onmessage = _this.onMessage;
+              _this.roadWebSocket.onclose = _this.onClose;
+              _this.roadWebSocket.onopen = _this.onOpen;
+              _this.roadWebSocket.onerror = _this.onError;
+          }else{
+              _this.$message("此浏览器不支持websocket");
+          }
+      }catch (e){
+          this.spatReconnect();
       }
     },
     onMessage(message) {
@@ -291,67 +325,14 @@ export default {
           });
         }
       }
-      // 车辆
-      if ("vehDataDTO" in result === true) {
-         _this.crossData.roadSenseCars = result.vehDataDTO;
-        if (_this.crossData.roadSenseCars.length > 0) {
-          _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
-            x => x.targetType === 2 || x.targetType === 5
-          );
-          // console.log('_this.crossData.roadSenseCars', _this.crossData.roadSenseCars);
-          let _filterData = {};
-          _this.crossData.roadSenseCars.forEach((item, index) => {
-            _filterData[item.vehicleId] = {
-              longitude: item.longitude,
-              latitude: item.latitude,
-              heading: item.heading,
-              speed: item.speed,
-              vehicleId: item.vehicleId,
-              devId: item.devId,
-              marker: null,
-            };
-          });
-
-          for (let id in _this.prevData) {
-            if(_filterData[id]) {   //表示有该点，做move
-              _filterData[id].marker = _this.prevData[id].marker;
-              let _currentCar = _filterData[id];
-              _filterData[id].marker.setAngle(_currentCar.heading);
-              _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
-            } else {   //表示没有该点，做remove
-              _this.prevData[id].marker.stopMove();
-              _this.aMap.remove(_this.prevData[id].marker);
-              delete _this.prevData[id];
-            }
-          }
-          for (let id in _filterData) {
-            if(!_this.prevData[id]) {   //表示新增该点，做add
-                _filterData[id].marker = new AMap.Marker({
-                  position: [_filterData[id].longitude, _filterData[id].latitude],
-                  map: _this.aMap,
-                  icon: "static/images/road/car.png",
-                  angle: _filterData[id].heading,
-                  devId: _filterData[id].devId,
-                  zIndex: 1
-                });
-            }
-          }
-
-          _this.prevData = _filterData;
-
-        } else {
-          // 返回的数据为空
-          let obj = Object.values(_this.prevData);
-          for (let key in obj) {
-            obj[key].marker.stopMove();
-            _this.aMap.remove(obj[key].marker);
-            delete obj[key];
-          }
-        }
-      }
     },
     onClose(data) {
-      console.log("结束连接");
+      console.log("红绿灯结束连接");
+        this.spatReconnect();
+    },
+    onError(){
+        console.log("红绿灯连接error");
+        this.spatReconnect();
     },
     onOpen(data) {
       // 获取红绿灯
@@ -376,6 +357,22 @@ export default {
         return;
       }
     },
+    spatReconnect(){
+        //实例销毁后不进行重连
+        if(this._isDestroyed){
+            return;
+        }
+        //重连不能超过10次
+        if(this.spatConnectCount>=10){
+            return;
+        }
+        this.initWebsocket();
+        //重连不能超过5次
+        this.spatConnectCount++;
+    },
+
+
+
     // 根据状态返回红，黄，绿灯
     dealLight(data) {
       if ("status" in data === true) {
