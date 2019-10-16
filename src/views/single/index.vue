@@ -104,7 +104,9 @@
             },
         },
         components:{Left,Right},
-        mounted() {},
+        mounted() {
+            this.initWebSocket();
+        },
         destroyed(){
             //销毁Socket
             this.webSocket&&this.webSocket.close();

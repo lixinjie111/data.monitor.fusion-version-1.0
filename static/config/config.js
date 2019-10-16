@@ -50,6 +50,12 @@ window.mapOption = {
     // center: [113.07876,28.255618],	//长沙-高德地图坐标点
     mapStyleEmpty: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00", // 纯灰色背景地图
 };
+window.mapRoadOption={
+    center: [121.17265957261286,31.284096076877844],	//上海-高德地图坐标点  感知右下角
+    // center: [113.07876,28.255618],	//长沙-高德地图坐标点
+    mapStyleEmpty: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00", // 纯灰色背景地图
+    dragEnable:false
+}
 //单车
 window.defaultMapOption = {
     center: window.mapOption.center, //上海
