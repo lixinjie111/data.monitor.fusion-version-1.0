@@ -67,11 +67,6 @@
                 spatCount:0,
                 signCount:0,
                 center:[],
-                mapOption:{
-                    center: [121.262939,31.245149],
-                    zoom: 18,
-                    mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
-                },
                 weather:{},
                 cameraParam:{},
                 step:5,

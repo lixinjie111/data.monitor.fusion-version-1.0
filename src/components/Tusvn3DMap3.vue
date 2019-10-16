@@ -1579,9 +1579,6 @@
 
                     for (let n = 0; n < pcars.length; n++) {
                         let pcar = pcars[n];
-
-                        if(pcar.vehicleId!="B21E0005")
-                            continue;
                         if (pcar.heading<0) {
                             // 不处理小于0的的数据
                             continue;

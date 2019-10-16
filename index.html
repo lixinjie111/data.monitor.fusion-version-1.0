@@ -18,6 +18,18 @@
 
     <script src="https://webapi.amap.com/maps?v=1.4.14&key=8bf04484a44d846096c9ab84730e88b8&plugin=AMap.Geocoder"></script>
 
+  </head>
+  <body>
+    <script>
+      document.write('<script src="'+ window.config.staticUrl +'frontStatic/vue/vue.min.js"><\/script>');
+      document.write('<script src="'+ window.config.staticUrl +'frontStatic/vue-router/vue-router.min.js"><\/script>');
+      document.write('<script src="'+ window.config.staticUrl +'frontStatic/vuex/vuex.min.js"><\/script>');
+      document.write('<script src="'+ window.config.staticUrl +'frontStatic/axios/axios.min.js"><\/script>');
+    </script>
+    <script src="static/js/liveplayer-lib.min.js"></script>
+
+    <div id="app"></div>
+
     <script src="static/map3d/libs/browser-polyfill.js"></script>
     <script src="static/map3d/libs/jquery-3.1.1.min.js"></script>
     <script src="static/map3d/libs/three.min.js"></script>
@@ -37,18 +49,6 @@
     <script src="static/map3d/libs/shapefile.min.js"></script>
     <script src="static/map3d/libs/proj4.js"></script>
     <script src="static/map3d/libs/core.min.js"></script>
-  </head>
-  <body>
-    
-    <script>
-      document.write('<script src="'+ window.config.staticUrl +'frontStatic/vue/vue.min.js"><\/script>');
-      document.write('<script src="'+ window.config.staticUrl +'frontStatic/vue-router/vue-router.min.js"><\/script>');
-      document.write('<script src="'+ window.config.staticUrl +'frontStatic/vuex/vuex.min.js"><\/script>');
-      document.write('<script src="'+ window.config.staticUrl +'frontStatic/axios/axios.min.js"><\/script>');
-    </script>
-    <script src="static/js/liveplayer-lib.min.js"></script>
-
-    <div id="app"></div>
   </body>
   
   

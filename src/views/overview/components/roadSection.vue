@@ -15,11 +15,6 @@
                 aMap: null,
                 wms: {},
                 mapRoadData: this.mapData,
-                mapOption: {
-                    resizeEnable: false,
-                    zoom: 18,
-                    mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
-                },
                 crossData: {
                     roadLights: [], // 红绿灯数据
                     roadSenseCars: [], // 车辆数据
@@ -32,7 +27,7 @@
                 carWebSocket: null,
                 prevData: {},
                 platformConnectCount:0,
-                spatConnectCount:0,
+                spatConnectCount:0
             };
         },
         mounted() {
@@ -70,6 +65,7 @@
                 this.wms = new AMap.TileLayer.WMS(_optionWms);
                 this.wms.setMap(this.aMap);
                 this.aMap.setCenter(position);
+                this.aMap.setStatus({zoomEnable:false});
                 // this.aMap.setZoom(18);
                 this.getFourPosition();
                 this.initWebsocket();
@@ -77,49 +73,28 @@
             },
             // 获取四周的经纬度
             getFourPosition() {
-                let finalFourPosition=[];
-                let currentExtend = [];
-                let bounds = this.aMap.getBounds();
-                let northeast = bounds.northeast;
-                let southwest = bounds.southwest;
-                let x = 0.0005;
-                let y = 0.0003;
-                let x0=northeast.lng; //东北
-                let y0 = northeast.lat;
-                let x1 = southwest.lng; //西南
-                let y1 = southwest.lat;
-
-                finalFourPosition.push(ConvertCoord.gcj02towgs84(x1-x,y0+y));
-                finalFourPosition.push(ConvertCoord.gcj02towgs84(x0+x,y0+y));
-                finalFourPosition.push(ConvertCoord.gcj02towgs84(x0+x,y1-y));
-                finalFourPosition.push(ConvertCoord.gcj02towgs84(x1-x,y1-y));
-
-                currentExtend.push([x1-x,y0+y]);
-                currentExtend.push([x0+x,y0+y]);
-                currentExtend.push([x0+x,y1-y]);
-                currentExtend.push([x1-x,y1-y]);
-
-                this.crossData.finalFourPosition = finalFourPosition;
-//                let marker1 = new AMap.Marker({
-//                    position:  finalFourPosition[0],
+                let currentExtend = this.getExtend(this.mapRoadData.longitude, this.mapRoadData.latitude,0.001);
+                this.crossData.finalFourPosition = currentExtend;
+//                let marker11 = new AMap.Marker({
+//                    position:  currentExtend[0],
 //                    map: this.aMap,
 //                    icon: "static/images/road/side.png",
 //                    zIndex: 1
 //                });
-//                let marker2 = new AMap.Marker({
-//                    position: finalFourPosition[1],
+//                let marker22 = new AMap.Marker({
+//                    position: currentExtend[1],
 //                    map: this.aMap,
 //                    icon: "static/images/road/side.png",
 //                    zIndex: 1
 //                });
-//                let marker3 = new AMap.Marker({
-//                    position: finalFourPosition[2],
+//                let marker33 = new AMap.Marker({
+//                    position: currentExtend[2],
 //                    map: this.aMap,
 //                    icon: "static/images/road/side.png",
 //                    zIndex: 1
 //                });
-//                let marker4 = new AMap.Marker({
-//                    position: finalFourPosition[3],
+//                let marker44 = new AMap.Marker({
+//                    position: currentExtend[3],
 //                    map: this.aMap,
 //                    icon: "static/images/road/side.png",
 //                    zIndex: 1
@@ -127,6 +102,19 @@
 
                 // this.initWebsocket();
                 // this.initCarWebsocket();
+            },
+
+            getExtend(x,y,r){
+                let currentExtent=[];
+                let x0=x+r;
+                let y0=y+r;
+                let x1=x-r;
+                let y1=y-r;
+                currentExtent.push([x1, y0]);
+                currentExtent.push([x0, y0]);
+                currentExtent.push([x0, y1]);
+                currentExtent.push([x1, y1]);
+                return currentExtent;
             },
 
             // 获取平台车
