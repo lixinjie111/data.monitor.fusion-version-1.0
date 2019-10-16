@@ -1,6 +1,7 @@
 window.config = {
     
     //望京 内网
+    // staticUrl: "http://172.17.1.16:9090/", //静态文件路径
     // url: 'http://172.17.1.16:9093/monPlatApp/', //监控平台
     // operateUrl: 'http://172.17.1.16:9090/operateApp/',	//运营平台
     // websocketUrl:'ws://172.17.1.16:49982/mon',  //监控
@@ -10,30 +11,16 @@ window.config = {
     //http://172.17.1.16:9092/icvShadowApp/ws.html  不要给我删掉了！！！
 
     //望京 外网
+    staticUrl: "http://120.133.21.14:9090/", //静态文件路径
     url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台
     operateUrl: 'http://120.133.21.14:9090/operateApp/',	//运营平台
     websocketUrl:'ws://120.133.21.14:49982/mon',  //监控
     socketUrl:'ws://120.133.21.14:49999/ws',  //影子系统
     dlUrl: 'http://117.114.144.227:8085/', //迪路
     dlWmsUrl: 'http://117.114.144.227:8080/', //迪路
-    
-    //上海正式环境  内网-IP
-    // url: 'http://172.16.1.199:9093/monPlatApp/', //监控平台
-    // operateUrl: 'http://172.16.1.197:9090/operateApp/', //运营平台
-    // websocketUrl:'ws://172.16.1.199:9982/mon',  //监控
-    // socketUrl:'ws://172.16.1.198:9999/ws',  //影子系统
-    // dlUrl: 'http://172.16.1.197:8085/', //迪路
-    // dlWmsUrl: 'http://172.16.1.197:8080/', //迪路
-
-    //上海正式环境  内网-主机名
-    // url: 'http://app03:9093/monPlatApp/', //监控平台
-    // operateUrl: 'http://app01:9090/operateApp/', //运营平台
-    // websocketUrl:'ws://app03:9982/mon',  //监控
-    // socketUrl:'ws://app02:9999/ws',  //影子系统
-    // dlUrl: 'http://app01:8085/', //迪路
-    // dlWmsUrl: 'http://app01:8080/', //迪路
 
     //上海正式环境  外网
+    // staticUrl: "http://116.236.72.204:49090/", //静态文件路径
     // url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
     // operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
     // websocketUrl:'ws://116.236.72.206:49982/mon',  //监控
@@ -50,12 +37,6 @@ window.mapOption = {
     // center: [113.07876,28.255618],	//长沙-高德地图坐标点
     mapStyleEmpty: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00", // 纯灰色背景地图
 };
-window.mapRoadOption={
-    center: [121.17265957261286,31.284096076877844],	//上海-高德地图坐标点  感知右下角
-    // center: [113.07876,28.255618],	//长沙-高德地图坐标点
-    mapStyleEmpty: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00", // 纯灰色背景地图
-    dragEnable:false
-}
 //单车
 window.defaultMapOption = {
     center: window.mapOption.center, //上海

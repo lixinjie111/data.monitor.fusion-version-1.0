@@ -37,9 +37,15 @@
         },
         mounted() {
 //    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
-            this.aMap = new AMap.Map(this.id, window.mapRoadOption);
+            let _optionWms = Object.assign({},window.mapOption,
+                {
+                    zoom: 18,
+                    dragEnable: false
+                }
+            );
+            this.aMap = new AMap.Map(this.id, _optionWms);
             setTimeout(()=>{
-                this.aMap.setMapStyle(window.mapRoadOption.mapStyleEmpty);
+                this.aMap.setMapStyle(window.mapOption.mapStyleEmpty);
             },0)
             /*this.aMap = new AMap.Map(this.id, window.defaultMapOption);
             setTimeout(()=>{
@@ -64,7 +70,7 @@
                 this.wms = new AMap.TileLayer.WMS(_optionWms);
                 this.wms.setMap(this.aMap);
                 this.aMap.setCenter(position);
-                this.aMap.setZoom(18);
+                // this.aMap.setZoom(18);
                 this.getFourPosition();
                 this.initWebsocket();
                 this.initCarWebsocket();
