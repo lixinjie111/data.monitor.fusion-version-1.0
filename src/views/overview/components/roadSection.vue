@@ -4,7 +4,6 @@
   </div>
 </template>
 <script>
-    import ConvertCoord from '@/assets/js/coordConvert.js'
     export default {
         props: {
             id: String,
