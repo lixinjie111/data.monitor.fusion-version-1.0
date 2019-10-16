@@ -90,8 +90,8 @@ let ConvertCoord = {
             var sqrtmagic = Math.sqrt(magic);
             dlat = (dlat * 180.0) / ((this.a * (1 - this.ee)) / (magic * sqrtmagic) * this.PI);
             dlng = (dlng * 180.0) / (this.a / sqrtmagic * Math.cos(radlat) * this.PI);
-            mglat = lat + dlat;
-            mglng = lng + dlng;
+            var mglat = lat + dlat;
+            var mglng = lng + dlng;
             return [lng * 2 - mglng, lat * 2 - mglat]
         }
     },
