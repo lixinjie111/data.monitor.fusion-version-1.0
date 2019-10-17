@@ -369,9 +369,9 @@
             this.mapOption=window.defaultMapOption;
             this.distanceMap = new AMap.Map('singleMap', this.mapOption);
             //避免加载空白地图
-            setTimeout(()=>{
+            this.distanceMap.on('complete',()=>{
                 this.distanceMap.setMapStyle(window.defaultMapOption.mapStyle);
-            },0)
+            });
             this.getBaseData();
             this.getRouteDataByVehId();
         },

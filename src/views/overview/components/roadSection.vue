@@ -38,15 +38,10 @@
                 }
             );
             this.aMap = new AMap.Map(this.id, _optionWms);
-            setTimeout(()=>{
+            this.aMap.on('complete',()=>{
                 this.aMap.setMapStyle(window.mapOption.mapStyleEmpty);
-            },0)
-            /*this.aMap = new AMap.Map(this.id, window.defaultMapOption);
-            setTimeout(()=>{
-                this.aMap.setMapStyle(window.defaultMapOption.mapStyle);
-            },0)*/
+            });
             this.drawRoadMap();
-//            this.aMap.on('moveend', this.getFourPosition);
         },
         methods: {
             drawRoadMap() {
