@@ -667,7 +667,7 @@
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
                         console.log("距离："+item.dis);
-                        let msg = item.warnMsg+" "+item.dis+"米";
+                        let msg = item.warnMsg;
                         let warningObj={
                             longitude:item.longitude,
                             latitude:item.latitude
@@ -712,7 +712,7 @@
                                 }
                             },2000)
                             _this.warningData[warningId]=obj;
-                            console.log("提示信息："+msg,item.dis,obj.dist);
+//                            console.log("提示信息："+msg,item.dis,obj.dist);
                             //进行更新
                             _this.$refs.tusvnMap.removeModel(obj.id);
                             _this.$refs.tusvnMap.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
