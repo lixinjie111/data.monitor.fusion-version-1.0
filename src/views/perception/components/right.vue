@@ -81,7 +81,6 @@
                 platformWebsocke:null,
                 perceptionWebsocket:null,
                 spatWebsocket:null,
-                warningCancelWebsocket:null,
                 warningWebsocket:null,
                 param:1, //平面 俯视
                 time:'',
@@ -235,7 +234,6 @@
                 this.initSpatWebSocket();
 //                           //地图不连续移动，判断红绿灯的位置受否再可视区
                 this.initWarningWebSocket();
-                this.initWarningCancelWebSocket();
                 this.getMap();
             },
             map1InitComplete(){
@@ -675,7 +673,6 @@
                             longitude:item.longitude,
                             latitude:item.latitude
                         }
-                        let warningHash = _this.hashcode(JSON.stringify(warningObj));
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
                             _this.warningCount++;
@@ -684,19 +681,40 @@
                                 msg:msg,
                                 longitude:item.longitude,
                                 latitude:item.latitude,
-                                hash:warningHash
+                                timer:null,
+                                flag:false
+
                             }
+                            obj.timer = setTimeout(()=>{
+                                _this.$refs.perceptionMap.removeModel(obj.id);
+                                obj.flag=true;
+                                for(let key in warningData){
+                                    if(warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
                             _this.warningData[warningId]=obj;
                             _this.alertCount++;
                             _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
                             let obj = _this.warningData[warningId];
-                            if(obj.hash!=warningHash){
-                                //进行更新
+                            clearTimeout(obj.timer);
+                            obj.timer = setTimeout(()=>{
                                 _this.$refs.perceptionMap.removeModel(obj.id);
-                                _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
-                            }
+                                obj.flag=true;
+                                console.log("移除事件")
+                                for(let key in warningData){
+                                    if(key!=obj.id&&warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
+                            _this.warningData[warningId]=obj;
+
+                            _this.$refs.perceptionMap.removeModel(obj.id);
+                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }
                     })
                     //此次告警结束，将总数传递出去
@@ -742,99 +760,6 @@
                 this.initWarningWebSocket();
                 //重连不能超过5次
                 this.warningConnectCount++;
-            },
-
-            initWarningCancelWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.warningCancelWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                        _this.warningCancelWebsocket.onmessage = _this.onWarningCancelMessage;
-                        _this.warningCancelWebsocket.onclose = _this.onWarningCancelClose;
-                        _this.warningCancelWebsocket.onopen = _this.onWarningCancelOpen;
-                        _this.warningCancelWebsocket.onerror=_this.onWarningCancelError;
-                    }else{
-                        _this.$message("此浏览器不支持websocket")
-                    }
-                }catch(e){
-                    _this.warningCancelReconnect();
-                }
-
-            },
-            onWarningCancelMessage(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let warningCancelData = json.result;
-                let obj;
-                let warningIds = JSON.parse(warningCancelData);
-                warningIds.forEach(warningId=>{
-                    obj = _this.warningData[warningId];
-                    //防止路口页面和单车页面事件交叉影响
-                    if(obj&&obj.id){
-                        _this.$refs.perceptionMap.removeModel(obj.id);
-                        delete _this.warningData[warningId];
-                        let eventObj = {
-                            id:warningId,
-                            time:null
-                        }
-                        eventObj.time=setTimeout(()=>{
-                            delete _this.removeEventObj[warningId];
-                        },2000)
-                        _this.removeEventObj[warningId]=eventObj;
-                    }
-                })
-            },
-            onWarningCancelClose(data){
-                console.log("告警取消结束连接");
-                this.warningCancelReconnect();
-            },
-            onWarningCancelError(){
-                console.log("告警取消error");
-                this.warningCancelReconnect();
-            },
-            onWarningCancelOpen(data){
-                //旁车
-                let warningCancel = {
-                    "action": "event_cancel",
-                    "token": "tusvn"
-                }
-                let warningMsg = JSON.stringify(warningCancel);
-                this.sendWarningCancelMsg(warningMsg);
-            },
-            sendWarningCancelMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.warningCancelWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.warningCancelWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            warningCancelReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.cancelConnectCount>=10){
-                    return;
-                }
-                this.initWarningCancelWebSocket();
-                //重连不能超过5次
-                this.cancelConnectCount++;
-            },
-
-
-            hashcode(str) {
-                let hash = 0, i, chr, len;
-                if (str.length === 0) return hash;
-                for (i = 0, len = str.length; i < len; i++) {
-                    chr   = str.charCodeAt(i);
-                    hash  = ((hash << 5) - hash) + chr;
-                    hash |= 0; // Convert to 32bit integer
-                }
-                return hash;
             },
 
             //平台车
