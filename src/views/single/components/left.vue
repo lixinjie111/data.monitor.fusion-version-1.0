@@ -77,11 +77,6 @@
     export default {
         data() {
             return {
-                /*mapOption: {
-                    center: this.$parent.defalutCenterPoint,
-                    zoom: 11,
-                    mapStyle: "amap://styles/7b007636f01d8a19e9cc2841a85dc083"
-                },*/
                 mapOption:{},
                 singleVehicle:{},
                 routeId:'',
@@ -374,9 +369,9 @@
             this.mapOption=window.defaultMapOption;
             this.distanceMap = new AMap.Map('singleMap', this.mapOption);
             //避免加载空白地图
-            setTimeout(()=>{
+            this.distanceMap.on('complete',()=>{
                 this.distanceMap.setMapStyle(window.defaultMapOption.mapStyle);
-            },0)
+            });
             this.getBaseData();
             this.getRouteDataByVehId();
         },

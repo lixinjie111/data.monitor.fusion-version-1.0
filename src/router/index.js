@@ -13,6 +13,7 @@ const Single = resolve => require(['@/views/single'], resolve)
 const Perception = resolve => require(['@/views/perception'], resolve)
 const Overview = resolve => require(['@/views/overview'], resolve)
 
+
 /*Vue.use(Router)*/
 
 export default new VueRouter({

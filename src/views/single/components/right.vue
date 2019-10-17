@@ -70,31 +70,12 @@
     import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
     import LivePlayer from '@/components/livePlayer'
-    //websocket心跳检测
-    let wsHeartCheck = {
-        timeout: 5000,
-        timeId: -1,
-        wsObj: null,
-        init(ws) {
-            this.wsObj = ws;
-        },
-        reset() {
-            clearTimeout(this.timeId);
-            this.start();
-        },
-        start(){
-            this.timeId = setTimeout(() => {
-                this.wsObj.send('HeartBeat');
-            }, this.timeout);
-        }
-    };
     export default {
         data() {
             return {
                 vehicleId:this.$route.params.vehicleId,
                 spatWebsocket:null,
                 warningWebsocket:null,
-                warningCancelWebsocket:null,
                 carWebsocket:null,
                 sideCarWebsocket:null,
                 alertCount:0,
@@ -367,7 +348,7 @@
                         })
                     }
                 }
-                if(_this.warningList.length>0){
+                /*if(_this.warningList.length>0){
                     let warningMessage = _this.warningList.shift();
                     let warningJson = JSON.parse(warningMessage.data);
                     let warningData = warningJson.result.data;
@@ -405,19 +386,19 @@
                             }else{
                                 //判断是否需要更新
                                 let obj = _this.warningData[warningId];
-                                /*if(obj.hash!=warningHash){*/
+                                /!*if(obj.hash!=warningHash){*!/
 //                                    console.log("提示信息："+msg,item.dis,obj.dist);
-                                    /*if(item.dis>obj.dist){
+                                    /!*if(item.dis>obj.dist){
                                         return;
-                                    }*/
+                                    }*!/
                                     //进行更新
                                     _this.$refs.tusvnMap.removeModel(obj.id);
                                     _this.$refs.tusvnMap.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
-                               /* }*/
+                               /!* }*!/
                             }
                         })
                     }
-                }
+                }*/
             },
             //视频报错的方法
             getDeviceInfo(){
@@ -480,7 +461,6 @@
                 this.initSideCarWebSocket();
                 this.initSpatWebSocket();
                 this.initWarningWebSocket();
-                this.initWarningCancelWebSocket();
             },
 
             getNumPng(color,num){
@@ -675,8 +655,8 @@
             },
             onWarningMessage(message){
                 let _this=this;
-                _this.warningList.push(message);
-                /*let warningJson = JSON.parse(message.data);
+//                _this.warningList.push(message);
+                let warningJson = JSON.parse(message.data);
                 let warningData = warningJson.result.data;
                 let type = warningJson.result.type;
 //                let warningTime = Math.abs(time2-warningJson.time);
@@ -692,7 +672,6 @@
                             longitude:item.longitude,
                             latitude:item.latitude
                         }
-                        let warningHash = _this.hashcode(JSON.stringify(warningObj));
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
                             let obj = {
@@ -700,29 +679,46 @@
                                 msg:msg,
                                 longitude:item.longitude,
                                 latitude:item.latitude,
-                                hash:warningHash,
                                 warningObj:warningObj,
-                                dist:item.dis
+                                dist:item.dis,
+                                timer:null,
+                                flag:false
 
                             }
+                            obj.timer = setTimeout(()=>{
+                                _this.$refs.tusvnMap.removeModel(obj.id);
+                                obj.flag=true;
+                                for(let key in warningData){
+                                    if(warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
                             _this.warningData[warningId]=obj;
                             _this.alertCount++;
                             _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
                             let obj = _this.warningData[warningId];
-                            /!*if(obj.hash!=warningHash){*!/
+                            clearTimeout(obj.timer);
+                            obj.timer = setTimeout(()=>{
+                                _this.$refs.tusvnMap.removeModel(obj.id);
+                                obj.flag=true;
+                                console.log("移除事件")
+                                for(let key in warningData){
+                                    if(key!=obj.id&&warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
+                            _this.warningData[warningId]=obj;
                             console.log("提示信息："+msg,item.dis,obj.dist);
-                            /!*if(item.dis>obj.dist){
-                                return;
-                            }*!/
                             //进行更新
                             _this.$refs.tusvnMap.removeModel(obj.id);
                             _this.$refs.tusvnMap.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
-                            /!* }*!/
                         }
                     })
-                }*/
+                }
             },
             onWarningClose(data){
                 console.log("结束连接");
@@ -764,16 +760,6 @@
                 this.initWarningWebSocket();
                 //重连不能超过5次
                 this.warningConnectCount++;
-            },
-            hashcode(str) {
-                let hash = 0, i, chr, len;
-                if (str.length === 0) return hash;
-                for (i = 0, len = str.length; i < len; i++) {
-                    chr   = str.charCodeAt(i);
-                    hash  = ((hash << 5) - hash) + chr;
-                    hash |= 0; // Convert to 32bit integer
-                }
-                return hash;
             },
             //平台车
             initCarWebSocket(){
@@ -835,79 +821,6 @@
                 this.initCarWebSocket();
                 //重连不能超过5次
                 this.carConnectCount++;
-            },
-            initWarningCancelWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.warningCancelWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                        _this.warningCancelWebsocket.onmessage = _this.onWarningCancelMessage;
-                        _this.warningCancelWebsocket.onclose = _this.onWarningCancelClose;
-                        _this.warningCancelWebsocket.onopen = _this.onWarningCancelOpen;
-                        _this.warningCancelWebsocket.onerror=_this.onWarningCancelError;
-                    }else{
-                        _this.$message("此浏览器不支持websocket")
-                    }
-                }catch(e){
-                    _this.warningCancelReconnect();
-                }
-
-            },
-            onWarningCancelMessage(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let warningCancelData = json.result;
-                let obj;
-                let warningIds = JSON.parse(warningCancelData);
-                warningIds.forEach(warningId=>{
-                    obj = _this.warningData[warningId];
-                    //防止路口页面和单车页面事件交叉影响
-                    if(obj&&obj.id){
-                        _this.$refs.tusvnMap.removeModel(obj.id);
-                        delete _this.warningData[warningId];
-                    }
-                })
-            },
-            onWarningCancelClose(data){
-                console.log("告警取消结束连接");
-                this.warningCancelReconnect();
-            },
-            onWarningCancelError(){
-                console.log("告警取消error");
-                this.warningCancelReconnect();
-            },
-            onWarningCancelOpen(data){
-                //旁车
-                let warningCancel = {
-                    "action": "event_cancel",
-                    "token": "tusvn"
-                }
-                let warningMsg = JSON.stringify(warningCancel);
-                this.sendWarningCancelMsg(warningMsg);
-            },
-            sendWarningCancelMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.warningCancelWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.warningCancelWebsocket.send(msg); //send()发送消息
-                        console.log("warning已发送消息:"+ msg);
-                    }
-                }else{
-                    return;
-                }
-            },
-            warningCancelReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.cancelConnectCount>=10){
-                    return;
-                }
-                this.initWarningCancelWebSocket();
-                //重连不能超过5次
-                this.cancelConnectCount++;
             },
             //融合车
             initSideCarWebSocket(){
@@ -1006,7 +919,6 @@
             this.$refs.tusvnMap&&this.$refs.tusvnMap.reset3DMap();
             this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
-            this.warningCancelWebsocket&&this.warningCancelWebsocket.close();
             this.sideCarWebsocket&&this.sideCarWebsocket.close();
         }
     }
