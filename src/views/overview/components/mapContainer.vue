@@ -23,14 +23,16 @@ export default {
             count: 0,
             flag: true,
             prevData: [],
+            onlineConnectCount:0
 
         }
     },
     mounted() {
         this.AMap = new AMap.Map(this.id, window.defaultMapOption);
-        setTimeout(()=>{
+        this.AMap.on('complete',()=>{
             this.AMap.setMapStyle(window.defaultMapOption.mapStyle);
-        },0)
+        });
+
         this.initWebSocket();
         let param = ['2'];
         this.getDevDis(param);
@@ -38,13 +40,19 @@ export default {
     methods: {
         initWebSocket(){
             // console.log('websocket获取地图行驶车辆展示');
-            if ('WebSocket' in window) {
-                this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+            try{
+                if ('WebSocket' in window) {
+                    this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                    this.webSocket.onmessage = this.onmessage;
+                    this.webSocket.onclose = this.onclose;
+                    this.webSocket.onopen = this.onopen;
+                    this.webSocket.onerror = this.onerror;
+                }else{
+                    this.$message("此浏览器不支持websocket");
+                }
+            }catch (e){
+                this.carReconnect();
             }
-            this.webSocket.onmessage = this.onmessage;
-            this.webSocket.onclose = this.onclose;
-            this.webSocket.onopen = this.onopen;
-            this.webSocket.onerror = this.onerror;
         },
         onmessage(message){
             let _this = this,
@@ -247,10 +255,8 @@ export default {
         //             });
         //             _markerObj.marker.on('click', _this.showView);
         //             _markerObj.platNoMarker.on('click', _this.showView);
-
         //             _this.responseDataDraw.push(_markerObj);
         //         }
-
         //         if(i == _allPointDataLength - 1) {
         //             if(_this.setFitViewFlag) {
         //                 this.AMap.setFitView();
@@ -277,7 +283,12 @@ export default {
             });
         },
         onclose(data){
-            // console.log("结束--vehicleOnline--连接");
+            console.log("vehicleOnline结束连接");
+            this.carReconnect();
+        },
+        onerror(){
+            console.log("vehicleOnline连接error");
+            this.carReconnect();
         },
         onopen(data){
             // console.log("建立--vehicleOnline--连接");
@@ -295,6 +306,21 @@ export default {
                 return;
             }
         },
+        carReconnect(){
+            //实例销毁后不进行重连
+            if(this._isDestroyed){
+                return;
+            }
+            //重连不能超过10次
+            if(this.onlineConnectCount>=10){
+                return;
+            }
+            this.initWebSocket();
+            //重连不能超过5次
+            this.onlineConnectCount++;
+        },
+
+
         getDevDis(disParams){
             getDevDis({
                 'devTypes': disParams,
@@ -312,22 +338,22 @@ export default {
                         let option;
                         if(item.longitude|| item.latitude){
                             option={
-                               position:new AMap.LngLat(item.longitude, item.latitude),
-                               type:item.type,
-                               deviceId:item.deviceId,
-                               path:item.path,
-                               longitude:item.longitude,
-                               latitude:item.latitude,
-                               title:item.devName,
-                                // id:item.deviceId,
-                                // name:item.devName,
-                                // lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude),
+                                position:new AMap.LngLat(item.longitude, item.latitude),
+                                type:item.type,
+                                deviceId:item.deviceId,
+                                path:item.path,
+                                longitude:item.longitude,
+                                latitude:item.latitude,
+                                title:item.devName,
+//                                id:item.deviceId,
+//                                name:item.devName,
+//                                lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude)
                             }
                             resultData.push(option);
                         }
                     });
                     //转成高德地图的坐标
-                   resultData.forEach((item, index, arr)=>{
+                    resultData.forEach((item, index, arr)=>{
                         resultData[index].position = ConvertCoord.wgs84togcj02(item.longitude, item.latitude);
                         _this.count ++;
                         if(_this.count == arr.length) {
@@ -335,14 +361,14 @@ export default {
                             resultData.forEach(function (subItem,subIndex) {
                                 //路侧点
                                 if(subItem.type==2){
-                                    var marker = new AMap.Marker({
+                                    let marker = new AMap.Marker({
                                         position: subItem.position,
                                         icon: 'static/images/road/side.png', // 添加 Icon 图标 URL
                                         offset:new AMap.Pixel(-15, -15),
                                         title:subItem.title
                                     });
                                     _this.AMap.add(marker);
-                                    var item={
+                                    let item={
                                         path:subItem.path,
                                         roadSiderId:subItem.deviceId,
                                         camSerialNum:"",

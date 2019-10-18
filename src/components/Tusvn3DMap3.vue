@@ -12,7 +12,7 @@
     import _ from "lodash";
 
     import * as myBox from "../utils/myBox";
-    import { getMap } from "@/utils/tusvnMap.js";
+    import { getMap } from "@/utils/tusvnMap2.js";
 
     import THREEUtls from "@/utils/three.utils";
 
@@ -172,7 +172,7 @@
                 );
 
                 setTimeout(() => {
-                   // this.initData();
+                    this.initData();
                     getMap(this);
                     let lights=new Array();
                     let lightObj={
@@ -1393,10 +1393,10 @@
                         //平台车
                         continue;
                     }
-//                    if (d.heading >=360) {
-//                        // 不处理大于360的的数据
-//                        continue;
-//                    }
+                    if (d.heading >=360) {
+                        // 不处理大于360的的数据
+                        continue;
+                    }
                     if (d.heading<0) {
                         // 不处理小于0的的数据
                         continue;
@@ -1406,8 +1406,6 @@
                         d.longitude,
                         d.latitude
                     ]);
-//                    console.log(d.longitude);
-                   // console.log(dUTM[0]);
                     if (d.targetType == 0 || d.targetType == 1 || d.targetType == 3) {
                         if (i < this.deviceModels[deviceid].persons.length) {
                             let mdl = this.deviceModels[deviceid].persons[i];
@@ -1415,13 +1413,12 @@
                             mdl.position.y = dUTM[1];
                             mdl.position.z = this.defualtZ;
                             //test
-                            //  let text = this.deviceModels[deviceid].texts[i];
-                            //  text.setText(d.vehicleId.substr(0,8));
-                            //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
-                            // let text1 = this.deviceModels[deviceid].texts[i];
-
-                            //        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
-                            //      text1.update()
+                            let text1 = this.deviceModels[deviceid].texts[i];
+                            let h = d.heading.toFixed(1);
+                            let s = d.speed.toFixed(1);
+                            text1.setText("[" + h + ", " + s + "]");
+                            text1.setPositon([dUTM[0], dUTM[1], this.defualtZ + 2]);
+                            text1.update();
                         }
                     } else {
                         if (i < this.deviceModels[deviceid].cars.length) {
@@ -1576,8 +1573,6 @@
 
                     for (let n = 0; n < pcars.length; n++) {
                         let pcar = pcars[n];
-
-
                         if (pcar.heading<0) {
                             // 不处理小于0的的数据
                             continue;
@@ -1800,7 +1795,6 @@
                     data.longitude,
                     data.latitude
                 ]);
-//                console.log("经纬度："+data.longitude, data.latitude,data.heading);
                 if (carModel == null) {
                     this.addModel(
                         vid,
