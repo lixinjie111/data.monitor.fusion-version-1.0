@@ -4,7 +4,7 @@
             <div class="c-fusion-left fusion-left">
                 <div class="c-scroll-wrap">
                     <div class="c-scroll-inner">
-                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount" :vehData="vehData"></left>
+                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount" :vehData="vehData" v-show="leftShow"></left>
                     </div>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 signCount:0,
                 time:0,
                 perceptionData:{},
-                vehData:{}
+                leftShow:true
             }
         },
         components:{

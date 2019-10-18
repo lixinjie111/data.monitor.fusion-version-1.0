@@ -38,9 +38,9 @@
                 }
             );
             this.aMap = new AMap.Map(this.id, _optionWms);
-            setTimeout(()=>{
+            this.aMap.on('complete',()=>{
                 this.aMap.setMapStyle(window.mapOption.mapStyleEmpty);
-            },0)
+            });
             this.drawRoadMap();
         },
         methods: {
