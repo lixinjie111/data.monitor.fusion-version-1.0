@@ -98,7 +98,8 @@
                 carConnectCount:0,
                 cancelConnectCount:0,
                 sideConnectCount:0,
-                testCount:0
+                testCount:0,
+                testSet:new Set()
             }
 
         },
@@ -665,8 +666,12 @@
                 if(type=='CLOUD'){
                     warningData.forEach(item=>{
                         warningId = item.warnId;
+//                        console.log(_this.testSet);
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        console.log("距离："+item.dis);
+//                        _this.testSet.add(warningId);
+//                        console.log("告警大小："+_this.testSet.size);
+//                        console.log(warningId+"---"+warningJson.time);
+//                        console.log("距离："+item.dis);
                         let msg = item.warnMsg;
                         let warningObj={
                             longitude:item.longitude,
@@ -685,33 +690,34 @@
                                 flag:false
 
                             }
-                            obj.timer = setTimeout(()=>{
-                                _this.$refs.tusvnMap.removeModel(obj.id);
-                                obj.flag=true;
-                                for(let key in warningData){
-                                    if(warningData[key].flag){
-                                        delete warningData[key];
-                                    }
-                                }
-                            },2000)
+//                            obj.timer = setTimeout(()=>{
+//                                _this.$refs.tusvnMap.removeModel(obj.id);
+//                                obj.flag=true;
+//                                for(let key in warningData){
+//                                    if(warningData[key].flag){
+//                                        delete warningData[key];
+//                                    }
+//                                }
+//                            },2000)
                             _this.warningData[warningId]=obj;
                             _this.alertCount++;
                             _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
                             let obj = _this.warningData[warningId];
-                            clearTimeout(obj.timer);
-                            obj.timer = setTimeout(()=>{
-                                _this.$refs.tusvnMap.removeModel(obj.id);
-                                obj.flag=true;
-                                console.log("移除事件")
-                                for(let key in warningData){
-                                    if(key!=obj.id&&warningData[key].flag){
-                                        delete warningData[key];
-                                    }
-                                }
-                            },2000)
-                            _this.warningData[warningId]=obj;
+//                            clearTimeout(obj.timer);
+//                            obj.timer = setTimeout(()=>{
+//                                _this.$refs.tusvnMap.removeModel(obj.id);
+//                                obj.flag=true;
+////                                console.log("移除事件")
+////                                console.log("事件id："+warningId);
+//                                for(let key in warningData){
+//                                    if(key!=obj.id&&warningData[key].flag){
+//                                        delete warningData[key];
+//                                    }
+//                                }
+//                            },2000)
+//                            _this.warningData[warningId]=obj;
 //                            console.log("提示信息："+msg,item.dis,obj.dist);
                             //进行更新
                             _this.$refs.tusvnMap.removeModel(obj.id);
