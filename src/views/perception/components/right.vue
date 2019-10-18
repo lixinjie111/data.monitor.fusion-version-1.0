@@ -169,7 +169,7 @@
             let extend = parseFloat(_this.$route.params.extend);
             //设置地图的中心点
             if(longitude||latitude) {
-                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
+                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
                 _this.x = utm[0];
                 _this.y = utm[1];
                 _this.getExtend(longitude,latitude,extend);
@@ -298,8 +298,8 @@
             getCurrentExtent() {
                 this.currentExtent = [];
                 let result = this.$refs.perceptionMap.getExtent();
-                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
 
                 let x1 = utm1[0];
                 let y1 = utm1[1];
@@ -317,8 +317,8 @@
             getCenter(){
                 this.center= [];
                 let result = this.$refs.perceptionMap.getExtent();
-                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
+                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
+                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
                 /*let utm1 = [121.16305725240798,31.279518991604288];
                 let utm2 = [121.17979423666091,31.289571910992105];*/
                 let x1 = utm1[0];
@@ -362,7 +362,7 @@
                         signs.forEach(item=>{
                             this.signCount++;
                             //将小的转成大的3
-//                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
+//                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
 //                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
                         })
                     }

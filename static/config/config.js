@@ -1,5 +1,6 @@
 window.config = {
     //长沙 测试地址
+    // staticUrl: "http://111.23.140.59:9090/", //静态文件路径
     // url: 'http://111.23.140.59:9093/monPlatApp/', //监控平台
     // operateUrl: 'http://111.23.140.59:9090/operateApp/', //运营平台
     // websocketUrl:'ws://111.23.140.59:9982/mon',  //监控
@@ -8,6 +9,7 @@ window.config = {
     // dlWmsUrl: 'http://218.76.44.22:48080/', //迪路
 
     //长沙 正式地址
+    staticUrl: "http://218.76.44.22:9090/", //静态文件路径
     url: 'http://218.76.44.22:9093/monPlatApp/', //监控平台
     operateUrl: 'http://218.76.44.22:9090/operateApp/', //运营平台
     websocketUrl:'ws://218.76.44.22:9982/mon',  //监控
