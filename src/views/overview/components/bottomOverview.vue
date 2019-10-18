@@ -38,7 +38,8 @@ export default {
         // action: 'vehicleList',
         action: "can_real_data",
         token: "fpx",
-        vehicleIds: "B21E-00-017,B21E-00-018,B21E-00-019,B21E-00-020"
+        vehicleIds: "B21E-00-017,B21E-00-018,B21E-00-019,B21E-00-020",
+        canConnectCount:0
       }
     };
   },
@@ -89,13 +90,20 @@ export default {
     },
     initWebSocket() {
       // console.log('websocket获取指定车辆实时信息');
-      if ("WebSocket" in window) {
-        this.webSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
-          this.webSocket.onmessage = this.onmessage;
-          this.webSocket.onclose = this.onclose;
-          this.webSocket.onopen = this.onopen;
-          this.webSocket.onerror = this.onerror;
-      }
+        try{
+            if ("WebSocket" in window) {
+                this.webSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
+                this.webSocket.onmessage = this.onmessage;
+                this.webSocket.onclose = this.onclose;
+                this.webSocket.onopen = this.onopen;
+                this.webSocket.onerror = this.onerror;
+            }else{
+                this.$message("此浏览器不支持websocket");
+            }
+        }catch (e){
+            this.canReconnect();
+        }
+
     },
     onmessage(message) {
       let _json = JSON.parse(message.data),
@@ -115,7 +123,12 @@ export default {
       });
     },
     onclose(data) {
-      // console.log("结束--vehicleList--连接");
+      console.log("can数据结束连接");
+        this.canReconnect();
+    },
+    onerror(){
+        console.log("can数据连接error");
+        this.canReconnect();
     },
     onopen(data) {
       // console.log("建立--vehicleList--连接");
@@ -135,6 +148,21 @@ export default {
         return;
       }
     },
+    canReconnect(){
+        //实例销毁后不进行重连
+        if(this._isDestroyed){
+            return;
+        }
+        //重连不能超过10次
+        if(this.canConnectCount>=10){
+            return;
+        }
+        this.initWebSocket();
+        //重连不能超过5次
+        this.canConnectCount++;
+    },
+
+
     showView(carId) {
       this.$router.push({
         path: "/single/" + carId

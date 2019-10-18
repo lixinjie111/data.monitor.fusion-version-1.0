@@ -6,36 +6,18 @@
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
-            <div v-for="(item,index) in camList" class="video-position" v-if="camList.length>0">
+            <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
                 <div class="style">
-                    <div class="video-mask" @click="screenMagnify(index)"></div>
+                    <div class="video-mask" @click="screenMagnify(item)"></div>
                     <live-player
                             :requestVideoUrl="requestVideoUrl"
                             :params="item.params"
                             type="flvUrl"
                             :autoplay="false"
-                            @videoLoadCompleted="videoLoadCompleted"
                     >
                         <div class="video-num" @click="changeMap(index)">
                             <span class="device-num">摄像头编号:{{item.devId}}</span>
                             <span class="active-circle" :class="{'active-style':isActive==index}"></span>
-                            <span>{{item.rsPtName}}</span>
-                        </div>
-                        <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
-                    </live-player>
-                </div>
-                <div class="big-video" v-show="item.videoShow">
-                    <div class="video-mask" @click="screenShrink(index)"></div>
-                    <live-player
-                            :requestVideoUrl="item.videoUrl"
-                            :params="item.params"
-                            type="flvUrl"
-                            :autoplay="false"
-                            :ref="'bigPlayer'+index"
-
-                    >
-                        <div class="video-num" @click="changeMap(index)">
-                            <span class="device-num">摄像头编号:{{item.devId}}</span>
                             <span>{{item.rsPtName}}</span>
                         </div>
                         <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
@@ -85,11 +67,6 @@
                 spatCount:0,
                 signCount:0,
                 center:[],
-                mapOption:{
-                    center: [121.262939,31.245149],
-                    zoom: 18,
-                    mapStyle: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00"
-                },
                 weather:{},
                 cameraParam:{},
                 step:5,
@@ -101,8 +78,10 @@
                 viewTime:0,
                 isConMov:false,
                 source:'',
-                lightWebsocket:null,
-                warningCancleWebsocket:null,
+                platformWebsocke:null,
+                perceptionWebsocket:null,
+                spatWebsocket:null,
+                warningWebsocket:null,
                 param:1, //平面 俯视
                 time:'',
                 time1:'',
@@ -125,7 +104,12 @@
                 camList:[],
                 requestVideoUrl:getVideoByNum,
                 tabIsExist:true,
-                isMin:false
+                isMin:false,
+                warningConnectCount:0,
+                cancelConnectCount:0,
+                platformConnectCount:0,
+                perceptionConnectCount:0,
+                spatConnectCount:0
             }
         },
         props:{
@@ -148,7 +132,7 @@
         },
         components: { TusvnMap,TusvnMap1,LivePlayer},
         watch: {
-            realData: {
+            '$store.getters.getRealData': {
                 handler(newName, oldName) {
                     this.moveMap();
                 },
@@ -206,21 +190,13 @@
             });
         },
         methods: {
-            videoLoadCompleted(params){
-                for(let i=0;i<this.camList.length;i++){
-                    let item = this.camList[i];
-                    if(item.sn==params.serialNum){
-                        item.videoUrl = params.videoUrl;
-                        break;
-                    }
-                }
-            },
             onMapComplete(){
+
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-//                    setInterval(()=>{
-//                        let camera = this.$refs.perceptionMap.getCamera();
-//                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
-//                    },500)
+                    /*setInterval(()=>{
+                        let camera = this.$refs.perceptionMap.getCamera();
+                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
+                    },500)*/
                    let count=0;
                    let flag=false;
                    let camParam;
@@ -258,7 +234,6 @@
                 this.initSpatWebSocket();
 //                           //地图不连续移动，判断红绿灯的位置受否再可视区
                 this.initWarningWebSocket();
-                this.initWarningCancleWebSocket();
                 this.getMap();
             },
             map1InitComplete(){
@@ -278,7 +253,6 @@
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
                 let currentExtend = this.currentExtent;
-                console.log("currentExtent:"+this.currentExtent)
                 overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
@@ -293,7 +267,7 @@
                 if(processTime!=''){
                     this.processDataTime=processTime;
                 }
-                this.$emit("getPerceptionData",vehDataStat);
+                this.$parent.perceptionData=vehDataStat;
             },
             getCameraByRsId(){
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
@@ -308,7 +282,7 @@
                             }
                             item.params = params;
                             item.rsPtName=data.rsName;
-                            this.$set(item,"videoShow",false);
+                            this.$set(item,"magnify",false);
 //                        item.videoShow=false;
                         })
                     }
@@ -400,7 +374,9 @@
                             });
                         })
                     }
-                    this.$emit("count", this.signCount, this.spatCount);
+                    this.$parent.spatCount = this.spatCount;
+                    this.$parent.signCount = this.signCount;
+//                    this.$emit("count", this.signCount, this.spatCount);
                 })
             },
             moveMap(){
@@ -637,7 +613,6 @@
                     this.param=-1;
                     this.isActive=-1;
                     this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
-//                    this.$refs.perceptionMap.updateCameraPosition(window.defaultRoadParam.x,window.defaultRoadParam.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
                     return;
                 }
                 if(this.camList.length>0){
@@ -653,25 +628,29 @@
                 this.isActive=param;
                 this.param=param;
             },
-            screenMagnify(param){
-                let videoUrl = this.camList[param].videoUrl;
-                if(videoUrl!=''){
-                    this.camList[param].videoShow=true;
-                }
-            },
-            screenShrink(param){
-                let player = this.$refs['bigPlayer'+param];
-                player[0].player.pause();
-                this.camList[param].videoShow=false;
+            screenMagnify(item){
+                item.magnify = !item.magnify;
+//                let videoUrl = this.camList[param].videoUrl;
+//                if(videoUrl!=''){
+//                    this.camList[param].videoShow=true;
+//                }
             },
             initWarningWebSocket(){
                 let _this=this;
-                if ('WebSocket' in window) {
-                    _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                    _this.warningWebsocket.onmessage = _this.onWarningMessage;
-                    _this.warningWebsocket.onclose = _this.onWarningClose;
-                    _this.warningWebsocket.onopen = _this.onWarningOpen;
+                try{
+                    if ('WebSocket' in window) {
+                        _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                        _this.warningWebsocket.onmessage = _this.onWarningMessage;
+                        _this.warningWebsocket.onclose = _this.onWarningClose;
+                        _this.warningWebsocket.onopen = _this.onWarningOpen;
+                        _this.warningWebsocket.onerror = _this.onWarningError;
+                    }else {
+                        _this.$message("此浏览器不支持websocket")
+                    }
+                }catch (e){
+                    _this.warningReconnect();
                 }
+
             },
             onWarningMessage(mesasge){
                 let _this=this;
@@ -694,7 +673,6 @@
                             longitude:item.longitude,
                             latitude:item.latitude
                         }
-                        let warningHash = _this.hashcode(JSON.stringify(warningObj));
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
                             _this.warningCount++;
@@ -703,35 +681,61 @@
                                 msg:msg,
                                 longitude:item.longitude,
                                 latitude:item.latitude,
-                                hash:warningHash
+                                timer:null,
+                                flag:false
+
                             }
+                            obj.timer = setTimeout(()=>{
+                                _this.$refs.perceptionMap.removeModel(obj.id);
+                                obj.flag=true;
+                                for(let key in warningData){
+                                    if(warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
                             _this.warningData[warningId]=obj;
                             _this.alertCount++;
                             _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
                             let obj = _this.warningData[warningId];
-                            if(obj.hash!=warningHash){
-                                //进行更新
+                            clearTimeout(obj.timer);
+                            obj.timer = setTimeout(()=>{
                                 _this.$refs.perceptionMap.removeModel(obj.id);
-                                _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
-                            }
+                                obj.flag=true;
+                                console.log("移除事件")
+                                for(let key in warningData){
+                                    if(key!=obj.id&&warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
+                            _this.warningData[warningId]=obj;
+
+                            _this.$refs.perceptionMap.removeModel(obj.id);
+                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }
                     })
                     //此次告警结束，将总数传递出去
-                    _this.$emit("getWarningCount",_this.warningCount);
+                    _this.$parent.warningCount = _this.warningCount;
                 }
             },
             onWarningClose(data){
                 console.log("告警结束连接");
+                this.warningReconnect();
+            },
+            onWarningError(){
+                console.log("告警连接error");
+                this.warningReconnect();
             },
             onWarningOpen(data){
                 //旁车
-                var warning = {
+                let warning = {
                     "action": "clod_event",
                     "region": this.currentExtent
                 }
-                var warningMsg = JSON.stringify(warning);
+                let warningMsg = JSON.stringify(warning);
                 this.sendWarningMsg(warningMsg);
             },
             sendWarningMsg(msg) {
@@ -739,105 +743,68 @@
                 if(window.WebSocket){
                     if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
                         _this.warningWebsocket.send(msg); //send()发送消息
-                        console.log("warning已发送消息:"+ msg);
                     }
                 }else{
                     return;
                 }
             },
-            initWarningCancleWebSocket(){
-                let _this=this;
-                if ('WebSocket' in window) {
-                    _this.warningCancleWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                    _this.warningCancleWebsocket.onmessage = _this.onWarningCancleMessage;
-                    _this.warningCancleWebsocket.onclose = _this.onWarningCancleClose;
-                    _this.warningCancleWebsocket.onopen = _this.onWarningCancleOpen;
-                }
-            },
-            onWarningCancleMessage(mesasge){
-                let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let warningCancleData = json.result;
-                let obj;
-                let warningIds = JSON.parse(warningCancleData);
-                warningIds.forEach(warningId=>{
-                    obj = _this.warningData[warningId];
-                    //防止路口页面和单车页面事件交叉影响
-                    if(obj&&obj.id){
-                        _this.$refs.perceptionMap.removeModel(obj.id);
-                        delete _this.warningData[warningId];
-                        let eventObj = {
-                            id:warningId,
-                            time:null
-                        }
-                        eventObj.time=setTimeout(()=>{
-                            delete _this.removeEventObj[warningId];
-                        },2000)
-                        _this.removeEventObj[warningId]=eventObj;
-                    }
-                })
-            },
-            onWarningCancleClose(data){
-                console.log("取消告警结束连接");
-            },
-            onWarningCancleOpen(data){
-                //旁车
-                let warningCancel = {
-                    "action": "event_cancel",
-                    "token": "tusvn"
-                }
-                let warningMsg = JSON.stringify(warningCancel);
-                this.sendWarningCancleMsg(warningMsg);
-            },
-            sendWarningCancleMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.warningCancleWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.warningCancleWebsocket.send(msg); //send()发送消息
-                        console.log("warning已发送消息:"+ msg);
-                    }
-                }else{
+            warningReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
                     return;
                 }
-            },
-            hashcode(str) {
-                let hash = 0, i, chr, len;
-                if (str.length === 0) return hash;
-                for (i = 0, len = str.length; i < len; i++) {
-                    chr   = str.charCodeAt(i);
-                    hash  = ((hash << 5) - hash) + chr;
-                    hash |= 0; // Convert to 32bit integer
+                //重连不能超过10次
+                if(this.warningConnectCount>=10){
+                    return;
                 }
-                return hash;
+                this.initWarningWebSocket();
+                //重连不能超过5次
+                this.warningConnectCount++;
             },
 
             //平台车
             initPlatformWebSocket(){
                 let _this=this;
-                if ('WebSocket' in window) {
-                    _this.platformWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                    _this.platformWebsocket.onmessage = _this.onPlatformMessage;
-                    _this.platformWebsocket.onclose = _this.onPlatformClose;
-                    _this.platformWebsocket.onopen = _this.onPlatformOpen;
+                try{
+                    if ('WebSocket' in window) {
+                        _this.platformWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                        _this.platformWebsocket.onmessage = _this.onPlatformMessage;
+                        _this.platformWebsocket.onclose = _this.onPlatformClose;
+                        _this.platformWebsocket.onopen = _this.onPlatformOpen;
+                        _this.platformWebsocket.onerror=_this.onPlatformError;
+                    }else{
+                        _this.$message("此浏览器不支持websocket");
+                    }
+                }catch (e){
+                    this.platformReconnect();
                 }
+
             },
             onPlatformMessage(mesasge){
                 let _this=this;
                 _this.$refs.perceptionMap.onCarMessage(mesasge);
+                let json = JSON.parse(mesasge.data);
+                _this.$parent.vehData = json.result.vehDataStat;
+//                _this.$emit("getPlatformData",json.result.vehDataStat);
             },
             onPlatformClose(data){
-                console.log("红绿灯结束连接");
+                console.log("平台车结束连接");
+                this.platformReconnect();
+            },
+            onPlatformError(){
+                console.log("平台车连接error");
+                this.platformReconnect();
             },
             onPlatformOpen(data){
                 //旁车
-                var platform = {
+                let platform = {
                     "action": "road_real_data_reg",
                     "data": {
 //                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
                         "polygon":window.currentExtent
                     }
                 }
-                var platformMsg = JSON.stringify(platform);
+                let platformMsg = JSON.stringify(platform);
                 this.sendPlatformMsg(platformMsg);
             },
             sendPlatformMsg(msg) {
@@ -850,16 +817,37 @@
                     return;
                 }
             },
+            platformReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.platformConnectCount>=10){
+                    return;
+                }
+                this.initPlatformWebSocket();
+                //重连不能超过5次
+                this.platformConnectCount++;
+            },
 
             //感知车
             initPerceptionWebSocket(){
                 let _this=this;
-                if ('WebSocket' in window) {
-                    _this.perceptionWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                    _this.perceptionWebsocket.onmessage = _this.onPerceptionMessage;
-                    _this.perceptionWebsocket.onclose = _this.onPerceptionClose;
-                    _this.perceptionWebsocket.onopen = _this.onPerceptionOpen;
+                try{
+                    if ('WebSocket' in window) {
+                        _this.perceptionWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                        _this.perceptionWebsocket.onmessage = _this.onPerceptionMessage;
+                        _this.perceptionWebsocket.onclose = _this.onPerceptionClose;
+                        _this.perceptionWebsocket.onopen = _this.onPerceptionOpen;
+                        _this.perceptionWebsocket.onerror= _this.onPerceptionError;
+                    }else{
+                        _this.$message("此浏览器不支持websocket");
+                    }
+                }catch (e){
+                    this.perceptionReconnect();
                 }
+
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
@@ -876,11 +864,16 @@
                 }
             },
             onPerceptionClose(data){
-                console.log("红绿灯结束连接");
+                console.log("感知车结束连接");
+                this.perceptionReconnect();
+            },
+            onPerceptionError(){
+                console.log("感知车连接error");
+                this.perceptionReconnect();
             },
             onPerceptionOpen(data){
                 //旁车
-                var perception = {
+                let perception = {
                     "action": "road_real_data_per",
                     "data": {
                         /*"polygon": [
@@ -892,7 +885,7 @@
                         "polygon":this.currentExtent
                     }
                 }
-                var perceptionMsg = JSON.stringify(perception);
+                let perceptionMsg = JSON.stringify(perception);
                 this.sendPerceptionMsg(perceptionMsg);
             },
             sendPerceptionMsg(msg) {
@@ -905,20 +898,41 @@
                     return;
                 }
             },
-
+            perceptionReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.perceptionConnectCount>=10){
+                    return;
+                }
+                this.initPerceptionWebSocket();
+                //重连不能超过5次
+                this.perceptionConnectCount++;
+            },
             //红绿灯
             initSpatWebSocket(){
                 let _this=this;
-                if ('WebSocket' in window) {
-                    _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                    _this.spatWebsocket.onmessage = _this.onSpatMessage;
-                    _this.spatWebsocket.onclose = _this.onSpatClose;
-                    _this.spatWebsocket.onopen = _this.onSpatOpen;
+                try {
+                    if ('WebSocket' in window){
+                        _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                        _this.spatWebsocket.onmessage = _this.onSpatMessage;
+                        _this.spatWebsocket.onclose = _this.onSpatClose;
+                        _this.spatWebsocket.onopen = _this.onSpatOpen;
+                        _this.spatWebsocket.onerror = _this.onSpatError;
+                    }
+                    else{
+                        _this.$message("此浏览器不支持websocket")
+                    }
+                } catch (e) {
+                    _this.spatReconnect();
                 }
+
+
             },
             onSpatMessage(mesasge){
                 let _this=this;
-                _this.$refs.perceptionMap.addPerceptionData(mesasge);
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
 //                let vehData = json.result.vehDataStat;
@@ -1135,10 +1149,15 @@
             },
             onSpatClose(data){
                 console.log("红绿灯结束连接");
+                this.spatReconnect();
+            },
+            onSpatError(){
+                console.log("红绿灯连接error");
+                this.spatReconnect();
             },
             onSpatOpen(data){
                 //旁车
-                var spat = {
+                let spat = {
                     "action": "road_real_data_spat",
                     "data": {
                         /*"polygon": [
@@ -1150,7 +1169,7 @@
                         "polygon":this.currentExtent
                     }
                 }
-                var spatMsg = JSON.stringify(spat);
+                let spatMsg = JSON.stringify(spat);
                 this.sendSpatMsg(spatMsg);
             },
             sendSpatMsg(msg) {
@@ -1163,7 +1182,24 @@
                     return;
                 }
             },
+            spatReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.spatConnectCount>=10){
+                    return;
+                }
+                this.initSpatWebSocket();
+                //重连不能超过5次
+                this.spatConnectCount++;
+            },
+
+
+
             getExtend(x,y,r){
+                this.currentExtent=[];
                 let x0=x+r;
                 let y0=y+r;
                 let x1=x-r;
@@ -1181,10 +1217,8 @@
             clearInterval(this.mapTime4);
             clearTimeout(this.time);
             clearInterval(this.mapInitTime);
-            this.lightWebsocket&&this.lightWebsocket.close();
             this.$refs.perceptionMap&&this.$refs.perceptionMap.reset3DMap();
             this.warningWebsocket&&this.warningWebsocket.close();
-            this.warningCancleWebsocket&&this.warningCancleWebsocket.close();
             this.platformWebsocket&&this.platformWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
@@ -1264,7 +1298,6 @@
     }
     .video-num{
         position: absolute;
-        z-index:2;
         left: 0;
         right: 0;
         padding: 0px 10px;
@@ -1326,11 +1359,11 @@
             }*/
         }
     }
-    .big-video{
+    .magnify-style{
         position: absolute;
         top: 0px;
         right: 0px;
-        z-index:4;
+        z-index:6;
         width: 900px;
         border:1px solid rgba(211, 134, 0, 0.5);
         background: #000;
@@ -1341,6 +1374,7 @@
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
         height: 226px;
+        background: #00000082;
     }
     .video-mask{
         position: absolute;
@@ -1348,7 +1382,7 @@
         bottom: 0;
         width: 80px;
         height: 46px;
-        z-index: 999;
+        z-index: 3;
         cursor: pointer;
     }
 

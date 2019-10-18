@@ -42,12 +42,12 @@ export const rwDis = params => {return axios.post(`${HTTPURL}rw/bs/rwDis`, param
 /**
  * 典型路段信息
  */
-export const getTypicalRoadData = params => {return axios.post(`${HTTPURL}/ehb/road/typeRoad`, params).then(res => res.data); };
+export const getTypicalRoadData = params => {return axios.post(`${HTTPURL}ehb/road/typeRoad`, params).then(res => res.data); };
 
 /**
  * 获取四个角的地理位置
  */
-export const getTypeRoadData = params => { return axios.post(`${HTTPURL}/ehb/road/typeRoadData`, params).then(res => res.data); };
+export const getTypeRoadData = params => { return axios.post(`${HTTPURL}ehb/road/typeRoadData`, params).then(res => res.data); };
 
 
 /**
