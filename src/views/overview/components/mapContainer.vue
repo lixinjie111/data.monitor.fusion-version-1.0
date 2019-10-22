@@ -98,7 +98,7 @@ export default {
                         // console.log(_filterData[id].plateNo, "add");
                         _this.addMarker(_filterData[id]);
                         _this.addPlateNoMarker(_filterData[id]);
-                    }       
+                    }
                 }
 
                 if(_this.setFitViewFlag) {

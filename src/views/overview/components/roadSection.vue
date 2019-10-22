@@ -132,9 +132,21 @@
                 let _this = this;
                 let jsonData = JSON.parse(message.data);
                 let result = jsonData.result;
+                let data = result.vehDataDTO;
+                if(data.length>0){
+//                    console.log(data[0].gpsTime+".........");
+
+                    let id = data[0].vehicleId;
+                    if(_this.prevData[id]){
+                        if(_this.prevData[id].gpsTime>=data[0].gpsTime){
+                            console.log("车辆数据到达错误！")
+                            return;
+                        }
+                    }
+                }
                 // 车辆
                 if ("vehDataDTO" in result === true) {
-                    _this.crossData.roadSenseCars = result.vehDataDTO;
+                    _this.crossData.roadSenseCars = data;
                     if (_this.crossData.roadSenseCars.length > 0) {
                         _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
                             x => x.targetType === 2 || x.targetType === 5
@@ -150,18 +162,40 @@
                                 vehicleId: item.vehicleId,
                                 devId: item.devId,
                                 marker: null,
-                                plateNo:item.plateNo
+                                plateNo:item.plateNo,
+                                gpsTime:item.gpsTime
                             };
                         });
 
-                    for (let id in _this.prevData) {
-                        if(_filterData[id]) {   //表示有该点，做move
-                            _filterData[id].marker = _this.prevData[id].marker;
-                            let _currentCar = _filterData[id];
-                            _filterData[id].marker.setAngle(_currentCar.heading);
-//                            _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
+                        for (let id in _this.prevData) {
+                            if(_filterData[id]) {   //表示有该点，做move
+                                _filterData[id].marker = _this.prevData[id].marker;
+                                let _currentCar = _filterData[id];
+                                _filterData[id].marker.setAngle(_currentCar.heading);
+                                //计算速度AMap.GeometryUtil.distance(p1, p2);
+                                let p1 =  new AMap.LngLat(_filterData[id].longitude,_filterData[id].latitude);
+                                let time1 = _filterData[id].gpsTime;
+                                let p2 ;
+                                let time2;
+                                let item = _this.prevData[id];//上一个点
+//                                    console.log(item.gpsTime+"--------")
+                                p2 = new AMap.LngLat(item.longitude,item.latitude);
+                                time2 = item.gpsTime;
+                                let distance = AMap.GeometryUtil.distance(p1, p2);
+                                let t = Math.abs(time1-time2)/1000;
+                                let speed;
+//                                    console.log(distance,time1,time2,t);
+                                if(t==0){
+                                    speed = _currentCar.speed
+                                }else{
+                                    speed = (distance/t*3.6).toFixed(2);
+                                    console.log("speed:"+speed);
 
-                            _filterData[id].marker.setPosition([_currentCar.longitude, _currentCar.latitude]);
+                                }
+                                _filterData[id].marker.setPosition(p2);
+                                _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], speed);
+
+//                                    _filterData[id].marker.setPosition([_currentCar.longitude, _currentCar.latitude]);
 //                            if(_filterData[id].vehicleId=='B21E0005'){
 //                                console.log("沪A523456-----"+_filterData[id].plateNo);
 //                                let marker =  new AMap.Marker({
@@ -171,27 +205,27 @@
 //                                    zIndex: 1
 //                                });
 //                            }
-                        } else {   //表示没有该点，做remove
-//                            _this.prevData[id].marker.stopMove();
-                            _this.aMap.remove(_this.prevData[id].marker);
-                            delete _this.prevData[id];
+                            } else {   //表示没有该点，做remove
+                                _this.prevData[id].marker.stopMove();
+                                _this.aMap.remove(_this.prevData[id].marker);
+                                delete _this.prevData[id];
+                            }
                         }
-                    }
-                    for (let id in _filterData) {
-                        if(!_this.prevData[id]) {   //表示新增该点，做add
-                            _filterData[id].marker = new AMap.Marker({
-                                position: [_filterData[id].longitude, _filterData[id].latitude],
-                                map: _this.aMap,
-                                icon: "static/images/road/car.png",
-                                angle: _filterData[id].heading,
-                                devId: _filterData[id].devId,
-                                offset:new AMap.Pixel(-4, -9),
-                                zIndex: 1
-                            });
+                        for (let id in _filterData) {
+                            if(!_this.prevData[id]) {   //表示新增该点，做add
+                                _filterData[id].marker = new AMap.Marker({
+                                    position: [_filterData[id].longitude, _filterData[id].latitude],
+                                    map: _this.aMap,
+                                    icon: "static/images/road/car.png",
+                                    angle: _filterData[id].heading,
+                                    devId: _filterData[id].devId,
+                                    offset:new AMap.Pixel(-4, -9),
+                                    zIndex: 1
+                                });
+                            }
                         }
-                    }
 
-                    _this.prevData = _filterData;
+                        _this.prevData = _filterData;
 
                     } else {
                         // 返回的数据为空

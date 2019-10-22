@@ -1687,16 +1687,7 @@
                     cdata.nowRecieveData = d;
                     this.cacheAndInterpolateDataByVid[vid]=cdata;
                 }else{//存在该车的数据
-//                    let position = proj4(this.sourceProject, this.destinatePorject, [
-//                        pcar.longitude,
-//                        pcar.latitude
-//                    ]);
-//                    this.models[vid].position.set(position[0], position[1], this.defualtZ);
-//                    this.models[vid].rotation.set(
-//                        this.pitch,
-//                        this.yaw,
-//                        (-Math.PI / 180) * pcar.heading
-//                    );
+
                     let d = {
                         vehicleId: vid,
                         longitude: pcar.longitude,
