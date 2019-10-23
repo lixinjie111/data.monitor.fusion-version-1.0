@@ -136,12 +136,19 @@
                 if(data.length>0){
 //                    console.log(data[0].gpsTime+".........");
 
-                    let id = data[0].vehicleId;
-                    if(_this.prevData[id]){
-                        if(_this.prevData[id].gpsTime>data[0].gpsTime){
-                            console.log("车辆数据到达错误！")
-                            return;
+                    let flag = false;
+                    for(let i=0;i<data.length;i++){
+                        let id = data[i].vehicleId;
+                        if(_this.prevData[id]){
+                            if(_this.prevData[id].gpsTime>=data[i].gpsTime){
+                                console.log(id+"---车辆数据到达错误！")
+                                flag=true;
+                                break;
+                            }
                         }
+                    }
+                    if(flag){
+                        return;
                     }
                 }
                 // 车辆
@@ -183,15 +190,8 @@
                                 time2 = item.gpsTime;
                                 let distance = AMap.GeometryUtil.distance(p1, p2);
                                 let t = Math.abs(time1-time2)/1000;
-                                let speed;
-//                                    console.log(distance,time1,time2,t);
-                                if(t==0){
-                                    speed = _currentCar.speed
-                                }else{
-                                    speed = (distance/t*3.6).toFixed(2);
-                                    console.log("speed:"+speed);
-
-                                }
+                                let speed = (distance/t*3.6).toFixed(2);
+//                                    console.log("speed:"+speed);
                                 _filterData[id].marker.setPosition(p2);
                                 _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], speed);
 
