@@ -704,6 +704,8 @@
                             obj.timer = setTimeout(()=>{
                                 _this.$refs.perceptionMap.removeModel(obj.id);
                                 obj.flag=true;
+                                _this.warningCount--;
+                                _this.$parent.warningCount = _this.warningCount;
                                 console.log("移除事件")
                                 for(let key in warningData){
                                     if(key!=obj.id&&warningData[key].flag){
