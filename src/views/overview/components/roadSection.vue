@@ -190,7 +190,7 @@
                                 time2 = item.gpsTime;
                                 let distance = AMap.GeometryUtil.distance(p1, p2);
                                 let t = Math.abs(time1-time2)/1000;
-                                let speed = (distance/t*3.6).toFixed(2);
+                                let speed = (distance/t*3.6);
 //                                    console.log("speed:"+speed);
                                 _filterData[id].marker.setPosition(p2);
                                 _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], speed);
