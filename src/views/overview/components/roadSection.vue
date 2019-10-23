@@ -138,7 +138,7 @@
 
                     let id = data[0].vehicleId;
                     if(_this.prevData[id]){
-                        if(_this.prevData[id].gpsTime>=data[0].gpsTime){
+                        if(_this.prevData[id].gpsTime>data[0].gpsTime){
                             console.log("车辆数据到达错误！")
                             return;
                         }
