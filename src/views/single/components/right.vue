@@ -36,8 +36,8 @@
         <div class="c-map">
             <tusvn-map :target-id="'mapMonitor'" ref="tusvnMap"
                        background="mapParam.background" minX="mapParam.minX"   minY="mapParam.minY" minZ="mapParam.minZ"
-            maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
-            @mapcomplete="onMapComplete" @pcarDataTime="getProcessTime">
+                       maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
+                       @mapcomplete="onMapComplete" @pcarDataTime="getProcessTime">
             </tusvn-map>
         </div>
         <div class="travel-detail">
@@ -98,8 +98,7 @@
                 carConnectCount:0,
                 cancelConnectCount:0,
                 sideConnectCount:0,
-                testCount:0,
-                testSet:new Set()
+                testCount:0
             }
 
         },
@@ -407,11 +406,11 @@
                         //前向摄像头
                         if(item.toward==0){
                             this.forwardParam ={
-                               'vehicleId': this.vehicleId,
+                                'vehicleId': this.vehicleId,
                                 'camId':item.serialNum,
                                 'protocal':item.protocol
-                           }
-                           this.forwardShow=true;
+                            }
+                            this.forwardShow=true;
                         }
                         //车内摄像头
                         if(item.toward==4){
@@ -440,9 +439,9 @@
             repeatFn(item){//每5秒直播报活一次
                 let _this = this;
                 _this.keepStream(item);
-               if(_this.timeObj[item.camId]){
-                   clearTimeout(_this.timeObj[item.camId]);
-               }
+                if(_this.timeObj[item.camId]){
+                    clearTimeout(_this.timeObj[item.camId]);
+                }
                 let time = setTimeout(function(){
                     _this.repeatFn(item);
                 },5000)
@@ -661,12 +660,8 @@
                 if(type=='CLOUD'){
                     warningData.forEach(item=>{
                         warningId = item.warnId;
-//                        console.log(_this.testSet);
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-//                        _this.testSet.add(warningId);
-//                        console.log("告警大小："+_this.testSet.size);
-//                        console.log(warningId+"---"+warningJson.time);
-//                        console.log("距离："+item.dis);
+                        console.log("距离："+item.dis);
                         let msg = item.warnMsg;
                         let warningObj={
                             longitude:item.longitude,
@@ -685,34 +680,33 @@
                                 flag:false
 
                             }
-//                            obj.timer = setTimeout(()=>{
-//                                _this.$refs.tusvnMap.removeModel(obj.id);
-//                                obj.flag=true;
-//                                for(let key in warningData){
-//                                    if(warningData[key].flag){
-//                                        delete warningData[key];
-//                                    }
-//                                }
-//                            },2000)
+                            obj.timer = setTimeout(()=>{
+                                _this.$refs.tusvnMap.removeModel(obj.id);
+                                obj.flag=true;
+                                for(let key in warningData){
+                                    if(warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
                             _this.warningData[warningId]=obj;
                             _this.alertCount++;
                             _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
                             let obj = _this.warningData[warningId];
-//                            clearTimeout(obj.timer);
-//                            obj.timer = setTimeout(()=>{
-//                                _this.$refs.tusvnMap.removeModel(obj.id);
-//                                obj.flag=true;
-////                                console.log("移除事件")
-////                                console.log("事件id："+warningId);
-//                                for(let key in warningData){
-//                                    if(key!=obj.id&&warningData[key].flag){
-//                                        delete warningData[key];
-//                                    }
-//                                }
-//                            },2000)
-//                            _this.warningData[warningId]=obj;
+                            clearTimeout(obj.timer);
+                            obj.timer = setTimeout(()=>{
+                                _this.$refs.tusvnMap.removeModel(obj.id);
+                                obj.flag=true;
+                                console.log("移除事件")
+                                for(let key in warningData){
+                                    if(key!=obj.id&&warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
+                            _this.warningData[warningId]=obj;
 //                            console.log("提示信息："+msg,item.dis,obj.dist);
                             //进行更新
                             _this.$refs.tusvnMap.removeModel(obj.id);
@@ -844,12 +838,12 @@
             onSideCarMessage(message){
                 let _this = this;
                 _this.$refs.tusvnMap.onCarTrackMessage(message);
-               /* if(_this.testCount==0){
-                    _this.testCount=1;
-                    setTimeout(()=>{
-                        _this.sideCarWebsocket.close();
-                    },5000)
-                }*/
+                /* if(_this.testCount==0){
+                     _this.testCount=1;
+                     setTimeout(()=>{
+                         _this.sideCarWebsocket.close();
+                     },5000)
+                 }*/
             },
             onSideCarClose(data){
                 console.log("旁车结束连接");
@@ -977,7 +971,7 @@
         margin: 20px 0px;
         height: 184px;
         box-sizing: border-box;
-       /* padding-top: 10px;*/
+        /* padding-top: 10px;*/
     }
     .video-position{
         @include layoutMode(both);

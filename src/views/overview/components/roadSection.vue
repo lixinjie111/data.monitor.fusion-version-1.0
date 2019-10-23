@@ -52,9 +52,9 @@
                 let lng = this.mapRoadData.longitude;
                 let lat = this.mapRoadData.latitude;
                 let _optionWms = Object.assign({},window.dlWmsDefaultOption,
-                  {
-                     params:{'LAYERS': window.dlWmsOption.LAYERS_gjlk, 'VERSION': window.dlWmsOption.VERSION}
-                  }
+                    {
+                        params:{'LAYERS': window.dlWmsOption.LAYERS_gjlk, 'VERSION': window.dlWmsOption.VERSION}
+                    }
                 );
                 this.wms = new AMap.TileLayer.WMS(_optionWms);
                 this.wms.setMap(this.aMap);
@@ -132,28 +132,9 @@
                 let _this = this;
                 let jsonData = JSON.parse(message.data);
                 let result = jsonData.result;
-                let data = result.vehDataDTO;
-                if(data.length>0){
-//                    console.log(data[0].gpsTime+".........");
-
-                    let flag = false;
-                    for(let i=0;i<data.length;i++){
-                        let id = data[i].vehicleId;
-                        if(_this.prevData[id]){
-                            if(_this.prevData[id].gpsTime>=data[i].gpsTime){
-                                console.log(id+"---车辆数据到达错误！")
-                                flag=true;
-                                break;
-                            }
-                        }
-                    }
-                    if(flag){
-                        return;
-                    }
-                }
                 // 车辆
                 if ("vehDataDTO" in result === true) {
-                    _this.crossData.roadSenseCars = data;
+                    _this.crossData.roadSenseCars = result.vehDataDTO;
                     if (_this.crossData.roadSenseCars.length > 0) {
                         _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
                             x => x.targetType === 2 || x.targetType === 5
@@ -169,8 +150,7 @@
                                 vehicleId: item.vehicleId,
                                 devId: item.devId,
                                 marker: null,
-                                plateNo:item.plateNo,
-                                gpsTime:item.gpsTime
+                                plateNo:item.plateNo
                             };
                         });
 
@@ -179,23 +159,9 @@
                                 _filterData[id].marker = _this.prevData[id].marker;
                                 let _currentCar = _filterData[id];
                                 _filterData[id].marker.setAngle(_currentCar.heading);
-                                //计算速度AMap.GeometryUtil.distance(p1, p2);
-                                let p1 =  new AMap.LngLat(_filterData[id].longitude,_filterData[id].latitude);
-                                let time1 = _filterData[id].gpsTime;
-                                let p2 ;
-                                let time2;
-                                let item = _this.prevData[id];//上一个点
-//                                    console.log(item.gpsTime+"--------")
-                                p2 = new AMap.LngLat(item.longitude,item.latitude);
-                                time2 = item.gpsTime;
-                                let distance = AMap.GeometryUtil.distance(p1, p2);
-                                let t = Math.abs(time1-time2)/1000;
-                                let speed = (distance/t*3.6);
-//                                    console.log("speed:"+speed);
-                                _filterData[id].marker.setPosition(p2);
-                                _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], speed);
+//                            _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
 
-//                                    _filterData[id].marker.setPosition([_currentCar.longitude, _currentCar.latitude]);
+                                _filterData[id].marker.setPosition([_currentCar.longitude, _currentCar.latitude]);
 //                            if(_filterData[id].vehicleId=='B21E0005'){
 //                                console.log("沪A523456-----"+_filterData[id].plateNo);
 //                                let marker =  new AMap.Marker({
@@ -206,7 +172,7 @@
 //                                });
 //                            }
                             } else {   //表示没有该点，做remove
-                                _this.prevData[id].marker.stopMove();
+//                            _this.prevData[id].marker.stopMove();
                                 _this.aMap.remove(_this.prevData[id].marker);
                                 delete _this.prevData[id];
                             }

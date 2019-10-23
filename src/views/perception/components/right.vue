@@ -49,7 +49,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="mapParam.background" minX="mapParam.minX"   minY="mapParam.minY" minZ="mapParam.minZ"
                        maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
-            @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
+                       @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
         </div>
     </div>
@@ -141,7 +141,7 @@
             },
             $route: {
                 handler: function(val, oldVal){
-                   this.isShow = val.params.isShow;
+                    this.isShow = val.params.isShow;
                 },
                 // 深度观察监听
                 deep: true,
@@ -193,13 +193,13 @@
             onMapComplete(){
 
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                    /*setInterval(()=>{
-                        let camera = this.$refs.perceptionMap.getCamera();
-                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
-                    },500)*/
-                   let count=0;
-                   let flag=false;
-                   let camParam;
+                /*setInterval(()=>{
+                    let camera = this.$refs.perceptionMap.getCamera();
+                    console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
+                },500)*/
+                let count=0;
+                let flag=false;
+                let camParam;
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
@@ -209,24 +209,24 @@
                     return;
                 }
                 //5s没有 默认值
-                   this.mapInitTime = setInterval(()=>{
-                       if(this.camList.length>0&&this.camList[0].camParam){
-                           camParam = this.camList[0].camParam;
-                           this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-                           this.getData();
-                           clearInterval(this.mapInitTime);
-                           this.mapShow=true;
-                           return;
-                       }
-                       count++;
-                       if(count==10){
-                           this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-                           this.getData();
-                           this.mapShow=true;
-                           clearInterval(this.mapInitTime);
-                       }
-                   },100)
-             },
+                this.mapInitTime = setInterval(()=>{
+                    if(this.camList.length>0&&this.camList[0].camParam){
+                        camParam = this.camList[0].camParam;
+                        this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+                        this.getData();
+                        clearInterval(this.mapInitTime);
+                        this.mapShow=true;
+                        return;
+                    }
+                    count++;
+                    if(count==10){
+                        this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                        this.getData();
+                        this.mapShow=true;
+                        clearInterval(this.mapInitTime);
+                    }
+                },100)
+            },
             getData(){
                 this.typeRoadData();
                 this.initPlatformWebSocket();
@@ -306,10 +306,10 @@
                 let x2 = utm2[0];
                 let y2 = utm2[1];
 //                this.getNewCurrentExtent(x1,y1,x2,y2);
-               /* this.currentExtent.push([x2, y1]);
-                this.currentExtent.push([x1, y1]);
-                this.currentExtent.push([x1, y2]);
-                this.currentExtent.push([x2, y2]);*/
+                /* this.currentExtent.push([x2, y1]);
+                 this.currentExtent.push([x1, y1]);
+                 this.currentExtent.push([x1, y2]);
+                 this.currentExtent.push([x2, y2]);*/
                 this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
                 console.log("边界值："+this.currentExtent);
 //                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
@@ -853,8 +853,8 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-              /*  console.log("########");
-                console.log(_this.tabIsExist);*/
+                /*  console.log("########");
+                  console.log(_this.tabIsExist);*/
                 if(_this.tabIsExist){
                     /*console.log("..............");*/
                     _this.$refs.perceptionMap.addPerceptionData(mesasge);
@@ -1225,13 +1225,13 @@
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
         }
-}
+    }
 </script>
 
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
     .map-right{
-      width: 270px;
+        width: 270px;
     }
     .point-style{
         width: 10px;
@@ -1335,7 +1335,7 @@
             bottom: 0px;
         }
 
-      /*  transition: all 2s ease-in-out;*/
+        /*  transition: all 2s ease-in-out;*/
         .active-circle{
             display: inline-block;
             width: 10px;
