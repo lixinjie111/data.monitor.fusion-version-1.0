@@ -702,14 +702,16 @@
                             let obj = _this.warningData[warningId];
                             clearTimeout(obj.timer);
                             obj.timer = setTimeout(()=>{
-                                _this.$refs.perceptionMap.removeModel(obj.id);
-                                obj.flag=true;
-                                _this.warningCount--;
-                                _this.$parent.warningCount = _this.warningCount;
-                                console.log("移除事件")
-                                for(let key in warningData){
-                                    if(key!=obj.id&&warningData[key].flag){
-                                        delete warningData[key];
+                                if(_this.$refs.perceptionMap) {
+                                    _this.$refs.perceptionMap.removeModel(obj.id);
+                                    obj.flag=true;
+                                    _this.warningCount--;
+                                    _this.$parent.warningCount = _this.warningCount;
+                                    console.log("移除事件")
+                                    for(let key in warningData){
+                                        if(key!=obj.id&&warningData[key].flag){
+                                            delete warningData[key];
+                                        }
                                     }
                                 }
                             },2000)
