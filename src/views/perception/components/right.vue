@@ -12,7 +12,7 @@
                     <live-player
                             :requestVideoUrl="requestVideoUrl"
                             :params="item.params"
-                            type="flvUrl"
+                            type="wsUrl"
                             :autoplay="false"
                     >
                         <div class="video-num" @click="changeMap(index)">
