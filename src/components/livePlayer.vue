@@ -70,6 +70,7 @@ export default {
             videoLoadingDelay: {
                 timer: null,
                 countTime:15,
+                reloadTime: 2,
                 count: 0
             }
         }
@@ -111,7 +112,17 @@ export default {
                 }
             }, 1000);
         },
+        videoTimerReload() {
+            this.videoLoadingDelay.timer = setInterval(() => {
+                if(this.videoLoadingDelay.count >= this.videoLoadingDelay.reloadTime) {
+                    this.requestVideo();
+                }else {
+                    this.videoLoadingDelay.count ++;
+                }
+            }, 1000);
+        },
         setVideoOptionPause() {
+            this.initVideoTimer();
             this.videoOption.videoMaskFlag = true;
             this.videoOption.playFlag = true;
             this.videoOption.loadingFlag = false;
@@ -132,7 +143,11 @@ export default {
             this.videoUrl = '';
         },
         setVideoOptionClose() {
+            this.initVideoTimer();
             this.videoOption.videoMaskFlag = false;
+            this.videoOption.playFlag = false;
+            this.videoOption.loadingFlag = false;
+            this.videoOption.playError = false;
         },
         onPlayerMessage(player) {
             // console.log("onPlayerMessage");
@@ -146,8 +161,8 @@ export default {
         },
         onPlayerTimeupdate(player) {
             // console.log("onPlayerTimeupdate");
-            this.initVideoTimer();
             this.setVideoOptionClose();
+            this.videoTimerReload();
         },
         onPlayerPause() {
             // console.log("onPlayerPause");
@@ -216,15 +231,14 @@ export default {
         // },
         refreshVideo(){
             this.videoUrl = '';
-            this.initVideoTimer();
-            // this.initVideo();
+            // this.initVideoTimer();
+            // // this.initVideo();
             setTimeout(() => {
                 this.requestVideo();
                 this.$emit("refreshVideo");
             }, 0);
         },
         initVideo() {
-            this.initVideoTimer();
             this.setVideoOptionPause();
             this.videoUrl = '';
         }
