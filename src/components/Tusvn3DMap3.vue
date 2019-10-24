@@ -2072,16 +2072,3 @@
         }
     };
 </script>
-<style>
-  #map {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    margin: 0;
-  }
-  canvas {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-</style>
