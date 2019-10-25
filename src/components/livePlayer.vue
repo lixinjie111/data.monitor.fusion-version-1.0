@@ -69,7 +69,8 @@ export default {
             },
             videoLoadingDelay: {
                 timer: null,
-                countTime:10,
+                countTime:15,
+                reloadTime: 2,
                 count: 0
             }
         }
@@ -111,7 +112,17 @@ export default {
                 }
             }, 1000);
         },
+        videoTimerReload() {
+            this.videoLoadingDelay.timer = setInterval(() => {
+                if(this.videoLoadingDelay.count >= this.videoLoadingDelay.reloadTime) {
+                    this.requestVideo();
+                }else {
+                    this.videoLoadingDelay.count ++;
+                }
+            }, 1000);
+        },
         setVideoOptionPause() {
+            this.initVideoTimer();
             this.videoOption.videoMaskFlag = true;
             this.videoOption.playFlag = true;
             this.videoOption.loadingFlag = false;
@@ -132,7 +143,11 @@ export default {
             this.videoUrl = '';
         },
         setVideoOptionClose() {
+            this.initVideoTimer();
             this.videoOption.videoMaskFlag = false;
+            this.videoOption.playFlag = false;
+            this.videoOption.loadingFlag = false;
+            this.videoOption.playError = false;
         },
         onPlayerMessage(player) {
             // console.log("onPlayerMessage");
@@ -146,8 +161,8 @@ export default {
         },
         onPlayerTimeupdate(player) {
             // console.log("onPlayerTimeupdate");
-            this.initVideoTimer();
             this.setVideoOptionClose();
+            this.videoTimerReload();
         },
         onPlayerPause() {
             // console.log("onPlayerPause");
@@ -190,24 +205,42 @@ export default {
                 }
                 
             }else {
-                this.player.play();
+                let _oldUrl = this.videoUrl;
+                this.videoUrl = "";
+                setTimeout(() => {
+                    this.videoUrl = _oldUrl;
+                }, 0);
+                // this.player.play();
             }
         },
+        // refreshVideo(){
+        //     if(this.videoUrl == ''){
+        //         this.requestVideo();
+        //     }else {
+        //         this.setVideoOptionLoading();
+        //         this.videoLoadingDelay.count = 0;
+        //         this.$emit("refreshVideo");
+        //         // this.$refs.livePlayer && this.player.pause();
+        //         // setTimeout(() => {
+        //         //     this.setVideoOptionLoading();
+        //         //     setTimeout(() => {
+        //         //         this.player.play();
+        //         //     }, 500);
+        //         // }, 0);
+        //     }
+        // },
         refreshVideo(){
-            if(this.videoUrl == ''){
+            this.videoUrl = '';
+            // this.initVideoTimer();
+            // // this.initVideo();
+            setTimeout(() => {
                 this.requestVideo();
-            }else {
-                this.setVideoOptionLoading();
-                this.videoLoadingDelay.count = 0;
                 this.$emit("refreshVideo");
-                // this.$refs.livePlayer && this.player.pause();
-                // setTimeout(() => {
-                //     this.setVideoOptionLoading();
-                //     setTimeout(() => {
-                //         this.player.play();
-                //     }, 500);
-                // }, 0);
-            }
+            }, 0);
+        },
+        initVideo() {
+            this.setVideoOptionPause();
+            this.videoUrl = '';
         }
     }
 }

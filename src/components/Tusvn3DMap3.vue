@@ -1976,6 +1976,11 @@
                 dl.scene.add(shp);
 
                 this.shps[name]=shp;
+            },
+            clearCache:function(object) {
+                let  mesh = object;
+                mesh.geometry.dispose();
+                mesh.material.dispose();
             }
             // addStaticModel: function(dl, name, url, x, y, z, pitch, yaw, roll) {
             //   let model = new dl.Model({
@@ -2016,6 +2021,37 @@
             }, 1000);
         },
         destroyed() {
+            
+            if(this.deviceModels["0"]) {
+                if(this.deviceModels["0"].cars && this.deviceModels["0"].cars.length>0) {
+                    for(let i=0;i<this.deviceModels["0"].cars.length;i++)
+                    {
+                        this.clearCache(this.deviceModels["0"].cars[i].children[0]);
+                        this.clearCache(this.deviceModels["0"].cars[i].children[1]);
+                    }
+                }
+                if(this.deviceModels["0"].persions && this.deviceModels["0"].persions.length>0) {
+                    for(let i=0;i<this.deviceModels["0"].persions.length;i++) {
+                        this.clearCache(this.deviceModels["0"].persions[i]); 
+                    }
+                }
+                // if(this.deviceModels["0"].texts && this.deviceModels["0"].texts.length>0) {
+                //     for(let i=0;i<this.deviceModels["0"].texts.length;i++) {
+                //         this.clearCache(this.deviceModels["0"].texts[i]); 
+                //     }
+                // }
+            }
+           if(this.shps.length>0) {
+                for(let i=0;i<this.shps.length;i++) {
+                    this.clearCache(this.shps[i]); 
+                }
+            }
+            dl.viewer.renderer.dispose();
+            dl.viewer.renderer.forceContextLoss();
+            dl.viewer.renderer.context = null;
+            dl.viewer.renderer.domElement = null;
+            dl.viewer.renderer = null; 
+            dl.viewer = null;
 
             this.cacheMainCarTrackData = new Array();
             for (let i = 0; i < this.intervalIds.length; i++) {
@@ -2040,16 +2076,3 @@
         }
     };
 </script>
-<style>
-  #map {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    margin: 0;
-  }
-  canvas {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-</style>
