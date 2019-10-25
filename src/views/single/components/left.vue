@@ -134,7 +134,7 @@
                     this.singleVehicle = res.vehicleBaseDetail[0];
                 });
             },
-            getRouteDataByVehId() {
+           /* getRouteDataByVehId() {
                 getRouteDataByVehId({
                     "scale": this.scale,
                     'vehicleId': this.vehicleId,
@@ -167,11 +167,11 @@
             },
             onmessage(message){
                 // console.log("行程概览 route *********************************************");
-                /*clearInterval(this.countTimer);
+                /!*clearInterval(this.countTimer);
                 this.countTime = 0;
                 this.countTimer = setInterval(() => {
                     this.countTime += 1000;
-                }, 1000);*/
+                }, 1000);*!/
                 let _this=this;
                 let json  = {};
                 if(typeof message.data == "string") {
@@ -328,8 +328,8 @@
                         strokeWeight: 2,
                         // 折线样式还支持 'dashed'
                         strokeStyle: "solid",
-                        /* // strokeStyle是dashed时有效
-                         strokeDasharray: [10, 5],*/
+                        /!* // strokeStyle是dashed时有效
+                         strokeDasharray: [10, 5],*!/
                         lineJoin: 'round',
                         lineCap: 'round',
                         zIndex: 50
@@ -362,8 +362,130 @@
                     this.markers.markerEnd.setPosition(_this.pointPath[_this.pointPath.length-1]);
                     this.markers.markerEnd.setAngle(_this.wholePath[_this.count].angle-90);
                 }
-                /*console.log("缩放级别:"+this.distanceMap.getZoom())*/
-            }
+                /!*console.log("缩放级别:"+this.distanceMap.getZoom())*!/
+            }*/
+            getRouteDataByVehId() {
+                let _this = this;
+                getRouteDataByVehId({
+                    "scale": 10,
+                    'vehicleId': "B21E0002",
+                }).then(res => {
+                    let _result = res.data.pointList;
+                    if(_result && _result.length > 0) {
+//                        this.onmessage(res);
+//                        _this.pointPath,
+//                        _this.carStartPoint = ConvertCoord.wgs84togcj02(pointList[0].gnss_LONG, pointList[0].gnss_LAT);
+                        let pointPath=[];
+                        _result.forEach(item=>{
+                            let position = ConvertCoord.wgs84togcj02(item.gnss_LONG, item.gnss_LAT);
+                            pointPath.push(position);
+                        })
+                        _this.carStartPoint=pointPath[0];
+                        _this.drawStart();
+                        _this.drawLine(pointPath);
+                        _this.carEndPoint=pointPath[pointPath.length-1];
+                        _this.lastPoint=[pointPath[pointPath.length-1].lng,pointPath[pointPath.length-1].lat];
+                        _this.drawEnd();
+                    }
+                    this.initWebSocket();
+                }).catch(error => {
+                });
+            },
+            drawStart(){
+                this.markers.markerStart = new AMap.Marker({
+                    position: this.carStartPoint,   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+                    icon:'static/images/single/start.png',
+                    offset: new AMap.Pixel(-10, -10),
+                });
+                this.distanceMap.add(this.markers.markerStart);
+            },
+            drawEnd(){
+                this.markers.markerEnd = new AMap.Marker({
+                    position: this.carEndPoint,   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+                    icon:'static/images/single/end.png',
+                    offset: new AMap.Pixel(-10, -10),
+                });
+                this.distanceMap.add(this.markers.markerEnd);
+            },
+            drawLine(pointPath){
+                let _this = this;
+                let polyline = new AMap.Polyline({
+                    map: _this.distanceMap,
+                    path: pointPath,
+                    strokeColor: "#03812e",
+                    strokeWeight: 2,
+                    // 折线样式还支持 'dashed'
+                    strokeStyle: "solid",
+                    /* // strokeStyle是dashed时有效
+                     strokeDasharray: [10, 5],*/
+                    lineJoin: 'round',
+                    lineCap: 'round',
+                    zIndex: 50
+                });
+                _this.distanceMap.setFitView();
+            },
+
+            initWebSocket(){
+                let _this=this;
+                try{
+                    if ('WebSocket' in window) {
+                        _this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                        _this.webSocket.onmessage = _this.onmessage;
+                        _this.webSocket.onclose = _this.onclose;
+                        _this.webSocket.onopen = _this.onopen;
+                        _this.webSocket.onerror = _this.onerror;
+                    }else{
+                        _this.$message("此浏览器不支持websocket");
+                    }
+                }catch (e){
+                }
+            },
+            onmessage(mesasge){
+                let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let data = json.data;
+                let position = ConvertCoord.wgs84togcj02(data.lon, data.lat);
+                let path = [];
+//                let lastPosition = [];
+//                lastPosition.push(_this.lastPoint.lng);
+//                lastPosition.push(_this.lastPoint.lat);
+                if(_this.lastPoint.length>0){
+                    path.push(_this.lastPoint);
+                    path.push(position);
+                    _this.drawLine(path);
+                    this.markers.markerEnd.setPosition(position);
+                }
+                _this.lastPoint=position;
+
+            },
+            onclose(data){
+                console.log("小程序控制结束连接");
+            },
+            onerror(){
+                console.log("小程序控制连接error");
+            },
+            onopen(data){
+                //获取车辆状态
+
+                let operationStatus = {
+                    'action':'route',
+                    'vehicleId': 'B21E0002',
+                    'scale': 10,
+                    'all': 1
+                }
+                let operationStatusMsg = JSON.stringify(operationStatus);
+                this.sendMsg(operationStatusMsg)
+            },
+            sendMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.webSocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
         },
         mounted() {
             this.mapOption=window.defaultMapOption;
