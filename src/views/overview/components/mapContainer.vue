@@ -56,117 +56,6 @@ export default {
         },
         onmessage(message){
             let _this = this,
-            _json = JSON.parse(message.data),
-            _result = _json.result.allVehicle;
-            if (_result.length > 0) {
-                // console.log(_result.length);
-                let _filterData = {};
-//                console.log(_result[0].vehicleId,_result[0].gpsTime)
-                let flag = false;
-                for(let i=0;i<_result.length;i++){
-                    let item = _result[i];
-                    if(_this.prevData[item.vehicleId]&&_this.prevData[item.vehicleId].gpsTime>=item.gpsTime){
-                        console.log(item.vehicleId+"车辆数据到达错误！");
-                        flag=true;
-                        break;
-                    }
-                }
-                if(flag){
-                    return;
-                }
-                _result.forEach((item, index) => {
-                    _filterData[item.vehicleId] = {
-                        vehicleId: item.vehicleId,
-                        plateNo: item.plateNo,
-                        source: item.source.join(','),
-                        heading: item.heading,
-                        speed: item.speed,
-                        position: ConvertCoord.wgs84togcj02(item.longitude, item.latitude),
-                        marker: null,
-                        plateNoMarker: null,
-                        gpsTime:item.gpsTime
-                    };
-                });
-                for (let id in _this.prevData) {
-                    if(_filterData[id]) {   //表示有该点，做setPosition
-                        // console.log(_this.prevData[id].plateNo, "moveTo");
-                        _filterData[id].marker = _this.prevData[id].marker;
-                        _filterData[id].plateNoMarker = _this.prevData[id].plateNoMarker;
-                        let _currentCar = _filterData[id];
-                        _filterData[id].marker.setAngle(_currentCar.heading);
-
-                        let p1 =  _filterData[id].position;
-                        let time1 = _filterData[id].gpsTime;
-                        let item = _this.prevData[id];//上一个点
-                        let p2 = item.position;
-                        let time2= item.gpsTime;
-                        let distance = AMap.GeometryUtil.distance(p1, p2);
-                        let t = Math.abs(time1-time2)/1000;
-//                        console.log(t,time1,time2)
-                        let speed = distance/t*3.6;
-                        _filterData[id].marker.setPosition(p2);
-                        _filterData[id].marker.moveTo(_currentCar.position, speed);
-
-                        _filterData[id].plateNoMarker.setPosition(p2);
-                        _filterData[id].plateNoMarker.moveTo(_currentCar.position, speed);
-
-//                            if(_filterData[id].vehicleId=='B21E0005'){
-//                                console.log("沪A523456-----"+_filterData[id].plateNo);
-//                                let marker =  new AMap.Marker({
-//                                    position:  _currentCar.position,
-//                                    map: this.AMap,
-//                                    icon: "static/images/road/side.png",
-//                                    zIndex: 1
-//                                });
-//                            }
-
-//                        _filterData[id].marker.setPosition(_currentCar.position);
-//                        _filterData[id].plateNoMarker.setPosition(_currentCar.position);
-                    }else {   //表示没有该点，做remove
-                        // console.log(_this.prevData[id].plateNo, "remove");
-                        _this.prevData[id].marker.off('click', _this.showView);
-                        _this.prevData[id].plateNoMarker.off('click', _this.showView);
-                         _this.prevData[id].marker.stopMove();
-                         _this.prevData[id].plateNoMarker.stopMove();
-                        _this.AMap.remove(_this.prevData[id].marker);
-                        _this.AMap.remove(_this.prevData[id].plateNoMarker);
-                        delete _this.prevData[id];
-                    }
-                }
-                for (let id in _filterData) {
-                    if(!_this.prevData[id]) {   //表示新增该点，做add
-                        // console.log(_filterData[id].plateNo, "add");
-                        _this.addMarker(_filterData[id]);
-                        _this.addPlateNoMarker(_filterData[id]);
-                    }
-                }
-
-                if(_this.setFitViewFlag) {
-                    setTimeout(()=>{
-                        _this.AMap.setFitView();
-                        _this.setFitViewFlag = false;
-                    },500)
-                }
-                _this.prevData = _filterData;
-            } else {
-                // 返回的数据为空
-                for (let id in _this.prevData) {
-                    // console.log("delete:-"+_this.prevData[id].plateNo);
-                    _this.prevData[id].marker.off('click', _this.showView);
-                    _this.prevData[id].plateNoMarker.off('click', _this.showView);
-                    // _this.prevData[id].marker.setMap(null);
-                    // _this.prevData[id].plateNoMarker.setMap(null);
-                    // _this.prevData[id].marker.stopMove();
-                    // _this.prevData[id].plateNoMarker.stopMove();
-                    _this.AMap.remove(_this.prevData[id].marker);
-                    _this.AMap.remove(_this.prevData[id].plateNoMarker);
-                    delete _this.prevData[id];
-                }
-                // this.prevData = {};
-            }
-        },
-        /*onmessage(message){
-            let _this = this,
                 _json = JSON.parse(message.data),
                 _result = _json.result.allVehicle;
             if (_result.length > 0) {
@@ -235,7 +124,7 @@ export default {
                 }
                 // this.prevData = {};
             }
-        },*/
+        },
         addMarker(obj) {
             obj.marker = new AMap.Marker({
                 map: this.AMap,
