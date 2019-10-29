@@ -1,7 +1,7 @@
 <template>
     <div class="c-fusion-right right-road">
-        <div class="perception-road" v-for="(item, index) in centerPointData" :key="index"  @click="showRoadDetail(item)">
-            <div class="road-word">
+        <div class="perception-road" v-for="(item, index) in centerPointData" :key="index"  >
+            <div class="road-word" @click="showRoadDetail(item)">
                 <p>{{item.rsName}}</p>
             </div>
             <road-section :id="'map' + index" :mapData="item" class="cross-scan"></road-section>

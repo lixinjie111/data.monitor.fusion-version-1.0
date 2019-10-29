@@ -34,90 +34,10 @@ export default {
         HeaderTop
     },
     data() {
-        return {
-            socket:this.$parent.socket
-        }
+        return {}
     },
-    methods: {
-        initWebSocket1(){
-            let _this=this;
-            if ('WebSocket' in window) {
-                _this.socket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
-                _this.socket.onmessage = this.onmessage1;
-                _this.socket.onclose = this.onclose1;
-                _this.socket.onopen = this.onopen1;
-                _this.socket.onerror = this.onerror1;
-            }
-        },
-        onmessage1(mesasge){
-            let _this=this;
-            let json = JSON.parse(mesasge.data);
-            let type = json.result.type;
-            let data = json.result.data;
-            let currentRoute = _this.$router.currentRoute.path;
-            let path;
-            if(type=='home'){
-                path = '/overview';
-                /*if(path==currentRoute){
-                    return;
-                }*/
-                this.$router.push({
-                    path: path
-                });
-            }
-            if(type=='vehicle'){
-                path = '/single';
-                /*if(path==currentRoute){
-                    return;
-                }*/
-                this.$router.push({
-                    path: path+"/"+data.id
-                });
-            }
-            if(type=='road'){
-                path = '/perception';
-                /* if(name==currentRoute){
-                     return;
-                 }*/
-                this.$router.push({
-//                    path: path+"/"+data.position.longitude+"/"+data.position.latitude
-                    path: path+"/" + data.position.longitude + "/" + data.position.latitude+"/"+data.id+ "/"+1+ "/"+false,
-                });
-            }
-            if(type=='map'){
-                this.realData = data;
-            }
-
-
-        },
-        onclose1(data){
-            console.log("结束连接");
-        },
-        onopen1(data){
-            //获取车辆状态
-            var operationStatus = {
-                "action":"operation_command"
-            }
-            var operationStatusMsg = JSON.stringify(operationStatus);
-            this.sendMsg1(operationStatusMsg);
-        },
-        sendMsg1(msg) {
-            let _this=this;
-            if(window.WebSocket){
-                if(_this.socket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                    _this.socket.send(msg); //send()发送消息
-                }
-            }else{
-                return;
-            }
-        }
-    },
-    mounted() {
-        this.socket.onmessage = this.onmessage1;
-        this.socket.onclose = this.onclose1;
-        this.socket.onopen = this.onopen1;
-        this.socket.onerror = this.onerror1;
-    },
+    methods: {},
+    mounted() {},
     destroyed(){}
 }
 </script>

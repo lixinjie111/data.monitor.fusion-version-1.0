@@ -77,11 +77,6 @@
     export default {
         data() {
             return {
-                /*mapOption: {
-                    center: this.$parent.defalutCenterPoint,
-                    zoom: 11,
-                    mapStyle: "amap://styles/7b007636f01d8a19e9cc2841a85dc083"
-                },*/
                 mapOption:{},
                 singleVehicle:{},
                 routeId:'',
@@ -105,7 +100,8 @@
                 },
                 vehicleId:this.$route.params.vehicleId,
                 flag: true,
-                count:0
+                count:0,
+                routeConnectCount:0
             }
         },
         computed:{
@@ -131,7 +127,7 @@
         methods: {
             getBaseData(){
                 console.log("id:"+this.$route.params.id);
-                var _this = this;
+                let _this = this;
                 getVehicleBaseData({
                     'vehicleId': this.vehicleId,
                 }).then(res => {
@@ -154,13 +150,20 @@
             initWebSocket(){
                 // debugger
                 let _this=this;
-                if ('WebSocket' in window) {
-                    _this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                    _this.webSocket.onmessage = _this.onmessage;
-                    _this.webSocket.onclose = _this.onclose;
-                    _this.webSocket.onopen = _this.onopen;
-                    _this.webSocket.onerror = _this.onerror;
+                try{
+                    if ('WebSocket' in window) {
+                        _this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                        _this.webSocket.onmessage = _this.onmessage;
+                        _this.webSocket.onclose = _this.onclose;
+                        _this.webSocket.onopen = _this.onopen;
+                        _this.webSocket.onerror = _this.onerror;
+                    }else {
+                        _this.$message("此浏览器不支持websocket");
+                    }
+                }catch(e){
+                    _this.routeReconnect();
                 }
+
             },
             onmessage(message){
                 // console.log("行程概览 route *********************************************");
@@ -169,14 +172,14 @@
                 this.countTimer = setInterval(() => {
                     this.countTime += 1000;
                 }, 1000);*/
-                var _this=this;
-                var json  = {};
+                let _this=this;
+                let json  = {};
                 if(typeof message.data == "string") {
                     json = JSON.parse(message.data);
                 }else {
                     json = message;
                 }
-                var pointList = [];
+                let pointList = [];
                 if(this.all == 1){
                     if(json.data.pointList && json.data.pointList.length > 0){
                         pointList = json.data.pointList;
@@ -218,7 +221,7 @@
                         this.prevLastPointPath = [pointList[pointList.length-1].gnss_LONG, pointList[pointList.length-1].gnss_LAT];
                     }
 
-                    var handlePointList = [];
+                    let handlePointList = [];
                     pointList.forEach((item, index) => {
                         if(item.gnss_LONG && item.gnss_LAT){
                             // let lnglatArr = new AMap.LngLat(item.gnss_LONG, item.gnss_LAT);
@@ -239,7 +242,7 @@
                 }
             },
             changeLngLat(){
-                var _this = this;
+                let _this = this;
                 if(this.flag && _this.count < this.wholePath.length){
                     // console.log("----------------------------------");
                     this.flag = false;
@@ -263,7 +266,12 @@
                 }
             },
             onclose(data){
-                console.log("结束连接");
+                console.log("行程结束连接");
+                this.routeReconnect();
+            },
+            onerror(){
+                console.log("行程结束error");
+                this.routeReconnect();
             },
             onopen(data){
                 //行程
@@ -281,6 +289,18 @@
                 }else{
                     return;
                 }
+            },
+            routeReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.routeConnectCount>=10){
+                    return;
+                }
+                this.initWebSocket();
+                this.routeConnectCount++;
             },
             //行程概览--绘制起点
             distanceMapStart(){
@@ -327,7 +347,7 @@
             distanceMapEnd(){
                 let _this = this;
                 if(!this.markers.markerEnd) {
-                    var _pointPath = _this.pointPath;
+                    let _pointPath = _this.pointPath;
                     this.markers.markerEnd = new AMap.Marker({
                         position: _pointPath[_pointPath.length-1],
                         icon:'static/images/single/end.png',
@@ -349,9 +369,9 @@
             this.mapOption=window.defaultMapOption;
             this.distanceMap = new AMap.Map('singleMap', this.mapOption);
             //避免加载空白地图
-            setTimeout(()=>{
+            this.distanceMap.on('complete',()=>{
                 this.distanceMap.setMapStyle(window.defaultMapOption.mapStyle);
-            },0)
+            });
             this.getBaseData();
             this.getRouteDataByVehId();
         },

@@ -1333,6 +1333,7 @@
                             this.deviceModels[deviceid].persons[m] = pmodel1;
                             dl.scene.add(pmodel1);
 
+
                             //融合车辆
                             // var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
                             //var model_out = new THREE.Mesh(geoBox_out, this.matStdObjects);
@@ -1418,13 +1419,12 @@
                             mdl.position.y = dUTM[1];
                             mdl.position.z = this.defualtZ;
                             //test
-                            //  let text = this.deviceModels[deviceid].texts[i];
-                            //  text.setText(d.vehicleId.substr(0,8));
-                            //  text.setPositon([dUTM[0],dUTM[1],this.defualtZ+5]);
-                            // let text1 = this.deviceModels[deviceid].texts[i];
-
-                            //        text1.setPositon([dUTM[0],dUTM[1],this.defualtZ+2]);
-                            //      text1.update()
+                            let text1 = this.deviceModels[deviceid].texts[i];
+                            let h = d.heading.toFixed(1);
+                            let s = d.speed.toFixed(1);
+                            text1.setText("[" + h + ", " + s + "]");
+                            text1.setPositon([dUTM[0], dUTM[1], this.defualtZ + 2]);
+                            text1.update();
                         }
                     } else {
                         if (i < this.deviceModels[deviceid].cars.length) {
@@ -1579,9 +1579,6 @@
 
                     for (let n = 0; n < pcars.length; n++) {
                         let pcar = pcars[n];
-
-                        if(pcar.vehicleId!="B21E0005")
-                            continue;
                         if (pcar.heading<0) {
                             // 不处理小于0的的数据
                             continue;
@@ -1979,6 +1976,11 @@
                 dl.scene.add(shp);
 
                 this.shps[name]=shp;
+            },
+            clearCache:function(object) {
+                let  mesh = object;
+                mesh.geometry.dispose();
+                mesh.material.dispose();
             }
             // addStaticModel: function(dl, name, url, x, y, z, pitch, yaw, roll) {
             //   let model = new dl.Model({
@@ -2019,6 +2021,37 @@
             }, 1000);
         },
         destroyed() {
+            
+            if(this.deviceModels["0"]) {
+                if(this.deviceModels["0"].cars && this.deviceModels["0"].cars.length>0) {
+                    for(let i=0;i<this.deviceModels["0"].cars.length;i++)
+                    {
+                        this.clearCache(this.deviceModels["0"].cars[i].children[0]);
+                        this.clearCache(this.deviceModels["0"].cars[i].children[1]);
+                    }
+                }
+                if(this.deviceModels["0"].persions && this.deviceModels["0"].persions.length>0) {
+                    for(let i=0;i<this.deviceModels["0"].persions.length;i++) {
+                        this.clearCache(this.deviceModels["0"].persions[i]); 
+                    }
+                }
+                // if(this.deviceModels["0"].texts && this.deviceModels["0"].texts.length>0) {
+                //     for(let i=0;i<this.deviceModels["0"].texts.length;i++) {
+                //         this.clearCache(this.deviceModels["0"].texts[i]); 
+                //     }
+                // }
+            }
+           if(this.shps.length>0) {
+                for(let i=0;i<this.shps.length;i++) {
+                    this.clearCache(this.shps[i]); 
+                }
+            }
+            dl.viewer.renderer.dispose();
+            dl.viewer.renderer.forceContextLoss();
+            dl.viewer.renderer.context = null;
+            dl.viewer.renderer.domElement = null;
+            dl.viewer.renderer = null; 
+            dl.viewer = null;
 
             this.cacheMainCarTrackData = new Array();
             for (let i = 0; i < this.intervalIds.length; i++) {
@@ -2043,16 +2076,3 @@
         }
     };
 </script>
-<style>
-  #map {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    margin: 0;
-  }
-  canvas {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-</style>
