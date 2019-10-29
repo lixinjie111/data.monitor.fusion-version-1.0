@@ -349,7 +349,7 @@
                         })
                     }
                 }
-                if(_this.warningList.length>0) {
+               /* if(_this.warningList.length>0) {
                     let warningMessage = _this.warningList.shift();
                     let warningJson = JSON.parse(warningMessage.data);
                     let warningData = warningJson.result.data;
@@ -386,7 +386,7 @@
                                         flag: false
 
                                     }
-                                    /*obj.timer = setTimeout(() => {
+                                    /!*obj.timer = setTimeout(() => {
                                         _this.$refs.tusvnMap.removeModel(obj.id);
                                         obj.flag = true;
                                         for (let key in warningData) {
@@ -394,14 +394,14 @@
                                                 delete warningData[key];
                                             }
                                         }
-                                    }, 2000)*/
+                                    }, 2000)*!/
                                     _this.warningData[warningId] = obj;
                                     _this.alertCount++;
                                     _this.$refs.tusvnMap.add3DInfoLabel(obj.id, obj.msg, obj.longitude, obj.latitude, 20);
                                 } else {
                                     //判断是否需要更新
                                     let obj = _this.warningData[warningId];
-                                    /*clearTimeout(obj.timer);
+                                    /!*clearTimeout(obj.timer);
                                     obj.timer = setTimeout(() => {
                                         _this.$refs.tusvnMap.removeModel(obj.id);
                                         obj.flag = true;
@@ -414,7 +414,7 @@
                                         }
                                     }, 2000)
                                     _this.warningData[warningId] = obj;
-                                    console.log("提示信息：" + msg, item.dis, obj.dist);*/
+                                    console.log("提示信息：" + msg, item.dis, obj.dist);*!/
                                     //进行更新
                                     _this.$refs.tusvnMap.removeModel(obj.id);
                                     _this.$refs.tusvnMap.add3DInfoLabel(obj.id, msg, obj.longitude, obj.latitude, 20);
@@ -422,7 +422,7 @@
                             })
                         }
                     }
-                }
+                }*/
             },
             //视频报错的方法
             getDeviceInfo(){
@@ -679,8 +679,8 @@
             },
             onWarningMessage(message){
                 let _this=this;
-                _this.warningList.push(message);
-                /*let warningJson = JSON.parse(message.data);
+//                _this.warningList.push(message);
+                let warningJson = JSON.parse(message.data);
                 let warningData = warningJson.result.data;
                 let type = warningJson.result.type;
 //                let warningTime = Math.abs(time2-warningJson.time);
@@ -741,13 +741,13 @@
                                 }
                             },2000)
                             _this.warningData[warningId]=obj;
-                            console.log("提示信息："+msg,item.dis,obj.dist);
+//                            console.log("提示信息："+msg,item.dis,obj.dist);
                             //进行更新
                             _this.$refs.tusvnMap.removeModel(obj.id);
                             _this.$refs.tusvnMap.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
                         }
                     })
-                }*/
+                }
             },
             onWarningClose(data){
                 console.log("结束连接");
