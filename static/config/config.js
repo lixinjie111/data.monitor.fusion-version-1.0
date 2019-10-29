@@ -1,51 +1,30 @@
 window.config = {
-    
-    //望京 内网
-    // staticUrl: "http://172.17.1.16:9090/", //静态文件路径
-    // url: 'http://172.17.1.16:9093/monPlatApp/', //监控平台
-    // operateUrl: 'http://172.17.1.16:9090/operateApp/',	//运营平台
-    // websocketUrl:'ws://172.17.1.16:49982/mon',  //监控
-    // socketUrl:'ws://172.17.1.16:49999/ws',  //影子系统
-    // dlUrl: 'http://10.0.1.22:8085/', //迪路
-    // dlWmsUrl: 'http://10.0.1.22:8080/', //迪路
-    //http://172.17.1.16:9092/icvShadowApp/ws.html  不要给我删掉了！！！
 
-    //望京 外网
-    staticUrl: "http://120.133.21.14:9090/", //静态文件路径
-    url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台
-    operateUrl: 'http://120.133.21.14:9090/operateApp/',	//运营平台
-    websocketUrl:'ws://120.133.21.14:49982/mon',  //监控
-    socketUrl:'ws://120.133.21.14:49999/ws',  //影子系统
-    dlUrl: 'http://117.114.144.227:8085/', //迪路
-    dlWmsUrl: 'http://117.114.144.227:8080/', //迪路
+    //雄安 外网地址
+    staticUrl: "http://144.7.122.89:9090/", //静态文件路径
+    url: 'http://144.7.127.19:9093/monPlatApp/', //监控平台
+    operateUrl: 'http://144.7.122.89:9090/operateApp/', //运营平台
+    websocketUrl:'ws://144.7.127.19:9982/mon',  //监控
+    socketUrl:'ws://144.7.122.84:9999/ws',  //影子系统
+    dlUrl: 'http://144.7.127.19:8085/', //迪路
+    dlWmsUrl: 'http://144.7.127.19:8080/', //迪路
 
-    //上海正式环境  外网
-    // staticUrl: "http://116.236.72.204:49090/", //静态文件路径
-    // url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
-    // operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
-    // websocketUrl:'ws://116.236.72.206:49982/mon',  //监控
-    // socketUrl:'ws://116.236.72.205:49999/ws',  //影子系统
-    // dlUrl: 'http://116.236.72.204:48085/', //迪路
-    // dlWmsUrl: 'http://116.236.72.204:48080/', //迪路
-
-     version: 1.0,       // 版本号
+    version: 1.0,       // 版本号
 }
 
 //地图额外配置项添加
 window.mapOption = {
-     center: [121.17265957261286,31.284096076877844],	//上海-高德地图坐标点  感知右下角
-    // center: [113.07876,28.255618],	//长沙-高德地图坐标点
+    center: [115.912987,39.049487], // 雄安雄安市民服务中心 -- 高德地图坐标点
     mapStyleEmpty: "amap://styles/bc5a63d154ee0a5221a1ee7197607a00", // 纯灰色背景地图
 };
 //单车
 window.defaultMapOption = {
-    center: window.mapOption.center, //上海
+    center: window.mapOption.center,
     zoom: 11,		// 默认：比例尺显示100m
     resizeEnable: true, //是否监控地图容器尺寸变化
     rotateEnable: true,
     mapStyle: "amap://styles/3312a5b0f7d3e828edc4b2f523ba76d8"
 }
-
 //路网配置参数
 window.dlWmsOption = {
     'LAYERS_gjlk': 'shanghai_qcc:dl_shcsq_wgs84_gjlk',
@@ -63,49 +42,43 @@ window.dlWmsDefaultOption = {
     tileSize: 256,
     params:{}
 }
+
 window.circleParam = {
-    redius:1000.0,
-    center:[325535.061,3462402.816,13.618],
-    color:"#ffffff",
-    outline:false,
-    outlineColor:"#ff0000",
-    opacity:0.1,
-    rotate:[0,0,0]
+    redius: 0,
+    center: [0,0,0],
+    color: "#000",
+    outline: false,
+    outlineColor: "#ff0000",
+    opacity: 0.1,
+    rotate: [0, 0, 0]
 };
 
 window.mapParam={
-    minX:325295.155400,
-    minY:3461941.703700,
-    minZ:50,
-    maxX:326681.125700,
-    maxY:3462723.022400,
-    maxZ:80,
-    background:"black"
-}
+    minX: 0,
+    minY: 0,
+    minZ: 0,
+    maxX: 0,
+    maxY: 0,
+    maxZ: 0,
+    background: "black"
+};
 
 window.defaultMapParam = {
-    x:326299.8136019115,
-    y:3462328.443327571,
-    z:34.16186920538662,
-    radius:31.40011218302981,
-    pitch:-0.1440529053876541,
-    yaw:-2.7068034133160297
+    x: 0,
+    y: 0,
+    z: 0,
+    radius: 0,
+    pitch: 0,
+    yaw: 0
 }
 
 window.defaultSingleParam = {
-    x:326181.72659014474,
-    y:3462354.6747002415,
-    z:737.3642832288795,
-    radius:741.5052736914325,
-    pitch:-1.5707963267948966,
-    yaw:-0.05266622778143515
+    x: 0,
+    y: 0,
+    z: 0,
+    radius: 0,
+    pitch: 0,
+    yaw: 0
 }
 
-window.defaultRoadParam={
-    z:217.16763677929166,
-    radius:0,
-    pitch:-1.5707963267948966,
-    yaw:-0.16236538804906267
-}
-
-window.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
+window.currentExtent=[window.mapOption.center,window.mapOption.center,window.mapOption.center,window.mapOption.center];
