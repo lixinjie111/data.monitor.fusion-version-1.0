@@ -440,11 +440,7 @@ export default {
     .road-view-map .amap-container img{
         cursor: pointer;
     }
-    .info{
-        background: none!important;
-        border:#ccc;
-    }
-    .amap-marker-label{
+    .road-view-map .amap-marker-label{
         border:1px solid #ccc!important;
         color: #2a2a2a!important;
         min-width: 110px;
