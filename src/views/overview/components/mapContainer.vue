@@ -56,8 +56,8 @@ export default {
         },
         onmessage(message){
             let _this = this,
-            _json = JSON.parse(message.data),
-            _result = _json.result.allVehicle;
+                _json = JSON.parse(message.data),
+                _result = _json.result.allVehicle;
             if (_result.length > 0) {
                 // console.log(_result.length);
                 let _filterData = {};
