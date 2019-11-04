@@ -194,7 +194,7 @@
 //                                    console.log("speed:"+speed);
                                 _filterData[id].marker.setPosition(p2);
                                 _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], speed);
-
+                                _this.getNextPosition(distance,p1,_filterData[id].heading);
 //                                    _filterData[id].marker.setPosition([_currentCar.longitude, _currentCar.latitude]);
 //                            if(_filterData[id].vehicleId=='B21E0005'){
 //                                console.log("沪A523456-----"+_filterData[id].plateNo);
@@ -281,7 +281,16 @@
                 //重连不能超过5次
                 this.platformConnectCount++;
             },
-
+            getNextPosition(distance,p1,heading){
+                let lng0 = p1.lng;
+                let lat0 = p1.lat;
+                let d = (distance/108000)*(distance/108000);
+                let e = Math.tan(heading)*Math.tan(heading)+1;
+                let lng = Math.sqrt(d/e)+lng0;
+                let lat = lat0+Math.tan(heading)*(lng-lng0);
+                let position = new AMap.LngLat(lng,lat);
+                return position;
+            },
 
             // 获取红绿灯
             initWebsocket() {
