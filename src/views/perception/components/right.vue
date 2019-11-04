@@ -661,10 +661,6 @@
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        let warningObj={
-                            longitude:item.longitude,
-                            latitude:item.latitude
-                        }
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
                             _this.warningCount++;
