@@ -1354,7 +1354,7 @@
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
         height: 226px;
-        background: #00000082;
+        background: #000000;
     }
     .video-mask{
         position: absolute;
