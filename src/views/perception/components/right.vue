@@ -688,10 +688,12 @@
                         _this.warningData[warningId].timer = setTimeout(()=>{
                             if(_this.$refs.perceptionMap) {
                                 _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
-                                _this.warningCount--;
+                                if(_this.warningCount > 0) {
+                                    _this.warningCount--;
+                                }
                                 _this.$parent.warningCount = _this.warningCount;
                                 console.log("移除事件")
-                                delete warningData[_this.warningData[warningId].warningId];
+                                delete _this.warningData[warningId];
                             }
                         },2000);
                     })
