@@ -12,7 +12,7 @@
                     <live-player
                             :requestVideoUrl="requestVideoUrl"
                             :params="item.params"
-                            type="flvUrl"
+                            type="wsUrl"
                             :autoplay="false"
                     >
                         <div class="video-num" @click="changeMap(index)">
@@ -49,7 +49,7 @@
             <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="mapParam.background" minX="mapParam.minX"   minY="mapParam.minY" minZ="mapParam.minZ"
                        maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
-            @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
+                       @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
             </tusvn-map>
         </div>
     </div>
@@ -96,7 +96,6 @@
                 warningCount:0,
                 lastLightObj:{},
                 processDataTime:'',
-                removeEventObj:{},
                 mapShow:false,
                 mapInitTime:'',
                 currentExtent:[],
@@ -141,7 +140,7 @@
             },
             $route: {
                 handler: function(val, oldVal){
-                   this.isShow = val.params.isShow;
+                    this.isShow = val.params.isShow;
                 },
                 // 深度观察监听
                 deep: true,
@@ -193,13 +192,13 @@
             onMapComplete(){
 
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                    /*setInterval(()=>{
-                        let camera = this.$refs.perceptionMap.getCamera();
-                        console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
-                    },500)*/
-                   let count=0;
-                   let flag=false;
-                   let camParam;
+                /*setInterval(()=>{
+                    let camera = this.$refs.perceptionMap.getCamera();
+                    console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
+                },500)*/
+                let count=0;
+                let flag=false;
+                let camParam;
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
@@ -209,24 +208,24 @@
                     return;
                 }
                 //5s没有 默认值
-                   this.mapInitTime = setInterval(()=>{
-                       if(this.camList.length>0&&this.camList[0].camParam){
-                           camParam = this.camList[0].camParam;
-                           this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-                           this.getData();
-                           clearInterval(this.mapInitTime);
-                           this.mapShow=true;
-                           return;
-                       }
-                       count++;
-                       if(count==10){
-                           this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-                           this.getData();
-                           this.mapShow=true;
-                           clearInterval(this.mapInitTime);
-                       }
-                   },100)
-             },
+                this.mapInitTime = setInterval(()=>{
+                    if(this.camList.length>0&&this.camList[0].camParam){
+                        camParam = this.camList[0].camParam;
+                        this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+                        this.getData();
+                        clearInterval(this.mapInitTime);
+                        this.mapShow=true;
+                        return;
+                    }
+                    count++;
+                    if(count==10){
+                        this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                        this.getData();
+                        this.mapShow=true;
+                        clearInterval(this.mapInitTime);
+                    }
+                },100)
+            },
             getData(){
                 this.typeRoadData();
                 this.initPlatformWebSocket();
@@ -306,10 +305,10 @@
                 let x2 = utm2[0];
                 let y2 = utm2[1];
 //                this.getNewCurrentExtent(x1,y1,x2,y2);
-               /* this.currentExtent.push([x2, y1]);
-                this.currentExtent.push([x1, y1]);
-                this.currentExtent.push([x1, y2]);
-                this.currentExtent.push([x2, y2]);*/
+                /* this.currentExtent.push([x2, y1]);
+                 this.currentExtent.push([x1, y1]);
+                 this.currentExtent.push([x1, y2]);
+                 this.currentExtent.push([x2, y2]);*/
                 this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
                 console.log("边界值："+this.currentExtent);
 //                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
@@ -662,13 +661,6 @@
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        for(let key in _this.removeEventObj){
-                            console.log("交通事件："+_this.removeEventObj[key]);
-                        }
-                        if(_this.removeEventObj[warningId]){
-                            return;
-                        }
-                        let msg = item.warnMsg;
                         let warningObj={
                             longitude:item.longitude,
                             latitude:item.latitude
@@ -676,50 +668,34 @@
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
                             _this.warningCount++;
-                            let obj = {
+                            _this.warningData[warningId] = {
+                                warningId: warningId,
                                 id:'alert'+_this.alertCount,
-                                msg:msg,
+                                msg:item.warnMsg,
                                 longitude:item.longitude,
                                 latitude:item.latitude,
-                                timer:null,
-                                flag:false
+                                timer:null
 
                             }
-                            obj.timer = setTimeout(()=>{
-                                _this.$refs.perceptionMap.removeModel(obj.id);
-                                obj.flag=true;
-                                for(let key in warningData){
-                                    if(warningData[key].flag){
-                                        delete warningData[key];
-                                    }
-                                }
-                            },2000)
-                            _this.warningData[warningId]=obj;
                             _this.alertCount++;
-                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
-                            let obj = _this.warningData[warningId];
-                            clearTimeout(obj.timer);
-                            obj.timer = setTimeout(()=>{
-                                if(_this.$refs.perceptionMap) {
-                                    _this.$refs.perceptionMap.removeModel(obj.id);
-                                    obj.flag=true;
-                                    _this.warningCount--;
-                                    _this.$parent.warningCount = _this.warningCount;
-                                    console.log("移除事件")
-                                    for(let key in warningData){
-                                        if(key!=obj.id&&warningData[key].flag){
-                                            delete warningData[key];
-                                        }
-                                    }
-                                }
-                            },2000)
-                            _this.warningData[warningId]=obj;
-
-                            _this.$refs.perceptionMap.removeModel(obj.id);
-                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                            _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
                         }
+
+                        _this.$refs.perceptionMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
+                        clearTimeout(_this.warningData[warningId].timer);
+                        _this.warningData[warningId].timer = setTimeout(()=>{
+                            if(_this.$refs.perceptionMap) {
+                                _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
+                                if(_this.warningCount > 0) {
+                                    _this.warningCount--;
+                                }
+                                _this.$parent.warningCount = _this.warningCount;
+                                console.log("移除事件")
+                                delete _this.warningData[warningId];
+                            }
+                        },2000);
                     })
                     //此次告警结束，将总数传递出去
                     _this.$parent.warningCount = _this.warningCount;
@@ -855,8 +831,8 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-              /*  console.log("########");
-                console.log(_this.tabIsExist);*/
+                /*  console.log("########");
+                  console.log(_this.tabIsExist);*/
                 if(_this.tabIsExist){
                     /*console.log("..............");*/
                     _this.$refs.perceptionMap.addPerceptionData(mesasge);
@@ -1223,18 +1199,17 @@
             clearInterval(this.mapInitTime);
             this.$refs.perceptionMap&&this.$refs.perceptionMap.reset3DMap();
             this.warningWebsocket&&this.warningWebsocket.close();
-            this.warningCancelWebsocket&&this.warningCancelWebsocket.close();
             this.platformWebsocket&&this.platformWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
         }
-}
+    }
 </script>
 
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
     .map-right{
-      width: 270px;
+        width: 270px;
     }
     .point-style{
         width: 10px;
@@ -1338,7 +1313,7 @@
             bottom: 0px;
         }
 
-      /*  transition: all 2s ease-in-out;*/
+        /*  transition: all 2s ease-in-out;*/
         .active-circle{
             display: inline-block;
             width: 10px;
