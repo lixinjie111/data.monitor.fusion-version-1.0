@@ -786,9 +786,17 @@
             },
             onPlatformMessage(mesasge){
                 let _this=this;
-                _this.$refs.perceptionMap.onCarMessage(mesasge);
-                let json = JSON.parse(mesasge.data);
-                _this.$parent.vehData = json.result.vehDataStat;
+                if(_this.tabIsExist){
+                    _this.$refs.perceptionMap.onCarMessage(mesasge);
+                    let json = JSON.parse(mesasge.data);
+                    _this.$parent.vehData = json.result.vehDataStat;
+                }else{
+                    let cacheObj = _this.$refs.tusvnMap.cacheAndInterpolateDataByVid;
+                    if(Object.keys(cacheObj).length>0){
+                        _this.$refs.perceptionMap.cacheAndInterpolateDataByVid = {};
+                    }
+                }
+
 //                _this.$emit("getPlatformData",json.result.vehDataStat);
             },
             onPlatformClose(data){

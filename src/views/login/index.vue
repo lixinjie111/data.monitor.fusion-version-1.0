@@ -102,7 +102,7 @@
                             password: _password
                         });
                         this.loginFunc(_param);
-                        // this.loginFunc(this.loginForm);
+//                        this.loginFunc( this.loginForm);
                     }else {
                         this.loading = false;
                         return false;

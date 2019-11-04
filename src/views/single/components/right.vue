@@ -98,6 +98,7 @@
                 carConnectCount:0,
                 cancelConnectCount:0,
                 sideConnectCount:0,
+                tabIsExist:true,
                 testCount:0,
                 testSet:new Set()
             }
@@ -695,7 +696,7 @@
 //                        console.log("告警大小："+_this.testSet.size);
 //                        console.log(warningId+"---"+warningJson.time);
 //                        console.log("距离："+item.dis);
-                        let msg = item.warnMsg+"  "+item.dis;
+                        let msg = item.warnMsg+"  "+item.dis+"米";
                         let warningObj={
                             longitude:item.longitude,
                             latitude:item.latitude
@@ -809,7 +810,13 @@
             },
             onCarMessage(message){
                 let _this = this;
-                _this.$refs.tusvnMap.onCarTrackMessage(message);
+                if(_this.tabIsExist){
+                    _this.$refs.tusvnMap.onCarTrackMessage(message);
+                }else{
+                    if(Object.keys(_this.$refs.tusvnMap.cacheAndInterpolateDataByVid).length>0){
+                        _this.$refs.tusvnMap.cacheAndInterpolateDataByVid={};
+                    }
+                }
             },
             onCarClose(data){
                 console.log("结束连接");
@@ -871,7 +878,18 @@
             },
             onSideCarMessage(message){
                 let _this = this;
-                _this.$refs.tusvnMap.onCarTrackMessage(message);
+//                _this.$refs.tusvnMap.onCarTrackMessage(message);
+
+                if(_this.tabIsExist){
+                    /*console.log("..............");*/
+                    _this.$refs.tusvnMap.addPerceptionData(mesasge);
+                }else{
+                    let cacheList = _this.$refs.tusvnMap.cachePerceptionQueue;
+                    if(cacheList.length>0){
+                        _this.$refs.tusvnMap.cachePerceptionQueue = new Array();
+                    }
+                }
+
                /* if(_this.testCount==0){
                     _this.testCount=1;
                     setTimeout(()=>{
@@ -921,9 +939,18 @@
             }
         },
         mounted(){
-            this.mapParam=window.mapParam;
-            this.getDeviceInfo();
+            let _this = this;
+            _this.mapParam=window.mapParam;
+            _this.getDeviceInfo();
 //            this.initLightWebSocket();
+            //判断当前标签页是否被隐藏
+            document.addEventListener("visibilitychange", () => {
+                if(document.visibilityState == "hidden") {
+                    _this.tabIsExist=false;
+                } else if (document.visibilityState == "visible") {
+                    _this.tabIsExist=true;
+                }
+            });
         },
         components:{
             TusvnMap,LivePlayer

@@ -1691,14 +1691,14 @@
                     cdata.lastRecieveData = d;
                     cdata.nowRecieveData = d;
 
-                    /*this.addModel(
+                   /* this.addModel(
                         'testCar',
                         "./static/map3d/map_photo/car.3DS",
                         0,
                         0,
                         this.defualtZ
-                    );*/
-
+                    );
+*/
                     this.addModel(
                         vid,
                         "./static/map3d/map_photo/car.3DS",
@@ -1712,18 +1712,17 @@
                         this.defualtZ)
 
                 }else{//存在该车的数据
-                    /*this.models['testCar'].position.set(position[0], position[1], this.defualtZ);
+                   /* this.models['testCar'].position.set(position[0], position[1], this.defualtZ);
                     this.models['testCar'].rotation.set(
                         this.pitch,
                         this.yaw,
                         (-Math.PI / 180) * pcar.heading
                     );
-
+*/
                     let position1 = proj4(this.sourceProject, this.destinatePorject, [
                         pcar.longitude,
                         pcar.latitude
                     ]);
-*/
 //                    clearTimeout(this.processPlatformCarsTrackIntervalId);
                     /*this.models[vid].position.set(position1[0], position1[1], this.defualtZ);
                     this.models[vid].rotation.set(
@@ -1740,7 +1739,7 @@
                         heading: pcar.heading,
                     };
                     cdata.nowRecieveData = d;
-                    if(cdata.cacheData.length>30){
+                    if(cdata.cacheData.length>30&&cdata.cacheData.length<=35){
                         let tempData = cdata.cacheData;
                         console.log("积压长度："+cdata.cacheData.length);
                         cdata.cacheData=[];
@@ -1750,8 +1749,27 @@
                             }
                         })
                     }
-                    if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime&&cdata.nowRecieveData.gpsTime== cdata.lastRecieveData.gpsTime) {
-                        console.log("到达顺序错误或重复数据");
+                    if(cdata.cacheData.length>35&&cdata.cacheData.length<=50){
+                        let count=0;
+                        let tempData = cdata.cacheData;
+                        console.log("积压长度："+cdata.cacheData.length);
+                        cdata.cacheData=[];
+                        tempData.forEach((item,index)=>{
+                            if(index==count+2){
+                                cdata.cacheData.push(item);
+                                count = index;
+                            }
+                        })
+                    }
+                    if(cdata.cacheData.length>50){
+                        let count=0;
+                        let tempData = cdata.cacheData;
+                        cdata.cacheData=[];
+                        console.log("积压长度："+cdata.cacheData.length);
+                    }
+
+                    if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime||cdata.nowRecieveData.gpsTime== cdata.lastRecieveData.gpsTime) {
+//                        console.log("到达顺序错误或重复数据");
                         return;
                     }
                    /* cdata.cacheData.push(cdata.nowRecieveData);*/
@@ -1784,13 +1802,14 @@
             },
             processPlatformCarsTrack:function(){
                 this.processPlatformCarsTrackIntervalId=setTimeout(() => {
+                    clearTimeout(this.processPlatformCarsTrackIntervalId);
+                    this.processPlatformCarsTrackIntervalId=null;
                     this.timeCall();
-                }, this.stepTime);//this.stepTime
+                }, 2000);//this.stepTime
             },
             timeCall(){
                 let _this = this;
-                for(var vid in _this.cacheAndInterpolateDataByVid)
-                {
+                for(var vid in _this.cacheAndInterpolateDataByVid){
                     let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
 //                    console.log(carCacheData.cacheData.length);
                     if(carCacheData!=null)
@@ -1809,8 +1828,18 @@
                         }
                     }
                 }
+               /* while(true){
+                    let start = (new Date()).getTime();
+                    while ((new Date()).getTime() - start < _this.stepTime) {
+                        continue;
+                    }
+                    _this.timeCall();
+                }*/
+
                 /*requestAnimationFrame(_this.timeCall);*/
                 _this.processPlatformCarsTrackIntervalId=setTimeout(() => {
+                    clearTimeout(_this.processPlatformCarsTrackIntervalId);
+                    _this.processPlatformCarsTrackIntervalId=null;
                     _this.timeCall();
                 }, _this.stepTime);//this.stepTime
             },
