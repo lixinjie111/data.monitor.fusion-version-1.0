@@ -11,17 +11,7 @@ import './assets/scss/reset.scss';
 import './assets/scss/public.scss';
 
 
-//导入video.js
-import VideoPlayer  from 'vue-video-player'
-import 'video.js/dist/video-js.css'
-import 'vue-video-player/src/custom-theme.css'
-import 'videojs-flash'
-
-Vue.use(VideoPlayer);
-
 //elementui 导入
-
-
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
