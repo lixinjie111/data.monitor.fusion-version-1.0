@@ -137,7 +137,6 @@
                 let data = result.vehDataDTO;
                 if(data.length>0){
 //                    console.log(data[0].gpsTime+".........");
-
                     let flag = false;
                     for(let i=0;i<data.length;i++){
                         let id = data[i].vehicleId;
@@ -152,6 +151,7 @@
                     if(flag){
                         return;
                     }
+
                 }
                 clearInterval(_this.messageTime);
                 _this.messageCount=0;
@@ -241,6 +241,7 @@
                         }
 
                         _this.prevData = _filterData;
+                        console.log(_this.prevData)
 
                     } else {
                         // 返回的数据为空
@@ -297,44 +298,67 @@
                 this.platformConnectCount++;
             },
             getNextPosition(distance,p1,heading){
-                if(heading>90&&heading<180){
+                let lng0 = p1.lng;
+                let lat0 = p1.lat;
+                let lng;
+                let lat;
+                //y1=y0
+                if(heading==90){
+                    //tan@=x1-x0/y1-y0    (x1-x0)2+(y1-y0)2 = d2
+                    lng = lng0+(distance/108000);
+                    lat = lat0;
+                    return;
+                }
+                if(heading==270){
+                    //tan@=x1-x0/y1-y0    (x1-x0)2+(y1-y0)2 = d2
+                    lng = lng0;
+                    lat = lat0-(distance/108000);
+                    return;
+                }
+
+                let d = (distance/108000)*(distance/108000);
+                let e = Math.tan(heading)*Math.tan(heading)+1;
+               /* if(heading>90&&heading<=180){
                     heading = 180-heading;
                 }
                 if(heading>180&&heading<270){
                     heading = 270-heading;
                 }
-                if(heading>270&&heading<360){
+                if(heading>270&&heading<=360){
                     heading = 360-heading;
                 }
-                if(heading==90){
-
-                }
-                let lng0 = p1.lng;
-                let lat0 = p1.lat;
-                let d = (distance/108000)*(distance/108000);
-                let e = Math.tan(heading)*Math.tan(heading)+1;
-                let lng = Math.sqrt(d/e)+lng0;
-                let lat = lat0+Math.tan(heading)*(lng-lng0);
+*/
+                lng = Math.sqrt(d/e)+lng0;
+                lat = lat0+Math.tan(heading)*(lng-lng0);
                 let position = new AMap.LngLat(lng,lat);
                 return position;
             },
             predictMove(){
                 let _this = this;
-                for (let id in _this.prevData) {
+                let prevData={
+                    distance: 16,
+                    heading: 265.27497921635324,
+                    latitude: 31.282431364646282,
+                    longitude: 121.16241199121829,
+                    plateNo: "仿A523456",
+                    speed: 55,
+                    vehicleId: "B21E0005"
+                }
+                for (let id in prevData) {
                     //上一个点
-                    let p2 = new AMap.LngLat(_this.prevData[id].longitude,_this.prevData[id].latitude)
-                    let time2 = _this.prevData[id].gpsTime;
+                    let p2 = new AMap.LngLat(prevData[id].longitude,prevData[id].latitude)
+                    let time2 = prevData[id].gpsTime;
 
-                    let heading = _this.prevData[id].heading;
+                    let heading = prevData[id].heading;
                     //此次的点
-                    let p1 = _this.getNextPosition(_this.prevData[id].distance,p2,heading);
-                    console.log(id,_this.prevData[id].heading);
+                    let p1 = _this.getNextPosition(prevData[id].distance,p2,heading);
+                    console.log(id,prevData[id].heading);
                     //预判的速度
-                    let speed = _this.prevData[id].speed;
-                    _this.prevData[id].marker.setPosition(p2);
-                    _this.prevData[id].marker.moveTo([p1.lng, p1.lat], speed);
-                    _this.prevData[id].longitude = p1.lng;
-                    _this.prevData[id].latitude = p1.lat;
+                    let speed = prevData[id].speed;
+                    prevData[id].marker.setPosition(p2);
+                    prevData[id].marker.moveTo([p1.lng, p1.lat], speed);
+                    prevData[id].longitude = p1.lng;
+                    prevData[id].latitude = p1.lat;
 
                 }
             },

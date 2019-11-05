@@ -37,7 +37,8 @@ export default {
         fetchTypicalRoad() {
             getTypicalRoadData().then(res => {
                 let data = res.data;
-                this.centerPointData = data.slice(0,4);
+                this.centerPointData = data.slice(0,1);
+//                this.centerPointData = data.slice(0,4);
             });
         }
     },
