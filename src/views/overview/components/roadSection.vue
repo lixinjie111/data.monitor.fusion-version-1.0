@@ -26,7 +26,9 @@
                 carWebSocket: null,
                 prevData: {},
                 platformConnectCount:0,
-                spatConnectCount:0
+                spatConnectCount:0,
+                messageCount:0,
+                messageTime:null
             };
         },
         mounted() {
@@ -141,7 +143,7 @@
                         let id = data[i].vehicleId;
                         if(_this.prevData[id]){
                             if(_this.prevData[id].gpsTime>=data[i].gpsTime){
-                                console.log(id+"---车辆数据到达错误！")
+//                                console.log(id+"---车辆数据到达错误！")
                                 flag=true;
                                 break;
                             }
@@ -151,6 +153,17 @@
                         return;
                     }
                 }
+                clearInterval(_this.messageTime);
+                _this.messageCount=0;
+                _this.messageTime = setInterval(()=>{
+                    _this.messageCount++;
+                    console.log(_this.messageCount);
+                    if(_this.messageCount==3){
+                        clearInterval(_this.messageTime);
+                        return;
+                    }
+                    _this.predictMove();
+                },1000)
                 // 车辆
                 if ("vehDataDTO" in result === true) {
                     _this.crossData.roadSenseCars = data;
@@ -177,8 +190,7 @@
                         for (let id in _this.prevData) {
                             if(_filterData[id]) {   //表示有该点，做move
                                 _filterData[id].marker = _this.prevData[id].marker;
-                                let _currentCar = _filterData[id];
-                                _filterData[id].marker.setAngle(_currentCar.heading);
+                                _filterData[id].marker.setAngle(_filterData[id].heading);
                                 //计算速度AMap.GeometryUtil.distance(p1, p2);
                                 let p1 =  new AMap.LngLat(_filterData[id].longitude,_filterData[id].latitude);
                                 let time1 = _filterData[id].gpsTime;
@@ -193,8 +205,9 @@
                                 let speed = (distance/t*3.6);
 //                                    console.log("speed:"+speed);
                                 _filterData[id].marker.setPosition(p2);
-                                _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], speed);
-                                _this.getNextPosition(distance,p1,_filterData[id].heading);
+                                _filterData[id].marker.moveTo([_filterData[id].longitude, _filterData[id].latitude], speed);
+                                _filterData[id].distance = distance;
+                                _filterData[id].speed = speed;
 //                                    _filterData[id].marker.setPosition([_currentCar.longitude, _currentCar.latitude]);
 //                            if(_filterData[id].vehicleId=='B21E0005'){
 //                                console.log("沪A523456-----"+_filterData[id].plateNo);
@@ -223,6 +236,8 @@
                                     zIndex: 1
                                 });
                             }
+                            _filterData[id].distance = 16;
+                            _filterData[id].speed = 55;
                         }
 
                         _this.prevData = _filterData;
@@ -282,6 +297,18 @@
                 this.platformConnectCount++;
             },
             getNextPosition(distance,p1,heading){
+                if(heading>90&&heading<180){
+                    heading = 180-heading;
+                }
+                if(heading>180&&heading<270){
+                    heading = 270-heading;
+                }
+                if(heading>270&&heading<360){
+                    heading = 360-heading;
+                }
+                if(heading==90){
+
+                }
                 let lng0 = p1.lng;
                 let lat0 = p1.lat;
                 let d = (distance/108000)*(distance/108000);
@@ -290,6 +317,26 @@
                 let lat = lat0+Math.tan(heading)*(lng-lng0);
                 let position = new AMap.LngLat(lng,lat);
                 return position;
+            },
+            predictMove(){
+                let _this = this;
+                for (let id in _this.prevData) {
+                    //上一个点
+                    let p2 = new AMap.LngLat(_this.prevData[id].longitude,_this.prevData[id].latitude)
+                    let time2 = _this.prevData[id].gpsTime;
+
+                    let heading = _this.prevData[id].heading;
+                    //此次的点
+                    let p1 = _this.getNextPosition(_this.prevData[id].distance,p2,heading);
+                    console.log(id,_this.prevData[id].heading);
+                    //预判的速度
+                    let speed = _this.prevData[id].speed;
+                    _this.prevData[id].marker.setPosition(p2);
+                    _this.prevData[id].marker.moveTo([p1.lng, p1.lat], speed);
+                    _this.prevData[id].longitude = p1.lng;
+                    _this.prevData[id].latitude = p1.lat;
+
+                }
             },
 
             // 获取红绿灯

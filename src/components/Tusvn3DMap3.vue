@@ -139,18 +139,14 @@
                 tag: true,
 
                 sourceProject: "EPSG:4326",
-                // ,destinatePorject:"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"//北京
                 destinatePorject:
-                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //上海
-//                destinatePorject:
-//                    "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //长沙
+                    "+proj=utm +zone=51 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", //长沙
                 timeA: 0,
                 timeB: 0,
                 //按照vid缓存插值的小车轨迹
                 cacheAndInterpolateDataByVid:{},
                 processPlatformCarsTrackIntervalId:null,
                 cacheLightData: new Array(),
-                start:0,
                 nextAt:0,
                 testCar:null,
             };
@@ -457,8 +453,7 @@
             /**
              * 导航角度转换为3D角度
              */
-            getHeading:function(heading)
-            {
+            getHeading:function(heading){
                 if(heading>180)
                 {
                     return  heading=-(Math.PI / 180.0) * (heading-180);
@@ -1223,7 +1218,6 @@
 
                                 ss += "  耗时：" + hs;
 
-
                                 this.$emit("processPerceptionDataTime", ss,d2.gpsTime,d2_vehDataStat);
 //                                this.$emit("processDataTime",d2.gpsTime)
                                 // if(this.lastPerceptionData!=null)
@@ -1283,7 +1277,6 @@
                 }
             },
             processPerceptionMesage: function() {
-
                 let data = null;
                 if (this.lastPerceptionMessage == null) {
                     return;
@@ -1335,7 +1328,6 @@
 
                             this.deviceModels[deviceid].persons[m] = pmodel1;
                             dl.scene.add(pmodel1);
-
 
                             //融合车辆
                             // var geoBox_out = new THREE.BoxBufferGeometry(1.7, 4.6, 1.4);
@@ -1521,38 +1513,7 @@
                 // console.log(nowtime-this.lasttime);
                 // this.lasttime = nowtime;
                 this.cacheTrackCarData = data;
-                this.processCarTrackMessage(1);    
-                // 画ws推过来的点的实时位置  
-                // let aa = JSON.parse(data.data);
-                // let position = proj4(this.sourceProject, this.destinatePorject, [
-                //     aa.result.selfVehInfo.longitude,
-                //     aa.result.selfVehInfo.latitude
-                // ]); 
-                // if(!this.testCar){
-                //     this.addModel(
-                //         "111",
-                //         "./static/map3d/map_photo/car.3DS",
-                //         position[0],
-                //         position[1],
-                //         this.defualtZ
-                //     );
-                //     this.testCar = true;
-                //     // this.testCar = myBox.addMyBox(1.7, 4.6, 1.4, this.carColor);
-                //     //  dl.scene.add(this.testCar);
-
-                // }else{
-                //     this.updateModelPostion(
-                //         "111",
-                //         position[0],
-                //         position[1],
-                //         this.defualtZ
-                //     )
-                //     // this.testCar.position.set(position[0], position[1], this.defualtZ);
-                  
-                // }
-                // this.testCar.castShadow = true;
-                // this.testCar.receiveShadow = true;
-                     
+                this.processCarTrackMessage(1);
             },
             onCarMessage: function(data) {
                 // console.log(data);
@@ -1697,7 +1658,12 @@
             cacheAndInterpolatePlatformCar:function(pcar){
                 let vid = pcar.vehicleId;
                 let cdata = this.cacheAndInterpolateDataByVid[vid];
-            
+
+                let position = proj4(this.sourceProject, this.destinatePorject, [
+                    pcar.longitude,
+                    pcar.latitude
+                ]);
+
                 if(cdata==null)//没有该车的数据
                 {
                     cdata = {
@@ -1720,7 +1686,22 @@
                     cdata.lastRecieveData = d;
                     cdata.nowRecieveData = d;
                     this.cacheAndInterpolateDataByVid[vid]=cdata;
+
+                     /*this.addModel(
+                       'testCar',
+                       "./static/map3d/map_photo/car.3DS",
+                       0,
+                       0,
+                       this.defualtZ
+                   );*/
                 }else{//存在该车的数据
+
+                    /*this.models['testCar'].position.set(position[0], position[1], this.defualtZ);
+                    this.models['testCar'].rotation.set(
+                        this.pitch,
+                        this.yaw,
+                        (-Math.PI / 180) * pcar.heading
+                    );*/
 
                     let d = {
                         vehicleId: vid,
@@ -1757,7 +1738,9 @@
                             cdata.cacheData.push(d2);
                         }
                     }
-                    if(cdata.cacheData.length > 50){
+
+                    if(cdata.cacheData.length > 40&&cdata.cacheData.length<100){
+//                        console.log("积压长度："+cdata.cacheData.length);
                         let tmpCacheData = []
                         for (let i = 0; i < cdata.cacheData.length; i++) {
                             if(i%2 == 0){
@@ -1766,36 +1749,34 @@
                         }
                         cdata.cacheData = tmpCacheData;
                     }
-
+                    if(cdata.cacheData.length>=100){
+//                        console.log("积压长度："+cdata.cacheData.length);
+                        cdata.cacheData=[];
+                    }
                     this.$emit("pcarDataTime",cdata.nowRecieveData.gpsTime,cdata.lastRecieveData.gpsTime);
                     cdata.lastRecieveData=cdata.nowRecieveData;
                 }
             },
             processPlatformCarsTrack:function(time){
-          
-                if (!this.start) {
-                    this.start = new Date().getTime();
-                    this.nextAt = this.start;
-                }     
+
+                this.nextAt = new Date().getTime();
                 let timeOutFlag = false;
                       
                 for(let vid in this.cacheAndInterpolateDataByVid)
                 {
                     let carCacheData = this.cacheAndInterpolateDataByVid[vid];  
-                   
-                    if(carCacheData.cacheData.length > 30){
-                        timeOutFlag = true;   
-                    }
-
-
-                    if(carCacheData!=null)
-                    {
+                    if(carCacheData!=null){
                         if(carCacheData.cacheData.length>0)
                         {
                             //缓存数据
                             let cardata = this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
                             if(this.mainCarVID == cardata.vehicleId)
                             {
+                                if(this.cacheAndInterpolateDataByVid[vid].cacheData.length > 20){
+//                                    console.log("积压长度："+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+                                    timeOutFlag = true;
+                                }
+
                                 this.moveCar(cardata);
                             }else{
                                 this.moveCar2(cardata);
@@ -1803,8 +1784,8 @@
 
                         }
                     }
-                }   
-                
+                }
+
                 if(timeOutFlag){
                      this.nextAt += 50;     
                 }else{
