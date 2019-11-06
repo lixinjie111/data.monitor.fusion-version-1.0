@@ -33,12 +33,12 @@
         <div class="map-real-time" >{{processTime|dateFormat}}</div>
         <!--<div class="map-time">{{processTime|dateFormat}}</div>
         <div class="map-time map-time1">{{lightTime|dateFormat}}</div>-->
-        <div class="c-map">
-            <tusvn-map :target-id="'mapMonitor'" ref="tusvnMap"
+        <div class="c-map" id="cesiumContainer">
+            <!--<tusvn-map :target-id="'mapMonitor'" ref="tusvnMap"
                        background="mapParam.background" minX="mapParam.minX"   minY="mapParam.minY" minZ="mapParam.minZ"
                        maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
                        @mapcomplete="onMapComplete" @pcarDataTime="getProcessTime">
-            </tusvn-map>
+            </tusvn-map>-->
         </div>
         <div class="travel-detail">
             <div class="detail1">
@@ -67,9 +67,16 @@
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
     import {getLiveDeviceInfo, startStream, sendStreamHeart } from '@/api/single'
-    import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
     import LivePlayer from '@/components/livePlayer'
+
+    import GIS3D from '@/utils/GIS3D.js'
+    import PerceptionCars from '@/utils/PerceptionCars.js'
+    import ProcessCarTrack from '@/utils/ProcessCarTrack.js'
+
+    let gis3d=new GIS3D();
+    let perceptionCars = new PerceptionCars();
+    let platCars = new ProcessCarTrack();
     export default {
         data() {
             return {
@@ -449,12 +456,12 @@
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
-                this.$refs.tusvnMap.updateCameraPosition(window.defaultSingleParam.x,window.defaultSingleParam.y,window.defaultSingleParam.z,window.defaultSingleParam.radius,window.defaultSingleParam.pitch,window.defaultSingleParam.yaw);
+                gis3d.updateCameraPosition(window.defaultSingleParam.x,window.defaultSingleParam.y,window.defaultSingleParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.config.websocketUrl,this.roadItem1.camSerialNum);*/
                 this.initCarWebSocket();
                 this.initSideCarWebSocket();
-                this.initSpatWebSocket();
+                /*this.initSpatWebSocket();*/
                 this.initWarningWebSocket();
             },
 
@@ -691,13 +698,13 @@
                             },2000)
                             _this.warningData[warningId]=obj;
                             _this.alertCount++;
-                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                            gis3d.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
                             let obj = _this.warningData[warningId];
                             clearTimeout(obj.timer);
                             obj.timer = setTimeout(()=>{
-                                _this.$refs.tusvnMap.removeModel(obj.id);
+                                gis3d.remove3DInforLabel(obj.id);
                                 obj.flag=true;
                                 console.log("移除事件")
                                 for(let key in warningData){
@@ -709,8 +716,8 @@
                             _this.warningData[warningId]=obj;
 //                            console.log("提示信息："+msg,item.dis,obj.dist);
                             //进行更新
-                            _this.$refs.tusvnMap.removeModel(obj.id);
-                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
+                            gis3d.remove3DInforLabel(obj.id);
+                            gis3d.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
                         }
                     })
                 }
@@ -775,7 +782,8 @@
             },
             onCarMessage(message){
                 let _this = this;
-                _this.$refs.tusvnMap.onCarTrackMessage(message);
+                let data = JSON.parse(message.data);
+                platCars.onCarTrackMessage(data);
             },
             onCarClose(data){
                 console.log("结束连接");
@@ -837,7 +845,8 @@
             },
             onSideCarMessage(message){
                 let _this = this;
-                _this.$refs.tusvnMap.onCarTrackMessage(message);
+                let data = JSON.parse(message.data)
+                perceptionCars.onCarTrackMessage(data);
                 /* if(_this.testCount==0){
                      _this.testCount=1;
                      setTimeout(()=>{
@@ -889,10 +898,18 @@
         mounted(){
             this.mapParam=window.mapParam;
             this.getDeviceInfo();
+
+            gis3d.initload("cesiumContainer",false);
+            perceptionCars.viewer=gis3d.cesium.viewer;
+            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
+
+            platCars.models={};
+            platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
+            this.onMapComplete();
 //            this.initLightWebSocket();
         },
         components:{
-            TusvnMap,LivePlayer
+            LivePlayer
         },
         filters: {
             dateFormat: function (value) {

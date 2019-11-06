@@ -45,22 +45,28 @@
             </div>
         </div>
         <div class="map-left"></div>
-        <div id="map" class="c-map">
-            <tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
+        <div id="cesiumContainer" class="c-map">
+            <!--<tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
                        background="mapParam.background" minX="mapParam.minX"   minY="mapParam.minY" minZ="mapParam.minZ"
                        maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
                        @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
-            </tusvn-map>
+            </tusvn-map>-->
         </div>
     </div>
 </template>
 <script>
     const isProduction = process.env.NODE_ENV === 'production'
     import TusvnMap1 from './TusvnMap.vue';
-    import TusvnMap from '@/components/Tusvn3DMap3'
     import DateFormat from '@/utils/date.js'
     import LivePlayer from '@/components/livePlayer'
     import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId} from '@/api/fusion'
+
+    import GIS3D from '@/utils/GIS3D.js'
+    import PerceptionCars from '@/utils/PerceptionCars.js'
+    import ProcessCarTrack from '@/utils/ProcessCarTrack.js'
+    let gis3d=new GIS3D();
+    let perceptionCars = new PerceptionCars();
+    let platCars = new ProcessCarTrack();
     export default {
         data() {
             return {
@@ -96,6 +102,7 @@
                 warningCount:0,
                 lastLightObj:{},
                 processDataTime:'',
+                removeEventObj:{},
                 mapShow:false,
                 mapInitTime:'',
                 currentExtent:[],
@@ -108,7 +115,8 @@
                 cancelConnectCount:0,
                 platformConnectCount:0,
                 perceptionConnectCount:0,
-                spatConnectCount:0
+                spatConnectCount:0,
+                gis3d:null
             }
         },
         props:{
@@ -129,7 +137,7 @@
                 }
             },
         },
-        components: { TusvnMap,TusvnMap1,LivePlayer},
+        components: { TusvnMap1,LivePlayer},
         watch: {
             '$store.getters.getRealData': {
                 handler(newName, oldName) {
@@ -159,6 +167,14 @@
         },
         mounted() {
             let _this = this;
+
+            gis3d.initload("cesiumContainer",false);
+            perceptionCars.viewer=gis3d.cesium.viewer;
+            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
+
+            platCars.models={};
+            platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
+
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
             /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
@@ -168,9 +184,11 @@
             let extend = parseFloat(_this.$route.params.extend);
             //设置地图的中心点
             if(longitude||latitude) {
-                let utm = _this.$refs.perceptionMap.coordinateTransfer("EPSG:4326", "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
-                _this.x = utm[0];
-                _this.y = utm[1];
+//                let utm = gis3d.coordinateTransfer("EPSG:4326", "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
+//                _this.x = utm[0];
+//                _this.y = utm[1];
+                _this.x = longitude;
+                _this.y = latitude;
                 _this.getExtend(longitude,latitude,extend);
                 _this.center=[longitude ,latitude];
             }else{
@@ -179,6 +197,7 @@
                 _this.getExtentCenter();
             }
             _this.getCameraByRsId();
+            _this.onMapComplete();
             //判断当前标签页是否被隐藏
             document.addEventListener("visibilitychange", () => {
                 if(document.visibilityState == "hidden") {
@@ -202,7 +221,8 @@
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
-                    this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+//                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
+                    gis3d.updateCameraPosition(this.x, this.y,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                     this.getData();
                     this.mapShow=true;
                     return;
@@ -211,7 +231,8 @@
                 this.mapInitTime = setInterval(()=>{
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
-                        this.$refs.perceptionMap.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+//                        gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+                        gis3d.updateCameraPosition(this.x, this.y,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                         this.getData();
                         clearInterval(this.mapInitTime);
                         this.mapShow=true;
@@ -219,7 +240,8 @@
                     }
                     count++;
                     if(count==10){
-                        this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+//                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                        gis3d.updateCameraPosition(this.x, this.y,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                         this.getData();
                         this.mapShow=true;
                         clearInterval(this.mapInitTime);
@@ -228,11 +250,11 @@
             },
             getData(){
                 this.typeRoadData();
-                this.initPlatformWebSocket();
                 this.initPerceptionWebSocket();
-                this.initSpatWebSocket();
-//                           //地图不连续移动，判断红绿灯的位置受否再可视区
-                this.initWarningWebSocket();
+                this.initPlatformWebSocket();
+                /*   this.initSpatWebSocket();*/
+ //                           //地图不连续移动，判断红绿灯的位置受否再可视区
+                 this.initWarningWebSocket();
                 this.getMap();
             },
             map1InitComplete(){
@@ -611,18 +633,18 @@
                 if(param==-1){
                     this.param=-1;
                     this.isActive=-1;
-                    this.$refs.perceptionMap.updateCameraPosition(this.x,this.y,window.defaultRoadParam.z,window.defaultRoadParam.radius,window.defaultRoadParam.pitch,window.defaultRoadParam.yaw);
+                    gis3d.updatePosition(121.063,31.113,121.431,31.371);
                     return;
                 }
                 if(this.camList.length>0){
                     let cameraParam = this.camList[param].camParam;
                     if(cameraParam){
-                        this.$refs.perceptionMap.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
+                        gis3d.updateCameraPosition(this.x,this.y,cameraParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                     }else{
-                        this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
                     }
                 }else{
-                    this.$refs.perceptionMap.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                    gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
                 }
                 this.isActive=param;
                 this.param=param;
@@ -661,6 +683,13 @@
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
+                        for(let key in _this.removeEventObj){
+                            console.log("交通事件："+_this.removeEventObj[key]);
+                        }
+                        if(_this.removeEventObj[warningId]){
+                            return;
+                        }
+                        let msg = item.warnMsg;
                         let warningObj={
                             longitude:item.longitude,
                             latitude:item.latitude
@@ -668,34 +697,50 @@
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
                             _this.warningCount++;
-                            _this.warningData[warningId] = {
-                                warningId: warningId,
+                            let obj = {
                                 id:'alert'+_this.alertCount,
-                                msg:item.warnMsg,
+                                msg:msg,
                                 longitude:item.longitude,
                                 latitude:item.latitude,
-                                timer:null
+                                timer:null,
+                                flag:false
 
                             }
+                            obj.timer = setTimeout(()=>{
+                                _this.$refs.perceptionMap.removeModel(obj.id);
+                                obj.flag=true;
+                                for(let key in warningData){
+                                    if(warningData[key].flag){
+                                        delete warningData[key];
+                                    }
+                                }
+                            },2000)
+                            _this.warningData[warningId]=obj;
                             _this.alertCount++;
+                            gis3d.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
                         }else{
                             //判断是否需要更新
-                            _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
-                        }
-
-                        _this.$refs.perceptionMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
-                        clearTimeout(_this.warningData[warningId].timer);
-                        _this.warningData[warningId].timer = setTimeout(()=>{
-                            if(_this.$refs.perceptionMap) {
-                                _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
-                                if(_this.warningCount > 0) {
+                            let obj = _this.warningData[warningId];
+                            clearTimeout(obj.timer);
+                            obj.timer = setTimeout(()=>{
+                                if(_this.$refs.perceptionMap) {
+                                    _this.$refs.perceptionMap.removeModel(obj.id);
+                                    obj.flag=true;
                                     _this.warningCount--;
+                                    _this.$parent.warningCount = _this.warningCount;
+                                    console.log("移除事件")
+                                    for(let key in warningData){
+                                        if(key!=obj.id&&warningData[key].flag){
+                                            delete _this.warningData[key];
+                                        }
+                                    }
                                 }
-                                _this.$parent.warningCount = _this.warningCount;
-                                console.log("移除事件")
-                                delete _this.warningData[warningId];
-                            }
-                        },2000);
+                            },2000)
+                            _this.warningData[warningId]=obj;
+
+                            gis3d.remove3DInforLabel(obj.id);
+                            gis3d.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                        }
                     })
                     //此次告警结束，将总数传递出去
                     _this.$parent.warningCount = _this.warningCount;
@@ -762,8 +807,8 @@
             },
             onPlatformMessage(mesasge){
                 let _this=this;
-                _this.$refs.perceptionMap.onCarMessage(mesasge);
                 let json = JSON.parse(mesasge.data);
+                platCars.onCarMessage(json);
                 _this.$parent.vehData = json.result.vehDataStat;
 //                _this.$emit("getPlatformData",json.result.vehDataStat);
             },
@@ -831,15 +876,30 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
+                let data = JSON.parse(mesasge.data)
                 /*  console.log("########");
                   console.log(_this.tabIsExist);*/
                 if(_this.tabIsExist){
                     /*console.log("..............");*/
-                    _this.$refs.perceptionMap.addPerceptionData(mesasge);
+                    perceptionCars.addPerceptionData(data);
+                    let obj =  perceptionCars.lastPerceptionMessage;
+                    if(obj!=null){
+                        _this.$parent.perceptionData= obj.result.vehDataStat;
+                        if(obj.result.vehDataDTO.length>0){
+                            _this.processDataTime = obj.result.vehDataDTO[0].gpsTime;
+                        }
+                    }
+                   /* if(time!=''){
+                        this.time1=time;
+                    }
+                    if(processTime!=''){
+                        this.processDataTime=processTime;
+                    }
+                    this.$parent.perceptionData=vehDataStat;*/
                 }else{
-                    let cacheList = _this.$refs.perceptionMap.cachePerceptionQueue;
+                    let cacheList = perceptionCars.cachePerceptionQueue;
                     if(cacheList.length>0){
-                        _this.$refs.perceptionMap.cachePerceptionQueue = new Array();
+                        perceptionCars.cachePerceptionQueue = new Array();
                     }
                 }
             },
@@ -1354,7 +1414,7 @@
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
         height: 226px;
-        background: #000000;
+        background: #00000082;
     }
     .video-mask{
         position: absolute;
