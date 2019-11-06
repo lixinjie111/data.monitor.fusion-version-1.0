@@ -784,7 +784,12 @@
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
                 platCars.onCarMessage(json);
-                _this.$parent.vehData = json.result.vehDataStat;
+                let keys = Object.keys(platCars.cacheAndInterpolateDataByVid);
+                if(keys&&keys.length>0){
+                    let key = keys[0];
+                    _this.$parent.vehData = platCars.cacheAndInterpolateDataByVid[key].data;
+                }
+//                _this.$parent.vehData = json.result.vehDataStat;
 //                _this.$emit("getPlatformData",json.result.vehDataStat);
             },
             onPlatformClose(data){

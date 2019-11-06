@@ -41,7 +41,7 @@ class ProcessCarTrack {
                     continue;
                 }
                 //缓存数据
-                this.cacheAndInterpolatePlatformCar(pcar);
+                this.cacheAndInterpolatePlatformCar(pcar,data.result.vehDataStat);
             }
         }
         else {
@@ -53,12 +53,12 @@ class ProcessCarTrack {
                     continue;
                 }
                 //缓存数据
-                this.cacheAndInterpolatePlatformCar(pcar);
+                this.cacheAndInterpolatePlatformCar(pcar,null);
             }
             let datamain = data.result.selfVehInfo;
             if (datamain != null) {
                 this.mainCarVID = datamain.vehicleId;
-                this.cacheAndInterpolatePlatformCar(datamain);
+                this.cacheAndInterpolatePlatformCar(datamain,null);
             }
         }
 
@@ -120,7 +120,7 @@ class ProcessCarTrack {
         // }
     }
     //缓存并且插值平台车轨迹
-    cacheAndInterpolatePlatformCar(car) {
+    cacheAndInterpolatePlatformCar(car,data) {
         let vid = car.vehicleId;
         let cdata = this.cacheAndInterpolateDataByVid[vid];
 
@@ -133,7 +133,8 @@ class ProcessCarTrack {
                 nowRecieveData: null,
                 lastProcessData: null,
                 nowProcessData: null,
-                plateNo: null
+                plateNo: null,
+                data:data
             };
             let d = {
                 vehicleId: vid,
@@ -141,7 +142,7 @@ class ProcessCarTrack {
                 longitude: car.longitude,
                 latitude: car.latitude,
                 gpsTime: car.gpsTime,
-                heading: car.heading,
+                heading: car.heading
             };
             cdata.cacheData.push(d);
             cdata.lastRecieveData = d;
@@ -155,7 +156,7 @@ class ProcessCarTrack {
                 latitude: car.latitude,
                 gpsTime: car.gpsTime,
                 plateNo: car.plateNo,
-                heading: car.heading,
+                heading: car.heading
             };
             cdata.nowRecieveData = d;
 

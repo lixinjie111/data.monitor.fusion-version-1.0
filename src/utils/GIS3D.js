@@ -344,7 +344,6 @@ remove3DInforLabel(name) {
    * 加载灯杆
    */
   initStreetLamp() {
-    debugger
     //添加路灯杆和信息牌
     let itemSide = [[112.95003033070373, 28.326432159727982, 0]]
 
