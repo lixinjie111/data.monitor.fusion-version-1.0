@@ -185,7 +185,7 @@ class GIS3D {
     ///////////////////////
   }
 
-  
+
 
   /**
    * 加载感知杆
@@ -211,10 +211,10 @@ class GIS3D {
           horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
           pixelOffset: new Cesium.Cartesian2(0.0, 0),
           // pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 3.0, 1.5e7, 0.0),
-          scaleByDistance: new Cesium.NearFarScalar(1000, 1, 8000, 0)
+            scaleByDistance: new Cesium.NearFarScalar(200, 1, 2000, 0)
         });
         var position = Cesium.Cartesian3.fromDegrees(itemSide[i].longitude, itemSide[i].latitude, 0);
-        //  
+        //
         var heading = Cesium.Math.toRadians(itemSide[i].heading + 90);
         var pitch = Cesium.Math.toRadians(0);
         var roll = 0;
@@ -249,10 +249,10 @@ remove3DInforLabel(name) {
     { 
      let positions = []; 
       positions.push(Cesium.Cartesian3.fromDegrees(x,y,0));
-      positions.push(Cesium.Cartesian3.fromDegrees(x,y,20)); 
+      positions.push(Cesium.Cartesian3.fromDegrees(x,y,10));
      let lableModel= this.cesium.viewer.entities.add({
         id: name,
-        position: Cesium.Cartesian3.fromDegrees(x,y,20),
+        position: Cesium.Cartesian3.fromDegrees(x,y,10),
         // point: {
         //   color: Cesium.Color.RED,    //点位颜色
         //   pixelSize: 10          //像素点大小
@@ -277,7 +277,7 @@ remove3DInforLabel(name) {
           horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
           pixelOffset: new Cesium.Cartesian2(0.0, 0),
           // pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 3.0, 1.5e7, 0.5),
-          scaleByDistance : new Cesium.NearFarScalar(2000, 1, 8000, 0)//new Cesium.NearFarScalar(1.5e2, 1.5, 1.0e5, 0.0)
+            scaleByDistance: new Cesium.NearFarScalar(200, 1, 2000, 0)
         }
       }); 
 
@@ -364,7 +364,7 @@ remove3DInforLabel(name) {
           horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
           pixelOffset: new Cesium.Cartesian2(0.0, 0),
           // pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 3.0, 1.5e7, 0.0),
-          scaleByDistance: new Cesium.NearFarScalar(1000, 1, 8000, 0)
+            scaleByDistance: new Cesium.NearFarScalar(200, 1, 2000, 0)
         }); 
         var position = Cesium.Cartesian3.fromDegrees(itemSide[i][0], itemSide[i][1], 0);
         //  
