@@ -14,6 +14,7 @@
     "compression-webpack-plugin": "^1.1.11",
     "echarts": "^4.2.1",
     "element-ui": "^2.4.8",
+    "js-md5": "^0.7.3",
     "jquery": "^2.2.3",
     "js-cookie": "^2.2.0",
     "nprogress": "^0.2.0",
@@ -22,7 +23,6 @@
     "vue": "^2.5.2",
     "vue-amap": "^0.5.9",
     "vue-router": "^3.0.1",
-    "vue-video-player": "^5.0.2",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

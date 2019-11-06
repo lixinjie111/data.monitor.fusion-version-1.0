@@ -33,6 +33,7 @@
 </template>
 
 <script>
+    import md5 from 'js-md5'
     import { mapActions } from 'vuex';
     import { removeAuthInfo } from '@/session/index';
     export default {
@@ -96,7 +97,12 @@
                 this.$refs.loginForm.validate(valid => {
                     if (valid) {
                         this.loading = true;
-                        this.loginFunc(this.loginForm);
+                        let _password = this.loginForm.password.length > 20 ? this.loginForm.password : md5(this.loginForm.password);
+                        let _param = Object.assign({}, this.loginForm, {
+                            password: _password
+                        });
+                        this.loginFunc(_param);
+                        // this.loginFunc(this.loginForm);
                     }else {
                         this.loading = false;
                         return false;

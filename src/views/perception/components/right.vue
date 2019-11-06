@@ -96,7 +96,6 @@
                 warningCount:0,
                 lastLightObj:{},
                 processDataTime:'',
-                removeEventObj:{},
                 mapShow:false,
                 mapInitTime:'',
                 currentExtent:[],
@@ -662,64 +661,41 @@
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        for(let key in _this.removeEventObj){
-                            console.log("交通事件："+_this.removeEventObj[key]);
-                        }
-                        if(_this.removeEventObj[warningId]){
-                            return;
-                        }
-                        let msg = item.warnMsg;
-                        let warningObj={
-                            longitude:item.longitude,
-                            latitude:item.latitude
-                        }
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
                             _this.warningCount++;
-                            let obj = {
+                            _this.warningData[warningId] = {
+                                warningId: warningId,
                                 id:'alert'+_this.alertCount,
-                                msg:msg,
+                                msg:item.warnMsg,
                                 longitude:item.longitude,
                                 latitude:item.latitude,
-                                timer:null,
-                                flag:false
+                                timer:null
 
                             }
-                            obj.timer = setTimeout(()=>{
-                                _this.$refs.perceptionMap.removeModel(obj.id);
-                                obj.flag=true;
-                                for(let key in warningData){
-                                    if(warningData[key].flag){
-                                        delete warningData[key];
-                                    }
-                                }
-                            },2000)
-                            _this.warningData[warningId]=obj;
                             _this.alertCount++;
-                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+
+                            _this.$refs.perceptionMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
                         }else{
                             //判断是否需要更新
-                            let obj = _this.warningData[warningId];
-                            clearTimeout(obj.timer);
-                            obj.timer = setTimeout(()=>{
-                                if(_this.$refs.perceptionMap) {
-                                    _this.$refs.perceptionMap.removeModel(obj.id);
-                                    obj.flag=true;
-                                    _this.warningCount--;
-                                    _this.$parent.warningCount = _this.warningCount;
-                                    console.log("移除事件")
-                                    for(let key in warningData){
-                                        if(key!=obj.id&&warningData[key].flag){
-                                            delete warningData[key];
-                                        }
-                                    }
-                                }
-                            },2000)
-                            _this.warningData[warningId]=obj;
+                            if(item.longitude != _this.warningData[warningId].longitude || item.latitude != _this.warningData[warningId].latitude) {
+                                _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
 
-                            _this.$refs.perceptionMap.removeModel(obj.id);
-                            _this.$refs.perceptionMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+                                _this.$refs.perceptionMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
+                            }
                         }
+                        clearTimeout(_this.warningData[warningId].timer);
+                        _this.warningData[warningId].timer = setTimeout(()=>{
+                            if(_this.$refs.perceptionMap) {
+                                _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
+                                if(_this.warningCount > 0) {
+                                    _this.warningCount--;
+                                }
+                                _this.$parent.warningCount = _this.warningCount;
+                                console.log("移除事件")
+                                delete _this.warningData[warningId];
+                            }
+                        },2000);
                     })
                     //此次告警结束，将总数传递出去
                     _this.$parent.warningCount = _this.warningCount;
@@ -1378,7 +1354,7 @@
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
         height: 226px;
-        background: #00000082;
+        background: #000000;
     }
     .video-mask{
         position: absolute;

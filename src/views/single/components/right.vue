@@ -602,7 +602,7 @@
                             [121.16305725240798, 31.289571910992105],
                             [121.17979423666091, 31.289571910992105]
                         ]*/
-                        "polygon":[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
+                        "polygon":window.currentExtent
                     }
                 }
                 let spatMsg = JSON.stringify(spat);
@@ -648,70 +648,45 @@
                 }
 
             },
-            onWarningMessage(message){
-                let _this=this;
-//                _this.warningList.push(message);
-                let warningJson = JSON.parse(message.data);
-                let warningData = warningJson.result.data;
-                let type = warningJson.result.type;
-//                let warningTime = Math.abs(time2-warningJson.time);
-                _this.lightTime = warningJson.time;
+            onWarningMessage(mesasge){let _this=this;
+                let json = JSON.parse(mesasge.data);
+                let warningData = json.result.data;
+                let type = json.result.type;
                 let warningId;
                 if(type=='CLOUD'){
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        console.log("距离："+item.dis);
-                        let msg = item.warnMsg;
-                        let warningObj={
-                            longitude:item.longitude,
-                            latitude:item.latitude
-                        }
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
-                            let obj = {
+                            _this.warningData[warningId] = {
+                                warningId: warningId,
                                 id:'alert'+_this.alertCount,
-                                msg:msg,
+                                msg:item.warnMsg,
                                 longitude:item.longitude,
                                 latitude:item.latitude,
-                                warningObj:warningObj,
-                                dist:item.dis,
-                                timer:null,
-                                flag:false
+                                timer:null
 
                             }
-                            obj.timer = setTimeout(()=>{
-                                _this.$refs.tusvnMap.removeModel(obj.id);
-                                obj.flag=true;
-                                for(let key in warningData){
-                                    if(warningData[key].flag){
-                                        delete warningData[key];
-                                    }
-                                }
-                            },2000)
-                            _this.warningData[warningId]=obj;
                             _this.alertCount++;
-                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,obj.msg,obj.longitude,obj.latitude,20);
+
+                            _this.$refs.tusvnMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
                         }else{
                             //判断是否需要更新
-                            let obj = _this.warningData[warningId];
-                            clearTimeout(obj.timer);
-                            obj.timer = setTimeout(()=>{
-                                _this.$refs.tusvnMap.removeModel(obj.id);
-                                obj.flag=true;
-                                console.log("移除事件")
-                                for(let key in warningData){
-                                    if(key!=obj.id&&warningData[key].flag){
-                                        delete warningData[key];
-                                    }
-                                }
-                            },2000)
-                            _this.warningData[warningId]=obj;
-//                            console.log("提示信息："+msg,item.dis,obj.dist);
-                            //进行更新
-                            _this.$refs.tusvnMap.removeModel(obj.id);
-                            _this.$refs.tusvnMap.add3DInfoLabel(obj.id,msg,obj.longitude,obj.latitude,20);
+                            if(item.longitude != _this.warningData[warningId].longitude || item.latitude != _this.warningData[warningId].latitude) {
+                                _this.$refs.tusvnMap.removeModel(_this.warningData[warningId].id);
+
+                                _this.$refs.tusvnMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
+                            }
                         }
+                        // clearTimeout(_this.warningData[warningId].timer);
+                        // _this.warningData[warningId].timer = setTimeout(()=>{
+                        //     if(_this.$refs.tusvnMap) {
+                        //         _this.$refs.tusvnMap.removeModel(_this.warningData[warningId].id);
+                        //         console.log("移除事件")
+                        //         delete _this.warningData[warningId];
+                        //     }
+                        // },2000);
                     })
                 }
             },
@@ -976,6 +951,7 @@
     .video-position{
         @include layoutMode(both);
         height:100%;
+        background: #000000;
     }
     .travel-detail{
         position: absolute;
