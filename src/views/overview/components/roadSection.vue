@@ -157,7 +157,7 @@
                 _this.messageCount=0;
                 _this.messageTime = setInterval(()=>{
                     _this.messageCount++;
-                    console.log(_this.messageCount);
+//                    console.log(_this.messageCount);
                     if(_this.messageCount==3){
                         clearInterval(_this.messageTime);
                         return;
@@ -241,7 +241,7 @@
                         }
 
                         _this.prevData = _filterData;
-                        console.log(_this.prevData)
+//                        console.log(_this.prevData)
 
                     } else {
                         // 返回的数据为空
@@ -318,19 +318,18 @@
 
                 let d = (distance/108000)*(distance/108000);
                 let e = Math.tan(heading)*Math.tan(heading)+1;
-               /* if(heading>90&&heading<=180){
-                    heading = 180-heading;
-                }
-                if(heading>180&&heading<270){
-                    heading = 270-heading;
-                }
-                if(heading>270&&heading<=360){
-                    heading = 360-heading;
-                }
-*/
+
                 lng = Math.sqrt(d/e)+lng0;
                 lat = lat0+Math.tan(heading)*(lng-lng0);
                 let position = new AMap.LngLat(lng,lat);
+                let marker = new AMap.Marker({
+                    position: position,
+                    map: this.aMap,
+                    icon: "static/images/road/side.png",
+                    angle: heading,
+                    offset:new AMap.Pixel(-4, -9),
+                    zIndex: 1
+                });
                 return position;
             },
             predictMove(){
