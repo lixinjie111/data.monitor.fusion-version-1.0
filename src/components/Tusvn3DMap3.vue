@@ -1152,6 +1152,7 @@
                             } catch (e) {
 //              console.log(data2.result);
                             }
+                            this.resetModels("0");
                             if (d2 != null) {
                                 // if(this.lastPerceptionData!=null&&d2.gpsTime<this.lastPerceptionData.gpsTime)
                                 // {
@@ -1248,23 +1249,6 @@
                     //this.processPerceptionData();
                 }, this.processPerceptionInterval); //
             },
-            resetModels: function() {
-                this.lastPerceptionMessage = null;
-                for (var deviceid in this.deviceModels) {
-                    for (let p = 0; p < this.deviceModels[deviceid].cars.length; p++) {
-                        let car = this.deviceModels[deviceid].cars[p];
-                        car.position.x = 0;
-                        car.position.y = 0;
-                        car.position.z = 0;
-                    }
-                    for (let p = 0; p < this.deviceModels[deviceid].persons.length; p++) {
-                        let person = this.deviceModels[deviceid].persons[p];
-                        person.position.x = 0;
-                        person.position.y = 0;
-                        person.position.z = 0;
-                    }
-                }
-            },
             processPlatformCars: function() {
 
                 if (this.platformCars != null) {
@@ -1289,9 +1273,8 @@
                 }
                 var data2 = JSON.parse(data.data);
                 let fusionList = data2.result.vehDataDTO;
-                // var deviceid = null;
+                var deviceid = "0";
                 if (fusionList.length > 0) {
-                    var deviceid = "0";
                     if (this.deviceModels[deviceid] == null) {
                         this.deviceModels[deviceid] = { cars: [], persons: [], texts: [] };
                         this.mixCars[deviceid] = { cars: [] };
@@ -1362,34 +1345,10 @@
                             dl.scene.add(mixCar);
                             this.mixCars[deviceid].cars[m] = mixCar;
                         }
-                    } else {
-                        for (let p = 0; p < this.deviceModels[deviceid].cars.length; p++) {
-                            let car = this.deviceModels[deviceid].cars[p];
-                            car.position.x = 0;
-                            car.position.y = 0;
-                            car.position.z = 0;
-                        }
-                        for (let q = 0; q < this.mixCars[deviceid].cars.length; q++) {
-                            let mixCar = this.mixCars[deviceid].cars[q];
-                            mixCar.position.x = 0;
-                            mixCar.position.y = 0;
-                            mixCar.position.z = 0;
-                        }
-
-                        for (let q = 0; q < this.deviceModels[deviceid].persons.length; q++) {
-                            let person = this.deviceModels[deviceid].persons[q];
-                            person.position.x = 0;
-                            person.position.y = 0;
-                            person.position.z = 0;
-                        }
-                        for (let q = 0; q < this.deviceModels[deviceid].texts.length; q++) {
-                            let text = this.deviceModels[deviceid].texts[q];
-                            text.position.x = 0;
-                            text.position.y = 0;
-                            text.position.z = 0;
-                        }
-
                     }
+                }else{
+//                    this.resetModels(deviceid);
+                    return;
                 }
 
                 for (let i = 0; i < fusionList.length; i++) {
@@ -1479,6 +1438,28 @@
                                 );
                             }
                         }
+                    }
+                }
+            },
+            resetModels(deviceid){
+                if(this.deviceModels[deviceid]){
+                    for (let p = 0; p < this.deviceModels[deviceid].cars.length; p++) {
+                        let car = this.deviceModels[deviceid].cars[p];
+                        car.position.x = 0;
+                        car.position.y = 0;
+                        car.position.z = 0;
+                    }
+                    for (let q = 0; q < this.deviceModels[deviceid].persons.length; q++) {
+                        let person = this.deviceModels[deviceid].persons[q];
+                        person.position.x = 0;
+                        person.position.y = 0;
+                        person.position.z = 0;
+                    }
+                    for (let q = 0; q < this.deviceModels[deviceid].texts.length; q++) {
+                        let text = this.deviceModels[deviceid].texts[q];
+                        text.position.x = 0;
+                        text.position.y = 0;
+                        text.position.z = 0;
                     }
                 }
             },
