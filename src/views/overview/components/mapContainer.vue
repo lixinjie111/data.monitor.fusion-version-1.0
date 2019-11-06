@@ -81,7 +81,7 @@ export default {
                         let _currentCar = _filterData[id];
                         _filterData[id].marker.setAngle(_currentCar.heading);
                         _filterData[id].marker.setPosition(_currentCar.position);
-                        _filterData[id].plateNoMarker.setText(_currentCar.plateNo+"<br/><span style='color:#e6a23c'>"+_currentCar.source+'</span>')
+                        _filterData[id].plateNoMarker.setText(_currentCar.plateNo+"<br/><span style='color:#e6a23c'>"+_currentCar.source+'</span>');
                         _filterData[id].plateNoMarker.setPosition(_currentCar.position);
                     }else {   //表示没有该点，做remove
                         // console.log(_this.prevData[id].plateNo, "remove");
