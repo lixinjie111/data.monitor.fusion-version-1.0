@@ -661,10 +661,6 @@
                     warningData.forEach(item=>{
                         warningId = item.warnId;
                         warningId = warningId.substring(0,warningId.lastIndexOf("_"));
-                        let warningObj={
-                            longitude:item.longitude,
-                            latitude:item.latitude
-                        }
                         //如果告警id不存在
                         if(!_this.warningData[warningId]){
                             _this.warningCount++;
@@ -678,12 +674,16 @@
 
                             }
                             _this.alertCount++;
+
+                            _this.$refs.perceptionMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
                         }else{
                             //判断是否需要更新
-                            _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
-                        }
+                            if(item.longitude != _this.warningData[warningId].longitude || item.latitude != _this.warningData[warningId].latitude) {
+                                _this.$refs.perceptionMap.removeModel(_this.warningData[warningId].id);
 
-                        _this.$refs.perceptionMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
+                                _this.$refs.perceptionMap.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
+                            }
+                        }
                         clearTimeout(_this.warningData[warningId].timer);
                         _this.warningData[warningId].timer = setTimeout(()=>{
                             if(_this.$refs.perceptionMap) {
