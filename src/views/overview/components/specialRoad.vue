@@ -29,7 +29,7 @@ export default {
 //            sessionStorage.setItem(item.rsId,JSON.stringify(item));
             let centPos = item.centPos.split(",");
             this.$router.push({
-                path: '/perception/' + centPos[0] + "/" + centPos[1]+"/"+item.rsId+ "/"+1+ "/"+false+ "/"+0.002+"/"+true+"/"+false,
+                path: '/perception/' + centPos[0] + "/" + centPos[1]+"/"+item.rsId+ "/"+1+ "/"+false+ "/"+0.002+"/"+true,
 //                query:{crossId:item.id}
             });
         },

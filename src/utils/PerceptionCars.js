@@ -22,7 +22,7 @@ class PerceptionCars {
         this.processPerceptionMesage(data);
     }
     //绘制感知车
-    processPerceptionMesage(data) {
+    processPerceptionMesage(data2) {
 
         let _this = this;
 
@@ -42,8 +42,7 @@ class PerceptionCars {
         // } else {
         //   data = _this.lastPerceptionMessage;
         // }
-        if (data == null) return;
-        var data2 = JSON.parse(data.data);
+        if (data2 == null) return;
         // var data2 = JSON.parse(data);
         let fusionList = data2.result.vehDataDTO;
         // for(var i=0;i<1000;i++)
@@ -75,10 +74,10 @@ class PerceptionCars {
                     count++;
                 }
             }
-            if ((count - fusionList.length) >= 20) {
+            if ((count - fusionList.length) >= 30) {
                 this.removeModelPrimitives();
             }
-            console.log(fusionList.length + "show" + count)
+            // console.log(fusionList.length + "show" + count)
             // var primitives = this.viewer.scene.primitives;
             // var length = primitives.length;
 

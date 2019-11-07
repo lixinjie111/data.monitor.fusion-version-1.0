@@ -2,6 +2,7 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
+        <div class="img-capture" @click="capture">截屏</div>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
@@ -93,7 +94,6 @@
                 time1:'',
                 x:0,
                 y:0,
-                waitingtime:this.$route.params.waitingtime,
                 isActive:0,
                 crossId:'',
                 vehData:[],
@@ -117,7 +117,9 @@
                 perceptionConnectCount:0,
                 spatConnectCount:0,
                 gis3d:null,
-                isCapture:false
+                isCapture:false,
+                perIsFirst:true,
+                waitingtime:this.$route.params.waitingtime
             }
         },
         props:{
@@ -171,14 +173,13 @@
 
             gis3d.initload("cesiumContainer",false);
             perceptionCars.viewer=gis3d.cesium.viewer;
-            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
+//            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
 
             platCars.models={};
             platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
 
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
-            _this.isCapture = _this.$route.params.isCapture;
             /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
             let longitude=parseFloat(_this.$route.params.lon);
@@ -210,6 +211,9 @@
             });
         },
         methods: {
+            capture(){
+                this.isCapture=!this.isCapture;
+            },
             onMapComplete(){
 
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
@@ -859,21 +863,31 @@
             onPerceptionMessage(mesasge){
                 let _this=this;
                 let data = JSON.parse(mesasge.data)
+                if(_this.perIsFirst){
+                    setTimeout(()=>{
+                        _this.perIsFirst=false;
+                    },_this.waitingtime);
+                    return;
+                }
                 /*  console.log("########");
                   console.log(_this.tabIsExist);*/
                 if(_this.tabIsExist){
                     /*console.log("..............");*/
                     if(_this.isCapture){
-
+                        return;
                     }
                     perceptionCars.addPerceptionData(data);
-                    let obj =  perceptionCars.lastPerceptionMessage;
+                    _this.$parent.perceptionData= data.result.vehDataStat;
+                    if(data.result.vehDataDTO.length>0){
+                        _this.processDataTime = data.result.vehDataDTO[0].gpsTime;
+                    }
+                   /* let obj =  perceptionCars.lastPerceptionMessage;
                     if(obj!=null){
                         _this.$parent.perceptionData= obj.result.vehDataStat;
                         if(obj.result.vehDataDTO.length>0){
                             _this.processDataTime = obj.result.vehDataDTO[0].gpsTime;
                         }
-                    }
+                    }*/
                    /* if(time!=''){
                         this.time1=time;
                     }
@@ -936,6 +950,7 @@
                 //重连不能超过5次
                 this.perceptionConnectCount++;
             },
+
             //红绿灯
             initSpatWebSocket(){
                 let _this=this;
@@ -1221,8 +1236,6 @@
                 this.spatConnectCount++;
             },
 
-
-
             getExtend(x,y,r){
                 this.currentExtent=[];
                 let x0=x+r;
@@ -1341,6 +1354,19 @@
         right: 420px;
         width:40px;
         cursor: pointer;
+    }
+    .img-capture{
+        position: absolute;
+        top: 130px;
+        z-index:3;
+        right: 420px;
+        height: 38px;
+        width:38px;
+        cursor: pointer;
+        border:1px solid #5d5d5d;
+        text-align: center;
+        background: #5d5d5d;
+        color: #cd8404;
     }
     .video-style{
         position: absolute;
