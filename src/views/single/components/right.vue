@@ -828,7 +828,7 @@
             onSideCarMessage(message){
                 let _this = this;
                 let data = JSON.parse(message.data)
-                perceptionCars.onCarTrackMessage(data);
+                perceptionCars.addPerceptionData(data);
                 /* if(_this.testCount==0){
                      _this.testCount=1;
                      setTimeout(()=>{
