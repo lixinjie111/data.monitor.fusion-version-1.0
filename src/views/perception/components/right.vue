@@ -15,6 +15,7 @@
                             :params="item.params"
                             type="wsUrl"
                             :autoplay="false"
+                            :ref="'player'+index"
                     >
                         <div class="video-num" @click="changeMap(index)">
                             <span class="device-num">摄像头编号:{{item.devId}}</span>
@@ -118,6 +119,7 @@
                 spatConnectCount:0,
                 gis3d:null,
                 isCapture:false,
+                isPlatCature:false,
                 perIsFirst:true,
                 waitingtime:this.$route.params.waitingtime
             }
@@ -212,7 +214,26 @@
         },
         methods: {
             capture(){
-                this.isCapture=!this.isCapture;
+                let _this = this;
+                _this.isCapture=!_this.isCapture;
+                if(_this.isCapture){
+                    _this.isPlatCature=true;
+                }else{
+                    setTimeout(()=>{
+                        _this.isPlatCature=false;
+                    },1000)
+                }
+                for(let str in _this.$refs){
+                    if(str!=''&&str.match("player")){
+                        if(_this.isCapture){
+                            _this.$refs[str][0].player&&_this.$refs[str][0].player.pause();
+                        }else {
+                            _this.$refs[str][0].player&&_this.$refs[str][0].player.play();
+                            platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
+                        }
+                    }
+                }
+
             },
             onMapComplete(){
 
@@ -682,6 +703,9 @@
             onWarningMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
+                if(_this.isCapture){
+                    return;
+                }
                 let warningData = json.result.data;
                 let type = json.result.type;
                 let warningId;
@@ -789,6 +813,12 @@
             onPlatformMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
+                if(_this.isPlatCature){
+//                    platCars.captureCarMessage(json);
+                    clearInterval(platCars.processPlatformCarsTrackIntervalId);
+                    platCars.cacheAndInterpolateDataByVid={};
+                    return;
+                }
                 platCars.onCarMessage(json);
                 let keys = Object.keys(platCars.cacheAndInterpolateDataByVid);
                 if(keys&&keys.length>0){
@@ -975,6 +1005,9 @@
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
+                if(_this.isCapture){
+                    return;
+                }
 //                let vehData = json.result.vehDataStat;
 //                _this.$emit("getPerceptionData",vehData);
 //                _this.vehData.push(vehData);
@@ -1255,6 +1288,8 @@
             clearInterval(this.mapTime4);
             clearTimeout(this.time);
             clearInterval(this.mapInitTime);
+            //平台车定时器的清除
+            clearInterval(platCars.processPlatformCarsTrackIntervalId);
             this.$refs.perceptionMap&&this.$refs.perceptionMap.reset3DMap();
             this.warningWebsocket&&this.warningWebsocket.close();
             this.platformWebsocket&&this.platformWebsocket.close();

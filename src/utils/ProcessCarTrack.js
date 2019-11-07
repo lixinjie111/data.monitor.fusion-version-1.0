@@ -2,7 +2,9 @@ class ProcessCarTrack {
     constructor() {
         this.view = null;
         // pCacheModelNum: 200,//感知车数量
-        this.stepTime = 60;//处理车缓存时间 
+        this.stepTime = 60;//处理车缓存时间
+        this.moveTime = 60;//车辆移动时间
+        this.recieveCount = 0;
         this.defualtZ = 0.8;
         this.pitch = 0;
         this.yaw = 0;
@@ -25,8 +27,17 @@ class ProcessCarTrack {
         this.cacheTrackCarData = data;
         this.thisMessage(1);
     }
+    captureCarMessage(data){
+        this.cacheTrackCarData = data;
+        this.recieveCount++;
+        this.moveTime=100;
+        if(this.recieveCount>30){
+            return;
+        }
+        this.thisMessage(0)
+    }
     onCarMessage(data) {
-
+        this.moveTime = 60;
         this.cacheTrackCarData = data;
         this.thisMessage(0);
     }
@@ -201,21 +212,18 @@ class ProcessCarTrack {
                 if (carCacheData != null) {
                     if (carCacheData.cacheData.length > 0) {
                         //缓存数据
-
                         let cardata = this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
                         if (this.mainCarVID == cardata.vehicleId) {
                             this.moveCar(cardata);
                             this.moveTo(cardata);
-
                             //主车
                         } else {
                             this.moveCar(cardata);
                         }
-
                     }
                 }
             }
-        }, this.stepTime);//this.stepTime
+        }, this.moveTime);//this.stepTime
     }
     destroyed() {
         clearInterval(this.processPlatformCarsTrackIntervalId);
@@ -225,7 +233,6 @@ class ProcessCarTrack {
         let vid = d.vehicleId;
         let plateNo = d.plateNo;
         let carModel = this.models[vid];
-
         if (carModel == null) {
 
             var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 0.0);

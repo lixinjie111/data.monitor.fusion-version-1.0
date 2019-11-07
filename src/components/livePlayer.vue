@@ -60,6 +60,7 @@ export default {
     data () {
         return {
             videoUrl: "",
+            isPause:false,
             videoOption: {
                 videoMaskFlag: true,
                 playFlag: true,
@@ -85,11 +86,12 @@ export default {
         'videoOption.loadingFlag'(newVal, oldVal) {
             this.initVideoTimer();
             if(newVal) {
+                console.log(newVal)
                 this.videoTimer();
             }
         },
         'videoLoadingDelay.count'(newVal, oldVal) {
-            console.log(newVal);
+//            console.log(newVal);
         }
     },
     mounted() {
@@ -103,6 +105,9 @@ export default {
             this.videoLoadingDelay.count = 0;
         },
         videoTimer() {
+            if(this.isPause){
+                return;
+            }
             this.videoLoadingDelay.timer = setInterval(() => {
                 if(this.videoLoadingDelay.count >= this.videoLoadingDelay.countTime) {
                     this.setVideoOptionError("此视频暂无法播放，请稍后再试");
@@ -113,6 +118,10 @@ export default {
             }, 1000);
         },
         videoTimerReload() {
+           /* if(this.isPause){
+                clearInterval()
+                return;
+            }*/
             this.videoLoadingDelay.timer = setInterval(() => {
                 if(this.videoLoadingDelay.count >= this.videoLoadingDelay.reloadTime) {
                     this.requestVideo();
@@ -160,17 +169,23 @@ export default {
             // console.log("onPlayerEnded");
         },
         onPlayerTimeupdate(player) {
-            // console.log("onPlayerTimeupdate");
+//             console.log("onPlayerTimeupdate");
             this.setVideoOptionClose();
-            this.videoTimerReload();
+            /*this.videoTimerReload();*/
         },
         onPlayerPause() {
             // console.log("onPlayerPause");
-            this.setVideoOptionPause();
+//            this.setVideoOptionPause();
+            this.videoOption.videoMaskFlag = false;
+            this.videoOption.playFlag = false;
+            this.videoOption.loadingFlag = false;
+            this.videoOption.playError = false;
+            this.isPause=true;
         },
         // listen event
         onPlayerPlay(player) {
             // console.log('player play!');
+            this.isPause=false;
         },
         requestVideo() {
             this.setVideoOptionLoading();
