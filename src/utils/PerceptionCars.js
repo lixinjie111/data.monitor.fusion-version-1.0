@@ -34,13 +34,13 @@ class PerceptionCars {
             if (_this.cachePerceptionQueue.length == 0)
                 return;
             _this.lastPerceptionMessage = _this.cachePerceptionQueue.shift();
-            let data = null;
+            let data2 = null;
             if (_this.lastPerceptionMessage == null) {
                 return;
             } else {
-                data = _this.lastPerceptionMessage;
+                data2 = _this.lastPerceptionMessage;
             }
-            var data2 = JSON.parse(data.data);
+            // var data2 = JSON.parse(data.data);
             // var data2 = JSON.parse(data);
             let fusionList = data2.result.vehDataDTO;
             // for(var i=0;i<1000;i++)

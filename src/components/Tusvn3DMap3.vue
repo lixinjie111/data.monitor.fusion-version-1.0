@@ -1149,7 +1149,7 @@
                             } catch (e) {
 //              console.log(data2.result);
                             }
-                            if (d2 != null) {
+                            if (d2!= null) {
                                 // if(this.lastPerceptionData!=null&&d2.gpsTime<this.lastPerceptionData.gpsTime)
                                 // {
                                 //     return;

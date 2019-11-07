@@ -377,7 +377,7 @@ export default {
                                     }
                                     marker.on('click', function(e) {
                                         _this.$router.push({
-                                            path: '/perception/' + subItem.longitude + "/" + subItem.latitude+"/"+subItem.deviceId+ "/"+1+ "/"+false+ "/"+0.002,
+                                            path: '/perception/' + subItem.longitude + "/" + subItem.latitude+"/"+subItem.deviceId+ "/"+1+ "/"+false+ "/"+0.002+"/"+false,
                                         });
                                     });
                                 }

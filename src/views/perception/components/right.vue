@@ -116,7 +116,8 @@
                 platformConnectCount:0,
                 perceptionConnectCount:0,
                 spatConnectCount:0,
-                gis3d:null
+                gis3d:null,
+                isCapture:false
             }
         },
         props:{
@@ -177,6 +178,7 @@
 
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
+            _this.isCapture = _this.$route.params.isCapture;
             /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
             let longitude=parseFloat(_this.$route.params.lon);
@@ -861,6 +863,9 @@
                   console.log(_this.tabIsExist);*/
                 if(_this.tabIsExist){
                     /*console.log("..............");*/
+                    if(_this.isCapture){
+
+                    }
                     perceptionCars.addPerceptionData(data);
                     let obj =  perceptionCars.lastPerceptionMessage;
                     if(obj!=null){
