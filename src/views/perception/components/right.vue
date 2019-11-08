@@ -2,7 +2,7 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
-        <div class="img-capture" @click="capture">截屏</div>
+        <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'">截屏</div>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
@@ -119,7 +119,7 @@
                 spatConnectCount:0,
                 gis3d:null,
                 isCapture:false,
-                isPlatCature:false,
+                isCaptureShow:false,
                 perIsFirst:true,
                 waitingtime:this.$route.params.waitingtime
             }
@@ -150,14 +150,6 @@
                 },
 //                immediate: true,
                 deep: true
-            },
-            $route: {
-                handler: function(val, oldVal){
-                    this.isShow = val.params.isShow;
-                },
-                // 深度观察监听
-                deep: true,
-                immediate: true,
             }
         },
         filters: {
@@ -182,10 +174,13 @@
 
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
+            _this.isCaptureShow = _this.$route.query.isCapture;
+            _this.isShow = _this.$route.query.isShow;
+
             /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
-            let longitude=parseFloat(_this.$route.params.lon);
-            let latitude=parseFloat(_this.$route.params.lat);
+            let longitude=parseFloat(_this.$route.query.lng);
+            let latitude=parseFloat(_this.$route.query.lat);
             let extend = parseFloat(_this.$route.params.extend);
             //设置地图的中心点
             if(longitude||latitude) {
@@ -216,11 +211,10 @@
             capture(){
                 let _this = this;
                 _this.isCapture=!_this.isCapture;
-                if(_this.isCapture){
-                    _this.isPlatCature=true;
-                }else{
+                if(!_this.isCapture){
                     setTimeout(()=>{
-                        _this.isPlatCature=false;
+                        //缓存1s的数据，开始调用
+                        platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
                     },1000)
                 }
                 for(let str in _this.$refs){
@@ -229,7 +223,6 @@
                             _this.$refs[str][0].player&&_this.$refs[str][0].player.pause();
                         }else {
                             _this.$refs[str][0].player&&_this.$refs[str][0].player.play();
-                            platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
                         }
                     }
                 }
@@ -702,10 +695,10 @@
             },
             onWarningMessage(mesasge){
                 let _this=this;
-                let json = JSON.parse(mesasge.data);
                 if(_this.isCapture){
                     return;
                 }
+                let json = JSON.parse(mesasge.data);
                 let warningData = json.result.data;
                 let type = json.result.type;
                 let warningId;
@@ -812,14 +805,14 @@
             },
             onPlatformMessage(mesasge){
                 let _this=this;
-                let json = JSON.parse(mesasge.data);
-                if(_this.isPlatCature){
+                if(_this.isCapture){
 //                    platCars.captureCarMessage(json);
                     clearInterval(platCars.processPlatformCarsTrackIntervalId);
                     platCars.cacheAndInterpolateDataByVid={};
                     return;
                 }
-                platCars.onCarMessage(json);
+                let json = JSON.parse(mesasge.data);
+                platCars.onCarMessage(json,0);
                 let keys = Object.keys(platCars.cacheAndInterpolateDataByVid);
                 if(keys&&keys.length>0){
                     let key = keys[0];
@@ -892,7 +885,6 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-                let data = JSON.parse(mesasge.data)
                 if(_this.perIsFirst){
                     setTimeout(()=>{
                         _this.perIsFirst=false;
@@ -906,7 +898,8 @@
                     if(_this.isCapture){
                         return;
                     }
-                    perceptionCars.addPerceptionData(data);
+                    let data = JSON.parse(mesasge.data)
+                    perceptionCars.addPerceptionData(data,0);
                     _this.$parent.perceptionData= data.result.vehDataStat;
                     if(data.result.vehDataDTO.length>0){
                         _this.processDataTime = data.result.vehDataDTO[0].gpsTime;
@@ -1003,11 +996,11 @@
             },
             onSpatMessage(mesasge){
                 let _this=this;
-                let json = JSON.parse(mesasge.data);
-                let data = json.result.spatDataDTO;
                 if(_this.isCapture){
                     return;
                 }
+                let json = JSON.parse(mesasge.data);
+                let data = json.result.spatDataDTO;
 //                let vehData = json.result.vehDataStat;
 //                _this.$emit("getPerceptionData",vehData);
 //                _this.vehData.push(vehData);
@@ -1295,6 +1288,9 @@
             this.platformWebsocket&&this.platformWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
+            gis3d=null;
+            perceptionCars = null;
+            platCars = null;
         }
     }
 </script>

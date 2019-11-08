@@ -14,15 +14,15 @@ class PerceptionCars {
     }
 
     //接受数据
-    addPerceptionData(data) {
+    addPerceptionData(data,flag) {
         //  console.log(11);
         // this.cachePerceptionQueue.push(data);
         // this.cachePerceptionQueue= new Array();
         // this.cachePerceptionQueue.push(data);
-        this.processPerceptionMesage(data);
+        this.processPerceptionMesage(data,flag);
     }
     //绘制感知车
-    processPerceptionMesage(data2) {
+    processPerceptionMesage(data,flag) {
 
         let _this = this;
 
@@ -42,9 +42,14 @@ class PerceptionCars {
         // } else {
         //   data = _this.lastPerceptionMessage;
         // }
-        if (data2 == null) return;
+        if (data == null) return;
         // var data2 = JSON.parse(data);
-        let fusionList = data2.result.vehDataDTO;
+        let fusionList;
+        if(flag==0){
+            fusionList = data.result.vehDataDTO;
+        }else{
+            fusionList = data.result.data;
+        }
         // for(var i=0;i<1000;i++)
         // {
 

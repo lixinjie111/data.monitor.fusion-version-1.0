@@ -1,6 +1,7 @@
 <template>
     <div class="fusion-right-style">
         <div class="c-fusion-right map-right">
+            <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'">截屏</div>
             <p class="c-title">前向摄像头</p>
             <div class="fusion-video">
                 <live-player
@@ -105,7 +106,10 @@
                 carConnectCount:0,
                 cancelConnectCount:0,
                 sideConnectCount:0,
-                testCount:0
+                testCount:0,
+                isCapture:false,
+                isCaptureShow:false,
+                recieveCount:0
             }
 
         },
@@ -136,6 +140,15 @@
             }
         },
         methods: {
+            capture(){
+                let _this = this;
+                _this.isCapture=!_this.isCapture;
+                if(!_this.isCapture){
+                    setTimeout(()=>{
+                        platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
+                    },1000);
+                }
+            },
             getProcessTime(time1,time2){
                 let _this = this;
                 _this.processTime=time2;
@@ -460,11 +473,10 @@
                 /*this.$refs.tusvnMap1.updateCameraPosition(cameraParam.x,cameraParam.y,cameraParam.z,cameraParam.radius,cameraParam.pitch,cameraParam.yaw);
                 this.$refs.tusvnMap1.changeRcuId(window.config.websocketUrl,this.roadItem1.camSerialNum);*/
                 this.initCarWebSocket();
-                this.initSideCarWebSocket();
+//                this.initSideCarWebSocket();
                 /*this.initSpatWebSocket();*/
                 this.initWarningWebSocket();
             },
-
             getNumPng(color,num){
                 let img;
                 if(color=='RED'){
@@ -566,7 +578,9 @@
                 return img;
 
             },
+
             //红绿灯
+            //1s处理（100ms调用一次 1个点（1s 平台车间隔是1s）需要（1000/60*100=1.6s）） 1.6    1s----1.6  融合车 500ms -----800ms
             initSpatWebSocket(){
                 let _this=this;
                 try {
@@ -588,6 +602,9 @@
             },
             onSpatMessage(message){
                 let _this=this;
+                if(_this.isCapture){
+                    return;
+                }
                 _this.lightList.push(message);
             },
             onSpatClose(data){
@@ -638,6 +655,7 @@
                 //重连不能超过5次
                 this.spatConnectCount++;
             },
+
             initWarningWebSocket(){
                 let _this=this;
                 try{
@@ -657,6 +675,9 @@
             },
             onWarningMessage(mesasge){
                 let _this=this;
+                if(_this.isCapture){
+                    return;
+                }
                 let json = JSON.parse(mesasge.data);
                 let warningData = json.result.data;
                 let type = json.result.type;
@@ -745,6 +766,7 @@
                 //重连不能超过5次
                 this.warningConnectCount++;
             },
+
             //平台车
             initCarWebSocket(){
                 let _this=this;
@@ -765,7 +787,15 @@
             onCarMessage(message){
                 let _this = this;
                 let data = JSON.parse(message.data);
-                platCars.onCarTrackMessage(data);
+                if(_this.isCapture){
+//                    platCars.captureCarMessage(json);
+                    clearInterval(platCars.processPlatformCarsTrackIntervalId);
+                    platCars.cacheAndInterpolateDataByVid={};
+                    return;
+                }
+                //当为false时候  先进行缓存1s的数据
+                platCars.onCarMessage(data,1);
+
             },
             onCarClose(data){
                 console.log("结束连接");
@@ -807,6 +837,7 @@
                 //重连不能超过5次
                 this.carConnectCount++;
             },
+
             //融合车
             initSideCarWebSocket(){
                 let _this=this;
@@ -827,8 +858,11 @@
             },
             onSideCarMessage(message){
                 let _this = this;
+                if(_this.isCapture){
+                    return;
+                }
                 let data = JSON.parse(message.data)
-                perceptionCars.addPerceptionData(data);
+                perceptionCars.addPerceptionData(data,1);
                 /* if(_this.testCount==0){
                      _this.testCount=1;
                      setTimeout(()=>{
@@ -883,11 +917,13 @@
 
             gis3d.initload("cesiumContainer",false);
             perceptionCars.viewer=gis3d.cesium.viewer;
-            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
 
             platCars.models={};
             platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
             this.onMapComplete();
+
+            this.isCaptureShow = this.$route.query.isCapture;
+
 //            this.initLightWebSocket();
         },
         components:{
@@ -914,7 +950,10 @@
             this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
             this.sideCarWebsocket&&this.sideCarWebsocket.close();
-        }
+            gis3d=null;
+            perceptionCars = null;
+            platCars = null;
+        },
     }
 </script>
 <style>
@@ -976,6 +1015,19 @@
         @include layoutMode(both);
         height:100%;
         background: #000000;
+    }
+    .img-capture{
+        position: absolute;
+        top: 60px;
+        z-index:3;
+        right: 350px;
+        height: 38px;
+        width:38px;
+        cursor: pointer;
+        border:1px solid #5d5d5d;
+        text-align: center;
+        background: #5d5d5d;
+        color: #cd8404;
     }
     .travel-detail{
         position: absolute;

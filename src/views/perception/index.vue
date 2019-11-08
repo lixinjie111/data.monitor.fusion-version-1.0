@@ -31,10 +31,10 @@
             HeaderTop,Left,Right
         },
         watch:{
-            '$route.params':function (newValue,oldValue) {
+            /*'$route.params':function (newValue,oldValue) {
 //                console.log(newValue.lon,newValue.lat);
                 this.$router.replace("/refresh");
-            },
+            },*/
         },
         methods: {},
         mounted() {

@@ -165,7 +165,8 @@ export default {
 
     showView(carId) {
       this.$router.push({
-        path: "/single/" + carId
+        path: "/single/" + carId,
+        query:{isCapture:false}
       });
     }
   },

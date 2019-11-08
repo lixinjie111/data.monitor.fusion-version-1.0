@@ -3,7 +3,6 @@ class ProcessCarTrack {
         this.view = null;
         // pCacheModelNum: 200,//感知车数量
         this.stepTime = 60;//处理车缓存时间
-        this.moveTime = 60;//车辆移动时间
         this.recieveCount = 0;
         this.defualtZ = 0.8;
         this.pitch = 0;
@@ -22,24 +21,10 @@ class ProcessCarTrack {
             this.x = 0
     }
 
-    onCarTrackMessage(data) {
-
+    //路口视角  平台车
+    onCarMessage(data,flag) {
         this.cacheTrackCarData = data;
-        this.thisMessage(1);
-    }
-    captureCarMessage(data){
-        this.cacheTrackCarData = data;
-        this.recieveCount++;
-        this.moveTime=100;
-        if(this.recieveCount>30){
-            return;
-        }
-        this.thisMessage(0)
-    }
-    onCarMessage(data) {
-        this.moveTime = 60;
-        this.cacheTrackCarData = data;
-        this.thisMessage(0);
+        this.thisMessage(flag);
     }
     thisMessage(isCar) {
         let data = this.cacheTrackCarData;
@@ -223,7 +208,7 @@ class ProcessCarTrack {
                     }
                 }
             }
-        }, this.moveTime);//this.stepTime
+        }, this.stepTime);//this.stepTime
     }
     destroyed() {
         clearInterval(this.processPlatformCarsTrackIntervalId);
@@ -246,10 +231,9 @@ class ProcessCarTrack {
                 id: vid + "car",
                 modelMatrix: modelMatrix,
                 url: './static/model/car.glb',
-                minimumPixelSize: 100
-                //   ,
-                //   scale : 3.0     //放大倍数
-                // debugWireframe:true
+                minimumPixelSize: 1,
+                show: false,
+                maximumScale: 5,
             }));
             this.models[vid] = vid;
 

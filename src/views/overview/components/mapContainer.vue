@@ -280,7 +280,8 @@ export default {
             })
             window.open(href, '_blank')*/
             this.$router.push({
-                path: "/single/" + e.target.get("vehicleId")
+                path: "/single/" + e.target.get("vehicleId"),
+                query:{isCapture:false}
             });
         },
         onclose(data){
@@ -377,7 +378,8 @@ export default {
                                     }
                                     marker.on('click', function(e) {
                                         _this.$router.push({
-                                            path: '/perception/' + subItem.longitude + "/" + subItem.latitude+"/"+subItem.deviceId+ "/"+1+ "/"+false+ "/"+0.002,
+                                            path: '/perception/'+subItem.deviceId+ "/"+1+ "/"+0.002+"/"+true,
+                                            query:{lng:subItem.longitude,lat:subItem.latitude,isShow:false,isCapture:false}
                                         });
                                     });
                                 }
