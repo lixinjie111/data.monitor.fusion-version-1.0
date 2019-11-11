@@ -18,7 +18,8 @@ class ProcessCarTrack {
             this.cameraDefualtPitch = -0.2,
             this.mainCarVID = "",
             this.isload = false,
-            this.x = 0
+            this.x = 0;
+            this.processPlatformCarsTrackIntervalId=null;
     }
 
     //路口视角  平台车
@@ -232,7 +233,7 @@ class ProcessCarTrack {
                 modelMatrix: modelMatrix,
                 url: './static/model/car.glb',
                 minimumPixelSize: 1,
-                show: false,
+                show: true,
                 maximumScale: 5,
             }));
             this.models[vid] = vid;
@@ -247,12 +248,14 @@ class ProcessCarTrack {
                     pixelSize: 0              //像素点大小
                 },
                 label: {
+                    fillColor: Cesium.Color.BLACK,
+                    backgroundColor: Cesium.Color.fromCssColorString('#fff'),
                     text: "sdfsdf",
                     font: '14px sans-serif',
                     showBackground: true,
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                     pixelOffset: new Cesium.Cartesian2(0.0, 0),
-                    pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 3.0, 1.5e7, 0.5)
+                    scaleByDistance: new Cesium.NearFarScalar(100, 1, 2000, 0)
                 }
             });
 
@@ -285,7 +288,7 @@ class ProcessCarTrack {
             Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, carpt.modelMatrix)
 
             var carlabelpt = this.view.entities.getById(vid + "labelpt");
-            carlabelpt.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 8);
+            carlabelpt.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude,4);
             carlabelpt.label.text = plateNo;
 
 

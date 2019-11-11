@@ -1,6 +1,6 @@
 class PerceptionCars {
     constructor() {
-        this.defualtZ = 3;
+        this.defualtZ = window.defualtZ;
         this.cacheModelNum = 200,//初始化车辆总数
             this.carColor = 0x80f77a,//感知车颜色
             this.pitch = 0,
