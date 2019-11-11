@@ -3,7 +3,7 @@
         <div class="c-fusion-left fusion-left">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
-                    <left :realData="realData"></left>
+                    <left :realData="realData" :isCapture="isCapture"></left>
                 </div>
             </div>
         </div>
@@ -25,7 +25,8 @@
                     gpsTime:''
                 },
                 vehicleId:this.$route.params.vehicleId,
-                canConnectCount:0
+                canConnectCount:0,
+                isCapture:false
             }
         },
         watch:{
@@ -52,6 +53,9 @@
             },
             onmessage(mesasge){
                 let _this=this;
+                if(_this.isCapture){
+                    return;
+                }
                 let json = JSON.parse(mesasge.data);
                 /*let type = json.action;*/
                 // console.log("data.transmission========"+data.transmission);

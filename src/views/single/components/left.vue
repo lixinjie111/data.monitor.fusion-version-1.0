@@ -112,7 +112,7 @@
             brakeLeftWidth(){
                 let brakeData = parseFloat(this.realData.brakePedal/100);
                 return parseInt(brakeData*80)
-            }
+            },
         },
         props:{
             realData:{
@@ -122,6 +122,10 @@
 
                     };
                 }
+            },
+            isCapture:{
+                type:Boolean,
+                default:false
             }
         },
         methods: {
@@ -173,6 +177,9 @@
                     this.countTime += 1000;
                 }, 1000);*/
                 let _this=this;
+                if(_this.isCapture){
+                    return;
+                }
                 let json  = {};
                 if(typeof message.data == "string") {
                     json = JSON.parse(message.data);
