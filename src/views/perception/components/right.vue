@@ -4,7 +4,7 @@
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'">截屏</div>
         <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
-        <div class="map-time map-time1" v-show="isShow=='true'">{{time1}}</div>
+        <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
             <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
@@ -92,7 +92,7 @@
                 warningWebsocket:null,
                 param:1, //平面 俯视
                 time:'',
-                time1:'',
+                statisticData:'',
                 x:0,
                 y:0,
                 isActive:0,
@@ -142,7 +142,7 @@
                 }
             },
         },
-        components: { TusvnMap1,LivePlayer},
+        components: {TusvnMap1,LivePlayer},
         watch: {
             '$store.getters.getRealData': {
                 handler(newName, oldName) {
@@ -303,7 +303,7 @@
             },
             getTime(time,processTime,vehDataStat){
                 if(time!=''){
-                    this.time1=time;
+                    this.statisticTime=time;
                 }
                 if(processTime!=''){
                     this.processDataTime=processTime;
@@ -901,9 +901,31 @@
                     let data = JSON.parse(mesasge.data)
                     perceptionCars.addPerceptionData(data,0);
                     _this.$parent.perceptionData= data.result.vehDataStat;
-                    if(data.result.vehDataDTO.length>0){
-                        _this.processDataTime = data.result.vehDataDTO[0].gpsTime;
+                    let cars = data.result.vehDataDTO;
+                    if(cars.length>0){
+                        _this.processDataTime = cars[0].gpsTime;
+                        let pcarnum = 0;
+                        let persons = 0;
+                        let zcarnum = 0;
+                        for (let i = 0; i < cars.length; i++) {
+                            let obj = cars[i];
+                            if (obj.type == 1) {
+                                zcarnum++;
+                                continue;
+                            }
+                            if (
+                                obj.targetType == 0 ||
+                                obj.targetType == 1 ||
+                                obj.targetType == 3
+                            ) {
+                                persons++;
+                            } else {
+                                pcarnum++;
+                            }
+                        }
+                        this.statisticData ="当前数据包："+cars.length +"=" +zcarnum +"(自车)+" +pcarnum +"(感知)+" +persons +"(人)";
                     }
+
                    /* let obj =  perceptionCars.lastPerceptionMessage;
                     if(obj!=null){
                         _this.$parent.perceptionData= obj.result.vehDataStat;
@@ -1313,13 +1335,13 @@
         position: absolute;
         top: 10px;
         left:50%;
-        margin-left: -125px;
-        width: 250px;
+        width: 300px;
         text-align: left;
         display: block;
         font-size: 14px;
         z-index:2;
         background: #969090;
+        transform: translate(-50%,0);
     }
     .map-real-time{
         position: absolute;
@@ -1333,7 +1355,7 @@
 
     }
     .map-time1{
-        top:50px!important;
+        top:100px!important;
     }
     .perception-road{
         height: 130px;
