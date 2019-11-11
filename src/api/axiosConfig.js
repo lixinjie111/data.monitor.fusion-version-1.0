@@ -17,7 +17,8 @@ function axiosFilter(vm) {
       baseURL: window.config.url,
       // withCredentials: true,
       headers: {
-        'Content-Type': 'application/json;charset=UTF-8'
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Cache-Control':'no-cache'
       },
       responseType: 'json',
       transformResponse: [function(data) { //后端发送过来的数据

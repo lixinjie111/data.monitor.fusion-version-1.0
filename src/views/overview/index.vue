@@ -12,7 +12,7 @@
         <map-container></map-container>
         <!-- 右侧  -->
         <special-road></special-road>
-        
+
         <div class="fusion-bottom">
             <!-- 底部车辆信息 -->
             <bottom-overview></bottom-overview>
@@ -89,6 +89,6 @@ export default {
         left: 0;
         right: 0;
         height: 80px;
-    } 
-}   
+    }
+}
 </style>
