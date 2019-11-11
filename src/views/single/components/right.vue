@@ -143,7 +143,6 @@
             capture(){
                 let _this = this;
                 _this.isCapture=!_this.isCapture;
-                _this.$parent.isCapture = _this.isCapture;
                 if(!_this.isCapture){
                     setTimeout(()=>{
                         platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
