@@ -653,7 +653,8 @@
                 if(param==-1){
                     this.param=-1;
                     this.isActive=-1;
-                    gis3d.updatePosition(121.063,31.113,121.431,31.371);
+                     gis3d.updatePosition(112.75003033070373, 28.106432159727982,113.05003033070373, 28.526432159727982);
+                    // gis3d.updatePosition(121.063,31.113,121.431,31.371);
                     return;
                 }
                 if(this.camList.length>0){
@@ -1310,9 +1311,9 @@
             this.platformWebsocket&&this.platformWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
-            gis3d=null;
-            perceptionCars = null;
-            platCars = null;
+            // gis3d=null;
+            // perceptionCars = null;
+            // platCars = null;
         }
     }
 </script>

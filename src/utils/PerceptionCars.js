@@ -203,12 +203,12 @@ class PerceptionCars {
             id: d.vehicleId + "car",
             modelMatrix: modelMatrix,
             url: './static/model/carbox.glb',
-            minimumPixelSize: 1,
+            minimumPixelSize: 5,
             show: true,
-            maximumScale: 5,
-            // color : Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE  , parseFloat(1)),
+            maximumScale: 10,
+            // color : Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE  , parseFloat(0.996)),
             // silhouetteColor : Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1)),//轮廓线
-            colorBlendMode: Cesium.ColorBlendMode.Mix
+            // colorBlendMode: Cesium.ColorBlendMode.Mix
             //   ,
             //   scale : 3.0     //放大倍数
             // debugWireframe:true
@@ -256,10 +256,17 @@ class PerceptionCars {
         carmodel.id = d.vehicleId + "car";
         //判断如果等或者大于360度，设置红色
         if (d.heading >= 360) {
-            carmodel.color = Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1));
+            carmodel.color = Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(0.996));
         }
         let fixedFrameTransforms = Cesium.Transforms.localFrameToFixedFrameGenerator('north', 'west')
         Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, carmodel.modelMatrix)
+
+        //     carmodel.readyPromise.then(function(carmodel) {
+        // debugger
+        // var m= carmodel.gltf.meshes[0];
+        // m. color = Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE  , parseFloat(1));
+
+        // });
 
         // var carlabel = this.viewer.entities.getById(i + "label");
         // carlabel.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 5);
@@ -268,85 +275,85 @@ class PerceptionCars {
         // carlabel.show = true;
         // carlabel.label.text = "[" + h + ", " + s + "]";
     }
-    /**
-     * 初始化感知车数量
-     */
-    initPerceptionCount(e) {
+    // /**
+    //  * 初始化感知车数量
+    //  */
+    // initPerceptionCount(e) {
 
-        var deviceid = "0";
-        this.deviceModels[deviceid] = { cars: [], persons: [], texts: [] };
-        for (let m = 0; m < this.cacheModelNum; m++) {
-            var position = Cesium.Cartesian3.fromDegrees(-1000, -1000, 0.0);
-            var heading = Cesium.Math.toRadians(0);
-            var pitch = Cesium.Math.toRadians(0);
-            var roll = 0;
-            var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
-            var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
-            var entity = Cesium.Model.fromGltf({
-                id: m + "model",
-                modelMatrix: modelMatrix,
-                url: './static/model/carbox.glb',
-                minimumPixelSize: 1,
-                show: false,
-                maximumScale: 5,
-                color: Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE, parseFloat(1)),
-                // silhouetteColor : Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1)),//轮廓线
-                colorBlendMode: Cesium.ColorBlendMode.Mix
-                //   ,
-                //   scale : 3.0     //放大倍数
-                // debugWireframe:true
-            })
+    //     var deviceid = "0";
+    //     this.deviceModels[deviceid] = { cars: [], persons: [], texts: [] };
+    //     for (let m = 0; m < this.cacheModelNum; m++) {
+    //         var position = Cesium.Cartesian3.fromDegrees(-1000, -1000, 0.0);
+    //         var heading = Cesium.Math.toRadians(0);
+    //         var pitch = Cesium.Math.toRadians(0);
+    //         var roll = 0;
+    //         var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+    //         var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
+    //         var entity = Cesium.Model.fromGltf({
+    //             id: m + "model",
+    //             modelMatrix: modelMatrix,
+    //             url: './static/model/carbox.glb',
+    //             minimumPixelSize: 1,
+    //             show: false,
+    //             maximumScale: 5,
+    //             color: Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE, parseFloat(1)),
+    //             // silhouetteColor : Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1)),//轮廓线
+    //             colorBlendMode: Cesium.ColorBlendMode.Mix
+    //             //   ,
+    //             //   scale : 3.0     //放大倍数
+    //             // debugWireframe:true
+    //         })
 
-            this.deviceModels[deviceid].cars[m] = entity;
-            //e.cesium.viewer.entities.add(entity);
-            e.scene.primitives.add(entity);
+    //         this.deviceModels[deviceid].cars[m] = entity;
+    //         //e.cesium.viewer.entities.add(entity);
+    //         e.scene.primitives.add(entity);
 
-            ////////////////////////
-            let entityLabel = e.entities.add({
-                id: m + "label",
-                position: position,
-                point: {
-                    color: Cesium.Color.RED,    //点位颜色
-                    pixelSize: 0          //像素点大小
-                },
-                label: {
-                    text: "",
-                    fillColor: Cesium.Color.BLACK,
-                    backgroundColor: Cesium.Color.fromCssColorString('#fff'),
-                    font: '12px sans-serif',
-                    showBackground: true,
-                    horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-                    pixelOffset: new Cesium.Cartesian2(0.0, 0),
-                    // pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 3.0, 1.5e7, 0.5),
-                    scaleByDistance: new Cesium.NearFarScalar(100, 1, 2000, 0)
-                }
-            });
+    //         ////////////////////////
+    //         let entityLabel = e.entities.add({
+    //             id: m + "label",
+    //             position: position,
+    //             point: {
+    //                 color: Cesium.Color.RED,    //点位颜色
+    //                 pixelSize: 0          //像素点大小
+    //             },
+    //             label: {
+    //                 text: "",
+    //                 fillColor: Cesium.Color.BLACK,
+    //                 backgroundColor: Cesium.Color.fromCssColorString('#fff'),
+    //                 font: '12px sans-serif',
+    //                 showBackground: true,
+    //                 horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+    //                 pixelOffset: new Cesium.Cartesian2(0.0, 0),
+    //                 // pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 3.0, 1.5e7, 0.5),
+    //                 scaleByDistance: new Cesium.NearFarScalar(100, 1, 2000, 0)
+    //             }
+    //         });
 
-            if (m <= 50) {
-                ////////////////////////////////
-                var entityPersons = Cesium.Model.fromGltf({
-                    id: m + "person",
-                    modelMatrix: modelMatrix,
-                    url: './static/model/person.glb',
-                    minimumPixelSize: 1,
-                    show: false,
-                    maximumScale: 5,
-                    color: Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE, parseFloat(1)),
-                    // silhouetteColor : Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1)),//轮廓线
-                    // colorBlendMode : Cesium.ColorBlendMode.Mix
-                    // ,
-                    scale: 0.5   //放大倍数
-                    // debugWireframe:true
-                })
+    //         if (m <= 50) {
+    //             ////////////////////////////////
+    //             var entityPersons = Cesium.Model.fromGltf({
+    //                 id: m + "person",
+    //                 modelMatrix: modelMatrix,
+    //                 url: './static/model/person.glb',
+    //                 minimumPixelSize: 1,
+    //                 show: false,
+    //                 maximumScale: 5,
+    //                 color: Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE, parseFloat(1)),
+    //                 // silhouetteColor : Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1)),//轮廓线
+    //                 // colorBlendMode : Cesium.ColorBlendMode.Mix
+    //                 // ,
+    //                 scale: 0.5   //放大倍数
+    //                 // debugWireframe:true
+    //             })
 
-                this.deviceModels[deviceid].persons[m] = entityPersons;
-                //e.cesium.viewer.entities.add(entity);
-                e.scene.primitives.add(entityPersons);
-            }
+    //             this.deviceModels[deviceid].persons[m] = entityPersons;
+    //             //e.cesium.viewer.entities.add(entity);
+    //             e.scene.primitives.add(entityPersons);
+    //         }
 
-        }
-        this.processPerceptionMesage();
-        this.viewer = e;
-    }
+    //     }
+    //     this.processPerceptionMesage();
+    //     this.viewer = e;
+    // }
 }
 export default PerceptionCars

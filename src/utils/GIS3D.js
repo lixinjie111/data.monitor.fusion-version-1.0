@@ -9,7 +9,7 @@ class GIS3D {
         this.cesiumContainer = document.getElementById(id);
         this.initCesium(); // Initialize Cesium renderer  
         if (!isFXAA) { 
-            this.cesium.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 60; //距离地形的距离？这个值可以多测试几个值，，我这不太好描述
+            this.cesium.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 55; //距离地形的距离？这个值可以多测试几个值，，我这不太好描述
         } 
     }
     initCesium() {
@@ -333,14 +333,18 @@ class GIS3D {
         }
     }
     addPolygon(hierarchy, z) {
+        // new Cesium.ImageMaterialProperty({
+        //     image:'./static/images/3.png',
+        //     color: Cesium.Color.fromCssColorString('#fff').withAlpha(0.8),
+        //     repeat : new Cesium.Cartesian2(4,4)
+        // })
         this.cesium.viewer.entities.add({
             id: "p1",
-            polygon: {
-
+            polygon: { 
                 hierarchy: Cesium.Cartesian3.fromDegreesArrayHeights(hierarchy),
                 extrudedHeight: z,
                 perPositionHeight: true,
-                material: Cesium.Color.fromCssColorString('#71446b').withAlpha(0.8),
+                material:  Cesium.Color.fromCssColorString('#71446b').withAlpha(0.8), 
                 outline: false
             }
         });
