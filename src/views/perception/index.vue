@@ -30,13 +30,15 @@
         components:{
             HeaderTop,Left,Right
         },
-        watch:{
-            /*'$route.params':function (newValue,oldValue) {
+       /* watch:{
+            '$route':function (newValue,oldValue) {
 //                console.log(newValue.lon,newValue.lat);
                 this.$router.replace("/refresh");
-            },*/
+            },
+        },*/
+        methods: {
+
         },
-        methods: {},
         mounted() {
             let _this = this;
             let leftShow = _this.$route.params.leftShow;

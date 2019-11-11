@@ -923,9 +923,17 @@
             platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
             this.onMapComplete();
 
-            this.isCaptureShow = this.$route.query.isCapture;
 
 //            this.initLightWebSocket();
+        },
+        watch: {
+            '$route':{
+                handler(newValue, oldValue) {
+                    this.isCaptureShow = newValue.query.isCapture;
+                },
+                immediate: true,
+//                deep: true
+            }
         },
         components:{
             LivePlayer

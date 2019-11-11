@@ -3,7 +3,6 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'">截屏</div>
-        <div class="map-time" v-show="isShow=='true'">{{time|dateFormat}}</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
@@ -150,6 +149,14 @@
                 },
 //                immediate: true,
                 deep: true
+            },
+            '$route':{
+                handler(newValue, oldValue) {
+                    this.isCaptureShow = newValue.query.isCapture;
+                    this.isShow = newValue.query.isShow;
+                },
+                immediate: true,
+//                deep: true
             }
         },
         filters: {
@@ -174,8 +181,6 @@
 
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
-            _this.isCaptureShow = _this.$route.query.isCapture;
-            _this.isShow = _this.$route.query.isShow;
 
             /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
