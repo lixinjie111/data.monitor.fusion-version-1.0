@@ -1,7 +1,7 @@
 <template>
     <div class="fusion-right-style">
         <div class="c-fusion-right map-right">
-            <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'">截屏</div>
+            <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'" :class="[isCapture?'capture-show':'capture-hidden']">截屏</div>
             <p class="c-title">前向摄像头</p>
             <div class="fusion-video">
                 <live-player
@@ -143,6 +143,7 @@
             capture(){
                 let _this = this;
                 _this.isCapture=!_this.isCapture;
+                this.$parent.isCapture= _this.isCapture;
                 if(!_this.isCapture){
                     setTimeout(()=>{
                         platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
@@ -960,9 +961,15 @@
             this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
             this.sideCarWebsocket&&this.sideCarWebsocket.close();
+<<<<<<< HEAD
             // gis3d=null;
             // perceptionCars = null;
             // platCars = null;
+=======
+//            gis3d=null;
+//            perceptionCars = null;
+//            platCars = null;
+>>>>>>> 6221d5371fde4d00bd134c6b4497cfb3d3f3cf1c
         },
     }
 </script>
@@ -1056,5 +1063,11 @@
                 padding: 0px 2px;
             }
         }
+    }
+    .capture-show{
+        border:1px solid #cd8404!important;
+     }
+    .capture-hidden{
+        border:1px solid #5d5d5d!important;
     }
 </style>
