@@ -215,11 +215,11 @@ class GIS3D {
     }
     add3DInfoLabel(name, text, x, y, z) {
         let positions = [];
-        positions.push(Cesium.Cartesian3.fromDegrees(x, y, 0));
-        positions.push(Cesium.Cartesian3.fromDegrees(x, y, 10));
+        positions.push(Cesium.Cartesian3.fromDegrees(x, y,this.defualtZ+ 0));
+        positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ+10));
         let lableModel = this.cesium.viewer.entities.add({
             id: name,
-            position: Cesium.Cartesian3.fromDegrees(x, y, 10),
+            position: Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ+10),
             polyline: {
                 positions: positions,
                 width: 3,
