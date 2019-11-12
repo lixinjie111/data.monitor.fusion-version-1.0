@@ -44,18 +44,18 @@ class GIS3D {
         //     canvas: this.cesium.viewer.scene.canvas,
         //     clampToGround: true //开启贴
         // } 
-          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/changsha/3.geojson', {
+          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/3.geojson', {
             fill: Cesium.Color.ALICEBLUE.withAlpha(0.996),//.withAlpha(1)
             stroke: Cesium.Color.fromCssColorString('#fff'),// Cesium.Color.ORANGE,
             strokeWidth: 0,
             markerSymbol: '?'
           }));
-         this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/changsha/2.geojson', {
+         this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/2.geojson', {
             stroke: Cesium.Color.ALICEBLUE.withAlpha(0.996),// Cesium.Color.ORANGE, new Cesium.Color(135,75,43,1)
             strokeWidth: 2,
             markerSymbol: '?'
         }));
-          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/changsha/1.geojson', {
+          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/1.geojson', {
             stroke: new Cesium.Color(0.5372549019607843, 0.2941176470588235, 0.1686274509803922, 0.996),// Cesium.Color.ALICEBLUE.withAlpha(0.996),
             strokeWidth: 2,
             markerSymbol: '?'
@@ -216,10 +216,10 @@ class GIS3D {
     add3DInfoLabel(name, text, x, y, z) {
         let positions = [];
         positions.push(Cesium.Cartesian3.fromDegrees(x, y, 0));
-        positions.push(Cesium.Cartesian3.fromDegrees(x, y, 20));
+        positions.push(Cesium.Cartesian3.fromDegrees(x, y, 10));
         let lableModel = this.cesium.viewer.entities.add({
             id: name,
-            position: Cesium.Cartesian3.fromDegrees(x, y, 20),
+            position: Cesium.Cartesian3.fromDegrees(x, y, 10),
             polyline: {
                 positions: positions,
                 width: 3,
