@@ -143,7 +143,7 @@ class ProcessCarTrack {
             };
             cdata.cacheData.push(d);
             cdata.lastRecieveData = d;
-            cdata.nowRecieveData = d;
+            cdata.nowRecieveData = d; 
             this.cacheAndInterpolateDataByVid[vid] = cdata;
         } else {//存在该车的数据
 
@@ -182,8 +182,10 @@ class ProcessCarTrack {
                     d2.heading = cdata.nowRecieveData.heading;
                     d2.vehicleId = cdata.nowRecieveData.vehicleId;
                     d2.plateNo = cdata.nowRecieveData.plateNo,
+                    d2.steps=i;
                         cdata.cacheData.push(d2);
                 }
+            
             }
             //  this.$emit("pcarDataTime",cdata.nowRecieveData.gpsTime,cdata.lastRecieveData.gpsTime);
             cdata.lastRecieveData = cdata.nowRecieveData;
@@ -191,25 +193,26 @@ class ProcessCarTrack {
     }
     processPlatformCarsTrack(e) {
         this.view = e;
+        let _this=this;
         // requestAnimationFrame(this.processPlatformCarsTrack);
-        this.processPlatformCarsTrackIntervalId = setInterval(() => {
-            for (var vid in this.cacheAndInterpolateDataByVid) {
-                let carCacheData = this.cacheAndInterpolateDataByVid[vid];
+        _this.processPlatformCarsTrackIntervalId = setInterval(() => {
+            for (var vid in _this.cacheAndInterpolateDataByVid) {
+                let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
                 if (carCacheData != null) {
                     if (carCacheData.cacheData.length > 0) {
                         //缓存数据
-                        let cardata = this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
-                        if (this.mainCarVID == cardata.vehicleId) {
-                            this.moveCar(cardata);
-                            this.moveTo(cardata);
+                        let cardata = _this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
+                        if (_this.mainCarVID == cardata.vehicleId) {
+                            _this.moveCar(cardata); 
+                            _this.moveTo(cardata);
                             //主车
                         } else {
-                            this.moveCar(cardata);
+                            _this.moveCar(cardata);
                         }
                     }
                 }
             }
-        }, this.stepTime);//this.stepTime
+        }, _this.stepTime);//this.stepTime
     }
     destroyed() {
         clearInterval(this.processPlatformCarsTrackIntervalId);
@@ -296,6 +299,7 @@ class ProcessCarTrack {
         }
     }
     moveTo(d) {
+        
         var heading = Cesium.Math.toRadians(d.heading);
         var pitch = -0.2369132859032279;
         var roll = 0.0029627735803421373;
