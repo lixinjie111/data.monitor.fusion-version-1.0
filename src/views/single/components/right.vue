@@ -918,7 +918,8 @@
 
             gis3d.initload("cesiumContainer",true);
             perceptionCars.viewer=gis3d.cesium.viewer;
-
+            
+            platCars.cacheAndInterpolateDataByVid = {},
             platCars.models={};
             platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
             this.onMapComplete();
@@ -950,6 +951,7 @@
         },
         beforeDestroy(){
             console.log("单车页面销毁");
+              clearInterval(platCars.processPlatformCarsTrackIntervalId);
             //释放定时器
             for(let key in this.timeObj){
                 clearTimeout(this.timeObj[key]);
@@ -959,9 +961,15 @@
             this.carWebsocket&&this.carWebsocket.close();
             this.warningWebsocket&&this.warningWebsocket.close();
             this.sideCarWebsocket&&this.sideCarWebsocket.close();
+<<<<<<< HEAD
+            // gis3d=null;
+            // perceptionCars = null;
+            // platCars = null;
+=======
 //            gis3d=null;
 //            perceptionCars = null;
 //            platCars = null;
+>>>>>>> 6221d5371fde4d00bd134c6b4497cfb3d3f3cf1c
         },
     }
 </script>

@@ -2,7 +2,7 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
-        <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'" :class="[isCapture?'capture-show':'capture-hidden']">截屏</div>
+        <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'">截屏</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
@@ -246,8 +246,8 @@
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
-//                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
-                    gis3d.updateCameraPosition(this.x, this.y,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
+                   gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
+                    // gis3d.updateCameraPosition(this.x, this.y,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                     this.getData();
                     this.mapShow=true;
                     return;
@@ -257,7 +257,7 @@
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
 //                        gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-                        gis3d.updateCameraPosition(this.x, this.y,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
+                          gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
                         this.getData();
                         clearInterval(this.mapInitTime);
                         this.mapShow=true;
@@ -266,7 +266,7 @@
                     count++;
                     if(count==10){
 //                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-                        gis3d.updateCameraPosition(this.x, this.y,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
+                            gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
                         this.getData();
                         this.mapShow=true;
                         clearInterval(this.mapInitTime);
@@ -1494,12 +1494,6 @@
         height: 46px;
         z-index: 3;
         cursor: pointer;
-    }
-    .capture-show{
-        border:1px solid #cd8404!important;
-    }
-    .capture-hidden{
-        border:1px solid #5d5d5d!important;
     }
 
 </style>
