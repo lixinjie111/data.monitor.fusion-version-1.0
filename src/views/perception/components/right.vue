@@ -2,7 +2,7 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
-        <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'">截屏</div>
+        <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'" :class="[isCapture?'capture-show':'capture-hidden']">截屏</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
@@ -1494,6 +1494,12 @@
         height: 46px;
         z-index: 3;
         cursor: pointer;
+    }
+    .capture-show{
+        border:1px solid #cd8404!important;
+    }
+    .capture-hidden{
+        border:1px solid #5d5d5d!important;
     }
 
 </style>
