@@ -14,7 +14,7 @@
             </div>
             <live-player 
                 class="c-live-player" 
-                ref="livePlayer" 
+                ref="livePlayer"
                 :videoUrl="videoUrl" 
                 autoplay
                 :muted="true"
@@ -52,6 +52,10 @@ export default {
         isBig: {
             default: true,
             type: Boolean
+        },
+        refName:{
+            default:'',
+            type:String
         }
     },
     components: {

@@ -27,6 +27,37 @@ class ProcessCarTrack {
         this.cacheTrackCarData = data;
         this.thisMessage(flag);
     }
+    platCarCapture(data,isCar){
+        if (isCar == 0) {
+            let data2 = data.result.vehDataDTO;
+            for (let n = 0; n < data2.length; n++) {
+                let pcar = data2[n];
+                if (pcar.heading < 0) {
+                    // 不处理小于0的的数据
+                    continue;
+                }
+                //缓存数据
+                this.cachePlatformCar(pcar,data.result.vehDataStat);
+            }
+        }
+        else {
+            let data2 = data.result.data;
+            for (let n = 0; n < data2.length; n++) {
+                let pcar = data2[n];
+                if (pcar.heading < 0) {
+                    // 不处理小于0的的数据
+                    continue;
+                }
+                //缓存数据
+                this.cachePlatformCar(pcar,null);
+            }
+            let datamain = data.result.selfVehInfo;
+            if (datamain != null) {
+                this.mainCarVID = datamain.vehicleId;
+                this.cachePlatformCar(datamain,null);
+            }
+        }
+    }
     thisMessage(isCar) {
         let data = this.cacheTrackCarData;
         if (isCar == 0) {
@@ -189,6 +220,69 @@ class ProcessCarTrack {
             }
             //  this.$emit("pcarDataTime",cdata.nowRecieveData.gpsTime,cdata.lastRecieveData.gpsTime);
             cdata.lastRecieveData = cdata.nowRecieveData;
+        }
+    }
+    cachePlatformCar(pcar){
+        let vid = pcar.vehicleId;
+        let cdata = this.cacheAndInterpolateDataByVid[vid];
+
+        let position = proj4(this.sourceProject, this.destinatePorject, [
+            pcar.longitude,
+            pcar.latitude
+        ]);
+
+        if(cdata==null)//没有该车的数据
+        {
+            cdata = {
+                cacheData:new Array(),
+                intervalid:null,
+                lastRecieveData:null,
+                nowRecieveData:null,
+                lastProcessData:null,
+                nowProcessData:null
+            };
+            let d = {
+                vehicleId: vid,
+                plateNo:pcar.plateNo,
+                longitude: pcar.longitude,
+                latitude: pcar.latitude,
+                gpsTime: pcar.gpsTime,
+                heading: pcar.heading,
+            };
+            cdata.cacheData.push(d);
+            cdata.lastRecieveData = d;
+            cdata.nowRecieveData = d;
+            this.cacheAndInterpolateDataByVid[vid]=cdata;
+
+            this.addModel(
+                'testCar',
+                "./static/map3d/map_photo/car.3DS",
+                0,
+                0,
+                this.defualtZ
+            );
+        }else{//存在该车的数据
+
+            this.models['testCar'].position.set(position[0], position[1], this.defualtZ);
+            this.models['testCar'].rotation.set(
+                this.pitch,
+                this.yaw,
+                (-Math.PI / 180) * pcar.heading
+            );
+
+            let d = {
+                vehicleId: vid,
+                longitude: pcar.longitude,
+                latitude: pcar.latitude,
+                gpsTime: pcar.gpsTime,
+                heading: pcar.heading,
+            };
+            cdata.nowRecieveData = d;
+            if(this.mainCarVID == d.vehicleId){
+                this.moveCar(d);
+            }else{
+                this.moveCar2(d);
+            }
         }
     }
     processPlatformCarsTrack(e) {

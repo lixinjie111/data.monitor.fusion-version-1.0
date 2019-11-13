@@ -2,7 +2,6 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
-        <div class="img-capture" @click="capture" v-if="isCaptureShow=='true'">截屏</div>
         <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="map-real-time" >{{processDataTime|dateFormat}}</div>
         <div class="video-style">
@@ -90,7 +89,6 @@
                 spatWebsocket:null,
                 warningWebsocket:null,
                 param:1, //平面 俯视
-                time:'',
                 statisticData:'',
                 x:0,
                 y:0,
@@ -118,9 +116,17 @@
                 spatConnectCount:0,
                 gis3d:null,
                 isCapture:false,
-                isCaptureShow:false,
+                isCap:false,
                 perIsFirst:true,
-                waitingtime:this.$route.params.waitingtime
+                waitingtime:this.$route.params.waitingtime,
+                perCaptureList:[],
+                platCaptureList:[],
+                platCount:0,
+                spatCaptureList:[],
+                warnCaptureList:[],
+
+                captureCount:0
+
             }
         },
         props:{
@@ -152,11 +158,37 @@
             },
             '$route':{
                 handler(newValue, oldValue) {
-                    this.isCaptureShow = newValue.query.isCapture;
+                    this.isCapture = newValue.query.isCapture;
                     this.isShow = newValue.query.isShow;
+                    if(this.isCapture=='true'){
+                        document.addEventListener('keyup',this.capture);
+                        document.addEventListener('keydown',this.playerCapture);
+                    }else{
+                        document.removeEventListener('keyup', this.capture);
+                        document.removeEventListener('keydown', this.playerCapture);
+                        this.perCaptureList=[];
+                        this.spatCaptureList=[];
+                        this.warnCaptureList=[];
+                    }
                 },
                 immediate: true,
 //                deep: true
+            },
+            isCap(newVal,oldVal){
+                let _this = this;
+                console.log(_this.$refs)
+                for(let str in _this.$refs){
+
+                    if(str!=''&&str.match("player")){
+                        console.log("---"+str)
+                        console.log()
+                        if(newVal){
+                            _this.$refs[str][0].player&&_this.$refs[str][0].player.pause();
+                        }else {
+                            _this.$refs[str][0].player&&_this.$refs[str][0].player.play();
+                        }
+                    }
+                }
             }
         },
         filters: {
@@ -171,7 +203,6 @@
         },
         mounted() {
             let _this = this;
-
             gis3d.initload("cesiumContainer",false);
             perceptionCars.viewer=gis3d.cesium.viewer;
 //            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
@@ -204,34 +235,39 @@
             _this.getCameraByRsId();
             _this.onMapComplete();
             //判断当前标签页是否被隐藏
-            document.addEventListener("visibilitychange", () => {
-                if(document.visibilityState == "hidden") {
-                    _this.tabIsExist=false;
-                } else if (document.visibilityState == "visible") {
-                    _this.tabIsExist=true;
-                }
-            });
+            document.addEventListener("visibilitychange",this.processTab);
         },
         methods: {
             capture(){
                 let _this = this;
-                _this.isCapture=!_this.isCapture;
-                if(!_this.isCapture){
-                    setTimeout(()=>{
-                        //缓存1s的数据，开始调用
-                        platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
-                    },1000)
-                }
-                for(let str in _this.$refs){
-                    if(str!=''&&str.match("player")){
-                        if(_this.isCapture){
-                            _this.$refs[str][0].player&&_this.$refs[str][0].player.pause();
-                        }else {
-                            _this.$refs[str][0].player&&_this.$refs[str][0].player.play();
-                        }
-                    }
+                if(this.perCaptureList.length>0){
+                    let perData = this.perCaptureList.shift();
+                    _this.processPerData(perData);
                 }
 
+                if(this.platCount==0||this.platCount==6){
+                    if(this.spatCaptureList.length>0){
+                        let spatData = this.spatCaptureList.shift();
+                        _this.processSpat(spatData);
+                    }
+                    if(this.warnCaptureList.length>0){
+                        let warnData = this.warnCaptureList.shift();
+                        _this.processWarn(warnData);
+                    }
+                    if(this.platCaptureList.length>0){
+                        let platData = this.platCaptureList.shift();
+                        platCars.platCarCapture(platData,0);
+                    }
+
+                }
+                if(this.platCount==6){
+                    this.platCount=0;
+                }
+                this.platCount++;
+                this.isCap=true;
+            },
+            playerCapture(){
+                this.isCap=false;
             },
             onMapComplete(){
 
@@ -682,6 +718,7 @@
 //                    this.camList[param].videoShow=true;
 //                }
             },
+
             initWarningWebSocket(){
                 let _this=this;
                 try{
@@ -701,10 +738,58 @@
             },
             onWarningMessage(mesasge){
                 let _this=this;
-                if(_this.isCapture){
+                let json = JSON.parse(mesasge.data);
+                if(_this.isCapture=='true'){
+                    if(_this.captureCount>1000){
+                        return;
+                    }
+                    _this.warnCaptureList.push(json)
                     return;
                 }
-                let json = JSON.parse(mesasge.data);
+                this.processWarn(json);
+            },
+            onWarningClose(data){
+                console.log("告警结束连接");
+                this.warningReconnect();
+            },
+            onWarningError(){
+                console.log("告警连接error");
+                this.warningReconnect();
+            },
+            onWarningOpen(data){
+                //旁车
+                let warning = {
+                    "action": "clod_event",
+                    "region": this.currentExtent
+                }
+                let warningMsg = JSON.stringify(warning);
+                this.sendWarningMsg(warningMsg);
+            },
+            sendWarningMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.warningWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
+            warningReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.warningConnectCount>=10){
+                    return;
+                }
+                this.initWarningWebSocket();
+                //重连不能超过5次
+                this.warningConnectCount++;
+            },
+            processWarn(json){
+                let _this = this;
                 let warningData = json.result.data;
                 let type = json.result.type;
                 let warningId;
@@ -750,46 +835,6 @@
                     _this.$parent.warningCount = _this.warningCount;
                 }
             },
-            onWarningClose(data){
-                console.log("告警结束连接");
-                this.warningReconnect();
-            },
-            onWarningError(){
-                console.log("告警连接error");
-                this.warningReconnect();
-            },
-            onWarningOpen(data){
-                //旁车
-                let warning = {
-                    "action": "clod_event",
-                    "region": this.currentExtent
-                }
-                let warningMsg = JSON.stringify(warning);
-                this.sendWarningMsg(warningMsg);
-            },
-            sendWarningMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.warningWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            warningReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.warningConnectCount>=10){
-                    return;
-                }
-                this.initWarningWebSocket();
-                //重连不能超过5次
-                this.warningConnectCount++;
-            },
 
             //平台车
             initPlatformWebSocket(){
@@ -811,13 +856,17 @@
             },
             onPlatformMessage(mesasge){
                 let _this=this;
-                if(_this.isCapture){
+                let json = JSON.parse(mesasge.data);
+                if(_this.isCapture=='true'){
+                    if(_this.captureCount>1000){
+                        return;
+                    }
 //                    platCars.captureCarMessage(json);
                     clearInterval(platCars.processPlatformCarsTrackIntervalId);
                     platCars.cacheAndInterpolateDataByVid={};
+                    _this.platCaptureList.push(json);
                     return;
                 }
-                let json = JSON.parse(mesasge.data);
                 platCars.onCarMessage(json,0);
                 let keys = Object.keys(platCars.cacheAndInterpolateDataByVid);
                 if(keys&&keys.length>0){
@@ -901,37 +950,17 @@
                   console.log(_this.tabIsExist);*/
                 if(_this.tabIsExist){
                     /*console.log("..............");*/
-                    if(_this.isCapture){
+                    let data = JSON.parse(mesasge.data)
+                    if(_this.isCapture=='true'){
+                        if(_this.captureCount>1000){
+                            return;
+                        }
+                        _this.perCaptureList.push(data);
+                        _this.captureCount++;
                         return;
                     }
-                    let data = JSON.parse(mesasge.data)
-                    perceptionCars.addPerceptionData(data,0);
-                    _this.$parent.perceptionData= data.result.vehDataStat;
-                    let cars = data.result.vehDataDTO;
-                    if(cars.length>0){
-                        _this.processDataTime = cars[0].gpsTime;
-                        let pcarnum = 0;
-                        let persons = 0;
-                        let zcarnum = 0;
-                        for (let i = 0; i < cars.length; i++) {
-                            let obj = cars[i];
-                            if (obj.type == 1) {
-                                zcarnum++;
-                                continue;
-                            }
-                            if (
-                                obj.targetType == 0 ||
-                                obj.targetType == 1 ||
-                                obj.targetType == 3
-                            ) {
-                                persons++;
-                            } else {
-                                pcarnum++;
-                            }
-                        }
-                        this.statisticData ="当前数据包："+cars.length +"=" +zcarnum +"(自车)+" +pcarnum +"(感知)+" +persons +"(人)";
-                    }
 
+                    _this.processPerData(data);
                    /* let obj =  perceptionCars.lastPerceptionMessage;
                     if(obj!=null){
                         _this.$parent.perceptionData= obj.result.vehDataStat;
@@ -1001,6 +1030,35 @@
                 //重连不能超过5次
                 this.perceptionConnectCount++;
             },
+            processPerData(data){
+                let _this = this;
+                perceptionCars.addPerceptionData(data,0);
+                _this.$parent.perceptionData= data.result.vehDataStat;
+                let cars = data.result.vehDataDTO;
+                if(cars.length>0){
+                    _this.processDataTime = cars[0].gpsTime;
+                    let pcarnum = 0;
+                    let persons = 0;
+                    let zcarnum = 0;
+                    for (let i = 0; i < cars.length; i++) {
+                        let obj = cars[i];
+                        if (obj.type == 1) {
+                            zcarnum++;
+                            continue;
+                        }
+                        if (
+                            obj.targetType == 0 ||
+                            obj.targetType == 1 ||
+                            obj.targetType == 3
+                        ) {
+                            persons++;
+                        } else {
+                            pcarnum++;
+                        }
+                    }
+                    this.statisticData ="当前数据包："+cars.length +"=" +zcarnum +"(自车)+" +pcarnum +"(感知)+" +persons +"(人)";
+                }
+            },
 
             //红绿灯
             initSpatWebSocket(){
@@ -1024,15 +1082,70 @@
             },
             onSpatMessage(mesasge){
                 let _this=this;
-                if(_this.isCapture){
-                    return;
-                }
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.spatDataDTO;
+                if(_this.isCapture=='true'){
+                    if(_this.captureCount>1000){
+                        return;
+                    }
+                    _this.spatCaptureList.push(data);
+                    return;
+                }
+                _this.processSpat(data);
 //                let vehData = json.result.vehDataStat;
 //                _this.$emit("getPerceptionData",vehData);
 //                _this.vehData.push(vehData);
-                _this.time=json.time;
+            },
+            onSpatClose(data){
+                console.log("红绿灯结束连接");
+                this.spatReconnect();
+            },
+            onSpatError(){
+                console.log("红绿灯连接error");
+                this.spatReconnect();
+            },
+            onSpatOpen(data){
+                //旁车
+                let spat = {
+                    "action": "road_real_data_spat",
+                    "data": {
+                        /*"polygon": [
+                            [121.17979423666091, 31.279518991604288],
+                            [121.16305725240798, 31.279518991604288],
+                            [121.16305725240798, 31.289571910992105],
+                            [121.17979423666091, 31.289571910992105]
+                        ]*/
+                        "polygon":this.currentExtent
+                    }
+                }
+                let spatMsg = JSON.stringify(spat);
+                this.sendSpatMsg(spatMsg);
+            },
+            sendSpatMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.spatWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.spatWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
+            spatReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.spatConnectCount>=10){
+                    return;
+                }
+                this.initSpatWebSocket();
+                //重连不能超过5次
+                this.spatConnectCount++;
+            },
+            processSpat(data){
+                let _this = this;
                 /*if(_this.param==3){*/
                 let resultData=[];
                 if(data&&data.length>0){
@@ -1241,54 +1354,6 @@
                     })
                 }
             },
-            onSpatClose(data){
-                console.log("红绿灯结束连接");
-                this.spatReconnect();
-            },
-            onSpatError(){
-                console.log("红绿灯连接error");
-                this.spatReconnect();
-            },
-            onSpatOpen(data){
-                //旁车
-                let spat = {
-                    "action": "road_real_data_spat",
-                    "data": {
-                        /*"polygon": [
-                            [121.17979423666091, 31.279518991604288],
-                            [121.16305725240798, 31.279518991604288],
-                            [121.16305725240798, 31.289571910992105],
-                            [121.17979423666091, 31.289571910992105]
-                        ]*/
-                        "polygon":this.currentExtent
-                    }
-                }
-                let spatMsg = JSON.stringify(spat);
-                this.sendSpatMsg(spatMsg);
-            },
-            sendSpatMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.spatWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.spatWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            spatReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.spatConnectCount>=10){
-                    return;
-                }
-                this.initSpatWebSocket();
-                //重连不能超过5次
-                this.spatConnectCount++;
-            },
 
             getExtend(x,y,r){
                 this.currentExtent=[];
@@ -1300,6 +1365,13 @@
                 this.currentExtent.push([x0, y0]);
                 this.currentExtent.push([x0, y1]);
                 this.currentExtent.push([x1, y1]);
+            },
+            processTab(){
+                if(document.visibilityState == "hidden") {
+                    this.tabIsExist=false;
+                } else if (document.visibilityState == "visible") {
+                    this.tabIsExist=true;
+                }
             }
         },
         destroyed(){
@@ -1316,6 +1388,10 @@
             this.platformWebsocket&&this.platformWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
+
+            document.removeEventListener("visibilitychange",this.processTab);
+            document.removeEventListener('keyup', this.capture);
+            document.removeEventListener('keydown', this.playerCapture);
             // gis3d=null;
             // perceptionCars = null;
             // platCars = null;
@@ -1413,19 +1489,6 @@
         right: 420px;
         width:40px;
         cursor: pointer;
-    }
-    .img-capture{
-        position: absolute;
-        top: 130px;
-        z-index:3;
-        right: 420px;
-        height: 38px;
-        width:38px;
-        cursor: pointer;
-        border:1px solid #5d5d5d;
-        text-align: center;
-        background: #5d5d5d;
-        color: #cd8404;
     }
     .video-style{
         position: absolute;
