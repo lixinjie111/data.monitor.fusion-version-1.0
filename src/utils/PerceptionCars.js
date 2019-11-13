@@ -160,7 +160,7 @@ class PerceptionCars {
       if ((countLable - fusionList.length) >= window.count) {
         this.removeModelEntities();
       }
-      console.log(fusionList.length + "空闲文字" + countLable)
+      // console.log(fusionList.length + "空闲文字" + countLable)
     }
     clearCar(fusionList, name) {
       let _this = this;
@@ -184,7 +184,7 @@ class PerceptionCars {
       if ((count - fusionList.length) >= window.count) {
         this.removeModelPrimitives(name);
       }
-      console.log(fusionList.length + "空闲车" + count)
+      // console.log(fusionList.length + "空闲车" + count)
     }
     /**
      * 增加车辆

@@ -86,12 +86,11 @@ export default {
         'videoOption.loadingFlag'(newVal, oldVal) {
             this.initVideoTimer();
             if(newVal) {
-                console.log(newVal)
                 this.videoTimer();
             }
         },
         'videoLoadingDelay.count'(newVal, oldVal) {
-//            console.log(newVal);
+            console.log(newVal);
         }
     },
     mounted() {
@@ -102,12 +101,10 @@ export default {
     methods: {
         initVideoTimer() {
             clearInterval(this.videoLoadingDelay.timer);
+            this.videoLoadingDelay.timer=null;
             this.videoLoadingDelay.count = 0;
         },
         videoTimer() {
-            if(this.isPause){
-                return;
-            }
             this.videoLoadingDelay.timer = setInterval(() => {
                 if(this.videoLoadingDelay.count >= this.videoLoadingDelay.countTime) {
                     this.setVideoOptionError("此视频暂无法播放，请稍后再试");
@@ -118,10 +115,6 @@ export default {
             }, 1000);
         },
         videoTimerReload() {
-           /* if(this.isPause){
-                clearInterval()
-                return;
-            }*/
             this.videoLoadingDelay.timer = setInterval(() => {
                 if(this.videoLoadingDelay.count >= this.videoLoadingDelay.reloadTime) {
                     this.requestVideo();
@@ -129,6 +122,7 @@ export default {
                     this.videoLoadingDelay.count ++;
                 }
             }, 1000);
+//            console.log("第一个定时器："+this.videoLoadingDelay.timer );
         },
         setVideoOptionPause() {
             this.initVideoTimer();
@@ -169,9 +163,9 @@ export default {
             // console.log("onPlayerEnded");
         },
         onPlayerTimeupdate(player) {
-//             console.log("onPlayerTimeupdate");
+//             console.log("onPlayerTimeupdate",player);
             this.setVideoOptionClose();
-            /*this.videoTimerReload();*/
+            this.videoTimerReload();
         },
         onPlayerPause() {
             // console.log("onPlayerPause");
@@ -181,6 +175,7 @@ export default {
             this.videoOption.loadingFlag = false;
             this.videoOption.playError = false;
             this.isPause=true;
+            this.initVideoTimer();
         },
         // listen event
         onPlayerPlay(player) {
