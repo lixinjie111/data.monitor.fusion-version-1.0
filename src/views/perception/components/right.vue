@@ -120,7 +120,6 @@
                 perIsFirst:true,
                 waitingtime:this.$route.params.waitingtime,
                 perCaptureList:[],
-                platCaptureList:[],
                 platCount:0,
                 spatCaptureList:[],
                 warnCaptureList:[],
@@ -244,21 +243,28 @@
                     let perData = this.perCaptureList.shift();
                     _this.processPerData(perData);
                 }
-
+                if(Object.keys(_this.cacheAndInterpolateDataByVid).length>0){
+                    for (var vid in _this.cacheAndInterpolateDataByVid) {
+                        let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
+                        if (carCacheData != null) {
+                            if (carCacheData.cacheData.length > 0) {
+                                //缓存数据
+                                let cardata = _this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
+                                _this.moveCar(cardata);
+                            }
+                        }
+                    }
+                }
                 if(this.platCount==0||this.platCount==6){
                     if(this.spatCaptureList.length>0){
                         let spatData = this.spatCaptureList.shift();
                         _this.processSpat(spatData);
                     }
+                    //告警事件 搁置  静态事件和动态事件  静态事件绘制一次  动态事件更新位置
                     if(this.warnCaptureList.length>0){
                         let warnData = this.warnCaptureList.shift();
                         _this.processWarn(warnData);
                     }
-                    if(this.platCaptureList.length>0){
-                        let platData = this.platCaptureList.shift();
-                        platCars.platCarCapture(platData,0);
-                    }
-
                 }
                 if(this.platCount==6){
                     this.platCount=0;
@@ -864,7 +870,8 @@
 //                    platCars.captureCarMessage(json);
                     clearInterval(platCars.processPlatformCarsTrackIntervalId);
                     platCars.cacheAndInterpolateDataByVid={};
-                    _this.platCaptureList.push(json);
+                    platCars.stepTime=100;
+                    platCars.onCarMessage(json,0);
                     return;
                 }
                 platCars.onCarMessage(json,0);
