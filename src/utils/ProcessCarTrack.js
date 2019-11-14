@@ -42,7 +42,7 @@ class ProcessCarTrack {
             }
         }
         else {
-            let data2 = data.result.data;
+           /* let data2 = data.result.data;
             for (let n = 0; n < data2.length; n++) {
                 let pcar = data2[n];
                 if (pcar.heading < 0) {
@@ -51,7 +51,7 @@ class ProcessCarTrack {
                 }
                 //缓存数据
                 this.cacheAndInterpolatePlatformCar(pcar,null);
-            }
+            }*/
             let datamain = data.result.selfVehInfo;
             if (datamain != null) {
                 this.mainCarVID = datamain.vehicleId;
@@ -157,11 +157,11 @@ class ProcessCarTrack {
             };
             cdata.nowRecieveData = d;
 
-            if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime && cdata.nowRecieveData.gpsTime == cdata.lastRecieveData.gpsTime) {
-                console.log("到达顺序错误或重复数据");
+            if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime ||cdata.nowRecieveData.gpsTime == cdata.lastRecieveData.gpsTime) {
+                // console.log("到达顺序错误或重复数据");
                 return;
             }
-
+            console.log("积压长度："+cdata.cacheData.length);
             let deltaTime = cdata.nowRecieveData.gpsTime - cdata.lastRecieveData.gpsTime;
             if (deltaTime <= this.stepTime) {
                 cdata.cacheData.push(cdata.nowRecieveData);
