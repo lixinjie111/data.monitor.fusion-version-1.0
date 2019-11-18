@@ -2,13 +2,14 @@ class ProcessCarTrack {
     constructor() {
         this.view = null;
         // pCacheModelNum: 200,//感知车数量
-        this.stepTime = 60;//处理车缓存时间
+        this.stepTime = 23;//处理车缓存时间
         this.recieveCount = 0;
         this.defualtZ = 0.8;
         this.pitch = 0;
         this.yaw = 0;
         this.roll = Math.PI * (10 / 90);
         this.pmodels = {};
+        this.testCar = {};
         this.models = {};
         this.cacheTrackCarData = null,
             //按照vid缓存插值的小车轨迹
@@ -42,7 +43,7 @@ class ProcessCarTrack {
             }
         }
         else {
-           /* let data2 = data.result.data;
+            let data2 = data.result.data;
             for (let n = 0; n < data2.length; n++) {
                 let pcar = data2[n];
                 if (pcar.heading < 0) {
@@ -51,7 +52,7 @@ class ProcessCarTrack {
                 }
                 //缓存数据
                 this.cacheAndInterpolatePlatformCar(pcar,null);
-            }*/
+            }
             let datamain = data.result.selfVehInfo;
             if (datamain != null) {
                 this.mainCarVID = datamain.vehicleId;
@@ -145,6 +146,22 @@ class ProcessCarTrack {
             cdata.lastRecieveData = d;
             cdata.nowRecieveData = d; 
             this.cacheAndInterpolateDataByVid[vid] = cdata;
+
+            // var position = Cesium.Cartesian3.fromDegrees(car.longitude, car.latitude, 0.0);
+            // var heading = Cesium.Math.toRadians(0);
+            // var pitch = Cesium.Math.toRadians(0);
+            // var roll = 0;
+            // var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+            // var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
+            // //e.cesium.viewer.entities.add(entity);
+            // this.testCar = this.view.scene.primitives.add(Cesium.Model.fromGltf({
+            //     id: "testcar",
+            //     modelMatrix: modelMatrix,
+            //     url: './static/model/car.glb',
+            //     minimumPixelSize: 1,
+            //     show: true,
+            //     maximumScale: 5,
+            // }));
         } else {//存在该车的数据
 
             let d = {
@@ -156,6 +173,20 @@ class ProcessCarTrack {
                 heading: car.heading
             };
             cdata.nowRecieveData = d;
+            // console.log("积压长度")
+                console.log(cdata.cacheData.length,d.vehicleId)
+            // var position = Cesium.Cartesian3.fromDegrees(car.longitude, car.latitude, 0.0);
+            //
+            // var heading = Cesium.Math.toRadians(car.heading);
+            // var pitch = 0;
+            // var roll = 0;
+            // var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+            // var orientation = Cesium.Transforms.headingPitchRollQuaternion(position, hpr);
+            // this.testCar.modelMatrix = orientation;
+            //
+            // let fixedFrameTransforms = Cesium.Transforms.localFrameToFixedFrameGenerator('north', 'west')
+            // Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, this.testCar.modelMatrix)
+
 
             if (cdata.nowRecieveData.gpsTime < cdata.lastRecieveData.gpsTime ||cdata.nowRecieveData.gpsTime == cdata.lastRecieveData.gpsTime) {
                 // console.log("到达顺序错误或重复数据");
@@ -183,19 +214,16 @@ class ProcessCarTrack {
                     d2.vehicleId = cdata.nowRecieveData.vehicleId;
                     d2.plateNo = cdata.nowRecieveData.plateNo,
                     d2.steps=i;
-                        cdata.cacheData.push(d2);
+                    cdata.cacheData.push(d2);
                 }
-            
             }
             //  this.$emit("pcarDataTime",cdata.nowRecieveData.gpsTime,cdata.lastRecieveData.gpsTime);
             cdata.lastRecieveData = cdata.nowRecieveData;
         }
     }
-    processPlatformCarsTrack(e) {
-        this.view = e;
+    processPlatformCarsTrack() {
         let _this=this;
-        // requestAnimationFrame(this.processPlatformCarsTrack);
-        _this.processPlatformCarsTrackIntervalId = setInterval(() => {
+        if(Object.keys(_this.cacheAndInterpolateDataByVid).length>0){
             for (var vid in _this.cacheAndInterpolateDataByVid) {
                 let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
                 if (carCacheData != null) {
@@ -212,13 +240,33 @@ class ProcessCarTrack {
                     }
                 }
             }
-        }, _this.stepTime);//this.stepTime
+        }
+        requestAnimationFrame(function() {
+            _this.processPlatformCarsTrack();
+        });
+        /*_this.processPlatformCarsTrackIntervalId = setInterval(() => {
+            for (var vid in _this.cacheAndInterpolateDataByVid) {
+                let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
+                if (carCacheData != null) {
+                    if (carCacheData.cacheData.length > 0) {
+                        //缓存数据
+                        let cardata = _this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
+                        if (_this.mainCarVID == cardata.vehicleId) {
+                            _this.moveCar(cardata);
+                            _this.moveTo(cardata);
+                            //主车
+                        } else {
+                            _this.moveCar(cardata);
+                        }
+                    }
+                }
+            }
+        }, _this.stepTime);//this.stepTime*/
     }
     destroyed() {
         clearInterval(this.processPlatformCarsTrackIntervalId);
     }
     moveCar(d) {
-
         let vid = d.vehicleId;
         let plateNo = d.plateNo;
         let carModel = this.models[vid];
@@ -234,10 +282,10 @@ class ProcessCarTrack {
             this.view.scene.primitives.add(Cesium.Model.fromGltf({
                 id: vid + "car",
                 modelMatrix: modelMatrix,
-                url: './static/model/car.glb',
+                url: './static/model/carbox.glb',
                 minimumPixelSize: 1,
                 show: true,
-                maximumScale: 5,
+                maximumScale: 100,
             }));
             this.models[vid] = vid;
 

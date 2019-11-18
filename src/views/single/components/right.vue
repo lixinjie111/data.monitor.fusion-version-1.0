@@ -115,7 +115,9 @@
                 spatCaptureList:[],
                 warnCaptureList:[],
 
-                captureCount:0
+                captureCount:0,
+                lat: 31.28243147,
+                lng: 121.16241333
             }
 
         },
@@ -840,6 +842,20 @@
                     return;
                 }
                 //当为false时候  先进行缓存1s的数据
+                let dataList = data.result.data;
+                for(let i=6;i<106;i++){
+                    _this.lat = _this.lat+0.00002;
+                    _this.lng = _this.lng+0.00002;
+                    let obj={
+                        vehicleId : 'B21E000'+i,
+                        targetType: 2,
+                        type:1,
+                        heading:265.87136259902326,
+                        latitude:_this.lat,
+                        longitude:_this.lng,
+                    }
+                    data.result.data.push(obj);
+                }
                 platCars.onCarMessage(data,1);
 
             },

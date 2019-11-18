@@ -28,7 +28,7 @@ class GIS3D {
             fullscreenButton: false,
             vrButton: false,
             orderIndependentTranslucency: false,
-            baseLayerPicker: false, //是否显示图层选择控件
+            // baseLayerPicker: false, //是否显示图层选择控件
 
         });
         this.cesium.viewer.scene.globe.depthTestAgainstTerrain = false;

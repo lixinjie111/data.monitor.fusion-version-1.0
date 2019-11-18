@@ -124,7 +124,9 @@
                 spatCaptureList:[],
                 warnCaptureList:[],
 
-                captureCount:0
+                captureCount:0,
+                lat: 31.28243147,
+                lng: 121.1624133
 
             }
         },
@@ -175,12 +177,9 @@
             },
             isCap(newVal,oldVal){
                 let _this = this;
-                console.log(_this.$refs)
                 for(let str in _this.$refs){
 
                     if(str!=''&&str.match("player")){
-                        console.log("---"+str)
-                        console.log()
                         if(newVal){
                             _this.$refs[str][0].player&&_this.$refs[str][0].player.pause();
                         }else {
@@ -207,7 +206,8 @@
 //            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
 
             platCars.models={};
-            platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
+            platCars.view=gis3d.cesium.viewer;
+             platCars.processPlatformCarsTrack();
 
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
@@ -225,6 +225,7 @@
                 _this.x = longitude;
                 _this.y = latitude;
                 _this.getExtend(longitude,latitude,extend);
+                console.log(_this.currentExtent)
                 _this.center=[longitude ,latitude];
             }else{
                 _this.currentExtent=window.currentExtent;
@@ -243,7 +244,7 @@
                     let perData = this.perCaptureList.shift();
                     _this.processPerData(perData);
                 }
-                if(Object.keys(_this.cacheAndInterpolateDataByVid).length>0){
+                if(_this.cacheAndInterpolateDataByVid&&Object.keys(_this.cacheAndInterpolateDataByVid).length>0){
                     for (var vid in _this.cacheAndInterpolateDataByVid) {
                         let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
                         if (carCacheData != null) {
@@ -288,7 +289,7 @@
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
-                   gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
+                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
                     // gis3d.updateCameraPosition(this.x, this.y,camParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                     this.getData();
                     this.mapShow=true;
@@ -298,7 +299,7 @@
                 this.mapInitTime = setInterval(()=>{
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
-//                        gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+//                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
                           gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
                         this.getData();
                         clearInterval(this.mapInitTime);
@@ -863,17 +864,44 @@
             onPlatformMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
-                if(_this.isCapture=='true'){
-                    if(_this.captureCount>1000){
-                        return;
+//                if(_this.isCapture=='true'){
+//                    if(_this.captureCount>1000){
+//                        return;
+//                    }
+////                    platCars.captureCarMessage(json);
+//                    clearInterval(platCars.processPlatformCarsTrackIntervalId);
+//                    platCars.cacheAndInterpolateDataByVid={};
+//                    platCars.stepTime=100;
+//                    platCars.onCarMessage(json,0);
+//                    return;
+//                }
+                for(let i=6;i<100;i++){
+                    _this.lat = _this.lat+0.0002;
+                    _this.lng = _this.lng+0.0002;
+                    let obj={
+                        devId : 'B21E000'+i,
+                        targetType: 2,
+                        type:1,
+                        heading:265.87136259902326,
+                        latitude:_this.lat,
+                        longitude:_this.lng,
+                        plateNo:'仿A22343'+i,
+                        gpsTime:new Date().getTime(),
+
+                        vehicleId: "B21E0003"+i,
+                        devType: 1,
+                        fuselLevel: 1,
+                        fuselStatus: 0,
+                        fuselType: 1,
+
+                        source: ["4G"],
+                        speed: 16.61343307525385
+
+
                     }
-//                    platCars.captureCarMessage(json);
-                    clearInterval(platCars.processPlatformCarsTrackIntervalId);
-                    platCars.cacheAndInterpolateDataByVid={};
-                    platCars.stepTime=100;
-                    platCars.onCarMessage(json,0);
-                    return;
+                    json.result.vehDataDTO.push(obj);
                 }
+//                _this.lat=_this.lat+0.001;
                 platCars.onCarMessage(json,0);
                 let keys = Object.keys(platCars.cacheAndInterpolateDataByVid);
                 if(keys&&keys.length>0){
@@ -897,7 +925,7 @@
                     "action": "road_real_data_reg",
                     "data": {
 //                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
-                        "polygon":window.currentExtent
+                        "polygon":this.currentExtent
                     }
                 }
                 let platformMsg = JSON.stringify(platform);
