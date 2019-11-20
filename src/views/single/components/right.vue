@@ -816,7 +816,8 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.carWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+//                        _this.carWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                        _this.carWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
                         _this.carWebsocket.onmessage = _this.onCarMessage;
                         _this.carWebsocket.onclose = _this.onCarClose;
                         _this.carWebsocket.onopen = _this.onCarOpen;
@@ -843,7 +844,7 @@
                 }
                 //当为false时候  先进行缓存1s的数据
                 let dataList = data.result.data;
-                for(let i=6;i<106;i++){
+                /*for(let i=6;i<106;i++){
                     _this.lat = _this.lat+0.00002;
                     _this.lng = _this.lng+0.00002;
                     let obj={
@@ -855,7 +856,7 @@
                         longitude:_this.lng,
                     }
                     data.result.data.push(obj);
-                }
+                }*/
                 platCars.onCarMessage(data,1);
 
             },
@@ -869,10 +870,17 @@
             },
             onCarOpen(data){
                 //旁车
-                let car = {
+                let car ={
+                    "action": "vehicle",
+                    "body": {
+                        "vehicleId": this.vehicleId
+                    },
+                    "type": 2
+                }
+                /*let car = {
                     "action": "sideVehicle",
                     "vehicleId": this.vehicleId
-                }
+                }*/
                 let carMsg = JSON.stringify(car);
                 this.sendCarMsg(carMsg);
             },

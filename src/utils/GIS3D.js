@@ -9,7 +9,7 @@ class GIS3D {
         this.cesiumContainer = document.getElementById(id);
         this.initCesium(); // Initialize Cesium renderer  
         if (!isFXAA) { 
-            this.cesium.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 55; //距离地形的距离？这个值可以多测试几个值，，我这不太好描述
+            this.cesium.viewer.scene.screenSpaceCameraController.minimumZoomDistance =this.defualtZ+5; //距离地形的距离？这个值可以多测试几个值，，我这不太好描述
         } 
     }
     initCesium() {
@@ -28,8 +28,8 @@ class GIS3D {
             fullscreenButton: false,
             vrButton: false,
             orderIndependentTranslucency: false,
-            baseLayerPicker: false, //是否显示图层选择控件
-            infoBox: false, //是否显示点击要素之后显示的信息
+            // baseLayerPicker: false, //是否显示图层选择控件
+            // infoBox: false, //是否显示点击要素之后显示的信息
 
         });
         this.cesium.viewer.scene.globe.depthTestAgainstTerrain = false;

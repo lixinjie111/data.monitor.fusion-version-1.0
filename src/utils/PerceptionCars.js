@@ -97,7 +97,7 @@ class PerceptionCars {
               if (modelShow != null) {
                 this.moveModel(modelShow, d, "car");
               } else {
-                //初始化增加车辆
+                //初始化增加车辆 如果没有隐藏车辆的模型
                 this.addModeCar(d, "car", "carbox");
               }
             }

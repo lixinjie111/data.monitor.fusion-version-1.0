@@ -2,7 +2,7 @@ class ProcessCarTrack {
     constructor() {
         this.view = null;
         // pCacheModelNum: 200,//感知车数量
-        this.stepTime = 23;//处理车缓存时间
+        this.stepTime = 150;//处理车缓存时间
         this.recieveCount = 0;
         this.defualtZ = 0.8;
         this.pitch = 0;
@@ -11,39 +11,40 @@ class ProcessCarTrack {
         this.pmodels = {};
         this.testCar = {};
         this.models = {};
-        this.cacheTrackCarData = null,
-            //按照vid缓存插值的小车轨迹
-            this.cacheAndInterpolateDataByVid = {},
-            this.cameraDefualtZ = 22.86,
-            this.cameraDefualtRadius = 10,
-            this.cameraDefualtPitch = -0.2,
-            this.mainCarVID = "",
-            this.isload = false,
-            this.x = 0;
-            this.processPlatformCarsTrackIntervalId=null;
+        this.cacheTrackCarData = [],
+        //按照vid缓存插值的小车轨迹
+        this.cacheAndInterpolateDataByVid = {},
+        this.cameraDefualtZ = 22.86,
+        this.cameraDefualtRadius = 10,
+        this.cameraDefualtPitch = -0.2,
+        this.mainCarVID = "",
+        this.isload = false,
+        this.x = 0;
+        this.processPlatformCarsTrackIntervalId=null;
     }
 
     //路口视角  平台车
     onCarMessage(data,flag) {
-        this.cacheTrackCarData = data;
-        this.thisMessage(flag);
+        console.log('----------')
+        console.log(data.time);
+        this.cacheTrackCarData.push(data);
+        this.thisMessage(flag,data);
     }
-    thisMessage(isCar) {
-        let data = this.cacheTrackCarData;
+    thisMessage(isCar,data) {
+        let data2 = data.result.data;
         if (isCar == 0) {
-            let data2 = data.result.vehDataDTO;
             for (let n = 0; n < data2.length; n++) {
                 let pcar = data2[n];
                 if (pcar.heading < 0) {
                     // 不处理小于0的的数据
                     continue;
                 }
+                if (pcar.vehicleId == "B21E0003")
                 //缓存数据
-                this.cacheAndInterpolatePlatformCar(pcar,data.result.vehDataStat);
+                this.cacheAndInterpolatePlatformCar(pcar,null);
             }
         }
         else {
-            let data2 = data.result.data;
             for (let n = 0; n < data2.length; n++) {
                 let pcar = data2[n];
                 if (pcar.heading < 0) {
@@ -117,8 +118,10 @@ class ProcessCarTrack {
         //     }
         // }
     }
+
+
     //缓存并且插值平台车轨迹
-    cacheAndInterpolatePlatformCar(car,data) {
+    cacheAndInterpolatePlatformCar(car) {
         let vid = car.vehicleId;
         let cdata = this.cacheAndInterpolateDataByVid[vid];
 
@@ -132,7 +135,6 @@ class ProcessCarTrack {
                 lastProcessData: null,
                 nowProcessData: null,
                 plateNo: null,
-                data:data
             };
             let d = {
                 vehicleId: vid,
@@ -174,7 +176,7 @@ class ProcessCarTrack {
             };
             cdata.nowRecieveData = d;
             // console.log("积压长度")
-                console.log(cdata.cacheData.length,d.vehicleId)
+            //     console.log(cdata.cacheData.length,d.vehicleId)
             // var position = Cesium.Cartesian3.fromDegrees(car.longitude, car.latitude, 0.0);
             //
             // var heading = Cesium.Math.toRadians(car.heading);
@@ -192,16 +194,18 @@ class ProcessCarTrack {
                 // console.log("到达顺序错误或重复数据");
                 return;
             }
-            console.log("积压长度："+cdata.cacheData.length);
+            console.log(vid,cdata.cacheData.length);
             let deltaTime = cdata.nowRecieveData.gpsTime - cdata.lastRecieveData.gpsTime;
             if (deltaTime <= this.stepTime) {
-                cdata.cacheData.push(cdata.nowRecieveData);
+                // cdata.cacheData.push(cdata.nowRecieveData);
             } else {
 
                 //插值处理
                 let deltaLon = cdata.nowRecieveData.longitude - cdata.lastRecieveData.longitude;
                 let deltaLat = cdata.nowRecieveData.latitude - cdata.lastRecieveData.latitude;
-                let steps = Math.ceil(deltaTime / this.stepTime);
+                // let steps = Math.ceil(deltaTime / this.stepTime);
+                // console.log(cdata.nowRecieveData.gpsTime, cdata.lastRecieveData.gpsTime,deltaTime,steps);
+                let steps = 1;
                 let timeStep = deltaTime / steps;
                 let lonStep = deltaLon / steps;
                 let latStep = deltaLat / steps;
@@ -219,32 +223,55 @@ class ProcessCarTrack {
             }
             //  this.$emit("pcarDataTime",cdata.nowRecieveData.gpsTime,cdata.lastRecieveData.gpsTime);
             cdata.lastRecieveData = cdata.nowRecieveData;
+
+            console.log("***************")
         }
     }
     processPlatformCarsTrack() {
         let _this=this;
-        if(Object.keys(_this.cacheAndInterpolateDataByVid).length>0){
-            for (var vid in _this.cacheAndInterpolateDataByVid) {
-                let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
-                if (carCacheData != null) {
-                    if (carCacheData.cacheData.length > 0) {
-                        //缓存数据
-                        let cardata = _this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
-                        if (_this.mainCarVID == cardata.vehicleId) {
-                            _this.moveCar(cardata);
-                            _this.moveTo(cardata);
-                            //主车
-                        } else {
-                            _this.moveCar(cardata);
-                        }
+        for (var vid in _this.cacheAndInterpolateDataByVid) {
+            let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
+            if (carCacheData != null) {
+                if (carCacheData.cacheData.length > 0) {
+                    //缓存数据
+                    let cacheData = _this.cacheAndInterpolateDataByVid[vid].cacheData;
+                    // console.log(cacheData);
+                    /*cardata.forEach(item=>{
+                        console.log(item);
+                    })*/
+                    let cardata = cacheData.shift();
+
+                  /*  var position = Cesium.Cartesian3.fromDegrees(cardata.longitude, cardata.latitude, 0.0);
+                    var heading = Cesium.Math.toRadians(0);
+                    var pitch = Cesium.Math.toRadians(0);
+                    var roll = 0;
+                    var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+                    var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
+                    //e.cesium.viewer.entities.add(entity);
+                    this.view.scene.primitives.add(Cesium.Model.fromGltf({
+                        id: "1212121",
+                        modelMatrix: modelMatrix,
+                        url: './static/model/poleWith2Camera3.glb',
+                        minimumPixelSize: 1,
+                        show: true,
+                        maximumScale: 100,
+                    }));
+*/
+                    console.log(new Date().getTime(),cardata.longitude)
+                    if (_this.mainCarVID == cardata.vehicleId) {
+                        _this.moveCar(cardata);
+                        _this.moveTo(cardata);
+                        //主车
+                    } else {
+                        _this.moveCar(cardata);
                     }
                 }
             }
         }
-        requestAnimationFrame(function() {
-            _this.processPlatformCarsTrack();
-        });
-        /*_this.processPlatformCarsTrackIntervalId = setInterval(() => {
+        // requestAnimationFrame(function() {
+        //     _this.processPlatformCarsTrack();
+        // });
+       /* _this.processPlatformCarsTrackIntervalId = setInterval(() => {
             for (var vid in _this.cacheAndInterpolateDataByVid) {
                 let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
                 if (carCacheData != null) {
@@ -261,7 +288,7 @@ class ProcessCarTrack {
                     }
                 }
             }
-        }, _this.stepTime);//this.stepTime*/
+        }, this.stepTime);//this.stepTime*/
     }
     destroyed() {
         clearInterval(this.processPlatformCarsTrackIntervalId);
@@ -282,10 +309,10 @@ class ProcessCarTrack {
             this.view.scene.primitives.add(Cesium.Model.fromGltf({
                 id: vid + "car",
                 modelMatrix: modelMatrix,
-                url: './static/model/carbox.glb',
+                url: './static/model/car.glb',
                 minimumPixelSize: 1,
                 show: true,
-                maximumScale: 100,
+                maximumScale: 300,
             }));
             this.models[vid] = vid;
 
@@ -306,7 +333,7 @@ class ProcessCarTrack {
                     showBackground: true,
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                     pixelOffset: new Cesium.Cartesian2(0.0, 0),
-                    scaleByDistance: new Cesium.NearFarScalar(100, 1, 2000, 0)
+                    scaleByDistance: new Cesium.NearFarScalar(100, 1, 20000, 0)
                 }
             });
 
@@ -328,6 +355,7 @@ class ProcessCarTrack {
             if (carpt == null) return;
             var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 0.0);
 
+            // console.log(d.longitude);
             var heading = Cesium.Math.toRadians(d.heading);
             var pitch = 0;
             var roll = 0;
