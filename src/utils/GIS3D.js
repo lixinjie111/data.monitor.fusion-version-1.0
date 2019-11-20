@@ -28,7 +28,8 @@ class GIS3D {
             fullscreenButton: false,
             vrButton: false,
             orderIndependentTranslucency: false,
-            // baseLayerPicker: false, //是否显示图层选择控件
+            baseLayerPicker: false, //是否显示图层选择控件
+            infoBox: false, //是否显示点击要素之后显示的信息
 
         });
         this.cesium.viewer.scene.globe.depthTestAgainstTerrain = false;
@@ -44,6 +45,13 @@ class GIS3D {
         //     canvas: this.cesium.viewer.scene.canvas,
         //     clampToGround: true //开启贴
         // } 
+        let promise=   this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/4.geojson', {
+            fill: Cesium.Color.fromCssColorString('#71446b').withAlpha(0.9),//'static/images/login-bg.jpg',//.withAlpha(1)
+            stroke: Cesium.Color.fromCssColorString('#71446b').withAlpha(0),// Cesium.Color.ORANGE,
+            strokeWidth: 0,
+            zIndex:1,
+            markerSymbol: '?'
+          }));
           this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/3.geojson', {
             fill: Cesium.Color.ALICEBLUE.withAlpha(0.996),//.withAlpha(1)
             stroke: Cesium.Color.fromCssColorString('#fff'),// Cesium.Color.ORANGE,
@@ -77,14 +85,14 @@ class GIS3D {
         //     destination: Cesium.Cartesian3.fromDegrees(112.94760914128275, 28.325093927226323, this.defualtZ + 39.142101722743725),
         //     orientation: hpr
         //   });
-        let hierarchy = [
-            112.953651652808389, 28.329121301607586, 50,
-            112.953927670284997, 28.328597820186189, 50,
-            112.952570766104373, 28.327743594794072, 50,
-            112.952201968003351, 28.328177801283175, 50,
-            112.953651652808276, 28.329121301607586, 50
-        ];
-        this.addPolygon(hierarchy, this.defualtZ);
+        // let hierarchy = [
+        //     112.953651652808389, 28.329121301607586, 50,
+        //     112.953927670284997, 28.328597820186189, 50,
+        //     112.952570766104373, 28.327743594794072, 50,
+        //     112.952201968003351, 28.328177801283175, 50,
+        //     112.953651652808276, 28.329121301607586, 50
+        // ];
+        // this.addPolygon(hierarchy, this.defualtZ);
         // this.initStreetLamp();
         this.initModel_pole();
         // this.add3DInfoLabel("aaa","慢行",112.95003033070373, 28.326432159727982,10)
@@ -125,7 +133,7 @@ class GIS3D {
                         for (var i = 0; i < v.dataSources.length; i++) {
                             v.dataSources.get(i).show = true;
                         }
-                        v.entities.getById("p1").show = true;
+                        // v.entities.getById("p1").show = true;
                     }
                 }
 
@@ -141,7 +149,7 @@ class GIS3D {
                         for (var i = 0; i < v.dataSources.length; i++) {
                             v.dataSources.get(i).show = false;
                         }
-                        v.entities.getById("p1").show = false;
+                        // v.entities.getById("p1").show = false;
                     }
 
                 }
