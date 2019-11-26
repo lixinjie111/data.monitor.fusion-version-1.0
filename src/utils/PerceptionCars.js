@@ -11,6 +11,8 @@ class PerceptionCars {
       this.lastPerceptionMessage = null;
       this.viewer = null;
       this.processPerceptionDataIntervalId = null;
+      this.devObj = {};
+      this.pulseInterval='';//阈值范围
     }
   
     //接受数据
@@ -21,10 +23,65 @@ class PerceptionCars {
         // this.cachePerceptionQueue.push(data);
         this.processPerceptionMesage(data,flag);
     }
+    receiveData(sideList){
+        sideList.forEach(item=>{
+          if(!this.devObj[item.devId]){
+              this.devObj[item.devId]=new Array();
+          }else {
+            this.devObj[item.devId].push(item);
+          }
+      });
+    }
+    processPerTrack(time,delayTime){
+      for(let devId in this.devObj){
+        let devData = this.getMinValue(devId,time,delayTime);
+        let fusionList = devData.data;
+        this.processPerceptionMesage(fusionList);
+      }
+    }
+    getMinValue(devId,time,delayTime){
+        let cacheData = this.devObj[devId];
+        let minData = {};
+        let minDiff = Math.abs(time-minData.gpsTime-delayTime);
+        let minIndex =-1;
+        // console.log("找到最小值前："+cacheData.length);
+        //找到最小值
+        for(let i=0;i<cacheData.length;i++){
+            let diff = Math.abs(time-cacheData[i].gpsTime-delayTime);
+            // console.log(vid,cacheData.length,time,cacheData[i].gpsTime,diff)
+            if(diff<this.pulseInterval){
+                minIndex = i;
+                minData = cacheData[i];
+                break;
+            }
+        }
+        if(minIndex<0){
+           console.log("per***********");
+           return;
+        }
+        //打印出被舍弃的点
+        let lostData = this.devObj[devId].filter((item,index)=>{
+            return index<minIndex;
+        })
+        lostData.forEach(item=>{
+            // let minDiff = Math.abs(time-cacheData[minIndex].gpsTime-insertTime);
+            // console.log("插值最小的索引"+minIndex,minDiff);
+            console.log("##"+item.devId,item.gpsTime);
+            // let d =  Math.abs(time-item.gpsTime-insertTime);
+            // console.log("##"+d);
+        })
+
+        //找到最小值后，将数据之前的数值清除
+        this.devObj[devId] = this.devObj[devId].filter((item,index)=>{
+            return index>minIndex;
+        })
+        // console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+
+        //返回距离标尺的最小插值的数据
+        return minData;
+    }
     //绘制感知车
-    processPerceptionMesage(data,flag) {
-  
-     
+    processPerceptionMesage(fusionList,flag) {
         let _this = this;
 
         // _this.processPerceptionDataIntervalId = setInterval(() => {
@@ -43,22 +100,12 @@ class PerceptionCars {
         // } else {
         //   data = _this.lastPerceptionMessage;
         // }
-        if (data == null) return;
-        // var data2 = JSON.parse(data);
-        let fusionList;
-        if(flag==0){
-            fusionList = data.result.vehDataDTO;
-        }else{
-            fusionList = data.result.data;
-        }
-
-      if (fusionList.length > 0) {
+        if (fusionList.length<=0) return;
         this.clearCar(fusionList, "car");
         this.clearCar(fusionList, "person");
         this.clearCarLabel(fusionList);
-      }
-  
-      for (let i = 0; i < fusionList.length; i++) {
+
+        for (let i = 0; i < fusionList.length; i++) {
         let d = fusionList[i];
   
         if (d.type == 1) {

@@ -26,8 +26,15 @@
                 carWebSocket: null,
                 prevData: {},
                 platformConnectCount:0,
-                spatConnectCount:0
-            };
+                spatConnectCount:0,
+                pulseWebsocket:null,
+
+                pulseLastTime :'',
+                pulseFilterTime:'',
+                pulseNowTime:'',
+
+                platObj:{}
+           }
         },
         mounted() {
 //    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
@@ -116,7 +123,8 @@
                 let _this = this;
                 try{
                     if ("WebSocket" in window) {
-                        _this.carWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
+//                        _this.carWebSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
+                        _this.carWebSocket = new WebSocket(window.config.socketTestUrl); //获得WebSocket对象
                         _this.carWebSocket.onmessage = _this.onCarMessage;
                         _this.carWebSocket.onclose = _this.onCarClose;
                         _this.carWebSocket.onopen = _this.onCarOpen;
@@ -132,8 +140,70 @@
                 let _this = this;
                 let jsonData = JSON.parse(message.data);
                 let result = jsonData.result;
+                let data = result.data;
+                let _filterData = {};
+               /* for(let vehicleId in data){
+                    let cdata = this.platObj[vehicleId];
+                    if(cdata==null){
+                        cdata = new Array();
+                    }
+                    this.platObj[vehicleId] = Array.prototype.push.apply(cdata,data[vehicleId]);
+                }*/
+                for(let vehicleId in data){
+                    if(data[vehicleId]&&data[vehicleId].length>0){
+                        _filterData[vehicleId] = data[vehicleId][0];
+                        _filterData[vehicleId].marker=null;
+                    }
+                }
+                if(Object.keys(data).length>0){
+                    for (let id in _this.prevData) {
+                        if(_filterData[id]) {   //表示有该点，做move
+                            _filterData[id].marker = _this.prevData[id].marker;
+                            let _currentCar = _filterData[id];
+                            _filterData[id].marker.setAngle(_currentCar.heading);
+//                            _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
+
+                            _filterData[id].marker.setPosition([_currentCar.longitude, _currentCar.latitude]);
+//                            if(_filterData[id].vehicleId=='B21E0005'){
+//                                console.log("沪A523456-----"+_filterData[id].plateNo);
+//                                let marker =  new AMap.Marker({
+//                                    position:  [_currentCar.longitude, _currentCar.latitude],
+//                                    map: this.aMap,
+//                                    icon: "static/images/road/side.png",
+//                                    zIndex: 1
+//                                });
+//                            }
+                        } else {   //表示没有该点，做remove
+//                            _this.prevData[id].marker.stopMove();
+                            _this.aMap.remove(_this.prevData[id].marker);
+                            delete _this.prevData[id];
+                        }
+                    }
+                    for (let id in _filterData) {
+                        if(!_this.prevData[id]) {   //表示新增该点，做add
+                            _filterData[id].marker = new AMap.Marker({
+                                position: [_filterData[id].longitude, _filterData[id].latitude],
+                                map: _this.aMap,
+                                icon: "static/images/road/car.png",
+                                angle: _filterData[id].heading,
+                                devId: _filterData[id].devId,
+                                offset:new AMap.Pixel(-4, -9),
+                                zIndex: 1
+                            });
+                        }
+                    }
+
+                    _this.prevData = _filterData;
+                }else{
+                    // 返回的数据为空
+                    for (let id in _this.prevData) {
+                        _this.prevData[id].marker.stopMove();
+                        _this.aMap.remove(_this.prevData[id].marker);
+                        delete _this.prevData[id];
+                    }
+                }
                 // 车辆
-                if ("vehDataDTO" in result === true) {
+             /*   if ("vehDataDTO" in result === true) {
                     _this.crossData.roadSenseCars = result.vehDataDTO;
                     if (_this.crossData.roadSenseCars.length > 0) {
                         _this.crossData.roadSenseCars = _this.crossData.roadSenseCars.filter(
@@ -201,7 +271,7 @@
                             delete _this.prevData[id];
                         }
                     }
-                }
+                }*/
             },
             onCarClose(data) {
                 console.log("平台车结束连接");
@@ -213,13 +283,20 @@
             },
             onCarOpen(data) {
                 // 获取红绿灯
-                let _params = {
-                    action: "road_real_data_reg",
-                    data: {
+                let _params ={
+                    "action": "vehicle",
+                    "body": {
                         polygon: this.crossData.finalFourPosition,
-                        fuselType: 1
-                    }
-                };
+                    },
+                    "type": 3
+                }
+//                let _params = {
+//                    action: "road_real_data_reg",
+//                    data: {
+//                        polygon: this.crossData.finalFourPosition,
+//                        fuselType: 1
+//                    }
+//                };
                 let carParams = JSON.stringify(_params);
                 this.sendCarMsg(carParams);
             },
@@ -369,8 +446,6 @@
                 this.spatConnectCount++;
             },
 
-
-
             // 根据状态返回红，黄，绿灯
             dealLight(data) {
                 if ("status" in data === true) {
@@ -384,11 +459,120 @@
                 } else {
                     return "static/images/road/green.jpg";
                 }
-            }
+            },
+
+            //脉冲
+            initPulseWebSocket(){
+                let _this=this;
+                try{
+                    if ('WebSocket' in window) {
+                        _this.pulseWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                        _this.pulseWebsocket.onmessage = _this.onPulseMessage;
+                        _this.pulseWebsocket.onclose = _this.onPulseClose;
+                        _this.pulseWebsocket.onopen = _this.onPulseOpen;
+                        _this.pulseWebsocket.onerror= _this.onPulseError;
+                    }else{
+                        _this.$message("此浏览器不支持websocket");
+                    }
+                }catch (e){
+                    this.pulseReconnect();
+                }
+
+            },
+            onPulseMessage(mesasge){
+                let json = JSON.parse(mesasge.data);
+                let result = json.result;
+                if(this.pulseLastTime==''){
+                    this.pulseLastTime = new Date().getTime();
+                }
+//                this.pulseLastTime = this.pulseNowTime;
+                this.pulseFilterTime = this.pulseNowTime;
+                this.pulseNowTime = new Date().getTime();
+                let timeDiff = this.pulseNowTime - this.pulseLastTime;
+                let filterDiff = this.pulseNowTime - this.pulseFilterTime;
+                let diff = this.formatTime(this.pulseNowTime)-this.formatTime(result.time);
+//                console.log(this.formatTime(this.pulseNowTime),this.formatTime(result.time),filterDiff);
+                if(timeDiff>1000) {
+
+                }
+            },
+            onPulseClose(data){
+                console.log("感知车结束连接");
+                this.PulseReconnect();
+            },
+            onPulseError(){
+                console.log("感知车连接error");
+                this.PulseReconnect();
+            },
+            onPulseOpen(data){
+                //旁车
+                let pulse = {
+                    "action":"pulse",
+                    "data":{
+//                        "frequency":39
+                        "frequency":40
+                    }
+                }
+                let pulseMsg = JSON.stringify(pulse);
+                this.sendPulseMsg(pulseMsg);
+            },
+            sendPulseMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.pulseWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.pulseWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
+            PulseReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.pulseConnectCount>=10){
+                    return;
+                }
+                this.initPulseWebSocket();
+                //重连不能超过5次
+                this.pulseConnectCount++;
+            },
+            processPulseData(data){
+                let _this = this;
+                perceptionCars.addPerceptionData(data,0);
+                _this.$parent.perceptionData= data.result.vehDataStat;
+                let cars = data.result.vehDataDTO;
+                if(cars.length>0){
+                    _this.processDataTime = cars[0].gpsTime;
+                    let pcarnum = 0;
+                    let persons = 0;
+                    let zcarnum = 0;
+                    for (let i = 0; i < cars.length; i++) {
+                        let obj = cars[i];
+                        if (obj.type == 1) {
+                            zcarnum++;
+                            continue;
+                        }
+                        if (
+                            obj.targetType == 0 ||
+                            obj.targetType == 1 ||
+                            obj.targetType == 3
+                        ) {
+                            persons++;
+                        } else {
+                            pcarnum++;
+                        }
+                    }
+                    this.statisticData ="当前数据包："+cars.length +"=" +zcarnum +"(自车)+" +pcarnum +"(感知)+" +persons +"(人)";
+                }
+            },
         },
         destroyed() {
             this.roadWebSocket&&this.roadWebSocket.close();
             this.carWebSocket&&this.carWebSocket.close();
+            this.pulseWebsocket&&this.pulseWebsocket.close();
         }
     };
 </script>

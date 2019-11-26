@@ -3,7 +3,7 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
-        <div class="map-real-time" :class="{'real-time-error':isTimeError}">{{processDataTime|dateFormat}}</div>
+        <div class="map-real-time">{{processDataTime|dateFormat}}</div>
         <div class="video-style">
             <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
                 <div class="style">
@@ -124,8 +124,6 @@
                 gis3d:null,
                 isCapture:false,
                 isCap:false,
-                perIsFirst:true,
-                waitingtime:this.$route.params.waitingtime,
 
 
                 perCaptureList:[],
@@ -137,17 +135,13 @@
                 lat: 31.28243147,
                 lng: 121.1624133,
 
-                perTime:null,
-                isTimeError:false,
 
                 perDataList:[], //感知数据实时滚动
 
                 pulseLastTime:'',
                 pulseNowTime:'',
-                platObj:{}
-
-
-
+                delayTime:'',
+                pulseInterval:40
             }
         },
         props:{
@@ -313,6 +307,13 @@
                     let camera = this.$refs.perceptionMap.getCamera();
                     console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
                 },500)*/
+
+                //初始化车辆步长以及平台车阀域范围
+                platCars.stepTime = this.pulseInterval;
+                platCars.pulseInterval = this.pulseInterval;//设置阀域范围 脉冲时间的100%
+
+                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2;
+
                 let count=0;
                 let flag=false;
                 let camParam;
@@ -898,18 +899,19 @@
             onPlatformMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
-//                console.log("-----");
-//                console.log(json.time);
-                let data = json.result.data[0];
-                let vehicleId = json.result.vehicleId;
-                if(_this.platObj[vehicleId]==null){
-                    _this.platObj[vehicleId] = [];
+                if(_this.tabIsExist){
+                    platCars.recieveData(json);
+                }else{
+//                    console.log("****"+_this.tabIsExist)
+                    for(let vid in platCars.platObj){
+                        platCars.platObj[vid] = [];
+                    }
                 }
-                _this.platObj[vehicleId].push(data);
+
 //                console.log(_this.platObj[vehicleId].length);
 //                console.log("*********");
 
-               /* if(_this.isCapture=='true'){
+           /*     if(_this.isCapture=='true'){
                     if(_this.captureCount>1000){
                         return;
                     }
@@ -1013,7 +1015,8 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.perceptionWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                        _this.perceptionWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+//                        _this.perceptionWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                         _this.perceptionWebsocket.onmessage = _this.onPerceptionMessage;
                         _this.perceptionWebsocket.onclose = _this.onPerceptionClose;
                         _this.perceptionWebsocket.onopen = _this.onPerceptionOpen;
@@ -1028,21 +1031,9 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-                _this.isTimeError = false;
-                clearTimeout(_this.perTime);
-                _this.perTime = setTimeout(()=>{
-                    _this.isTimeError = true;
-                },150)
-                if(_this.perIsFirst){
-                    setTimeout(()=>{
-                        _this.perIsFirst=false;
-                    },_this.waitingtime);
-                    return;
-                }
                 /*  console.log("########");
                   console.log(_this.tabIsExist);*/
                 if(_this.tabIsExist){
-                    /*console.log("..............");*/
                     let data = JSON.parse(mesasge.data)
                     if(_this.isCapture=='true'){
                         if(_this.captureCount>1000){
@@ -1052,9 +1043,10 @@
                         _this.captureCount++;
                         return;
                     }
-
-                    _this.processPerData(data);
-                    if(data.result.vehDataDTO&&data.result.vehDataDTO.length>0){
+                    let sideList = data.result.perList;
+                    perceptionCars.receiveData(sideList);
+//                    _this.processPerData(sideList);
+                    /*if(data.result.vehDataDTO&&data.result.vehDataDTO.length>0){
                         let result = data.result.vehDataDTO[0];
                         let time = _this.formatTime(result.gpsTime);
                         let obj  = {
@@ -1072,7 +1064,7 @@
                             _this.perDataList.push(obj);
 
                         }
-                    }
+                    }*/
                    /* let obj =  perceptionCars.lastPerceptionMessage;
                     if(obj!=null){
                         _this.$parent.perceptionData= obj.result.vehDataStat;
@@ -1087,11 +1079,6 @@
                         this.processDataTime=processTime;
                     }
                     this.$parent.perceptionData=vehDataStat;*/
-                }else{
-                    let cacheList = perceptionCars.cachePerceptionQueue;
-                    if(cacheList.length>0){
-                        perceptionCars.cachePerceptionQueue = new Array();
-                    }
                 }
             },
             onPerceptionClose(data){
@@ -1103,19 +1090,31 @@
                 this.perceptionReconnect();
             },
             onPerceptionOpen(data){
-                //旁车
-                let perception = {
-                    "action": "road_real_data_per",
-                    "data": {
-                        /*"polygon": [
-                            [121.17979423666091, 31.279518991604288],
-                            [121.16305725240798, 31.279518991604288],
-                            [121.16305725240798, 31.289571910992105],
-                            [121.17979423666091, 31.289571910992105]
-                        ]*/
-                        "polygon":this.currentExtent
+                let perception ={
+                    "action":"road_real_data_per",
+                    "data":{
+                        "type":1,
+                        "polygon":[
+                            [121.17403069999999,31.2836193],
+                            [121.1760307,31.2836193],
+                            [121.1760307,31.2816193],
+                            [121.17403069999999,31.2816193]
+                        ]
                     }
                 }
+//                //旁车
+//                let perception = {
+//                    "action": "road_real_data_per",
+//                    "data": {
+//                        /*"polygon": [
+//                            [121.17979423666091, 31.279518991604288],
+//                            [121.16305725240798, 31.279518991604288],
+//                            [121.16305725240798, 31.289571910992105],
+//                            [121.17979423666091, 31.289571910992105]
+//                        ]*/
+//                        "polygon":this.currentExtent
+//                    }
+//                }
                 let perceptionMsg = JSON.stringify(perception);
                 this.sendPerceptionMsg(perceptionMsg);
             },
@@ -1145,7 +1144,7 @@
             processPerData(data){
                 let _this = this;
                 perceptionCars.addPerceptionData(data,0);
-                _this.$parent.perceptionData= data.result.vehDataStat;
+               /* _this.$parent.perceptionData= data.result.vehDataStat;
                 let cars = data.result.vehDataDTO;
                 if(cars.length>0){
                     _this.processDataTime = cars[0].gpsTime;
@@ -1169,7 +1168,7 @@
                         }
                     }
                     this.statisticData ="当前数据包："+cars.length +"=" +zcarnum +"(自车)+" +pcarnum +"(感知)+" +persons +"(人)";
-                }
+                }*/
             },
 
             //红绿灯
@@ -1507,29 +1506,60 @@
             onPulseMessage(mesasge){
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
-                this.pulseLastTime = this.pulseNowTime;
+                if(this.pulseLastTime==''){
+                    this.pulseLastTime = new Date().getTime();
+                }
                 this.pulseNowTime = new Date().getTime();
                 let timeDiff = this.pulseNowTime - this.pulseLastTime;
-                //发送重复数据，不进行触发
-                if(timeDiff<10){
-                    return;
-                }
-                //当大于500s时进行插值，如果有未分割的 进行分割
-                if(this.pulseLastTime!=''&&timeDiff>500){
-                    debugger
-                    for(let vehicleId in this.platObj){
-                        let dataList = this.platObj[vehicleId];
-                        if(dataList.length>0){
-                            //将第一个点进行分割
-                            let data = dataList.shift();
-                            platCars.cacheAndInterpolatePlatformCar(data);
+                this.processDataTime = result.timestamp;
+//                if(Object.keys(platCars.platObj).length>0){
+//                    for(let vehicleId in platCars.platObj){
+//                        let dataList = platCars.platObj[vehicleId];
+////                        console.log(dataList.length)
+//                    }
+//                }
+                //第一次进行分割 计算等待时间
+               /* if(timeDiff>1000){*/
+                    if(Object.keys(platCars.platObj).length>0){
+                        for(let vehicleId in platCars.platObj){
+                            let dataList = platCars.platObj[vehicleId];
+                            /*console.log("*****")
+                            console.log(vehicleId,dataList.length)*/
+                            if(dataList.length>0){
+                                //分割之前将车辆移动到上一个点
+                                /* if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
+                                     if(platCars.cacheAndInterpolateDataByVid[vehicleId]){
+                                         let cdata =platCars.cacheAndInterpolateDataByVid[vehicleId];
+                                         platCars.moveCar(cdata.lastRecieveData);
+                                         platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData = [];
+                                     }
+                                 }*/
+                                //将第一个点进行分割
+                                let data = dataList.shift();
+                                platCars.cacheAndInterpolatePlatformCar(data);
+                                this.pulseLastTime=this.pulseNowTime;
+                                if(platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length>1&&this.delayTime==''){
+                                    this.delayTime=timeDiff;
+//                                        console.log("第一次插值等待时间"+timeDiff)
+                                }
+                                /*debugger
+                                cdata =platCars.cacheAndInterpolateDataByVid[vehicleId];
+                                let cardata = cdata.cacheData.shift();
+                                platCars.moveCar(cardata);*/
+                            }
                         }
                     }
+                    //当平台车开始插值时，调用其他接口
+                    if(this.delayTime!=''){
+                        if(Object.keys(perceptionCars.devObj).length>0){
+                            perceptionCars.processPerTrack(result.timestamp,this.delayTime)
+                        }
+                    }
+
+//                }
+                if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
+                    platCars.processPlatformCarsTrack(result.timestamp,this.delayTime);
                 }
-               /* if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                    debugger
-                    platCars.processPlatformCarsTrack();
-                }*/
             },
             onPulseClose(data){
                 console.log("感知车结束连接");
@@ -1544,7 +1574,8 @@
                 let pulse = {
                     "action":"pulse",
                     "data":{
-                        "frequency":100
+//                        "frequency":39
+                        "frequency":this.pulseInterval
                     }
                 }
                 let pulseMsg = JSON.stringify(pulse);
@@ -1573,35 +1604,6 @@
                 //重连不能超过5次
                 this.pulseConnectCount++;
             },
-            processPulseData(data){
-                let _this = this;
-                perceptionCars.addPerceptionData(data,0);
-                _this.$parent.perceptionData= data.result.vehDataStat;
-                let cars = data.result.vehDataDTO;
-                if(cars.length>0){
-                    _this.processDataTime = cars[0].gpsTime;
-                    let pcarnum = 0;
-                    let persons = 0;
-                    let zcarnum = 0;
-                    for (let i = 0; i < cars.length; i++) {
-                        let obj = cars[i];
-                        if (obj.type == 1) {
-                            zcarnum++;
-                            continue;
-                        }
-                        if (
-                            obj.targetType == 0 ||
-                            obj.targetType == 1 ||
-                            obj.targetType == 3
-                        ) {
-                            persons++;
-                        } else {
-                            pcarnum++;
-                        }
-                    }
-                    this.statisticData ="当前数据包："+cars.length +"=" +zcarnum +"(自车)+" +pcarnum +"(感知)+" +persons +"(人)";
-                }
-            },
         },
         destroyed(){
             clearInterval(this.mapTime1);
@@ -1617,6 +1619,7 @@
             this.platformWebsocket&&this.platformWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
+            this.pulseWebsocket&&this.pulseWebsocket.close();
 
             document.removeEventListener("visibilitychange",this.processTab);
             document.removeEventListener('keyup', this.capture);
@@ -1664,18 +1667,6 @@
         margin-left:-150px;
         text-align: left;
 
-    }
-    .real-time-error{
-        animation:myAnimation 1s infinite;
-    }
-    @keyframes myAnimation {
-        from {
-            opacity: 1;
-            color: #f33619;
-        }
-        to {
-            opacity: 0;
-        }
     }
     .map-time1{
         top:100px!important;
@@ -1802,7 +1793,7 @@
 
     .per-data-list{
         position: absolute;
-        right: 300px;
+        right: 420px;
         bottom: 10px;
         z-index:3;
         background: rgba(94, 89, 112, 0.3);
