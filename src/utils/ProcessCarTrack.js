@@ -1,6 +1,7 @@
+import DateFormat from '@/utils/date.js'
 class ProcessCarTrack {
     constructor() {
-        this.view = null;
+        this.viewer = null;
         // pCacheModelNum: 200,//感知车数量
         this.stepTime = '';//处理车缓存时间
         this.pulseInterval='';//阈值范围
@@ -122,18 +123,26 @@ class ProcessCarTrack {
     }
 
     //接受数据
-    recieveData(json){
+    recieveData(json,time){
         let data = json.result.data;
         for(let vehicleId in data){
-            let vehList = data[vehicleId];
-            let cdata = this.platObj[vehicleId];
-            if(cdata==null){
-                cdata=new Array();
-            }
-            vehList.forEach(item=>{
-                cdata.push(item);
-            })
-            this.platObj[vehicleId]=cdata;
+            // if(vehicleId=='B21E0002'){
+            //     let diff = json.time - data[vehicleId][0].gpsTime;
+            //     let diff1 = time - json.time;
+                let diff = new Date().getTime()-data[vehicleId][0].gpsTime;
+                let diff1 = json.time-data[vehicleId][0].gpsTime;
+                let diff2 = new Date().getTime()-json.time
+            // console.log("vehicleId:"+vehicleId+",send:"+DateFormat.formatTime(json.time,'hh:mm:ss')+",gpsTime:"+DateFormat.formatTime(data[vehicleId][0].gpsTime,'hh:mm:ss')+",pulseTime"+DateFormat.formatTime(time,'hh:mm:ss')+",local："+DateFormat.formatTime(new Date().getTime(),'hh:mm:ss')+",'local-send'"+diff2+",'local-gps:'"+diff+",'send-gps:'"+diff1)
+                let vehList = data[vehicleId];
+                let cdata = this.platObj[vehicleId];
+                if(cdata==null){
+                    cdata=new Array();
+                }
+                vehList.forEach(item=>{
+                    cdata.push(item);
+                })
+                this.platObj[vehicleId]=cdata;
+            // }
         }
         // console.log(vehicleId,this.platObj[vehicleId].length);
     }
@@ -159,7 +168,7 @@ class ProcessCarTrack {
                 longitude: car.longitude,
                 latitude: car.latitude,
                 gpsTime: car.gpsTime,
-                heading: car.heading
+                heading: car.heading,
             };
             cdata.cacheData.push(d);
             cdata.lastRecieveData = d;
@@ -173,7 +182,7 @@ class ProcessCarTrack {
             // var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
             // var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
             // //e.cesium.viewer.entities.add(entity);
-            // this.testCar = this.view.scene.primitives.add(Cesium.Model.fromGltf({
+            // this.testCar = this.viewer.scene.primitives.add(Cesium.Model.fromGltf({
             //     id: "testcar",
             //     modelMatrix: modelMatrix,
             //     url: './static/model/car.glb',
@@ -189,7 +198,7 @@ class ProcessCarTrack {
                 latitude: car.latitude,
                 gpsTime: car.gpsTime,
                 plateNo: car.plateNo,
-                heading: car.heading
+                heading: car.heading,
             };
             cdata.nowRecieveData = d;
             // console.log("积压长度")
@@ -219,8 +228,9 @@ class ProcessCarTrack {
                 //插值处理
                 let deltaLon = cdata.nowRecieveData.longitude - cdata.lastRecieveData.longitude;
                 let deltaLat = cdata.nowRecieveData.latitude - cdata.lastRecieveData.latitude;
+                // let steps = Math.floor(deltaTime / this.stepTime)-1;
                 let steps = Math.ceil(deltaTime / this.stepTime);
-                // let steps = 28;
+                // let steps = 27;
                 // console.log(steps)
                 // console.log(cdata.nowRecieveData.gpsTime, cdata.lastRecieveData.gpsTime,deltaTime,steps);
                 // let steps = 1;
@@ -256,8 +266,10 @@ class ProcessCarTrack {
                 if (carCacheData.cacheData.length > 0) {
                     //缓存数据
                     let cacheData = _this.cacheAndInterpolateDataByVid[vid].cacheData;
+                    // console.log(cacheData.length);
                     let cardata = this.getMinValue(vid,time,delayTime);
-                    if(cardata&&Object.keys(cardata).length<=0){
+                    // let cardata = cacheData.shift();
+                    if(!cardata){
                         return;
                     }
                     if (_this.mainCarVID == cardata.vehicleId) {
@@ -273,24 +285,90 @@ class ProcessCarTrack {
     }
     getMinValue(vid,time,delayTime){
         let cacheData = this.cacheAndInterpolateDataByVid[vid].cacheData;
-        let minData = {};
-        let minIndex =-1;
+        let rangeData=null;
+        let startIndex=-1;
         // console.log("找到最小值前："+cacheData.length);
-        //找到最小值
+        //找到满足条件的范围
         for(let i=0;i<cacheData.length;i++){
             let diff = Math.abs(time-cacheData[i].gpsTime-delayTime);
-            // console.log(vid,cacheData.length,time,cacheData[i].gpsTime,diff)
+            console.log(vid,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
             if(diff<this.pulseInterval){
-                minData = cacheData[i];
-                minIndex = i;
-                break;
+                // if(startIndex == -1) {
+                //     startIndex=i;
+                // }else {
+                //     if(i == startIndex+1) {
+                //         startIndex = i;
+                //     }else {
+                //         break;
+                //     }
+                // }
+                // console.log("++++++++++++++")
+               /* minData = cacheData[i];
+                minIndex = i;*/
+               //起始位置并且判断是否连续
+               //  startIndex=i;
+               //  let obj={
+               //      index:i,
+               //      delayTime: diff,
+               //      data:cacheData[i]
+               //  }
+               //  rangeData.push(obj);
+                if(startIndex !=-1 && i != startIndex+1) {
+                    break;
+                }
+                if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
+                    startIndex=i;
+                    let obj={
+                        index:i,
+                        delayTime: diff,
+                        data:cacheData[i]
+                    }
+                    rangeData = obj;
+                }else {
+                    break;
+                }
+            }else {
+                if(rangeData) {
+                    break;
+                }
             }
         }
+        let minIndex=-1;
+        let minData = {};
+        let obj={};
+        //如果能找到最小范围
+        console.log(rangeData)
+        if(rangeData){
+            minIndex = rangeData.index;
+            minData = rangeData.data;
+           /* minIndex = 0;
+            minData = rangeData[0].data;
+            let minDiff = Math.abs(time-minData.gpsTime-delayTime);
+            for(let i=0;i<rangeData.length;i++){
+                let diff = Math.abs(time-parseInt(rangeData[i].data.gpsTime)-delayTime);
+                // console.log(vid,rangeData.length, time, parseInt(rangeData[i].data.gpsTime) , diff)
+                if(diff<minDiff){
+                    minData = rangeData[i].data;
+                    minIndex = rangeData[i].index;
+                }
+            }*/
+        }else{
+            console.log("plat***********************");
+            minIndex = 0;
+            minData = cacheData[0];
+            let minDiff = Math.abs(time-minData.gpsTime-delayTime);
+            for(let i=0;i<cacheData.length;i++){
+                let diff = Math.abs(time-parseInt(cacheData[i].gpsTime)-delayTime);
+                // let diff = time-cacheData[i].gpsTime-insertTime;
+                // console.log(vid,cacheData.length, time, parseInt(cacheData[i].gpsTime) , diff)
+                if(diff<minDiff){
+                    minData = cacheData[i];
+                    minIndex = i;
+                }
 
-        if(minIndex<0){
-            console.log("plat***********************")
-            return {};
+            }
         }
+        console.log("最小索引:"+minIndex);
         //打印出被舍弃的点
         let lostData = this.cacheAndInterpolateDataByVid[vid].cacheData.filter((item,index)=>{
             return index<minIndex;
@@ -299,10 +377,9 @@ class ProcessCarTrack {
             debugger
         }*/
         lostData.forEach(item=>{
-            let minDiff = Math.abs(time-cacheData[minIndex].gpsTime-delayTime);
+            let minDiff = Math.abs(time-cacheData[minIndex].gpsTime);
             // console.log("插值最小的索引"+minIndex,minDiff);
-            console.log("##"+'time='+time+",gpsTime="+cacheData[minIndex].gpsTime+",minIndex="+minIndex+",insertTime="+delayTime+",minDiff="+minDiff);
-            let d =  Math.abs(time-item.gpsTime-delayTime);
+            let d =  Math.abs(time-item.gpsTime);
             // console.log("##"+d);
         })
 
@@ -311,11 +388,46 @@ class ProcessCarTrack {
         this.cacheAndInterpolateDataByVid[vid].cacheData = this.cacheAndInterpolateDataByVid[vid].cacheData.filter((item,index)=>{
             return index>minIndex;
         })
-        // console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+        console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
 
         //返回距离标尺的最小插值的数据
         return minData;
     }
+   /* getMinValue(vid,time,insertTime){
+        let cacheData = this.cacheAndInterpolateDataByVid[vid].cacheData;
+        let minData = cacheData[0];
+        let minDiff = Math.abs(time-minData.recieveTime);
+        let minIndex =0;
+        // console.log("找到最小值前："+cacheData.length);
+        // console.log("---------------------------------------");
+        //找到最小值
+        for(let i=0;i<cacheData.length;i++){
+            let diff = Math.abs(time-parseInt(cacheData[i].recieveTime));
+            // let diff = time-cacheData[i].gpsTime-insertTime;
+            // console.log(vid,cacheData.length,time,insertTime,cacheData[i].gpsTime,diff)
+            console.log(vid,cacheData.length, time, parseInt(cacheData[i].recieveTime) , diff)
+            if(diff<minDiff){
+                minData = cacheData[i];
+                minIndex = i;
+            }
+
+        }
+        console.log("插值最小的索引"+minIndex);
+        //打印出被舍弃的点
+        /!*  let lostData = this.cacheAndInterpolateDataByVid[vid].cacheData.slice(0,minIndex+1);
+         console.log(lostData)*!/
+        /!* lostData.forEach(item=>{
+             console.log("##"+item.vehicleId);
+         })*!/
+        //找到最小值后，将数据之前的数值清除
+        this.cacheAndInterpolateDataByVid[vid].cacheData = this.cacheAndInterpolateDataByVid[vid].cacheData.filter((item,index)=>{
+            return index>minIndex;
+        })
+        // console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+
+        //返回距离标尺的最小插值的数据
+        return minData;
+    }*/
     destroyed() {
         clearInterval(this.processPlatformCarsTrackIntervalId);
     }
@@ -332,7 +444,7 @@ class ProcessCarTrack {
             var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
             var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
             //e.cesium.viewer.entities.add(entity);
-            this.view.scene.primitives.add(Cesium.Model.fromGltf({
+            this.viewer.scene.primitives.add(Cesium.Model.fromGltf({
                 id: vid + "car",
                 modelMatrix: modelMatrix,
                 url: './static/model/car.glb',
@@ -344,8 +456,8 @@ class ProcessCarTrack {
 
 
             ////////////////////////
-            let entityLabel = this.view.entities.add({
-                id: vid + "labelpt",
+            let entityLabel = this.viewer.entities.add({
+                id: vid + "lblpt",
                 position: position,
                 point: {
                     color: Cesium.Color.RED,    //点位颜色
@@ -367,7 +479,7 @@ class ProcessCarTrack {
         } else {
 
             let carpt = null;
-            var primitives = this.view.scene.primitives;
+            var primitives = this.viewer.scene.primitives;
             var length = primitives.length;
             for (var k = 0; k < length; ++k) {
                 var p = primitives.get(k);
@@ -392,7 +504,7 @@ class ProcessCarTrack {
             let fixedFrameTransforms = Cesium.Transforms.localFrameToFixedFrameGenerator('north', 'west')
             Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, carpt.modelMatrix)
 
-            var carlabelpt = this.view.entities.getById(vid + "labelpt");
+            var carlabelpt = this.viewer.entities.getById(vid + "lblpt");
             carlabelpt.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude,4);
             carlabelpt.label.text = plateNo;
 
@@ -409,7 +521,7 @@ class ProcessCarTrack {
 
 
 
-        this.view.camera.setView({
+        this.viewer.camera.setView({
             destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 10),
             orientation: hpr
         });
@@ -421,7 +533,7 @@ class ProcessCarTrack {
         //     var pitch = -0.2369132859032279;
         //     var roll = 0.0029627735803421373;
         //     var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
-        //     this.view.camera.flyTo({
+        //     this.viewer.camera.flyTo({
         //       destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude,0),
         //       orientation: hpr
         //     });
@@ -448,7 +560,7 @@ class ProcessCarTrack {
 
 
 
-        //             this.view.camera.setView({
+        //             this.viewer.camera.setView({
         //                 destination : Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude,6),
         //                 orientation: hpr
         //             });
@@ -461,8 +573,8 @@ class ProcessCarTrack {
         //         }
 
         //          let vid = d.vehicleId;
-        //         var carlabelpt = this.view.entities.getById(vid + "labelpt");
-        //         this.view.trackedEntity = carlabelpt; 
+        //         var carlabelpt = this.viewer.entities.getById(vid + "labelpt");
+        //         this.viewer.trackedEntity = carlabelpt; 
         //         this.x=d.heading;
         //         var property = new Cesium.SampledPositionProperty(); 
 
@@ -472,8 +584,8 @@ class ProcessCarTrack {
         //     // else
         //     // {
         //         // let vid = d.vehicleId;
-        //         // var carlabelpt = this.view.entities.getById(vid + "labelpt");
-        //         // this.view.trackedEntity = carlabelpt; 
+        //         // var carlabelpt = this.viewer.entities.getById(vid + "labelpt");
+        //         // this.viewer.trackedEntity = carlabelpt; 
         //     // }
 
 

@@ -3,7 +3,7 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
-        <div class="map-real-time">{{processDataTime|dateFormat}}</div>
+        <div class="map-real-time">{{processDataTime|dateFormat}} {{new Date().getTime()|dateFormat}} {{pulseNowTime|dateFormat}}</div>
         <div class="video-style">
             <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
                 <div class="style">
@@ -138,10 +138,12 @@
 
                 perDataList:[], //感知数据实时滚动
 
-                pulseLastTime:'',
+//                pulseLastTime:'',
                 pulseNowTime:'',
                 delayTime:'',
-                pulseInterval:40
+                pulseInterval:40,
+
+                pulseCount:0
             }
         },
         props:{
@@ -225,17 +227,17 @@
 //            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
 
             platCars.models={};
-            platCars.view=gis3d.cesium.viewer;
+            platCars.viewer=gis3d.cesium.viewer;
              platCars.processPlatformCarsTrack();
 
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
-
             /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
             let longitude=parseFloat(_this.$route.query.lng);
             let latitude=parseFloat(_this.$route.query.lat);
             let extend = parseFloat(_this.$route.params.extend);
+            _this.delayTime= parseFloat(_this.$route.params.delayTime).toFixed(3)*1000*3;
             //设置地图的中心点
             if(longitude||latitude) {
 //                let utm = gis3d.coordinateTransfer("EPSG:4326", "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
@@ -310,9 +312,9 @@
 
                 //初始化车辆步长以及平台车阀域范围
                 platCars.stepTime = this.pulseInterval;
-                platCars.pulseInterval = this.pulseInterval;//设置阀域范围 脉冲时间的100%
+                platCars.pulseInterval = this.pulseInterval*0.8;//设置阀域范围 脉冲时间的100%
 
-                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2;
+                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2*0.8;
 
                 let count=0;
                 let flag=false;
@@ -352,11 +354,11 @@
             getData(){
                 this.typeRoadData();
                 this.initPulseWebSocket();
-                this.initPerceptionWebSocket();
-                this.initPlatformWebSocket();
+//                this.initPerceptionWebSocket();
+//                this.initPlatformWebSocket();
                 /*   this.initSpatWebSocket();*/
  //                           //地图不连续移动，判断红绿灯的位置受否再可视区
-                 this.initWarningWebSocket();
+//                 this.initWarningWebSocket();
                 this.getMap();
             },
             map1InitComplete(){
@@ -764,7 +766,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                        _this.warningWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
                         _this.warningWebsocket.onmessage = _this.onWarningMessage;
                         _this.warningWebsocket.onclose = _this.onWarningClose;
                         _this.warningWebsocket.onopen = _this.onWarningOpen;
@@ -799,9 +801,12 @@
             },
             onWarningOpen(data){
                 //旁车
-                let warning = {
-                    "action": "clod_event",
-                    "region": this.currentExtent
+                let warning ={
+                    "action":"cloud_event",
+                    "body":{
+                        "region":this.currentExtent,
+                    },
+                    "type":1    //发请求
                 }
                 let warningMsg = JSON.stringify(warning);
                 this.sendWarningMsg(warningMsg);
@@ -900,7 +905,7 @@
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
                 if(_this.tabIsExist){
-                    platCars.recieveData(json);
+                    platCars.recieveData(json,this.pulseNowTime);
                 }else{
 //                    console.log("****"+_this.tabIsExist)
                     for(let vid in platCars.platObj){
@@ -1506,28 +1511,21 @@
             onPulseMessage(mesasge){
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
-                if(this.pulseLastTime==''){
-                    this.pulseLastTime = new Date().getTime();
+                if(this.pulseNowTime==''){
+                    this.initPerceptionWebSocket();
+                    this.initPlatformWebSocket();
+//                    this.initWarningWebSocket();
                 }
-                this.pulseNowTime = new Date().getTime();
-                let timeDiff = this.pulseNowTime - this.pulseLastTime;
-                this.processDataTime = result.timestamp;
-//                if(Object.keys(platCars.platObj).length>0){
-//                    for(let vehicleId in platCars.platObj){
-//                        let dataList = platCars.platObj[vehicleId];
-////                        console.log(dataList.length)
-//                    }
-//                }
-                //第一次进行分割 计算等待时间
-               /* if(timeDiff>1000){*/
-                    if(Object.keys(platCars.platObj).length>0){
-                        for(let vehicleId in platCars.platObj){
+                this.pulseNowTime = result.timestamp;
+                this.pulseCount++;
+                    if (Object.keys(platCars.platObj).length > 0) {
+                        for (let vehicleId in platCars.platObj) {
                             let dataList = platCars.platObj[vehicleId];
                             /*console.log("*****")
                             console.log(vehicleId,dataList.length)*/
-                            if(dataList.length>0){
+                            if (dataList.length > 0) {
                                 //分割之前将车辆移动到上一个点
-                                /* if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
+                                /*if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
                                      if(platCars.cacheAndInterpolateDataByVid[vehicleId]){
                                          let cdata =platCars.cacheAndInterpolateDataByVid[vehicleId];
                                          platCars.moveCar(cdata.lastRecieveData);
@@ -1537,11 +1535,12 @@
                                 //将第一个点进行分割
                                 let data = dataList.shift();
                                 platCars.cacheAndInterpolatePlatformCar(data);
-                                this.pulseLastTime=this.pulseNowTime;
-                                if(platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length>1&&this.delayTime==''){
-                                    this.delayTime=timeDiff;
+                                console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
+                                //当存入第二个值时
+                                /*if (platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length > 1 && this.delayTime == '') {
+                                    this.delayTime = 1000;
 //                                        console.log("第一次插值等待时间"+timeDiff)
-                                }
+                                }*/
                                 /*debugger
                                 cdata =platCars.cacheAndInterpolateDataByVid[vehicleId];
                                 let cardata = cdata.cacheData.shift();
@@ -1549,16 +1548,22 @@
                             }
                         }
                     }
-                    //当平台车开始插值时，调用其他接口
-                    if(this.delayTime!=''){
-                        if(Object.keys(perceptionCars.devObj).length>0){
-                            perceptionCars.processPerTrack(result.timestamp,this.delayTime)
-                        }
-                    }
-
 //                }
-                if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                    platCars.processPlatformCarsTrack(result.timestamp,this.delayTime);
+               /* if(Object.keys(perceptionCars.devObj).length>0&&this.pulseCount%3==0){
+                    perceptionCars.processPerTrack(result.timestamp,this.delayTime)
+                }*/
+                let pulseNum = this.delayTime/40;
+                let delayTime=this.delayTime*0.5;
+                //当pulseCount为delayTime*2/40*0.5
+                if(this.pulseCount>=pulseNum) {
+                    //当平台车开始插值时，调用其他接口
+                    this.processDataTime = result.timestamp-delayTime;
+                    if(Object.keys(perceptionCars.devObj).length>0&&this.pulseCount%3==0){
+                        perceptionCars.processPerTrack(result.timestamp,delayTime)
+                    }
+                    if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
+                        platCars.processPlatformCarsTrack(result.timestamp,delayTime);
+                    }
                 }
             },
             onPulseClose(data){

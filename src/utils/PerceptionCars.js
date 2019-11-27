@@ -35,50 +35,99 @@ class PerceptionCars {
     processPerTrack(time,delayTime){
       for(let devId in this.devObj){
         let devData = this.getMinValue(devId,time,delayTime);
-        let fusionList = devData.data;
-        this.processPerceptionMesage(fusionList);
+        // console.log(devData)
+        if(!devData){
+            console.log("++++++++++++没有值了")
+            return;
+        }
+       let fusionList = devData.data;
+       this.processPerceptionMesage(fusionList);
       }
     }
     getMinValue(devId,time,delayTime){
         let cacheData = this.devObj[devId];
-        let minData = {};
-        let minDiff = Math.abs(time-minData.gpsTime-delayTime);
-        let minIndex =-1;
-        // console.log("找到最小值前："+cacheData.length);
-        //找到最小值
-        for(let i=0;i<cacheData.length;i++){
-            let diff = Math.abs(time-cacheData[i].gpsTime-delayTime);
-            // console.log(vid,cacheData.length,time,cacheData[i].gpsTime,diff)
-            if(diff<this.pulseInterval){
-                minIndex = i;
-                minData = cacheData[i];
-                break;
-            }
-        }
-        if(minIndex<0){
-           console.log("per***********");
-           return;
-        }
-        //打印出被舍弃的点
-        let lostData = this.devObj[devId].filter((item,index)=>{
-            return index<minIndex;
-        })
-        lostData.forEach(item=>{
-            // let minDiff = Math.abs(time-cacheData[minIndex].gpsTime-insertTime);
-            // console.log("插值最小的索引"+minIndex,minDiff);
-            console.log("##"+item.devId,item.gpsTime);
-            // let d =  Math.abs(time-item.gpsTime-insertTime);
-            // console.log("##"+d);
-        })
+       /* let minDiff = Math.abs(time-minData.gpsTime-delayTime);*/
+       if(cacheData.length>0){
+           let rangeData=[];
+           let startIndex=-1;
+           console.log("找到最小值前："+cacheData.length);
+           //找到最小值
+           for(let i=0;i<cacheData.length;i++){
+               let diff = Math.abs(time-cacheData[i].gpsTime-delayTime);
+               // console.log(vid,cacheData.length,time,cacheData[i].gpsTime,diff)
+               /*if(diff<this.pulseInterval){
+                   minIndex = i;
+                   minData = cacheData[i];
+                   break;
+               }*/
+               if(diff<this.pulseInterval){
+                   if(i!=-1&&i!=startIndex+1){
+                       break;
+                   }
+                   startIndex=i;
+                   let obj={
+                       index:i,
+                       data:cacheData[i]
+                   }
+                   rangeData.push(obj);
+               }
+           }
 
-        //找到最小值后，将数据之前的数值清除
-        this.devObj[devId] = this.devObj[devId].filter((item,index)=>{
-            return index>minIndex;
-        })
-        // console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+           let minIndex=-1;
+           let minData = {};
+           //如果能找到最小范围
+           // console.log(rangeData.length,this.pulseInterval)
+           if(rangeData.length>0){
+               minIndex = 0;
+               minData = rangeData[0].data;
+               let minDiff = Math.abs(time-minData.gpsTime-delayTime);
+               for(let i=0;i<rangeData.length;i++){
+                   let diff = Math.abs(time-parseInt(rangeData[i].data.gpsTime)-delayTime);
+                   // console.log(vid,rangeData.length, time, parseInt(rangeData[i].data.gpsTime) , diff)
+                   if(diff<minDiff){
+                       minData = rangeData[i].data;
+                       minIndex = rangeData[i].index;
+                   }
+               }
+           }else{
+               console.log("per***********************");
+               minIndex = 0;
+               minData = cacheData[0];
+               let minDiff = Math.abs(time-minData.gpsTime-delayTime);
+               for(let i=0;i<cacheData.length;i++){
+                   let diff = Math.abs(time-parseInt(cacheData[i].gpsTime)-delayTime);
+                   // let diff = time-cacheData[i].gpsTime-insertTime;
+                   // console.log(vid,cacheData.length, time, parseInt(cacheData[i].gpsTime) , diff)
+                   if(diff<minDiff){
+                       minData = cacheData[i];
+                       minIndex = i;
+                   }
 
-        //返回距离标尺的最小插值的数据
-        return minData;
+               }
+           }
+           //打印出被舍弃的点
+           let lostData = this.devObj[devId].filter((item,index)=>{
+               return index<minIndex;
+           })
+           lostData.forEach(item=>{
+               // let minDiff = Math.abs(time-cacheData[minIndex].gpsTime-insertTime);
+               // console.log("插值最小的索引"+minIndex,minDiff);
+               console.log("##"+item.devId,item.gpsTime);
+               // let d =  Math.abs(time-item.gpsTime-insertTime);
+               // console.log("##"+d);
+           })
+
+           //找到最小值后，将数据之前的数值清除
+           this.devObj[devId] = this.devObj[devId].filter((item,index)=>{
+               return index>minIndex;
+           })
+           console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+
+           //返回距离标尺的最小插值的数据
+           return minData;
+       }else{
+           return null;
+       }
     }
     //绘制感知车
     processPerceptionMesage(fusionList,flag) {
@@ -100,11 +149,8 @@ class PerceptionCars {
         // } else {
         //   data = _this.lastPerceptionMessage;
         // }
+        this.clearModel(fusionList);
         if (fusionList.length<=0) return;
-        this.clearCar(fusionList, "car");
-        this.clearCar(fusionList, "person");
-        this.clearCarLabel(fusionList);
-
         for (let i = 0; i < fusionList.length; i++) {
         let d = fusionList[i];
   
@@ -138,18 +184,18 @@ class PerceptionCars {
           if (d.fuselStatus == 0) {
             // console.log(d.vehicleId)
             /////////////处理感知车数据
-            let carModel = this.getModelForPrimitive(d.vehicleId + "car");//this.deviceModels.cars[d.vehicleId+"car"];
+            let carModel = this.getModelForPrimitive(d.vehicleId + "carbox");//this.deviceModels.cars[d.vehicleId+"car"];
             if (carModel == null) {
-              let modelShow = this.getShowModelPrimitive("car");
+              let modelShow = this.getShowModelPrimitive("carbox");
               if (modelShow != null) {
-                this.moveModel(modelShow, d, "car");
+                this.moveModel(modelShow, d, "carbox");
               } else {
                 //初始化增加车辆 如果没有隐藏车辆的模型
-                this.addModeCar(d, "car", "carbox");
+                this.addModeCar(d, "carbox", "carbox");
               }
             }
             else {
-              this.moveModel(carModel, d, "car");
+              this.moveModel(carModel, d, "carbox");
             }
             ///////////////////////////end
   
@@ -186,6 +232,11 @@ class PerceptionCars {
       }
       // },0); //
     }
+    clearModel(fusionList){
+        this.clearCar(fusionList, "carbox");
+        this.clearCar(fusionList, "person");
+        this.clearCarLabel(fusionList);
+    }
     clearCarLabel(fusionList) {
       /////////////////////////
       let countLable = 0;
@@ -200,7 +251,11 @@ class PerceptionCars {
           }
         }
         if (isTrue) {
-          entitie.show = false;
+            if(entitie.id.search("label") != -1)
+            {
+                entitie.show = false;
+            }
+
           countLable++;
         }
       }
@@ -224,7 +279,9 @@ class PerceptionCars {
           }
         }
         if (isTrue) {
-          primitive.show = false;
+            if(primitive.id.indexOf(name) != -1) {
+                primitive.show = false;
+            }
           count++;
         }
       }
@@ -270,7 +327,7 @@ class PerceptionCars {
       var primitives = this.viewer.scene.primitives;
       for (var i = 0; i < primitives.length; i++) {
         var primitive = primitives.get(i);
-        if (primitive instanceof Cesium.Model && !primitive.show && primitive.id.search("car") != -1 || primitive.id.search(name) != -1) {
+        if (primitive instanceof Cesium.Model && !primitive.show && primitive.id.search("carbox") != -1 || primitive.id.search(name) != -1) {
           this.viewer.scene.primitives.remove(primitive);
         }
       }
