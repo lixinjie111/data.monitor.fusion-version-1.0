@@ -45,25 +45,25 @@ class GIS3D {
         //     canvas: this.cesium.viewer.scene.canvas,
         //     clampToGround: true //开启贴
         // } 
-        let promise=   this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/4.geojson', {
-            fill: Cesium.Color.fromCssColorString('#71446b').withAlpha(0.9),//'static/images/login-bg.jpg',//.withAlpha(1)
-            stroke: Cesium.Color.fromCssColorString('#71446b').withAlpha(0),// Cesium.Color.ORANGE,
-            strokeWidth: 0,
-            zIndex:1,
-            markerSymbol: '?'
-          }));
-          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/3.geojson', {
+        // let promise=   this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/map3d/data/4.geojson', {
+        //     fill: Cesium.Color.fromCssColorString('#71446b').withAlpha(0.9),//'static/images/login-bg.jpg',//.withAlpha(1)
+        //     stroke: Cesium.Color.fromCssColorString('#71446b').withAlpha(0),// Cesium.Color.ORANGE,
+        //     strokeWidth: 0,
+        //     zIndex:1,
+        //     markerSymbol: '?'
+        //   }));
+          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/map3d/data/3.geojson', {
             fill: Cesium.Color.ALICEBLUE.withAlpha(0.996),//.withAlpha(1)
             stroke: Cesium.Color.fromCssColorString('#fff'),// Cesium.Color.ORANGE,
             strokeWidth: 0,
             markerSymbol: '?'
           }));
-         this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/2.geojson', {
+         this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/map3d/data/2.geojson', {
             stroke: Cesium.Color.ALICEBLUE.withAlpha(0.996),// Cesium.Color.ORANGE, new Cesium.Color(135,75,43,1)
             strokeWidth: 2,
             markerSymbol: '?'
         }));
-          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/data/'+window.pro+'/1.geojson', {
+          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/map3d/data/1.geojson', {
             stroke: new Cesium.Color(0.5372549019607843, 0.2941176470588235, 0.1686274509803922, 0.996),// Cesium.Color.ALICEBLUE.withAlpha(0.996),
             strokeWidth: 2,
             markerSymbol: '?'
@@ -200,7 +200,7 @@ class GIS3D {
                 });
             }
             this.cesium.viewer.scene.primitives.add(new Cesium.ModelInstanceCollection({
-                url: './static/model/poleWith2Camera.glb',
+                url: './static/map3d/model/poleWith2Camera.glb',
                 instances: instances
             }));
         }
@@ -273,7 +273,7 @@ class GIS3D {
         var entity = Cesium.Model.fromGltf({
             id: name,
             modelMatrix: modelMatrix,
-            url: './static/model/car.glb',
+            url: './static/map3d/model/car.glb',
             minimumPixelSize: 80,
             show: false,
             maximumScale: 5
@@ -335,7 +335,7 @@ class GIS3D {
                 });
             }
             this.cesium.viewer.scene.primitives.add(new Cesium.ModelInstanceCollection({
-                url: './static/model/street_lamp_two1.glb',
+                url: './static/map3d/model/street_lamp_two1.glb',
                 instances: instances
             }));
         }
@@ -394,7 +394,7 @@ class GIS3D {
                 });
             }
             this.cesium.viewer.scene.primitives.add(new Cesium.ModelInstanceCollection({
-                url: './static/model/car_close.glb',
+                url: './static/map3d/model/car_close.glb',
                 instances: instances,
                 scale: 10.0
             }));

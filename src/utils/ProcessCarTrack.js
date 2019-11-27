@@ -158,8 +158,8 @@ class ProcessCarTrack {
                 intervalid: null,
                 lastRecieveData: null,
                 nowRecieveData: null,
-                lastProcessData: null,
-                nowProcessData: null,
+                // lastProcessData: null,
+                // nowProcessData: null,
                 plateNo: null
             };
             let d = {
