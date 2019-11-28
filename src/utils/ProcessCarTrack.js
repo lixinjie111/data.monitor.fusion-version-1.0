@@ -447,7 +447,7 @@ class ProcessCarTrack {
             this.viewer.scene.primitives.add(Cesium.Model.fromGltf({
                 id: vid + "car",
                 modelMatrix: modelMatrix,
-                url: './static/model/car.glb',
+                url: './static/map3d/model/car.glb',
                 minimumPixelSize: 1,
                 show: true,
                 maximumScale: 300,

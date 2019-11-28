@@ -3,7 +3,7 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
-        <div class="map-real-time">{{processDataTime|dateFormat}} {{new Date().getTime()|dateFormat}} {{pulseNowTime|dateFormat}}</div>
+        <div class="map-real-time">{{processDataTime|dateFormat}}  {{pulseNowTime|dateFormat}} {{new Date().getTime()|dateFormat}}</div>
         <div class="video-style">
             <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
                 <div class="style">
@@ -1525,26 +1525,10 @@
                             console.log(vehicleId,dataList.length)*/
                             if (dataList.length > 0) {
                                 //分割之前将车辆移动到上一个点
-                                /*if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                                     if(platCars.cacheAndInterpolateDataByVid[vehicleId]){
-                                         let cdata =platCars.cacheAndInterpolateDataByVid[vehicleId];
-                                         platCars.moveCar(cdata.lastRecieveData);
-                                         platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData = [];
-                                     }
-                                 }*/
                                 //将第一个点进行分割
                                 let data = dataList.shift();
                                 platCars.cacheAndInterpolatePlatformCar(data);
                                 console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
-                                //当存入第二个值时
-                                /*if (platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length > 1 && this.delayTime == '') {
-                                    this.delayTime = 1000;
-//                                        console.log("第一次插值等待时间"+timeDiff)
-                                }*/
-                                /*debugger
-                                cdata =platCars.cacheAndInterpolateDataByVid[vehicleId];
-                                let cardata = cdata.cacheData.shift();
-                                platCars.moveCar(cardata);*/
                             }
                         }
                     }
@@ -1558,7 +1542,7 @@
                 if(this.pulseCount>=pulseNum) {
                     //当平台车开始插值时，调用其他接口
                     this.processDataTime = result.timestamp-delayTime;
-                    if(Object.keys(perceptionCars.devObj).length>0&&this.pulseCount%3==0){
+                    if(Object.keys(perceptionCars.devObj).length>0&&this.pulseCount%2==0){
                         perceptionCars.processPerTrack(result.timestamp,delayTime)
                     }
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){

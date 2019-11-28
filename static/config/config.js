@@ -20,7 +20,6 @@ window.config = {
     dlWmsUrl: 'http://117.114.144.227:8080/', //迪路
 
     socketTestUrl:'ws://172.17.1.16:8888/ws',
-    // socketTestUrl:'ws://192.168.10.96:8888/ws',
 
     //上海正式环境  外网
     // staticUrl: "http://116.236.72.204:49090/", //静态文件路径
