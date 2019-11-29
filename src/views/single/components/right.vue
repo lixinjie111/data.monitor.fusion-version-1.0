@@ -298,7 +298,7 @@
                 this.initCarWebSocket();
 //                this.initSideCarWebSocket();
                 /*this.initSpatWebSocket();*/
-                this.initWarningWebSocket();
+//                this.initWarningWebSocket();
             },
             getNumPng(color,num){
                 let img;
@@ -817,7 +817,7 @@
                 try{
                     if ('WebSocket' in window) {
 //                        _this.carWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.carWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.carWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                         _this.carWebsocket.onmessage = _this.onCarMessage;
                         _this.carWebsocket.onclose = _this.onCarClose;
                         _this.carWebsocket.onopen = _this.onCarOpen;
@@ -870,17 +870,17 @@
             },
             onCarOpen(data){
                 //旁车
-                let car ={
+               /* let car ={
                     "action": "vehicle",
                     "body": {
                         "vehicleId": this.vehicleId
                     },
                     "type": 2
-                }
-                /*let car = {
+                }*/
+                let car = {
                     "action": "sideVehicle",
                     "vehicleId": this.vehicleId
-                }*/
+                }
                 let carMsg = JSON.stringify(car);
                 this.sendCarMsg(carMsg);
             },

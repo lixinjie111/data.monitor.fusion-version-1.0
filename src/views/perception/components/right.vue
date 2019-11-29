@@ -69,9 +69,11 @@
     import GIS3D from '@/utils/GIS3D.js'
     import PerceptionCars from '@/utils/PerceptionCars.js'
     import ProcessCarTrack from '@/utils/ProcessCarTrack.js'
+    import ProcessData from '@/utils/ProcessData.js'
     let gis3d=new GIS3D();
     let perceptionCars = new PerceptionCars();
     let platCars = new ProcessCarTrack();
+    let processData = new ProcessData();
     export default {
         data() {
             return {
@@ -144,7 +146,9 @@
                 delayTime:'',
                 pulseInterval:40,
 
-                pulseCount:0
+                pulseCount:0,
+                spatPulseCount:0,
+                spatPulse:''
             }
         },
         props:{
@@ -238,7 +242,7 @@
             let longitude=parseFloat(_this.$route.query.lng);
             let latitude=parseFloat(_this.$route.query.lat);
             let extend = parseFloat(_this.$route.params.extend);
-            _this.delayTime= parseFloat(_this.$route.params.delayTime).toFixed(3)*1000*3;
+            _this.delayTime= parseFloat(_this.$route.params.delayTime).toFixed(3)*1000;
             //设置地图的中心点
             if(longitude||latitude) {
 //                let utm = gis3d.coordinateTransfer("EPSG:4326", "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
@@ -314,9 +318,15 @@
                 //初始化车辆步长以及平台车阀域范围
                 platCars.stepTime = this.pulseInterval;
                 platCars.pulseInterval = this.pulseInterval*0.8;//设置阀域范围 脉冲时间的100%
+                platCars.platMaxValue = platCars.pulseInterval*1.5;
 
                 perceptionCars.stepTime = this.pulseInterval;
-                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2*0.8;
+                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*0.8;
+                perceptionCars.perMaxValue = perceptionCars.pulseInterval*1.5;
+
+                this.spatPulse = this.pulseInterval*30;
+                processData.pulseInterval = this.spatPulse*0.8;
+                processData.spatMaxValue =  processData.pulseInterval*1.5;
 
                 let count=0;
                 let flag=false;
@@ -634,107 +644,6 @@
                     }
                 }
             },
-            getNumPng(color,num){
-                let img;
-                if(color=='RED'){
-                    if(num==0){
-                        img='./static/images/light/0.png'
-                    }
-                    if(num==1){
-                        img='./static/images/light/1.png'
-                    }
-                    if(num==2){
-                        img='./static/images/light/2.png'
-                    }
-                    if(num==3){
-                        img='./static/images/light/3.png'
-                    }
-                    if(num==4){
-                        img='./static/images/light/4.png'
-                    }
-                    if(num==5){
-                        img='./static/images/light/5.png'
-                    }
-                    if(num==6){
-                        img='./static/images/light/6.png'
-                    }
-                    if(num==7){
-                        img='./static/images/light/7.png'
-                    }
-                    if(num==8){
-                        img='./static/images/light/8.png'
-                    }
-                    if(num==9){
-                        img='./static/images/light/9.png'
-                    }
-                }
-                if(color=='YELLOW'){
-                    if(num==0){
-                        img='./static/images/light/0-2.png'
-                    }
-                    if(num==1){
-                        img='./static/images/light/1-2.png'
-                    }
-                    if(num==2){
-                        img='./static/images/light/2-2.png'
-                    }
-                    if(num==3){
-                        img='./static/images/light/3-2.png'
-                    }
-                    if(num==4){
-                        img='./static/images/light/4-2.png'
-                    }
-                    if(num==5){
-                        img='./static/images/light/5-2.png'
-                    }
-                    if(num==6){
-                        img='./static/images/light/6-2.png'
-                    }
-                    if(num==7){
-                        img='./static/images/light/7-2.png'
-                    }
-                    if(num==8){
-                        img='./static/images/light/8-2.png'
-                    }
-                    if(num==9){
-                        img='./static/images/light/9-2.png'
-                    }
-                }
-                if(color=='GREEN'){
-                    if(num==0){
-                        img='./static/images/light/0-1.png'
-                    }
-                    if(num==1){
-                        img='./static/images/light/1-1.png'
-                    }
-                    if(num==2){
-                        img='./static/images/light/2-1.png'
-                    }
-                    if(num==3){
-                        img='./static/images/light/3-1.png'
-                    }
-                    if(num==4){
-                        img='./static/images/light/4-1.png'
-                    }
-                    if(num==5){
-                        img='./static/images/light/5-1.png'
-                    }
-                    if(num==6){
-                        img='./static/images/light/6-1.png'
-                    }
-                    if(num==7){
-                        img='./static/images/light/7-1.png'
-                    }
-                    if(num==8){
-                        img='./static/images/light/8-1.png'
-                    }
-                    if(num==9){
-                        img='./static/images/light/9-1.png'
-                    }
-                }
-                return img;
-
-            },
             changeMap(param){
                 if(param==-1){
                     this.param=-1;
@@ -926,7 +835,7 @@
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
                 if(_this.tabIsExist){
-                    platCars.recieveData(json,this.pulseNowTime);
+                    platCars.receiveData(json,this.pulseNowTime);
                 }else{
 //                    console.log("****"+_this.tabIsExist)
                     for(let vid in platCars.platObj){
@@ -1199,7 +1108,7 @@
                 let _this=this;
                 try {
                     if ('WebSocket' in window){
-                        _this.spatWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
+                        _this.spatWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
                         _this.spatWebsocket.onmessage = _this.onSpatMessage;
                         _this.spatWebsocket.onclose = _this.onSpatClose;
                         _this.spatWebsocket.onopen = _this.onSpatOpen;
@@ -1225,7 +1134,8 @@
                     _this.spatCaptureList.push(data);
                     return;
                 }
-                _this.processSpat(data);
+                processData.receiveLightData(data);
+//                _this.processSpat(data);
 //                let vehData = json.result.vehDataStat;
 //                _this.$emit("getPerceptionData",vehData);
 //                _this.vehData.push(vehData);
@@ -1240,18 +1150,25 @@
             },
             onSpatOpen(data){
                 //旁车
-                let spat = {
+                let spat ={
+                    "action":"spat",
+                    "data":{
+                        "polygon":[[12.1730307,41.2846193],[129.17703069999999,41.2846193],[129.17703069999999,11.2806193],[12.1730307,11.2806193]]
+                    },
+                    "type":2
+                }
+              /*  let spat = {
                     "action": "road_real_data_spat",
                     "data": {
-                        /*"polygon": [
+                        /!*"polygon": [
                             [121.17979423666091, 31.279518991604288],
                             [121.16305725240798, 31.279518991604288],
                             [121.16305725240798, 31.289571910992105],
                             [121.17979423666091, 31.289571910992105]
-                        ]*/
+                        ]*!/
                         "polygon":this.currentExtent
                     }
-                }
+                }*/
                 let spatMsg = JSON.stringify(spat);
                 this.sendSpatMsg(spatMsg);
             },
@@ -1278,9 +1195,8 @@
                 //重连不能超过5次
                 this.spatConnectCount++;
             },
-            processSpat(data){
+            drawnSpat(data){
                 let _this = this;
-                /*if(_this.param==3){*/
                 let resultData=[];
                 if(data&&data.length>0){
                     data.forEach(item=>{
@@ -1483,11 +1399,113 @@
                         light.img2=img2;
                         light.img3=img3;
                         _this.lastLightObj[item.spatId]=item;
-                        _this.$refs.perceptionMap.addStaticModel_light_1(light);
-
+                        // _this.$refs.perceptionMap.addStaticModel_light_1(light);
+                        //地图渲染剩余时间
                     })
                 }
             },
+            getNumPng(color,num){
+                let img;
+                if(color=='RED'){
+                    if(num==0){
+                        img='./static/images/light/0.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9.png'
+                    }
+                }
+                if(color=='YELLOW'){
+                    if(num==0){
+                        img='./static/images/light/0-2.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1-2.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2-2.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3-2.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4-2.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5-2.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6-2.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7-2.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8-2.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9-2.png'
+                    }
+                }
+                if(color=='GREEN'){
+                    if(num==0){
+                        img='./static/images/light/0-1.png'
+                    }
+                    if(num==1){
+                        img='./static/images/light/1-1.png'
+                    }
+                    if(num==2){
+                        img='./static/images/light/2-1.png'
+                    }
+                    if(num==3){
+                        img='./static/images/light/3-1.png'
+                    }
+                    if(num==4){
+                        img='./static/images/light/4-1.png'
+                    }
+                    if(num==5){
+                        img='./static/images/light/5-1.png'
+                    }
+                    if(num==6){
+                        img='./static/images/light/6-1.png'
+                    }
+                    if(num==7){
+                        img='./static/images/light/7-1.png'
+                    }
+                    if(num==8){
+                        img='./static/images/light/8-1.png'
+                    }
+                    if(num==9){
+                        img='./static/images/light/9-1.png'
+                    }
+                }
+                return img;
+
+            },
+
 
             getExtend(x,y,r){
                 this.currentExtent=[];
@@ -1530,9 +1548,10 @@
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
                 if(this.pulseNowTime==''){
-                    this.initPerceptionWebSocket();
+//                    this.initPerceptionWebSocket();
 //                    this.initPlatformWebSocket();
-                    this.initWarningWebSocket();
+//                    this.initWarningWebSocket();
+                    this.initSpatWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
@@ -1564,21 +1583,31 @@
                         }
                     }
                 }
-                let pulseNum = this.delayTime/40;
-                let delayTime=this.delayTime*0.5;
-                //当pulseCount为delayTime*2/40*0.5
+                //缓存的时间
+                let pulseNum = this.delayTime*3/40;
                 if(this.pulseCount>=pulseNum) {
                     //当平台车开始插值时，调用其他接口
-                    this.processDataTime = result.timestamp-delayTime;
+                    this.processDataTime = result.timestamp-this.delayTime;
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(perceptionCars.devObj).length>0){
-                        let processPerCar = perceptionCars.processPerTrack(result.timestamp,delayTime);
-                        this.processPerData(processPerCar);
+                        let processPerCar = perceptionCars.processPerTrack(result.timestamp,this.delayTime);
+//                        this.processPerData(processPerCar);
 
                     }
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                        platCars.processPlatformCarsTrack(result.timestamp,delayTime);
+                        platCars.processPlatformCarsTrack(result.timestamp,this.delayTime);
                     }
+                    //每隔80ms一次
+                    if(this.spatPulseCount==0||this.spatPulseCount>=30){
+                        console.log(this.spatPulseCount);
+                        this.spatPulseCount=1;
+                        if(Object.keys(processData.spatObj).length>0){
+//                            console.log("spatPulseCount:"+this.spatPulseCount)
+                            let data = processData.processSpatData(result.timestamp,this.delayTime);
+                            this.drawnSpat(data);
+                        }
+                    }
+                    this.spatPulseCount++;
                 }
             },
             onPulseClose(data){
