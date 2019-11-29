@@ -3,7 +3,7 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
-        <div class="map-real-time">{{processDataTime|dateFormat}}  {{pulseNowTime|dateFormat}} {{new Date().getTime()|dateFormat}}</div>
+        <div class="map-real-time">{{processDataTime|dateFormat}}  {{pulseNowTime|dateFormat}} </div>
         <div class="video-style">
             <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
                 <div class="style">
@@ -139,6 +139,7 @@
                 perDataList:[], //感知数据实时滚动
 
 //                pulseLastTime:'',
+                warningObj:{},
                 pulseNowTime:'',
                 delayTime:'',
                 pulseInterval:40,
@@ -314,6 +315,7 @@
                 platCars.stepTime = this.pulseInterval;
                 platCars.pulseInterval = this.pulseInterval*0.8;//设置阀域范围 脉冲时间的100%
 
+                perceptionCars.stepTime = this.pulseInterval;
                 perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2*0.8;
 
                 let count=0;
@@ -782,6 +784,19 @@
             onWarningMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
+                let data = json.result.data;
+                data.forEach(item=>{
+                    let warning = {
+                        "action":"cloud_event",
+                        "body":{
+                            "warnId":item.warnId,
+                            "status":1
+                        },
+                        "type":2
+                    }
+                    let warningMsg = JSON.stringify(warning);
+                    this.sendWarningMsg(warningMsg)
+                });
                 if(_this.isCapture=='true'){
                     if(_this.captureCount>1000){
                         return;
@@ -789,7 +804,7 @@
                     _this.warnCaptureList.push(json)
                     return;
                 }
-                this.processWarn(json);
+//                this.processWarn(json);
             },
             onWarningClose(data){
                 console.log("告警结束连接");
@@ -804,10 +819,17 @@
                 let warning ={
                     "action":"cloud_event",
                     "body":{
-                        "region":this.currentExtent,
+                        "region":[[121.28083,31.3882042],[121.28083,31.1882042],[121.08083,31.1882042],[121.08083,31.3882042]],
                     },
-                    "type":1    //发请求
+                    "type":1
                 }
+//                let warning ={
+//                    "action":"cloud_event",
+//                    "body":{
+//                        "region":this.currentExtent,
+//                    },
+//                    "type":1    //发请求
+//                }
                 let warningMsg = JSON.stringify(warning);
                 this.sendWarningMsg(warningMsg);
             },
@@ -856,7 +878,6 @@
 
                             }
                             _this.alertCount++;
-
                             gis3d.add3DInfoLabel(_this.warningData[warningId].id,_this.warningData[warningId].msg,_this.warningData[warningId].longitude,_this.warningData[warningId].latitude,20);
                         }else{
                             //判断是否需要更新
@@ -1148,11 +1169,8 @@
             },
             processPerData(data){
                 let _this = this;
-                perceptionCars.addPerceptionData(data,0);
-               /* _this.$parent.perceptionData= data.result.vehDataStat;
-                let cars = data.result.vehDataDTO;
-                if(cars.length>0){
-                    _this.processDataTime = cars[0].gpsTime;
+                let cars = data.data;
+                if(cars.length>0) {
                     let pcarnum = 0;
                     let persons = 0;
                     let zcarnum = 0;
@@ -1172,8 +1190,8 @@
                             pcarnum++;
                         }
                     }
-                    this.statisticData ="当前数据包："+cars.length +"=" +zcarnum +"(自车)+" +pcarnum +"(感知)+" +persons +"(人)";
-                }*/
+                    this.statisticData = "当前数据包：" + cars.length + "=" + zcarnum + "(自车)+" + pcarnum + "(感知)+" + persons + "(人)";
+                }
             },
 
             //红绿灯
@@ -1513,37 +1531,50 @@
                 let result = json.result;
                 if(this.pulseNowTime==''){
                     this.initPerceptionWebSocket();
-                    this.initPlatformWebSocket();
-//                    this.initWarningWebSocket();
+//                    this.initPlatformWebSocket();
+                    this.initWarningWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
-                    if (Object.keys(platCars.platObj).length > 0) {
-                        for (let vehicleId in platCars.platObj) {
-                            let dataList = platCars.platObj[vehicleId];
-                            /*console.log("*****")
-                            console.log(vehicleId,dataList.length)*/
-                            if (dataList.length > 0) {
-                                //分割之前将车辆移动到上一个点
-                                //将第一个点进行分割
-                                let data = dataList.shift();
-                                platCars.cacheAndInterpolatePlatformCar(data);
-                                console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
-                            }
+                if (Object.keys(platCars.platObj).length > 0) {
+                    for (let vehicleId in platCars.platObj) {
+                        let dataList = platCars.platObj[vehicleId];
+                        /*console.log("*****")
+                        console.log(vehicleId,dataList.length)*/
+                        if (dataList.length > 0) {
+                            //分割之前将车辆移动到上一个点
+                            //将第一个点进行分割
+                            let data = dataList.shift();
+                            platCars.cacheAndInterpolatePlatformCar(data);
+                            console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
                         }
                     }
-//                }
-               /* if(Object.keys(perceptionCars.devObj).length>0&&this.pulseCount%3==0){
-                    perceptionCars.processPerTrack(result.timestamp,this.delayTime)
-                }*/
+                }
+                if (Object.keys(perceptionCars.devObj).length > 0) {
+                    for (let devId in perceptionCars.devObj) {
+                        let devList = perceptionCars.devObj[devId];
+                        /*console.log("*****")
+                        console.log(vehicleId,dataList.length)*/
+                        if (devList.length > 0) {
+                            //分割之前将车辆移动到上一个点
+                            //将第一个点进行分割
+                            let data = devList.shift();
+                            perceptionCars.cacheAndInterpolatePerCar(data);
+//                            console.log(devId+"————————"+perceptionCars.cacheAndInterpolateDataByDevId[devId].cacheData.length)
+                        }
+                    }
+                }
                 let pulseNum = this.delayTime/40;
                 let delayTime=this.delayTime*0.5;
                 //当pulseCount为delayTime*2/40*0.5
                 if(this.pulseCount>=pulseNum) {
                     //当平台车开始插值时，调用其他接口
                     this.processDataTime = result.timestamp-delayTime;
-                    if(Object.keys(perceptionCars.devObj).length>0&&this.pulseCount%2==0){
-                        perceptionCars.processPerTrack(result.timestamp,delayTime)
+//                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
+                    if(Object.keys(perceptionCars.devObj).length>0){
+                        let processPerCar = perceptionCars.processPerTrack(result.timestamp,delayTime);
+                        this.processPerData(processPerCar);
+
                     }
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
                         platCars.processPlatformCarsTrack(result.timestamp,delayTime);
