@@ -431,8 +431,8 @@
             keepStream(item){
                 sendStreamHeart({
                     'vehicleId': this.vehicleId,
-                    'camId':item.serialNum,
-                    'protocal':item.protocol
+                    'camId':item.camId,
+                    'protocal':item.protocal
                 }).then(res => {
                 });
             },
@@ -908,6 +908,10 @@
     }
     .fusion-video .video-js{
         height: 180px!important;
+    }
+    .fusion-right-style .fusion-video .video-wrapper{
+        /* overflow: visible !important; */
+        padding-bottom: 67.25% !important;
     }
 </style>
 <style lang="scss" scoped>
