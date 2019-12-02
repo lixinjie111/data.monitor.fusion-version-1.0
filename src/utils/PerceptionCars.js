@@ -3,10 +3,10 @@ class PerceptionCars {
     constructor() {
       this.defualtZ = window.defualtZ;
       this.cacheModelNum = 200,//初始化车辆总数
-        this.carColor = 0x80f77a,//感知车颜色
-        this.pitch = 0,
-        this.yaw = 0,
-        this.roll = Math.PI * (10 / 90);
+      this.carColor = 0x80f77a,//感知车颜色
+      this.pitch = 0,
+      this.yaw = 0,
+      this.roll = Math.PI * (10 / 90);
       this.deviceModels = { cars: {}, persons: [], texts: [] };
       this.cachePerceptionQueue = new Array(); //缓存感知数据
       this.lastPerceptionMessage = null;
@@ -14,6 +14,7 @@ class PerceptionCars {
       this.processPerceptionDataIntervalId = null;
       this.devObj = {};
       this.pulseInterval='';//阈值范围
+      this.perMaxValue='';
       this.cacheAndInterpolateDataByDevId={};
       this.stepTime='';
       this.drawnObj={};
@@ -130,7 +131,7 @@ class PerceptionCars {
            //找到满足条件的范围
            for(let i=0;i<cacheData.length;i++){
                let diff = Math.abs(time-cacheData[i].gpsTime-delayTime);
-               // console.log(devId,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
+               console.log(devId,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
                if(diff<this.pulseInterval){
                    if(startIndex !=-1 && i != startIndex+1) {
                        break;
@@ -154,7 +155,7 @@ class PerceptionCars {
            }
            let minIndex=-1;
            let minData = {};
-           let obj={};
+           let minDiff;
            //如果能找到最小范围
            // console.log(rangeData)
            if(rangeData){
@@ -164,7 +165,7 @@ class PerceptionCars {
                console.log("plat***********************");
                minIndex = 0;
                minData = cacheData[0];
-               let minDiff = Math.abs(time-minData.gpsTime-delayTime);
+               minDiff = Math.abs(time-minData.gpsTime-delayTime);
                for(let i=0;i<cacheData.length;i++){
                    let diff = Math.abs(time-parseInt(cacheData[i].gpsTime)-delayTime);
                    // let diff = time-cacheData[i].gpsTime-insertTime;
@@ -178,6 +179,10 @@ class PerceptionCars {
            }
 
            console.log("最小索引:"+minIndex);
+           if(minDiff&&minDiff>this.perMaxValue){
+               console.log("per找到最小值无效")
+               return;
+           }
            //打印出被舍弃的点
            let lostData =  this.cacheAndInterpolateDataByDevId[devId].cacheData.filter((item,index)=>{
                return index<minIndex;

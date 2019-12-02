@@ -188,7 +188,7 @@
                     let data = json.result.spatDataDTO;
                     let resultData=[];
                     if(time<1000){
-                       _this.processSpat();
+                        _this.processSpat();
                     }
                 }
                 /*if(_this.warningList.length>0){
@@ -298,7 +298,7 @@
                 this.initCarWebSocket();
 //                this.initSideCarWebSocket();
                 /*this.initSpatWebSocket();*/
-                this.initWarningWebSocket();
+//                this.initWarningWebSocket();
             },
             getNumPng(color,num){
                 let img;
@@ -817,7 +817,7 @@
                 try{
                     if ('WebSocket' in window) {
 //                        _this.carWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.carWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.carWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                         _this.carWebsocket.onmessage = _this.onCarMessage;
                         _this.carWebsocket.onclose = _this.onCarClose;
                         _this.carWebsocket.onopen = _this.onCarOpen;
@@ -870,17 +870,17 @@
             },
             onCarOpen(data){
                 //旁车
-                let car ={
+               /* let car ={
                     "action": "vehicle",
                     "body": {
                         "vehicleId": this.vehicleId
                     },
                     "type": 2
-                }
-                /*let car = {
+                }*/
+                let car = {
                     "action": "sideVehicle",
                     "vehicleId": this.vehicleId
-                }*/
+                }
                 let carMsg = JSON.stringify(car);
                 this.sendCarMsg(carMsg);
             },
@@ -992,9 +992,9 @@
 
             gis3d.initload("cesiumContainer",true);
             perceptionCars.viewer=gis3d.cesium.viewer;
-            
+
             platCars.cacheAndInterpolateDataByVid = {},
-            platCars.models={};
+                platCars.models={};
             platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
             this.onMapComplete();
 
@@ -1034,7 +1034,7 @@
         },
         beforeDestroy(){
             console.log("单车页面销毁");
-              clearInterval(platCars.processPlatformCarsTrackIntervalId);
+            clearInterval(platCars.processPlatformCarsTrackIntervalId);
             //释放定时器
             for(let key in this.timeObj){
                 clearTimeout(this.timeObj[key]);
@@ -1107,7 +1107,7 @@
         /* padding-top: 10px;*/
     }
     .video-position{
-        @include layoutMode(both);
+    @include layoutMode(both);
         height:100%;
         background: #000000;
     }
@@ -1120,14 +1120,14 @@
         font-size: 16px;
         letter-spacing: 0px;
         z-index:1;
-        .detail1{
-            display: inline-block;
-            padding:5px 10px;
-            .detail2{
-                color: #37ba7b;
-                display: inline-block;
-                padding: 0px 2px;
-            }
-        }
+    .detail1{
+        display: inline-block;
+        padding:5px 10px;
+    .detail2{
+        color: #37ba7b;
+        display: inline-block;
+        padding: 0px 2px;
+    }
+    }
     }
 </style>
