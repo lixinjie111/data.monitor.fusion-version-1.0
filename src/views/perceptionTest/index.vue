@@ -1,18 +1,82 @@
 <template>
     <div class="fusion-right-style">
-        <div class="map-real-time" v-if="nowTime">
-            {{nowTime|dateFormat}} 收包时间
+        <div class="fusion-left-main left-style">
+            <div v-for="(item, key) in drawObj">
+                <p class="c-title" style="margin-top: 0px;">{{key}}</p>
+                <ul class="perception-style" style="display: none;">
+                    <li>
+                        <span class="overview-sign fusion-sign"></span>
+                        <span>感知车辆：{{item.data.length}}</span>
+                    </li>
+                    <li>
+                        <span class="overview-sign fusion-sign"></span>
+                        <!-- <span>车辆gpsTime：{{item.gpsTime}}</span> -->
+                        <span>车辆gpsTime：{{domDateFormat.formatTime(item.gpsTime, "yy-mm-dd hh:mm:ss:ms")}}</span>
+                    </li>
+                    <li>
+                        <span class="overview-sign fusion-sign"></span>
+                        <!-- <span>车辆updateTime：{{item.updateTime}}</span> -->
+                        <span>车辆updateTime：{{domDateFormat.formatTime(item.updateTime, "yy-mm-dd hh:mm:ss:ms")}}</span>
+                    </li>
+                    <li>
+                        <span class="overview-sign fusion-sign"></span>
+                        <span>车辆处理时间：{{item.updateTime-item.gpsTime}}ms</span>
+                    </li>
+                    <li>
+                        <span class="overview-sign fusion-sign"></span>
+                        <span>绘制gpsTime-车辆gpsTime：{{startGpsTime+(runTime*drawCount)-item.gpsTime}}ms</span>
+                    </li>
+                </ul>
+                <ul class="perception-style">
+                    <!-- <li v-for="items in item.data">
+                        <span class="overview-sign perception-sign"></span>
+                        <span>{{items.vehicleId.substr(0,4)+"_"+items.vehicleId.substring(items.vehicleId.length-4)}}: {{items.longitude}}, {{items.latitude}}, {{items.speed}}km/h, {{items.heading}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>
+                    </li> -->
+                    <li v-for="items in item.data">
+                        <span class="overview-sign perception-sign"></span>
+                        <span>{{items.vehicleId.substr(0,4)+"_"+items.vehicleId.substring(items.vehicleId.length-4)}}: {{items.longitude.toFixed(9)}}, {{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- <div class="map-real-time perception-style">
+            <template>
+                拿到第一包的数据的gpsTime作为第一帧的时间，每隔{{runTime}}ms画下一帧数据，寻找{{sectionTime}}ms间隔内的最接近点
+            </template>
             <br/>
-            <!-- <template v-if="drawCount>=0 && countTimeList[drawCount]">
-                {{countTimeList[drawCount]|dateFormat}}
-            </template> -->
+            <br/>
+            <template v-if="nowTime">
+                收包时间 {{nowTime|dateFormat}}
+            </template>
+            <br/>
             <template v-if="startGpsTime">
-            {{domDateFormat.formatTime(startGpsTime, "yy-mm-dd hh:mm:ss:ms")}} 第一个gpsTime
+                第一个gpsTime {{domDateFormat.formatTime(startGpsTime, "yy-mm-dd hh:mm:ss:ms")}}
+            </template>
+            <br/>
+            <template v-if="startGpsTime && drawCount >=0">
+                当前绘制的gpsTime {{domDateFormat.formatTime(startGpsTime+(runTime*drawCount), "yy-mm-dd hh:mm:ss:ms")}}
+            </template>
+            <br/>
+            <template v-if="startGpsTime && drawCount >=0">
+                当前绘制的gpsTime {{startGpsTime+(runTime*drawCount)}}
+            </template>
+        </div> -->
+        <div class="map-real-time perception-style">
+            <template>
+                {{runTime}}ms画下一帧，{{sectionTime}}ms间隔
+            </template>
+            <br/>
+            <template v-if="nowTime">
+                {{nowTime|dateFormat}}
+            </template>
+            <br/>
+            <template v-if="startGpsTime">
+                {{domDateFormat.formatTime(startGpsTime, "yy-mm-dd hh:mm:ss:ms")}}
             <!-- {{startGpsTime}} 第一个gpsTime -->
             </template>
             <br/>
             <template v-if="startGpsTime && drawCount >=0">
-            {{domDateFormat.formatTime(startGpsTime+(sectionTime*drawCount), "yy-mm-dd hh:mm:ss:ms")}} 当前绘制的gpsTime
+                {{domDateFormat.formatTime(startGpsTime+(runTime*drawCount), "yy-mm-dd hh:mm:ss:ms")}}
             </template>
         </div>
         <div id="cesiumContainer" class="c-map"></div>
@@ -43,8 +107,10 @@
                 countTimeList: [],
                 startGpsTime: '',
                 drawCount: -1,
+                runTime: 80,
                 sectionTime: 55,
-                domDateFormat: DateFormat
+                domDateFormat: DateFormat,
+                drawObj: {}
             }
         },
         filters: {
@@ -89,32 +155,67 @@
                 console.log(this.currentExtent);
             },
             stepHandle(event) {
-                var e = event || window.event || arguments.callee.caller.arguments[0];
+                if(this.nowTime) {
+                    this.drawObj = {};
+                    var e = event || window.event || arguments.callee.caller.arguments[0];
 
-                if(e && e.keyCode==40){ //下
-                    console.log("向下");
-                    // if (Object.keys(perceptionCars.devObj).length > 0) {
-                    //     for (let devId in perceptionCars.devObj) {
-                    //         let devList = perceptionCars.devObj[devId];
-                    //         if (devList.length > 0) {
-                    //             //分割之前将车辆移动到上一个点
-                    //             //将第一个点进行分割
-                    //             let data = devList.shift();
-                    //             perceptionCars.cacheAndInterpolatePerCar(data);
-                    //         }
-                    //     }
-                    // }
-                    this.drawCount++;
-                    if(Object.keys(perceptionCars.devObj).length>0){
-                        perceptionCars.processPerTrack(this.startGpsTime+(this.drawCount*this.sectionTime));
-                    }
-                }
-                if(e && e.keyCode==38){ // 上
-                    // console.log("向上");
-                    if(this.drawCount>0) {
-                        this.drawCount--;
+                    if(e && e.keyCode==40){ //下
+                        console.log("向下");
+                        // if (Object.keys(perceptionCars.devObj).length > 0) {
+                        //     for (let devId in perceptionCars.devObj) {
+                        //         let devList = perceptionCars.devObj[devId];
+                        //         if (devList.length > 0) {
+                        //             //分割之前将车辆移动到上一个点
+                        //             //将第一个点进行分割
+                        //             let data = devList.shift();
+                        //             perceptionCars.cacheAndInterpolatePerCar(data);
+                        //         }
+                        //     }
+                        // }
+                        this.drawCount++;
                         if(Object.keys(perceptionCars.devObj).length>0){
-                            perceptionCars.processPerTrack(this.drawCount, this.countTimeList);
+                            perceptionCars.processPerTrack(this.startGpsTime+(this.drawCount*this.runTime));
+                            console.log("**************************");
+                            console.log(perceptionCars.drawObj);
+                            for(let attr in perceptionCars.drawObj) {
+                                if(perceptionCars.drawObj[attr].length) {
+                                    this.$set(this.drawObj,attr,{});
+                                    this.$set(this.drawObj[attr],"data",perceptionCars.drawObj[attr]);
+                                    this.$set(this.drawObj[attr],"gpsTime",perceptionCars.drawObj[attr][0].gpsTime);
+                                    this.$set(this.drawObj[attr],"updateTime",perceptionCars.drawObj[attr][0].updateTime);
+                                    // this.drawObj[attr] = {};
+                                    // this.drawObj[attr].rcuId = attr;
+                                    // this.drawObj[attr].data = perceptionCars.drawObj[attr];
+                                    // this.drawObj[attr].gpsTime = perceptionCars.drawObj[attr][0].gpsTime;
+                                    // this.drawObj[attr].updateTime =  perceptionCars.drawObj[attr][0].updateTime;
+                                }
+                            }
+                            console.log(this.drawObj);
+                        }
+                    }
+                    if(e && e.keyCode==38){ // 上
+                        // console.log("向上");
+                        if(this.drawCount>0) {
+                            this.drawCount--;
+                            if(Object.keys(perceptionCars.devObj).length>0){
+                                perceptionCars.processPerTrack(this.startGpsTime+(this.drawCount*this.runTime));
+                                console.log("**************************");
+                                console.log(perceptionCars.drawObj);
+                                for(let attr in perceptionCars.drawObj) {
+                                    if(perceptionCars.drawObj[attr].length) {
+                                        this.$set(this.drawObj,attr,{});
+                                        this.$set(this.drawObj[attr],"data",perceptionCars.drawObj[attr]);
+                                        this.$set(this.drawObj[attr],"gpsTime",perceptionCars.drawObj[attr][0].gpsTime);
+                                        this.$set(this.drawObj[attr],"updateTime",perceptionCars.drawObj[attr][0].updateTime);
+                                        // this.drawObj[attr] = {};
+                                        // this.drawObj[attr].rcuId = attr;
+                                        // this.drawObj[attr].data = perceptionCars.drawObj[attr];
+                                        // this.drawObj[attr].gpsTime = perceptionCars.drawObj[attr][0].gpsTime;
+                                        // this.drawObj[attr].updateTime =  perceptionCars.drawObj[attr][0].updateTime;
+                                    }
+                                }
+                                console.log(this.drawObj);
+                            }
                         }
                     }
                 }
@@ -138,7 +239,7 @@
 
             },
             onPerceptionMessage(mesasge){
-                if(this.nowTimeCount < 10) {
+                if(this.nowTimeCount < 1000) {
                     let data = JSON.parse(mesasge.data);
                     let sideList = data.result.perList;
                     perceptionCars.receiveData(sideList);
@@ -149,6 +250,7 @@
                     this.nowTimeCount ++;
                     this.countTimeList.push(data.time);
                 }else {
+                    console.log(perceptionCars.devObj);
                     this.perceptionWebsocket&&this.perceptionWebsocket.close();
                 }
             },
@@ -200,16 +302,56 @@
         }
     }
 </script>
-<style scoped>
+<style lang="scss" scoped>
+.left-style{
+    position: absolute;
+    left: 0;
+    top: 100px;
+    z-index: 2;
+    padding-top:0px!important;
+    padding-bottom:0px!important;
+}
+.perception-style{
+    padding: 10px;
+    line-height: 28px;
+    font-size: 14px;
+    margin:20px 0px;
+    border: 1px solid rgba(211, 134, 0, 0.7);
+    background: #00000082;
+    li{
+        letter-spacing: 1px;
+        color: #cccccc;
+        font-size: 14px;
+        .overview-sign{
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right:2px;
+        }
+        .fusion-font{
+            word-wrap:break-word
+        }
+        .fusion-sign{
+            background:#9b9b9b;
+        }
+        .perception-sign{
+            background:#4eaf6b ;
+        }
+        .traffic-sign{
+            background: #d1d151;
+        }
+    }
+}
 .map-real-time{
     position: absolute;
-    width: 500px;
+    width: 320px;
     font-size: 20px;
     z-index: 2;
-    margin-top: 80px;
+    top: 0;
     left:50%;
-    margin-left:-200px;
     text-align: left;
+    margin-left: -155px;
 
 }
 </style>
