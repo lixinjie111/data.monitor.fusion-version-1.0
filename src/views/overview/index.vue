@@ -36,7 +36,8 @@ export default {
     data() {
         return {}
     },
-    methods: {},
+    methods: {
+    },
     mounted() {},
     destroyed(){},
 }

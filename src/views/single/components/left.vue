@@ -80,7 +80,7 @@
                 mapOption:{},
                 singleVehicle:{},
                 routeId:'',
-                all: 1,
+                all: 1, //是否开启新的行程，1 是一个新的行程  0 不是一个新的行程
                 distanceMap: {}, //创建的地图对象
                 prevLastPointPath:[],//上次请求的终点，
                 carStartPoint:this.$parent.$parent.defaultCenterPoint,
@@ -123,9 +123,22 @@
                     };
                 }
             },
-            isCapture:{
-                type:Boolean,
-                default:false
+            routeData:{
+                type:Object,
+                default() {
+                    return {
+
+                    };
+                }
+            }
+        },
+        watch:{
+            routeData:{
+                handler(newValue, oldValue) {
+                    this.onmessage();
+                },
+//                immediate: true,
+                deep: true
             }
         },
         methods: {
@@ -145,31 +158,13 @@
                 }).then(res => {
                     let _result = res.data.pointList;
                     if(_result && _result.length > 0) {
-                        this.onmessage(res);
+                        this.onmessage(_result);
                     }
-                    this.initWebSocket();
+//                    this.initWebSocket();
                 }).catch(error => {
                 });
             },
-            initWebSocket(){
-                // debugger
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.webSocket.onmessage = _this.onmessage;
-                        _this.webSocket.onclose = _this.onclose;
-                        _this.webSocket.onopen = _this.onopen;
-                        _this.webSocket.onerror = _this.onerror;
-                    }else {
-                        _this.$message("此浏览器不支持websocket");
-                    }
-                }catch(e){
-                    _this.routeReconnect();
-                }
-
-            },
-            onmessage(message){
+            onmessage(data){
                 // console.log("行程概览 route *********************************************");
                 /*clearInterval(this.countTimer);
                 this.countTime = 0;
@@ -177,31 +172,25 @@
                     this.countTime += 1000;
                 }, 1000);*/
                 let _this=this;
-                if(_this.isCapture){
-                    return;
-                }
-                let json  = {};
-                if(typeof message.data == "string") {
-                    json = JSON.parse(message.data);
-                }else {
-                    json = message;
-                }
                 let pointList = [];
+                //是一次新的行程
                 if(this.all == 1){
-                    if(json.data.pointList && json.data.pointList.length > 0){
-                        pointList = json.data.pointList;
+                    //判断是历史数据还是新的轨迹
+                    //如果是历史轨迹
+                    if(data &&Object.prototype.toString.call(data)=='[object Array]'){
+                        pointList = data;
                     }else{
                         pointList = [{
-                            gnss_LONG: json.data.lon,
-                            gnss_LAT: json.data.lat,
-                            gnss_HEAD: json.data.head
+                            gnss_LONG: data.lon,
+                            gnss_LAT: data.lat,
+                            gnss_HEAD: data.head
                         }];
                     }
                 }else{
                     pointList = [{
-                        gnss_LONG: json.data.lon,
-                        gnss_LAT: json.data.lat,
-                        gnss_HEAD: json.data.head
+                        gnss_LONG: data.lon,
+                        gnss_LAT: data.lat,
+                        gnss_HEAD: data.head
                     }];
                 }
                 if(pointList && pointList.length > 0) {
@@ -213,7 +202,7 @@
                         }
                     }else{
                         console.log("第一次开启行程");
-                        this.routeId = json.data.routeId;
+                        this.routeId =json.data.routeId;
                         // console.log(this.routeId);
                         _this.carStartPoint = ConvertCoord.wgs84togcj02(pointList[0].gnss_LONG, pointList[0].gnss_LAT);
                         _this.distanceMapStart();
@@ -240,7 +229,7 @@
                     let _dataLength = handlePointList.length;
                     this.wholePath.push( {
                         angle: pointList[_dataLength-1].gnss_HEAD >= 0 ? pointList[_dataLength-1].gnss_HEAD : 90,
-                        routeId: json.data.routeId,
+                        routeId: this.routeId,
                         pathList: handlePointList
                     });
                     this.changeLngLat();
@@ -271,43 +260,6 @@
                         }
                     };
                 }
-            },
-            onclose(data){
-                console.log("行程结束连接");
-                this.routeReconnect();
-            },
-            onerror(){
-                console.log("行程结束error");
-                this.routeReconnect();
-            },
-            onopen(data){
-                //行程
-                this.webSocketData.vehicleId = this.vehicleId;
-                this.webSocketData.scale = this.scale;
-                this.webSocketData.all = this.all;
-                this.sendMsg(JSON.stringify(this.webSocketData));
-            },
-            sendMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.webSocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            routeReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.routeConnectCount>=10){
-                    return;
-                }
-                this.initWebSocket();
-                this.routeConnectCount++;
             },
             //行程概览--绘制起点
             distanceMapStart(){

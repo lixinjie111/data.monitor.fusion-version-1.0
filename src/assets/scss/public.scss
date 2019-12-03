@@ -276,3 +276,15 @@ img {
 .weather-icon{
   display: inline-block;
 }
+.c-pulse-time{
+  position: absolute;
+  width: 300px;
+  font-size: 20px;
+  z-index: 2;
+  margin-top: 50px;
+  left:50%;
+  transform: translate(-50%,0);
+  text-align: left;
+
+}
+
