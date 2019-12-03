@@ -1302,10 +1302,10 @@
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
                 if(this.pulseNowTime==''){
-//                    this.initPerceptionWebSocket();
-//                    this.initPlatformWebSocket();
-//                    this.initWarningWebSocket();
-//                    this.initSpatWebSocket();
+                   this.initPerceptionWebSocket();
+                   this.initPlatformWebSocket();
+                   this.initWarningWebSocket();
+                   this.initSpatWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;

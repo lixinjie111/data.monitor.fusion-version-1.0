@@ -11,6 +11,7 @@ const Refresh = resolve => require(['@/views/refresh'], resolve)
 
 const Single = resolve => require(['@/views/single'], resolve)
 const Perception = resolve => require(['@/views/perception'], resolve)
+const PerceptionTest = resolve => require(['@/views/perceptionTest'], resolve)
 const Overview = resolve => require(['@/views/overview'], resolve)
 
 
@@ -48,6 +49,13 @@ export default new VueRouter({
       path: '/perception/:crossId/:delayTime/:extend/:leftShow',
       name: 'Perception',
       component: Perception,
+      meta: {
+          // keepAlive:true
+      }
+  },{
+      path: '/PerceptionTest/:crossId/:delayTime/:extend/:leftShow',
+      name: 'PerceptionTest',
+      component: PerceptionTest,
       meta: {
           // keepAlive:true
       }
