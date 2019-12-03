@@ -19,7 +19,7 @@ window.config = {
     // dlUrl: 'http://117.114.144.227:8085/', //迪路
     // dlWmsUrl: 'http://117.114.144.227:8080/', //迪路
 
-    //测试环境 外网
+    //测试环境 内网
     staticUrl: "http://10.0.1.181:9090/", //静态文件路径
     url: 'http://10.0.1.181:9093/monPlatApp/', //监控平台
     operateUrl: 'http://10.0.1.181:9090/operateApp/',    //运营平台
