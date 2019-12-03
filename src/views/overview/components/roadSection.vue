@@ -6,8 +6,22 @@
 <script>
     export default {
         props: {
-            id: String,
-            mapData: Object
+            id:{
+                type:String,
+                default:''
+            } ,
+            mapData: {
+                type:Object,
+                default(){
+                    return {
+
+                    };
+                }
+            },
+            processTime:{
+                type:String,
+                default:''
+            } ,
         },
         data() {
             return {
@@ -27,14 +41,35 @@
                 prevData: {},
                 platformConnectCount:0,
                 spatConnectCount:0,
-                pulseWebsocket:null,
 
                 pulseLastTime :'',
                 pulseFilterTime:'',
                 pulseNowTime:'',
 
-                platObj:{}
+                platObj:{},
+                pulseStart:this.$parent.pulseStart,
            }
+        },
+        watch: {
+            '$parent.pulseStart': {
+                handler(newValue,oldValue) {
+                    if(newValue){
+                        console.log("启动路口")
+                        this.drawRoadMap();
+                    }
+                },
+//                immediate: true,
+//                deep: true
+            },
+            '$parent.drawStart': {
+                handler(newValue,oldValue) {
+                    if(newValue){
+
+                    }
+                },
+//                immediate: true,
+//                deep: true
+            }
         },
         mounted() {
 //    this.mapOption.mapStyle=window.mapOption.mapStyleEmpty;
@@ -48,7 +83,7 @@
             this.aMap.on('complete',()=>{
                 this.aMap.setMapStyle(window.mapOption.mapStyleEmpty);
             });
-            this.drawRoadMap();
+//            this.drawRoadMap();
         },
         methods: {
             drawRoadMap() {
@@ -139,69 +174,21 @@
             onCarMessage(message) {
                 let _this = this;
                 let jsonData = JSON.parse(message.data);
-                let result = jsonData.result;
-                let data = result.data;
+                let data = jsonData.result.data;
                 let _filterData = {};
-               /* for(let vehicleId in data){
+                for(let vehicleId in data){
                     let cdata = this.platObj[vehicleId];
                     if(cdata==null){
                         cdata = new Array();
                     }
                     this.platObj[vehicleId] = Array.prototype.push.apply(cdata,data[vehicleId]);
-                }*/
-                for(let vehicleId in data){
+                }
+                /*for(let vehicleId in data){
                     if(data[vehicleId]&&data[vehicleId].length>0){
                         _filterData[vehicleId] = data[vehicleId][0];
                         _filterData[vehicleId].marker=null;
                     }
-                }
-                if(Object.keys(data).length>0){
-                    for (let id in _this.prevData) {
-                        if(_filterData[id]) {   //表示有该点，做move
-                            _filterData[id].marker = _this.prevData[id].marker;
-                            let _currentCar = _filterData[id];
-                            _filterData[id].marker.setAngle(_currentCar.heading);
-//                            _filterData[id].marker.moveTo([_currentCar.longitude, _currentCar.latitude], _currentCar.speed);
-
-                            _filterData[id].marker.setPosition([_currentCar.longitude, _currentCar.latitude]);
-//                            if(_filterData[id].vehicleId=='B21E0005'){
-//                                console.log("沪A523456-----"+_filterData[id].plateNo);
-//                                let marker =  new AMap.Marker({
-//                                    position:  [_currentCar.longitude, _currentCar.latitude],
-//                                    map: this.aMap,
-//                                    icon: "static/images/road/side.png",
-//                                    zIndex: 1
-//                                });
-//                            }
-                        } else {   //表示没有该点，做remove
-//                            _this.prevData[id].marker.stopMove();
-                            _this.aMap.remove(_this.prevData[id].marker);
-                            delete _this.prevData[id];
-                        }
-                    }
-                    for (let id in _filterData) {
-                        if(!_this.prevData[id]) {   //表示新增该点，做add
-                            _filterData[id].marker = new AMap.Marker({
-                                position: [_filterData[id].longitude, _filterData[id].latitude],
-                                map: _this.aMap,
-                                icon: "static/images/road/car.png",
-                                angle: _filterData[id].heading,
-                                devId: _filterData[id].devId,
-                                offset:new AMap.Pixel(-4, -9),
-                                zIndex: 1
-                            });
-                        }
-                    }
-
-                    _this.prevData = _filterData;
-                }else{
-                    // 返回的数据为空
-                    for (let id in _this.prevData) {
-                        _this.prevData[id].marker.stopMove();
-                        _this.aMap.remove(_this.prevData[id].marker);
-                        delete _this.prevData[id];
-                    }
-                }
+                }*/
                 // 车辆
              /*   if ("vehDataDTO" in result === true) {
                     _this.crossData.roadSenseCars = result.vehDataDTO;
@@ -272,6 +259,126 @@
                         }
                     }
                 }*/
+            },
+            getMinValue(vid){
+                let cacheData = this.platObj[vid];
+                let rangeData=null;
+                let startIndex=-1;
+                // console.log("找到最小值前："+cacheData.length);
+                //找到满足条件的范围
+                for(let i=0;i<cacheData.length;i++){
+                    let diff = Math.abs(this.processTime-cacheData[i].gpsTime);
+                    console.log(vid,cacheData.length,this.processTime,parseInt(cacheData[i].gpsTime),diff,i)
+                    if(diff<this.pulseInterval){
+                        if(startIndex !=-1 && i != startIndex+1) {
+                            break;
+                        }
+                        if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
+                            startIndex=i;
+                            let obj={
+                                index:i,
+                                delayTime: diff,
+                                data:cacheData[i]
+                            }
+                            rangeData = obj;
+                        }else {
+                            break;
+                        }
+                    }else {
+                        if(rangeData) {
+                            break;
+                        }
+                    }
+                }
+                let minIndex=-1;
+                let minData = {};
+                let minDiff;
+                //如果能找到最小范围
+                console.log(rangeData)
+                if(rangeData){
+                    minIndex = rangeData.index;
+                    minData = rangeData.data;
+                }else{
+                    console.log("plat***********************");
+                    minIndex = 0;
+                    minData = cacheData[0];
+                    minDiff = Math.abs(this.processTime-minData.gpsTime);
+                    for(let i=0;i<cacheData.length;i++){
+                        let diff = Math.abs(this.processTime-parseInt(cacheData[i].gpsTime));
+                        // let diff = time-cacheData[i].gpsTime-insertTime;
+                        // console.log(vid,cacheData.length, time, parseInt(cacheData[i].gpsTime) , diff)
+                        if(diff<minDiff){
+                            minData = cacheData[i];
+                            minIndex = i;
+                        }
+
+                    }
+                }
+                console.log("最小索引:"+minIndex);
+                if (minDiff&&minDiff>this.platMaxValue){
+                    console.log("plat找到最小值无效")
+                    return;
+                }
+                //打印出被舍弃的点
+                let lostData = this.platObj[vid].filter((item,index)=>{
+                    return index<minIndex;
+                })
+                /*if(lostData.length>0){
+                    debugger
+                }*/
+                lostData.forEach(item=>{
+                    let minDiff = Math.abs(this.processTime-cacheData[minIndex].gpsTime);
+                    // console.log("插值最小的索引"+minIndex,minDiff);
+                    let d =  Math.abs(this.processTime-item.gpsTime);
+                    // console.log("##"+d);
+                })
+
+
+                //找到最小值后，将数据之前的数值清除
+                this.platObj[vid] = this.platObj[vid].filter((item,index)=>{
+                    return index>minIndex;
+                })
+                console.log("找到最小值后"+this.platObj[vid].length);
+
+                //返回距离标尺的最小插值的数据
+                return minData;
+            },
+            processPlatData(){
+                if(Object.keys(this.platObj).length>0){
+                    for(let vehicleId in this.platObj){
+                        let cardata = this.getMinValue(vehicleId);
+                        if(!cardata){
+                            return;
+                        }
+                        this.moveCar(cardata);
+                    }
+                }else {
+                    console.log("没有平台车数据")
+                }
+            },
+            moveCar(cardata){
+                let _this = this;
+                let _filterData={};
+                let id = cardata.vehicleId;
+                //新增的点
+                if(!_this.prevData[id]){
+                    _this.prevData[id].marker = new AMap.Marker({
+                        position: [cardata.longitude, cardata.latitude],
+                        map: _this.aMap,
+                        icon: "static/images/road/car.png",
+                        angle: cardata.heading,
+                        devId: cardata.devId,
+                        offset:new AMap.Pixel(-4, -9),
+                        zIndex: 1
+                    });
+                    _this.prevData[id].timer=setTimeout(()=>{
+                        _this.aMap.remove(_this.prevData[id].marker);
+                        delete _this.prevData[id];
+                    },2000)
+                }else{//如果存在该车
+                    _this.prevData[id].marker.setPosition([cardata.longitude, cardata.latitude]);
+                    _this.prevData[id].marker.setAngle(cardata.heading);
+                }
             },
             onCarClose(data) {
                 console.log("平台车结束连接");
@@ -461,118 +568,10 @@
                 }
             },
 
-            //脉冲
-            initPulseWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.pulseWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.pulseWebsocket.onmessage = _this.onPulseMessage;
-                        _this.pulseWebsocket.onclose = _this.onPulseClose;
-                        _this.pulseWebsocket.onopen = _this.onPulseOpen;
-                        _this.pulseWebsocket.onerror= _this.onPulseError;
-                    }else{
-                        _this.$message("此浏览器不支持websocket");
-                    }
-                }catch (e){
-                    this.pulseReconnect();
-                }
-
-            },
-            onPulseMessage(mesasge){
-                let json = JSON.parse(mesasge.data);
-                let result = json.result;
-                if(this.pulseLastTime==''){
-                    this.pulseLastTime = new Date().getTime();
-                }
-//                this.pulseLastTime = this.pulseNowTime;
-                this.pulseFilterTime = this.pulseNowTime;
-                this.pulseNowTime = new Date().getTime();
-                let timeDiff = this.pulseNowTime - this.pulseLastTime;
-                let filterDiff = this.pulseNowTime - this.pulseFilterTime;
-                let diff = this.formatTime(this.pulseNowTime)-this.formatTime(result.time);
-//                console.log(this.formatTime(this.pulseNowTime),this.formatTime(result.time),filterDiff);
-                if(timeDiff>1000) {
-
-                }
-            },
-            onPulseClose(data){
-                console.log("感知车结束连接");
-                this.PulseReconnect();
-            },
-            onPulseError(){
-                console.log("感知车连接error");
-                this.PulseReconnect();
-            },
-            onPulseOpen(data){
-                //旁车
-                let pulse = {
-                    "action":"pulse",
-                    "data":{
-//                        "frequency":39
-                        "frequency":40
-                    }
-                }
-                let pulseMsg = JSON.stringify(pulse);
-                this.sendPulseMsg(pulseMsg);
-            },
-            sendPulseMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.pulseWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.pulseWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            PulseReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.pulseConnectCount>=10){
-                    return;
-                }
-                this.initPulseWebSocket();
-                //重连不能超过5次
-                this.pulseConnectCount++;
-            },
-            processPulseData(data){
-                let _this = this;
-                perceptionCars.addPerceptionData(data,0);
-                _this.$parent.perceptionData= data.result.vehDataStat;
-                let cars = data.result.vehDataDTO;
-                if(cars.length>0){
-                    _this.processDataTime = cars[0].gpsTime;
-                    let pcarnum = 0;
-                    let persons = 0;
-                    let zcarnum = 0;
-                    for (let i = 0; i < cars.length; i++) {
-                        let obj = cars[i];
-                        if (obj.type == 1) {
-                            zcarnum++;
-                            continue;
-                        }
-                        if (
-                            obj.targetType == 0 ||
-                            obj.targetType == 1 ||
-                            obj.targetType == 3
-                        ) {
-                            persons++;
-                        } else {
-                            pcarnum++;
-                        }
-                    }
-                    this.statisticData ="当前数据包："+cars.length +"=" +zcarnum +"(自车)+" +pcarnum +"(感知)+" +persons +"(人)";
-                }
-            },
         },
         destroyed() {
             this.roadWebSocket&&this.roadWebSocket.close();
             this.carWebSocket&&this.carWebSocket.close();
-            this.pulseWebsocket&&this.pulseWebsocket.close();
         }
     };
 </script>

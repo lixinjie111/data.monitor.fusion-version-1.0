@@ -2,8 +2,8 @@
     <div class="fusion-right-style" id="fusionRight">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
-        <div class="map-time map-time1" v-show="isShow=='true'">{{statisticData}}</div>
-        <div class="map-real-time">{{processDataTime|dateFormat}}  {{pulseNowTime|dateFormat}} </div>
+        <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
+        <div class="c-pulse-time">{{processDataTime|dateFormat}} </div>
         <div class="video-style">
             <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
                 <div class="style">
@@ -46,11 +46,6 @@
         </div>
         <div class="map-left"></div>
         <div id="cesiumContainer" class="c-map">
-            <!--<tusvn-map :target-id="'mapFusion'"  ref="perceptionMap"
-                       background="mapParam.background" minX="mapParam.minX"   minY="mapParam.minY" minZ="mapParam.minZ"
-                       maxX="mapParam.maxX"  maxY="mapParam.maxY"  maxZ="mapParam.maxZ"
-                       @mapcomplete="onMapComplete"   @processPerceptionDataTime='getTime' :waitingtime='waitingtime'>
-            </tusvn-map>-->
         </div>
         <div class="per-data-list">
             <p v-for="item in perDataList">
@@ -80,17 +75,6 @@
                 spatCount:0,
                 signCount:0,
                 center:[],
-                weather:{},
-                cameraParam:{},
-                step:5,
-                step1:1,
-                mapTime1:0,
-                mapTime2:0,
-                mapTime3:0,
-                mapTime4:0,
-                viewTime:0,
-                isConMov:false,
-                source:'',
                 platformWebsocke:null,
                 perceptionWebsocket:null,
                 spatWebsocket:null,
@@ -101,22 +85,19 @@
                 x:0,
                 y:0,
                 isActive:0,
-                crossId:'',
                 vehData:[],
                 alertCount:0,
                 warningData:{},
                 warningCount:0,
                 lastLightObj:{},
                 processDataTime:'',
-                removeEventObj:{},
                 mapShow:false,
                 mapInitTime:'',
                 currentExtent:[],
-                mapParam:{},
+                mapParam:{}, //参数待定
                 camList:[],
                 requestVideoUrl:getVideoByNum,
                 tabIsExist:true,
-                isMin:false,
                 warningConnectCount:0,
                 cancelConnectCount:0,
                 platformConnectCount:0,
@@ -124,24 +105,10 @@
                 spatConnectCount:0,
                 pulseConnectCount:0,
                 gis3d:null,
-                isCapture:false,
-                isCap:false,
-
-
-                perCaptureList:[],
-                platCount:0,
-                spatCaptureList:[],
-                warnCaptureList:[],
-
-                captureCount:0,
-                lat: 31.28243147,
-                lng: 121.1624133,
-
 
                 perDataList:[], //感知数据实时滚动
 
-//                pulseLastTime:'',
-                warningObj:{},
+                warningObj:{}, // 参数待定
                 pulseNowTime:'',
                 delayTime:'',
                 pulseInterval:40,
@@ -171,57 +138,19 @@
         },
         components: {TusvnMap1,LivePlayer},
         watch: {
-            '$store.getters.getRealData': {
-                handler(newName, oldName) {
-                    this.moveMap();
-                },
-//                immediate: true,
-                deep: true
-            },
             '$route':{
                 handler(newValue, oldValue) {
-                    this.isCapture = newValue.query.isCapture;
                     this.isShow = newValue.query.isShow;
-                    if(this.isCapture=='true'){
-                        document.addEventListener('keyup',this.capture);
-                        document.addEventListener('keydown',this.playerCapture);
-                    }else{
-                        document.removeEventListener('keyup', this.capture);
-                        document.removeEventListener('keydown', this.playerCapture);
-                        this.perCaptureList=[];
-                        this.spatCaptureList=[];
-                        this.warnCaptureList=[];
-                    }
                 },
                 immediate: true,
 //                deep: true
-            },
-            isCap(newVal,oldVal){
-                let _this = this;
-                try{
-                    for(let str in _this.$refs){
-
-                        if(str!=''&&str.match("player")){
-                            if(newVal){
-                                _this.$refs[str][0].player&&_this.$refs[str][0].player.pause();
-                            }else {
-                                _this.$refs[str][0].player.muted=true;
-                                _this.$refs[str][0].player&&_this.$refs[str][0].player.play();
-                            }
-                        }
-                    }
-                }catch (e){
-                    console.log("异常报错"+e.message)
-                }
             }
         },
         filters: {
             dateFormat: function (value) {
-                /*debugger*/
                 if(value!=''){
-                    let ms = value%1000;
-                    let time = DateFormat.formatTime(value);
-                    return time+"."+ms;
+                    let time = DateFormat.formatTime(value,'yy-mm-dd hh:mm:ss:ms');
+                    return time;
                 }
             }
         },
@@ -264,48 +193,9 @@
             document.addEventListener("visibilitychange",this.processTab);
         },
         methods: {
-            capture(){
-                let _this = this;
-                if(this.perCaptureList.length>0){
-                    let perData = this.perCaptureList.shift();
-                    _this.processPerData(perData);
-                }
-                if(_this.cacheAndInterpolateDataByVid&&Object.keys(_this.cacheAndInterpolateDataByVid).length>0){
-                    for (var vid in _this.cacheAndInterpolateDataByVid) {
-                        let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
-                        if (carCacheData != null) {
-                            if (carCacheData.cacheData.length > 0) {
-                                //缓存数据
-                                let cardata = _this.cacheAndInterpolateDataByVid[vid].cacheData.shift();
-                                _this.moveCar(cardata);
-                            }
-                        }
-                    }
-                }
-                if(this.platCount==0||this.platCount==6){
-                    if(this.spatCaptureList.length>0){
-                        let spatData = this.spatCaptureList.shift();
-                        _this.processSpat(spatData);
-                    }
-                    //告警事件 搁置  静态事件和动态事件  静态事件绘制一次  动态事件更新位置
-                    if(this.warnCaptureList.length>0){
-                        let warnData = this.warnCaptureList.shift();
-                        _this.processWarn(warnData);
-                    }
-                }
-                if(this.platCount==6){
-                    this.platCount=0;
-                }
-                this.platCount++;
-                this.isCap=true;
-            },
             formatTime(value){
-                let ms = value%1000;
-                let time = DateFormat.formatTime(value,'hh:mm:ss');
+                let time = DateFormat.formatTime(value,'hh:mm:ss:ms');
                 return time;
-            },
-            playerCapture(){
-                this.isCap=false;
             },
             onMapComplete(){
 
@@ -396,15 +286,6 @@
                     null, 1, overviewLayerId);
 
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
-            },
-            getTime(time,processTime,vehDataStat){
-                if(time!=''){
-                    this.statisticTime=time;
-                }
-                if(processTime!=''){
-                    this.processDataTime=processTime;
-                }
-                this.$parent.perceptionData=vehDataStat;
             },
             getCameraByRsId(){
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
@@ -516,134 +397,6 @@
 //                    this.$emit("count", this.signCount, this.spatCount);
                 })
             },
-            moveMap(){
-                /*direction:方向 "停",0;"上",1;"下",2;"左",3;"右",4;
-                status:状态 动一步 0 ;一直动 1*/
-                let direction = this.realData.direction;
-                let status = this.realData.status;
-                let x = this.cameraParam.x;
-                let y = this.cameraParam.y;
-                this.source='mapMove';
-                //动一步
-                if(status=='0'){
-                    this.isConMov=false;
-                    clearInterval(this.mapTime1);
-                    clearInterval(this.mapTime2);
-                    clearInterval(this.mapTime3);
-                    clearInterval(this.mapTime4);
-                    //停止
-                    if(direction=='0'){
-                        this.isConMov=false;
-                        console.log("停止------")
-                        this.getPerceptionAreaInfo();
-                        this.typeRoadData();
-                        return;
-                        //
-                    }
-                    //向上
-                    if(direction=='1'){
-                        if(this.cameraParam.y<=this.$refs.perceptionMap.minY){
-                            return;
-                        }
-//                        this.cameraParam.y=y-this.step;
-                        this.$refs.perceptionMap.move(0,this.step,0);
-                    }
-                    //向下
-                    if(direction=='2'){
-                        if(this.cameraParam.y>=this.$refs.perceptionMap.maxY){
-                            return;
-                        }
-//                        this.cameraParam.y=y+this.step;
-                        this.$refs.perceptionMap.move(0,-this.step,0);
-                    }
-                    //向左
-                    if(direction=='3'){
-                        if(this.cameraParam.x>=this.$refs.perceptionMap.maxX){
-                            return;
-                        }
-//                        this.cameraParam.x=x+this.step;
-                        this.$refs.perceptionMap.move(-this.step,0,0);
-                    }
-                    //向右
-                    if(direction=='4'){
-                        if(this.cameraParam.x<=this.$refs.perceptionMap.minX){
-                            return;
-                        }
-//                        this.cameraParam.x=x-this.step;
-                        this.$refs.perceptionMap.move(this.step,0,0);
-                    }
-//                    this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-
-                }else{
-
-                    this.isConMov=true;
-                    //向上
-                    if(direction=='1'){
-                        clearInterval(this.mapTime1);
-                        clearInterval(this.mapTime2);
-                        clearInterval(this.mapTime3);
-                        clearInterval(this.mapTime4);
-                        this.mapTime1 = setInterval(()=>{
-                            if(this.cameraParam.y<=this.$refs.perceptionMap.minY){
-                                clearInterval(this.mapTime1);
-                                return;
-                            }
-                            this.$refs.perceptionMap.move(0,this.step1,0);
-//                            this.cameraParam.y=this.cameraParam.y-this.step1;
-//                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-                        },100)
-                    }
-                    //向下
-                    if(direction=='2'){
-                        clearInterval(this.mapTime1);
-                        clearInterval(this.mapTime2);
-                        clearInterval(this.mapTime3);
-                        clearInterval(this.mapTime4);
-                        this.mapTime2 = setInterval(()=>{
-                            if(this.cameraParam.y>=this.$refs.perceptionMap.maxY){
-                                clearInterval(this.mapTime2);
-                                return;
-                            }
-                            this.$refs.perceptionMap.move(0,-this.step1,0);
-//                            this.cameraParam.y=this.cameraParam.y+this.step1;
-//                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-                        },100)
-                    }
-                    //向左
-                    if(direction=='3'){
-                        clearInterval(this.mapTime1);
-                        clearInterval(this.mapTime2);
-                        clearInterval(this.mapTime3);
-                        clearInterval(this.mapTime4);
-                        this.mapTime3 = setInterval(()=>{
-                            if(this.cameraParam.x>=this.$refs.perceptionMap.maxX){
-                                clearInterval(this.mapTime3);
-                                return;
-                            }
-                            this.$refs.perceptionMap.move(-this.step,0,0);
-
-//                            this.cameraParam.x=this.cameraParam.x+this.step1;
-//                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-                        },100)
-                    }
-                    //向右
-                    if(direction=='4'){
-                        clearInterval(this.mapTime1);
-                        clearInterval(this.mapTime2);
-                        clearInterval(this.mapTime3);
-                        clearInterval(this.mapTime4);
-                        this.mapTime4 = setInterval(()=>{
-                            if(this.cameraParam.x<=this.$refs.perceptionMap.minX){
-                                clearInterval(this.mapTime4);
-                                return;
-                            }
-                            this.$refs.perceptionMap.move(this.step,0,0);
-//                            this.cameraParam.x=this.cameraParam.x-this.step1;
-//                            this.$refs.perceptionMap.updateCameraPosition(this.cameraParam.x,this.cameraParam.y,this.cameraParam.z,this.cameraParam.radius,this.cameraParam.pitch,this.cameraParam.yaw);
-                        },100)
-                    }
-                }
-            },
             changeMap(param){
                 if(param==-1){
                     this.param=-1;
@@ -673,6 +426,7 @@
 //                }
             },
 
+            //告警
             initWarningWebSocket(){
                 let _this=this;
                 try{
@@ -1551,7 +1305,7 @@
 //                    this.initPerceptionWebSocket();
 //                    this.initPlatformWebSocket();
 //                    this.initWarningWebSocket();
-                    this.initSpatWebSocket();
+//                    this.initSpatWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
@@ -1584,18 +1338,20 @@
                     }
                 }
                 //缓存的时间
-                let pulseNum = this.delayTime*3/40;
+                let pulseNum = this.delayTime*2/40;
+                let delayTime = this.delayTime*2*0.6;
                 if(this.pulseCount>=pulseNum) {
                     //当平台车开始插值时，调用其他接口
-                    this.processDataTime = result.timestamp-this.delayTime;
+                    this.processDataTime = result.timestamp-delayTime;
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(perceptionCars.devObj).length>0){
-                        let processPerCar = perceptionCars.processPerTrack(result.timestamp,this.delayTime);
-//                        this.processPerData(processPerCar);
-
+                        let processPerCar = perceptionCars.processPerTrack(result.timestamp,delayTime);
+                        if(processPerCar){
+                            this.processPerData(processPerCar);
+                        }
                     }
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                        platCars.processPlatformCarsTrack(result.timestamp,this.delayTime);
+                        platCars.processPlatformCarsTrack(result.timestamp,delayTime);
                     }
                     //每隔80ms一次
                     if(this.spatPulseCount==0||this.spatPulseCount>=30){
@@ -1603,7 +1359,7 @@
                         this.spatPulseCount=1;
                         if(Object.keys(processData.spatObj).length>0){
 //                            console.log("spatPulseCount:"+this.spatPulseCount)
-                            let data = processData.processSpatData(result.timestamp,this.delayTime);
+                            let data = processData.processSpatData(result.timestamp,delayTime);
                             this.drawnSpat(data);
                         }
                     }
@@ -1612,7 +1368,7 @@
             },
             onPulseClose(data){
                 console.log("感知车结束连接");
-                this.PulseReconnect();
+                this.pulseReconnect();
             },
             onPulseError(){
                 console.log("感知车连接error");
@@ -1640,7 +1396,7 @@
                     return;
                 }
             },
-            PulseReconnect(){
+            pulseReconnect(){
                 //实例销毁后不进行重连
                 if(this._isDestroyed){
                     return;
@@ -1655,27 +1411,12 @@
             },
         },
         destroyed(){
-            clearInterval(this.mapTime1);
-            clearInterval(this.mapTime2);
-            clearInterval(this.mapTime3);
-            clearInterval(this.mapTime4);
-            clearTimeout(this.time);
             clearInterval(this.mapInitTime);
-            //平台车定时器的清除
-            clearInterval(platCars.processPlatformCarsTrackIntervalId);
-            this.$refs.perceptionMap&&this.$refs.perceptionMap.reset3DMap();
             this.warningWebsocket&&this.warningWebsocket.close();
             this.platformWebsocket&&this.platformWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
             this.pulseWebsocket&&this.pulseWebsocket.close();
-
-            document.removeEventListener("visibilitychange",this.processTab);
-            document.removeEventListener('keyup', this.capture);
-            document.removeEventListener('keydown', this.playerCapture);
-            // gis3d=null;
-            // perceptionCars = null;
-            // platCars = null;
         }
     }
 </script>
@@ -1685,40 +1426,12 @@
     .map-right{
         width: 270px;
     }
-    .point-style{
-        width: 10px;
-        height: 10px;
-        background: red;
-        z-index:1;
-        position: absolute;
-        /*left: 10px;
-        top: 10px;*/
-    }
-    .map-time{
-        position: absolute;
-        top: 10px;
-        left:50%;
-        width: 300px;
-        text-align: left;
-        display: block;
-        font-size: 14px;
-        z-index:2;
-        background: #969090;
-        transform: translate(-50%,0);
-    }
-    .map-real-time{
-        position: absolute;
-        width: 300px;
-        font-size: 20px;
-        z-index: 2;
-        margin-top: 50px;
-        left:50%;
-        margin-left:-150px;
-        text-align: left;
 
-    }
-    .map-time1{
-        top:100px!important;
+
+    .map-time{
+        margin-top:100px!important;
+        background: #969090;
+        font-size: 14px;
     }
     .perception-road{
         height: 130px;
@@ -1729,23 +1442,6 @@
         background: #000;
         right: 10px;
         z-index:100;
-        .map-type{
-            position: absolute;
-            z-index: 110;
-            right:0;
-            img{
-                width: 18px;
-                cursor: pointer;
-            }
-        }
-    }
-    .base-info{
-        padding:10px 0px ;
-        text-align: center;
-        .weather-icon{
-            vertical-align: middle;
-            padding-left: 10px;
-        }
     }
     .style{
         position: relative;

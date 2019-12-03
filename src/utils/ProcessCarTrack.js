@@ -25,6 +25,7 @@ class ProcessCarTrack {
         this.x = 0;
         this.processPlatformCarsTrackIntervalId=null;
         this.platObj={};
+        this.singleObj={};
     }
 
     //路口视角  平台车
@@ -123,8 +124,8 @@ class ProcessCarTrack {
         // }
     }
 
-    //接受数据
-    receiveData(json,time){
+    //接收数据
+    receiveData(json,time,mainCarId){
         let data = json.result.data;
         for(let vehicleId in data){
             // if(vehicleId=='B21E0002'){
@@ -134,15 +135,37 @@ class ProcessCarTrack {
                 let diff1 = json.time-data[vehicleId][0].gpsTime;
                 let diff2 = new Date().getTime()-json.time
             // console.log("vehicleId:"+vehicleId+",send:"+DateFormat.formatTime(json.time,'hh:mm:ss')+",gpsTime:"+DateFormat.formatTime(data[vehicleId][0].gpsTime,'hh:mm:ss')+",pulseTime"+DateFormat.formatTime(time,'hh:mm:ss')+",local："+DateFormat.formatTime(new Date().getTime(),'hh:mm:ss')+",'local-send'"+diff2+",'local-gps:'"+diff+",'send-gps:'"+diff1)
-                let vehList = data[vehicleId];
-                let cdata = this.platObj[vehicleId];
-                if(cdata==null){
-                    cdata=new Array();
+            let vehList = data[vehicleId];
+            let cdata = this.platObj[vehicleId];
+            if(cdata==null){
+                cdata=new Array();
+            }
+            //单车视角
+            if(mainCarId&&vehicleId==mainCarId){
+                this.mainCarVID = mainCarId;
+                for(let i=0;i<vehList.length;i++){
+                    let flag = false;
+                    if(cdata.length>0){
+                        for(let j=0;j<cdata.length;j++){
+                            //判断主车位置是否更新
+                            if(vehList[i].gpsTime==cdata[j].gpsTime){
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if(flag){
+                            continue;
+                        }else {
+                            cdata.push(vehList[i]);
+                        }
+                    }
                 }
+            }else{
                 vehList.forEach(item=>{
                     cdata.push(item);
                 })
-                this.platObj[vehicleId]=cdata;
+            }
+            this.platObj[vehicleId]=cdata;
             // }
         }
         // console.log(vehicleId,this.platObj[vehicleId].length);
@@ -268,14 +291,14 @@ class ProcessCarTrack {
                     //缓存数据
                     let cacheData = _this.cacheAndInterpolateDataByVid[vid].cacheData;
                     // console.log(cacheData.length);
-                    let cardata = this.getMinValue(vid,time,delayTime);
-                    // let cardata = cacheData.shift();
+                    let cardata = _this.getMinValue(vid,time,delayTime);
+                    // let cardata = cacheData.shift();+
                     if(!cardata){
                         return;
                     }
                     if (_this.mainCarVID == cardata.vehicleId) {
                         _this.moveCar(cardata);
-                        // _this.moveTo(cardata);
+                        _this.moveTo(cardata);
                         //主车
                     } else {
                         _this.moveCar(cardata);

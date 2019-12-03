@@ -23,8 +23,16 @@ export default {
             count: 0,
             flag: true,
             prevData: [],
-            onlineConnectCount:0
+            onlineConnectCount:0,
+            pulseStart:this.$parent.pulseStart
 
+        }
+    },
+    watch: {
+        pulseStart(newValue,oldValue){
+            if(newValue){
+//                this.initWebSocket();
+            }
         }
     },
     mounted() {
@@ -33,7 +41,6 @@ export default {
             this.AMap.setMapStyle(window.defaultMapOption.mapStyle);
         });
 
-        this.initWebSocket();
         let param = ['2'];
         this.getDevDis(param);
     },
@@ -281,7 +288,7 @@ export default {
             window.open(href, '_blank')*/
             this.$router.push({
                 path: "/single/" + e.target.get("vehicleId"),
-                query:{isCapture:false}
+                query:{delayTime:3}
             });
         },
         onclose(data){
@@ -379,7 +386,7 @@ export default {
                                     marker.on('click', function(e) {
                                         _this.$router.push({
                                             path: '/perception/'+subItem.deviceId+ "/"+1+ "/"+0.004+"/"+true,
-                                            query:{lng:subItem.longitude,lat:subItem.latitude,isShow:false,isCapture:false}
+                                            query:{lng:subItem.longitude,lat:subItem.latitude,isShow:false}
                                         });
                                     });
                                 }

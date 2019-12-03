@@ -20,7 +20,7 @@ class TDate {
             return year + '-' + month + '-' + day + ' ' + hour + ':' + minutes + ':' + seconds;
         }else if(type == 'yy-mm-dd hh:mm:ss:ms'){
             return year + '-' + month + '-' + day + ' ' + hour + ':' + minutes + ':' + seconds + '.' + millisecond;
-        }else if(type == 'hh:mm:ss'){
+        }else if(type == 'hh:mm:ss:ms'){
             return  hour + ':' + minutes + ':' + seconds + '.' + millisecond;
         }else {
             return year + '-' + month + '-' + day + ' ' + hour + ':' + minutes + ':' + seconds;
