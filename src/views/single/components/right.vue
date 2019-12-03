@@ -406,11 +406,11 @@
                         //前向摄像头
                         if(item.toward==0){
                             this.forwardParam ={
-                                'vehicleId': this.vehicleId,
-                                'camId':item.serialNum,
-                                'protocal':item.protocol
-                            }
-                            this.forwardShow=true;
+                               'vehicleId': this.vehicleId,
+                                'camId':item.camId,
+                                'protocal':item.protocal
+                           }
+                           this.forwardShow=true;
                         }
                         //车内摄像头
                         if(item.toward==4){
