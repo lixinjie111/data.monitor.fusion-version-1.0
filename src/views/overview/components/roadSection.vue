@@ -64,7 +64,7 @@
             '$parent.drawStart': {
                 handler(newValue,oldValue) {
                     if(newValue){
-
+                        this.processPlatData();
                     }
                 },
 //                immediate: true,
@@ -353,7 +353,7 @@
                         this.moveCar(cardata);
                     }
                 }else {
-                    console.log("没有平台车数据")
+                    console.log("没有平台车数据");
                 }
             },
             moveCar(cardata){
@@ -371,11 +371,13 @@
                         offset:new AMap.Pixel(-4, -9),
                         zIndex: 1
                     });
+                    //出范围后消失
                     _this.prevData[id].timer=setTimeout(()=>{
                         _this.aMap.remove(_this.prevData[id].marker);
                         delete _this.prevData[id];
                     },2000)
                 }else{//如果存在该车
+                    clearTimeout(_this.prevData[id].timer);
                     _this.prevData[id].marker.setPosition([cardata.longitude, cardata.latitude]);
                     _this.prevData[id].marker.setAngle(cardata.heading);
                 }
