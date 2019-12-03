@@ -413,8 +413,8 @@
                         if(item.toward==0){
                             this.forwardParam ={
                                'vehicleId': this.vehicleId,
-                                'camId':item.serialNum,
-                                'protocal':item.protocol
+                                'camId':item.camId,
+                                'protocal':item.protocal
                            }
                            this.forwardShow=true;
                         }
