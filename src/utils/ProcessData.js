@@ -108,7 +108,7 @@ class ProcessCarTrack {
             return index<minIndex;
         })
         /*if(lostData.length>0){
-            debugger
+            
         }*/
         lostData.forEach(item=>{
             let minDiff = Math.abs(time-cacheData[minIndex].spatTime);
@@ -205,7 +205,7 @@ class ProcessCarTrack {
             return index<minIndex;
         })
         /*if(lostData.length>0){
-            debugger
+            
         }*/
         lostData.forEach(item=>{
             let minDiff = Math.abs(time-this.routeList[minIndex].gpsTime);

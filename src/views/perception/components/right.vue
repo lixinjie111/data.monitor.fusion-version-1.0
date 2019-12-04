@@ -61,7 +61,7 @@
     import LivePlayer from '@/components/livePlayer'
     import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId} from '@/api/fusion'
 
-    import GIS3D from '@/utils/GIS3D.js'
+    import GIS3D from '@/utils/GIS3D.js' 
     import PerceptionCars from '@/utils/PerceptionCars.js'
     import ProcessCarTrack from '@/utils/ProcessCarTrack.js'
     import ProcessData from '@/utils/ProcessData.js'
@@ -227,7 +227,7 @@
 
 //                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
 //                    gis3d.updateCameraPosition(121.1727923, 31.2840917,39,70,-0.2369132859032279, 0.0029627735803421373);
-                     gis3d.updateCameraPosition(this.x, this.y,39,70,-0.2369132859032279, 0.0029627735803421373);
+                     gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
                     this.getData();
                     this.mapShow=true;
                     return;
@@ -237,7 +237,7 @@
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
 //                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-                          gis3d.updateCameraPosition(this.x, this.y,39,70,-0.2369132859032279, 0.0029627735803421373);
+                         gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
                         this.getData();
                         clearInterval(this.mapInitTime);
                         this.mapShow=true;
@@ -246,7 +246,7 @@
                     count++;
                     if(count==10){
 //                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-                            gis3d.updateCameraPosition(this.x, this.y,39,70,-0.2369132859032279, 0.0029627735803421373);
+                            gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
                         this.getData();
                         this.mapShow=true;
                         clearInterval(this.mapInitTime);
@@ -1153,6 +1153,7 @@
                         light.img2=img2;
                         light.img3=img3;
                         _this.lastLightObj[item.spatId]=item;
+                            gis3d.updateLight(light);
                         // _this.$refs.perceptionMap.addStaticModel_light_1(light);
                         //地图渲染剩余时间
                     })

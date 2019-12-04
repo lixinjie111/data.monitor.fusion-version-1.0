@@ -1,15 +1,15 @@
-import DateFormat from '@/utils/date.js'
+import GisUtils from '@/utils/GIS/GisUtils.js'
+/**
+ * 平台车类
+ */
 class ProcessCarTrack {
     constructor() {
-        this.viewer = null;
-        // pCacheModelNum: 200,//感知车数量
+        this.viewer = null;//三维视图
         this.stepTime = '';//处理车缓存时间
-        this.pulseInterval='';//阈值范围
-        this.platMaxValue='';//平台车插值最大值
+        this.pulseInterval = '';//阈值范围
+        this.platMaxValue = '';//平台车插值最大值
         this.receiveCount = 0;
         this.defualtZ = 0.8;
-        this.pitch = 0;
-        this.yaw = 0;
         this.roll = Math.PI * (10 / 90);
         this.pmodels = {};
         this.testCar = {};
@@ -17,25 +17,21 @@ class ProcessCarTrack {
         this.cacheTrackCarData = [];
         //按照vid缓存插值的小车轨迹
         this.cacheAndInterpolateDataByVid = {};
-        this.cameraDefualtZ = 22.86,
-        this.cameraDefualtRadius = 10,
-        this.cameraDefualtPitch = -0.2,
         this.mainCarVID = "";
-        this.isload = false;
-        this.x = 0;
-        this.processPlatformCarsTrackIntervalId=null;
-        this.platObj={};
-        this.singleObj={};
+        this.processPlatformCarsTrackIntervalId = null;
+        this.platObj = {};
+        this.singleObj = {};
     }
 
     //路口视角  平台车
-    onCarMessage(data,flag) {
+    onCarMessage(data, flag) {
         console.log('----------')
         console.log(data.time);
         // this.cacheTrackCarData=data;
-        this.thisMessage(flag,data);
+        this.thisMessage(flag, data);
     }
-    thisMessage(isCar,data) {
+    //接受数据
+    thisMessage(isCar, data) {
         let data2 = data.result.data;
         if (isCar == 0) {
             for (let n = 0; n < data2.length; n++) {
@@ -45,8 +41,8 @@ class ProcessCarTrack {
                     continue;
                 }
                 if (pcar.vehicleId == "B21E0003")
-                //缓存数据
-                this.cacheAndInterpolatePlatformCar(pcar,data);
+                    //缓存数据
+                    this.cacheAndInterpolatePlatformCar(pcar, data);
             }
         }
         else {
@@ -57,71 +53,14 @@ class ProcessCarTrack {
                     continue;
                 }
                 //缓存数据
-                this.cacheAndInterpolatePlatformCar(pcar,null);
+                this.cacheAndInterpolatePlatformCar(pcar, null);
             }
             let datamain = data.result.selfVehInfo;
             if (datamain != null) {
                 this.mainCarVID = datamain.vehicleId;
-                this.cacheAndInterpolatePlatformCar(datamain,null);
+                this.cacheAndInterpolatePlatformCar(datamain, null);
             }
         }
-
-
-        // if (Object.getOwnPropertyNames(this.pmodels).length != 1) {
-        //     // console.log("thisMessage:================>"+this.cacheMainCarTrackData.length);
-        //     if (this.cacheTrackCarData == null) {
-        //         return;
-        //     }
-        //     let data = this.cacheTrackCarData;
-        //     let json = JSON.parse(data.data);
-        //     // console.log(json);
-        //     //处理旁车信息
-        //     let pcars = null;// json.result.data;
-        //     if (isCar == 1) {
-        //         pcars = json.result.data;//单车界面
-        //     }
-        //     else {
-        //         pcars = json.result.vehDataDTO;//路口界面
-        //     }
-        //     if (pcars != null) {
-        //         for (let i = 0; i < this.pCacheModelNum; i++) {
-        //             let model = this.pmodels["gzc" + i];
-        //             if (model == undefined)
-        //                 break;
-        //             if (typeof (model) != undefined) {
-        //                 model.position.set(0, 0, this.defualtZ);
-        //             }
-        //         }
-        //         for (let n = 0; n < pcars.length; n++) {
-        //             let pcar = pcars[n];
-        //             if (pcar.heading < 0) {
-        //                 // 不处理小于0的的数据
-        //                 continue;
-        //             }
-        //             if (pcar.type != 1) {
-        //                 let dUTM = this.webMercatorUtils.lngLatToXY(pcar.longitude, pcar.latitude)
-        //                 let model = this.pmodels["gzc" + n];
-        //                 model.position.set(dUTM[0], dUTM[1], this.defualtZ);
-        //                 model.rotation.set(
-        //                     this.pitch,
-        //                     this.yaw,
-        //                     (-Math.PI / 180) * pcar.heading
-        //                 );
-        //             } else {
-        //                 //缓存数据
-        //                 this.cacheAndInterpolatePlatformCar(pcar);
-        //             }
-        //         }
-        //     }
-        //     // return ;
-        //     //处理自车信息
-
-        //     let data2 = json.result.selfVehInfo;
-        //     if (data2 != null) {
-        //         this.mainCarVID = data2.vehicleId;
-        //         this.cacheAndInterpolatePlatformCar(data2);
-        //     }
-        // }
     }
 
     //接收数据
@@ -198,22 +137,6 @@ class ProcessCarTrack {
             cdata.lastReceiveData = d;
             cdata.nowReceiveData = d;
             this.cacheAndInterpolateDataByVid[vid] = cdata;
-
-            // var position = Cesium.Cartesian3.fromDegrees(car.longitude, car.latitude, 0.0);
-            // var heading = Cesium.Math.toRadians(0);
-            // var pitch = Cesium.Math.toRadians(0);
-            // var roll = 0;
-            // var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
-            // var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
-            // //e.cesium.viewer.entities.add(entity);
-            // this.testCar = this.viewer.scene.primitives.add(Cesium.Model.fromGltf({
-            //     id: "testcar",
-            //     modelMatrix: modelMatrix,
-            //     url: './static/model/car.glb',
-            //     minimumPixelSize: 1,
-            //     show: true,
-            //     maximumScale: 5,
-            // }));
         } else {//存在该车的数据
 
             let d = {
@@ -291,17 +214,64 @@ class ProcessCarTrack {
                     //缓存数据
                     let cacheData = _this.cacheAndInterpolateDataByVid[vid].cacheData;
                     // console.log(cacheData.length);
-                    let cardata = _this.getMinValue(vid,time,delayTime);
+                    let cardata = _this.getMinValue(vid, time, delayTime);
                     // let cardata = cacheData.shift();+
-                    if(!cardata){
+                    if (!cardata) {
                         return;
                     }
+                    _this.moveCar(cardata);
+                    _this.poleToCar(cardata);
                     if (_this.mainCarVID == cardata.vehicleId) {
-                        _this.moveCar(cardata);
                         _this.moveTo(cardata);
                         //主车
-                    } else {
-                        _this.moveCar(cardata);
+                    }
+                }
+            }
+        }
+    }
+     //检测感知杆和单车关联
+     poleToCar(d) {
+        let vid = d.vehicleId;
+        var item = sessionStorage.getItem("sideList");
+        var itemSide = JSON.parse(item);
+        // console.log(item)
+        if (itemSide != null && itemSide.length > 0) {
+
+            for (var i = 0; i < itemSide.length; i++) {
+                let x = itemSide[i].longitude;
+                let y = itemSide[i].latitude;
+                let _line = function line(result) {
+                    return Cesium.Cartesian3.fromDegreesArrayHeights([d.longitude, d.latitude, 1, x, y, 10], Cesium.Ellipsoid.WGS84, result);
+                }
+
+                if (Math.abs(GisUtils.getDistance(itemSide[i].latitude, itemSide[i].longitude, d.latitude, d.longitude)) > 0.1)
+                //    if(Math.abs(121.172434- d.longitude)>0.001&&Math.abs(31.284172- d.latitude)>0.001)
+                {
+                    if (this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId) != null) {
+                        this.viewer.entities.remove(this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId));
+                    }
+                }
+                else {
+                    if (this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId) == null) {
+                        //连接线
+                        // debugger
+                        var redLine = this.viewer.entities.add({
+                            id: vid + "line" + itemSide[i].deviceId,
+                            polyline: {
+                                distanceDisplayCondition :new Cesium.DistanceDisplayCondition(0, 2000),
+                                // This callback updates positions each frame.
+                                positions: new Cesium.CallbackProperty(_line, false),// Cesium.Cartesian3.fromDegreesArrayHeights([ d.longitude, d.latitude,0.1, 121.17070961131611, 31.285431834985424,1]),//
+                                width: 5,
+                                material: new Cesium.PolylineGlowMaterialProperty({
+                                    color: Cesium.Color.DEEPSKYBLUE,
+                                    glowPower: 0.25
+                                })
+                            }
+                        });
+                    }
+                    else {
+                        this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId).show = true;
+                        this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId).polyline.positions = new Cesium.CallbackProperty(_line, false)
                     }
                 }
             }
@@ -412,7 +382,7 @@ class ProcessCarTrack {
                 url: './static/map3d/model/car.glb',
                 minimumPixelSize: 1,
                 show: true,
-                maximumScale: 300,
+                maximumScale: 100,
             }));
             this.models[vid] = vid;
 
@@ -433,11 +403,12 @@ class ProcessCarTrack {
                     showBackground: true,
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                     pixelOffset: new Cesium.Cartesian2(0.0, 0),
-                    scaleByDistance: new Cesium.NearFarScalar(100, 1, 20000, 0)
+                    scaleByDistance: new Cesium.NearFarScalar(100, 1, 2000, 0)
                 }
             });
 
-
+            //增加光环
+            this.addEllipse(vid,position);
         } else {
 
             let carpt = null;
@@ -467,98 +438,103 @@ class ProcessCarTrack {
             Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, carpt.modelMatrix)
 
             var carlabelpt = this.viewer.entities.getById(vid + "lblpt");
-            carlabelpt.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude,4);
+            carlabelpt.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 4);
             carlabelpt.label.text = plateNo;
 
-
+            //修改光环大小
+            this.viewer.entities.getById(vid + "ellipse1").position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + 4);
+            this.viewer.entities.getById(vid + "ellipse2").position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + 4);
+            this.viewer.entities.getById(vid + "ellipse3").position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + 4);
 
         }
     }
+     //添加光环
+     addEllipse(vid,position)
+     {
+         //光环
+         var r1 = 0, r2 = 3, r3 = 6;
+         function changeR1() { //这是callback，参数不能内传
+             r1 = r1 + 0.1;
+             if (r1 >= 10) {
+                 r1 = 0;
+             }
+             return r1;
+         }
+         //光环回调
+         function changeR2() {
+             r2 = r2 + 0.1;
+             if (r2 >= 10) {
+                 r2 = 0;
+             }
+             return r2;
+         }
+         function changeR3() {
+             r3 = r3 + 0.1;
+             if (r3 >= 10) {
+                 r3 = 0;
+             }
+             return r3;
+         }
+         //光环
+         this.viewer.entities.add({
+             id: vid + "ellipse1",
+             position: position,
+             ellipse: {
+                 semiMinorAxis: new Cesium.CallbackProperty(function () {
+                     return r1
+                 }, false),
+                 semiMajorAxis: new Cesium.CallbackProperty(changeR1, false),
+                 height: this.defualtZ + 0.3,
+                 outline: true, //必须设置height，否则ouline无法显示
+                 outlineColor: Cesium.Color.YELLOW.withAlpha(1),
+                 outlineWidth: 2.0,//不能设置，固定为1
+                 fill: false
+             }
+         });
+
+         this.viewer.entities.add({
+             id: vid + "ellipse2",
+             position: position,
+             ellipse: {
+                 semiMinorAxis: new Cesium.CallbackProperty(function () {
+                     return r2
+                 }, false),
+                 semiMajorAxis: new Cesium.CallbackProperty(changeR2, false),
+                 height: this.defualtZ + 0.3,
+                 outline: true, //必须设置height，否则ouline无法显示
+                 outlineColor: Cesium.Color.YELLOW.withAlpha(1),
+                 outlineWidth: 2.0,//不能设置，固定为1
+                 fill: false
+             }
+         });
+
+         this.viewer.entities.add({
+             id: vid + "ellipse3",
+             position: position,
+             ellipse: {
+                 semiMinorAxis: new Cesium.CallbackProperty(function () {
+                     return r3
+                 }, false),
+                 semiMajorAxis: new Cesium.CallbackProperty(changeR3, false),
+                 height: this.defualtZ + 0.3,
+                 outline: true, //必须设置height，否则ouline无法显示
+                 outlineColor: Cesium.Color.YELLOW.withAlpha(1),
+                 outlineWidth: 2.0,//不能设置，固定为1
+                 fill: false
+             }
+         });
+     }
+       //主车移动
     moveTo(d) {
-        
         var heading = Cesium.Math.toRadians(d.heading);
         var pitch = -0.2369132859032279;
         var roll = 0.0029627735803421373;
         var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
 
-
-
         this.viewer.camera.setView({
             destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 10),
             orientation: hpr
         });
-
-        /*let vid = d.vehicleId;
-        var carlabelpt = this.viewer.entities.getById(vid + "lblpt");
-        this.viewer.trackedEntity = carlabelpt;*/
-
-
-
-        //     debugger
-        //      if(!this.isload)
-        //      {
-        //     var heading = Cesium.Math.toRadians(70);
-        //     var pitch = -0.2369132859032279;
-        //     var roll = 0.0029627735803421373;
-        //     var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
-        //     this.viewer.camera.flyTo({
-        //       destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude,0),
-        //       orientation: hpr
-        //     });
-
-        //     this.isload=true;
-        // }
-        // else
-        // {
-
-        // }
-
-
-        //     // viewer.trackedEntity = undefined;
-        //     // viewer.scene.camera.flyTo(homeCameraView);
-
-        //     // if(!this.isload)
-        //     // {
-        //         if((d.heading-this.x)>3)
-        //         {
-        //               var heading = Cesium.Math.toRadians(d.heading);
-        //             var pitch = -0.2369132859032279;
-        //             var roll =0.0029627735803421373;
-        //             var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
-
-
-
-        //             this.viewer.camera.setView({
-        //                 destination : Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude,6),
-        //                 orientation: hpr
-        //             });
-
-
-        //         }
-        //         else
-        //         {
-
-        //         }
-
-        //          let vid = d.vehicleId;
-        //         var carlabelpt = this.viewer.entities.getById(vid + "labelpt");
-        //         this.viewer.trackedEntity = carlabelpt; 
-        //         this.x=d.heading;
-        //         var property = new Cesium.SampledPositionProperty(); 
-
-        //         carlabelpt.orientation=new Cesium.VelocityOrientationProperty(property);
-        //     // this.isload=true;
-        //     // }
-        //     // else
-        //     // {
-        //         // let vid = d.vehicleId;
-        //         // var carlabelpt = this.viewer.entities.getById(vid + "labelpt");
-        //         // this.viewer.trackedEntity = carlabelpt; 
-        //     // }
-
-
-
-
     }
 
 }
