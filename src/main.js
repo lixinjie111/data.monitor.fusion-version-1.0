@@ -35,8 +35,16 @@ const whiteList = ['/login','/404'];
 //     adminId: "********"
 // });
 // removeAuthInfo();
-// router global config
-router.beforeEach((to,from,next) => {
+// axios 过滤器
+import  axiosFilter from './api/axiosConfig.js';
+
+//取消请求的对象
+window.cancleSource={};
+window.cancelToken = axios.CancelToken;
+// 路由拦截器
+router.beforeEach((to, from, next) => {
+    window.cancleSource.cancel && window.cancleSource.cancel();
+    window.cancleSource = window.cancelToken.source();
     NProgress.start()
     // _hmt.push(['_trackPageview', to.fullPath]);
     const ADMINID = getAdminId();
@@ -71,5 +79,4 @@ const vm = new Vue({
 });
 
 // axios 过滤器
-import axiosFilter from './api/axiosConfig.js';
 axiosFilter(vm);
