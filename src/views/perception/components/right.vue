@@ -880,7 +880,7 @@
             onSpatMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
-                let data = json.result.spatDataDTO;
+                let data = json.result.data;
                 if(_this.isCapture=='true'){
                     if(_this.captureCount>1000){
                         return;
@@ -1303,10 +1303,10 @@
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
                 if(this.pulseNowTime==''){
-                   this.initPerceptionWebSocket();
+//                   this.initPerceptionWebSocket();
                    this.initPlatformWebSocket();
-                   this.initWarningWebSocket();
-                   this.initSpatWebSocket();
+//                   this.initWarningWebSocket();
+//                   this.initSpatWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
@@ -1340,19 +1340,18 @@
                 }
                 //缓存的时间
                 let pulseNum = this.delayTime*2/40;
-                let delayTime = this.delayTime*2*0.6;
                 if(this.pulseCount>=pulseNum) {
                     //当平台车开始插值时，调用其他接口
-                    this.processDataTime = result.timestamp-delayTime;
+                    this.processDataTime = result.timestamp-this.delayTime;
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(perceptionCars.devObj).length>0){
-                        let processPerCar = perceptionCars.processPerTrack(result.timestamp,delayTime);
+                        let processPerCar = perceptionCars.processPerTrack(result.timestamp,this.delayTime);
                         if(processPerCar){
                             this.processPerData(processPerCar);
                         }
                     }
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                        platCars.processPlatformCarsTrack(result.timestamp,delayTime);
+                        platCars.processPlatformCarsTrack(result.timestamp,this.delayTime);
                     }
                     //每隔80ms一次
                     if(this.spatPulseCount==0||this.spatPulseCount>=30){
@@ -1360,7 +1359,7 @@
                         this.spatPulseCount=1;
                         if(Object.keys(processData.spatObj).length>0){
 //                            console.log("spatPulseCount:"+this.spatPulseCount)
-                            let data = processData.processSpatData(result.timestamp,delayTime);
+                            let data = processData.processSpatData(result.timestamp,this.delayTime);
                             this.drawnSpat(data);
                         }
                     }

@@ -166,7 +166,7 @@ export default {
     showView(carId) {
       this.$router.push({
         path: "/single/" + carId,
-        query:{delayTime:3}
+        query:{delayTime:4}
       });
     }
   },

@@ -135,7 +135,7 @@
         watch:{
             routeData:{
                 handler(newValue, oldValue) {
-                    this.onmessage();
+                    this.onmessage(this.routeData);
                 },
 //                immediate: true,
                 deep: true
@@ -173,62 +173,72 @@
                 }, 1000);*/
                 let _this=this;
                 let pointList = [];
+                let isArray = false;
+                if(data &&Object.prototype.toString.call(data)=='[object Array]'){
+                    isArray = true;
+                }
                 //是一次新的行程
                 if(this.all == 1){
                     //判断是历史数据还是新的轨迹
-                    //如果是历史轨迹
-                    if(data &&Object.prototype.toString.call(data)=='[object Array]'){
+                    //如果历史轨迹
+                    if(data &&isArray){
                         pointList = data;
                     }else{
                         pointList = [{
-                            gnss_LONG: data.lon,
-                            gnss_LAT: data.lat,
-                            gnss_HEAD: data.head
+                            longitude: data.longitude,
+                            latitude: data.latitude,
+                            heading: data.heading
                         }];
                     }
                 }else{
                     pointList = [{
-                        gnss_LONG: data.lon,
-                        gnss_LAT: data.lat,
-                        gnss_HEAD: data.head
+                        longitude: data.longitude,
+                        latitude: data.latitude,
+                        heading: data.heading
                     }];
                 }
                 if(pointList && pointList.length > 0) {
+
+                    let routeId;
+                    if(!isArray){
+                        routeId = data.routeId;
+                    }
+
                     if(this.routeId != ""){
-                        if(this.routeId != json.data.routeId) {
+                        if(this.routeId != routeId){
                             console.log("重新开启行程");
                             this.all = 1;
+                            this.routeId =routeId;
                             return false;
                         }
                     }else{
                         console.log("第一次开启行程");
-                        this.routeId =json.data.routeId;
                         // console.log(this.routeId);
-                        _this.carStartPoint = ConvertCoord.wgs84togcj02(pointList[0].gnss_LONG, pointList[0].gnss_LAT);
+                        _this.carStartPoint = ConvertCoord.wgs84togcj02(pointList[0].longitude, pointList[0].latitude);
                         _this.distanceMapStart();
                     }
-
-                    if(this.prevLastPointPath.length !=0 && pointList.length==1 && this.prevLastPointPath[0] == pointList[0].gnss_LONG && this.prevLastPointPath[1] == pointList[0].gnss_LAT){
+                    this.routeId =routeId;
+                    if(this.prevLastPointPath.length !=0 && pointList.length==1 && this.prevLastPointPath[0] == pointList[0].longitude && this.prevLastPointPath[1] == pointList[0].latitude){
                         this.changeLngLat();
                         return false;
                     }
 
                     if(pointList.length!=0){
-                        this.prevLastPointPath = [pointList[pointList.length-1].gnss_LONG, pointList[pointList.length-1].gnss_LAT];
+                        this.prevLastPointPath = [pointList[pointList.length-1].longitude, pointList[pointList.length-1].latitude];
                     }
 
                     let handlePointList = [];
                     pointList.forEach((item, index) => {
-                        if(item.gnss_LONG && item.gnss_LAT){
+                        if(item.longitude && item.latitude){
                             // let lnglatArr = new AMap.LngLat(item.gnss_LONG, item.gnss_LAT);
-                            let lnglatArr = [item.gnss_LONG, item.gnss_LAT];
+                            let lnglatArr = [item.longitude, item.latitude];
                             handlePointList.push(lnglatArr);
                         }
                     });
                     // console.log(handlePointList);
                     let _dataLength = handlePointList.length;
                     this.wholePath.push( {
-                        angle: pointList[_dataLength-1].gnss_HEAD >= 0 ? pointList[_dataLength-1].gnss_HEAD : 90,
+                        angle: pointList[_dataLength-1].heading >= 0 ? pointList[_dataLength-1].heading : 90,
                         routeId: this.routeId,
                         pathList: handlePointList
                     });

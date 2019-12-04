@@ -168,7 +168,7 @@
                 window.open(href, '_blank')*/
                 this.$router.push({
                     path: "/single/" + e.target.get("vehicleId"),
-                    query:{delayTime:3}
+                    query:{delayTime:4}
                 });
             },
             onclose(data){
@@ -265,7 +265,7 @@
                                         }
                                         marker.on('click', function(e) {
                                             _this.$router.push({
-                                                path: '/perception/'+subItem.deviceId+ "/"+1+ "/"+0.004+"/"+true,
+                                                path: '/perception/'+subItem.deviceId+ "/"+4+ "/"+0.004+"/"+true,
                                                 query:{lng:subItem.longitude,lat:subItem.latitude,isShow:false}
                                             });
                                         });
