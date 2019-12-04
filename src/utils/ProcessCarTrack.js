@@ -126,7 +126,6 @@ class ProcessCarTrack {
 
     //接收数据
     receiveData(json,time,mainCarId){
-        debugger
         let data = json.result.data;
         for(let vehicleId in data){
             // if(vehicleId=='B21E0002'){
@@ -159,12 +158,12 @@ class ProcessCarTrack {
                         }else {
                             cdata.push(vehList[i]);
                         }
+                    }else{
+                        Array.prototype.push.apply(cdata,vehList);
                     }
                 }
             }else{
-                vehList.forEach(item=>{
-                    cdata.push(item);
-                })
+                Array.prototype.push.apply(cdata,vehList) ;
             }
             this.platObj[vehicleId]=cdata;
             // }
@@ -342,7 +341,7 @@ class ProcessCarTrack {
         let minData = {};
         let minDiff;
         //如果能找到最小范围
-        console.log(rangeData)
+        // console.log(rangeData)
         if(rangeData){
             minIndex = rangeData.index;
             minData = rangeData.data;
@@ -386,7 +385,7 @@ class ProcessCarTrack {
         this.cacheAndInterpolateDataByVid[vid].cacheData = this.cacheAndInterpolateDataByVid[vid].cacheData.filter((item,index)=>{
             return index>minIndex;
         })
-        console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+        // console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
 
         //返回距离标尺的最小插值的数据
         return minData;
@@ -488,6 +487,12 @@ class ProcessCarTrack {
             destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 10),
             orientation: hpr
         });
+
+        /*let vid = d.vehicleId;
+        var carlabelpt = this.viewer.entities.getById(vid + "lblpt");
+        this.viewer.trackedEntity = carlabelpt;*/
+
+
 
         //     debugger
         //      if(!this.isload)

@@ -109,6 +109,9 @@
                 spatPulseCount:0,
                 routePulseCount:0,
                 pulseInterval:40,
+                perCount:0,
+                spatCount:0,
+
 
                 tabIsExist:true
 
@@ -983,11 +986,14 @@
                     this.initPlatformWebSocket();
 //                    this.initPerceptionWebSocket();
 //                    this.initWarningWebSocket();
-//                    this.initSpatWebSocket();
+                    this.initSpatWebSocket();
 //                    this.initRouteWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
+                //缓存的时间
+                let pulseNum = this.delayTime*2/40;
+                let delayTime = this.delayTime*2*0.6;
                 if (Object.keys(platCars.platObj).length > 0) {
                     for (let vehicleId in platCars.platObj) {
                         let dataList = platCars.platObj[vehicleId];
@@ -998,61 +1004,80 @@
                             //将第一个点进行分割
                             let data = dataList.shift();
                             platCars.cacheAndInterpolatePlatformCar(data);
-                            console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
+//                            console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
                         }
                     }
                 }
-             /*   if (Object.keys(perceptionCars.devObj).length > 0) {
+                if(this.perCount>0){
+                    this.perCount++;
+                    console.log("感知车辆数量："+this.perCount+","+pulseNum)
+                }
+                if (Object.keys(perceptionCars.devObj).length > 0) {
+                    //当有感知数据时
+                    if(this.perCount==0){
+                        this.perCount++;
+                    }
                     for (let devId in perceptionCars.devObj) {
                         let devList = perceptionCars.devObj[devId];
-                        /!*console.log("*****")
-                        console.log(vehicleId,dataList.length)*!/
+                        /*console.log("*****")
+                        console.log(vehicleId,dataList.length)*/
                         if (devList.length > 0) {
                             //分割之前将车辆移动到上一个点
                             //将第一个点进行分割
                             let data = devList.shift();
                             perceptionCars.cacheAndInterpolatePerCar(data);
+                            console.log(devId+"————————"+perceptionCars.cacheAndInterpolateDataByDevId[devId].cacheData.length)
 //                            console.log(devId+"————————"+perceptionCars.cacheAndInterpolateDataByDevId[devId].cacheData.length)
                         }
                     }
                 }
-                //缓存的时间
-                let pulseNum = this.delayTime*2/40;
-                let delayTime = this.delayTime*2*0.6;
-                console.log(pulseNum)
+
+                if(this.spatCount>0){
+                    this.spatCount++;
+                    console.log("红绿灯："+this.spatPulseCount+","+pulseNum)
+                }
+                if(Object.keys(processData.spatObj).length>0){
+                    if(this.spatCount==0){
+                        this.spatCount++;
+                    }
+                }
+
+                //平台车  缓存+40ms调用一次
                 if(this.pulseCount>=pulseNum) {
                     //当平台车开始插值时，调用其他接口
                     this.processDataTime = result.timestamp-delayTime;
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
+                    if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
+                        platCars.processPlatformCarsTrack(result.timestamp,delayTime);
+                    }
+                    if(this.routePulseCount==0||this.routePulseCount>=25){
+                        this.routePulseCount=1;
+                        if(processData.routeList.length>0){
+                            let routeData = processData.processRouteData(result.timestamp,delayTime);
+                            this.$parent.routeData=routeData;
+                        }
+                    }
+                    this.routePulseCount++;
+                }
+                //感知车 缓存+40ms调用一次
+                if(this.perCount>=pulseNum){
                     if(Object.keys(perceptionCars.devObj).length>0){
                         let processPerCar = perceptionCars.processPerTrack(result.timestamp,delayTime);
 //                        this.processPerData(processPerCar);
 
                     }
-                    if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                        platCars.processPlatformCarsTrack(result.timestamp,delayTime);
-                    }
-                    if(this.spatPulseCount==0||this.spatPulseCount>=30){
-                        console.log(this.spatPulseCount);
-                        this.spatPulseCount=1;
-                        if(Object.keys(processData.spatObj).length>0){
+                }
+                //红绿灯  缓存+1200ms调用一次
+                if(this.spatCount>=pulseNum&&(this.spatPulseCount==0||this.spatPulseCount>=30)){
+                    console.log(this.spatPulseCount);
+                    this.spatPulseCount=1;
+                    if(Object.keys(processData.spatObj).length>0){
 //                            console.log("spatPulseCount:"+this.spatPulseCount)
-                            let spatData = processData.processSpatData(result.timestamp,delayTime);
-                            this.drawnSpat(spatData);
-                        }
-                    }
-                    if(this.routePulseCount==0||this.routePulseCount>=25){
-                        console.log("-------------"+this.routePulseCount);
-                        this.routePulseCount=1;
-                        if(processData.routeList.length>0){
-//                            console.log("spatPulseCount:"+this.spatPulseCount)
-                            let routeData = processData.processRouteData(result.timestamp,delayTime);
-                            this.$parent.routeData=routeData;
-                        }
+                        let spatData = processData.processSpatData(result.timestamp,delayTime);
+                        this.drawnSpat(spatData);
                     }
                     this.spatPulseCount++;
-                    this.routePulseCount++;
-                }*/
+                }
             },
             onPulseClose(data){
                 console.log("感知车结束连接");
@@ -1114,7 +1139,8 @@
 
             platCars.cacheAndInterpolateDataByVid = {},
             platCars.models={};
-            platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
+            platCars.viewer = gis3d.cesium.viewer;
+
             this.delayTime= parseFloat(this.$route.query.delayTime).toFixed(3)*1000;
             this.onMapComplete();
             //判断当前标签页是否被隐藏

@@ -29,7 +29,7 @@
 //            sessionStorage.setItem(item.rsId,JSON.stringify(item));
                 let centPos = item.centPos.split(",");
                 this.$router.push({
-                    path: '/perception/'+item.rsId+ "/"+3+"/"+0.004+"/"+true,
+                    path: '/perception/'+item.rsId+ "/"+4+"/"+0.004+"/"+true,
                     query:{lng:centPos[0],lat:centPos[1],isShow:false}
                 });
             },
