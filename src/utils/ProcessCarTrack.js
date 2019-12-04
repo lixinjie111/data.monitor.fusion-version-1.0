@@ -126,6 +126,7 @@ class ProcessCarTrack {
 
     //接收数据
     receiveData(json,time,mainCarId){
+        debugger
         let data = json.result.data;
         for(let vehicleId in data){
             // if(vehicleId=='B21E0002'){
