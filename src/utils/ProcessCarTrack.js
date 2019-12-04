@@ -315,7 +315,7 @@ class ProcessCarTrack {
         //找到满足条件的范围
         for(let i=0;i<cacheData.length;i++){
             let diff = Math.abs(time-cacheData[i].gpsTime-delayTime);
-            console.log(vid,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
+            // console.log(vid,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
             if(diff<this.pulseInterval){
                 if(startIndex !=-1 && i != startIndex+1) {
                     break;
@@ -346,7 +346,7 @@ class ProcessCarTrack {
             minIndex = rangeData.index;
             minData = rangeData.data;
         }else{
-            console.log("plat***********************");
+            console.log("plat没有符合范围的");
             minIndex = 0;
             minData = cacheData[0];
             minDiff = Math.abs(time-minData.gpsTime-delayTime);
@@ -361,7 +361,7 @@ class ProcessCarTrack {
 
             }
         }
-        console.log("最小索引:"+minIndex);
+        // console.log("最小索引:"+minIndex);
         if (minDiff&&minDiff>this.platMaxValue){
             console.log("plat找到最小值无效")
             return;

@@ -243,7 +243,7 @@
             onSpatMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
-                let data = json.result.spatDataDTO;
+                let data = json.result.data;
                 processData.receiveLightData(data);
 //                _this.processSpat(data);
 //                let vehData = json.result.vehDataStat;
@@ -986,8 +986,8 @@
                     this.initPlatformWebSocket();
 //                    this.initPerceptionWebSocket();
 //                    this.initWarningWebSocket();
-                    this.initSpatWebSocket();
-//                    this.initRouteWebSocket();
+//                    this.initSpatWebSocket();
+                    this.initRouteWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
@@ -1010,7 +1010,6 @@
                 }
                 if(this.perCount>0){
                     this.perCount++;
-                    console.log("感知车辆数量："+this.perCount+","+pulseNum)
                 }
                 if (Object.keys(perceptionCars.devObj).length > 0) {
                     //当有感知数据时
@@ -1034,7 +1033,6 @@
 
                 if(this.spatCount>0){
                     this.spatCount++;
-                    console.log("红绿灯："+this.spatPulseCount+","+pulseNum)
                 }
                 if(Object.keys(processData.spatObj).length>0){
                     if(this.spatCount==0){
@@ -1052,6 +1050,7 @@
                     }
                     if(this.routePulseCount==0||this.routePulseCount>=25){
                         this.routePulseCount=1;
+                        console.log("length:"+processData.routeList.length);
                         if(processData.routeList.length>0){
                             let routeData = processData.processRouteData(result.timestamp,delayTime);
                             this.$parent.routeData=routeData;
@@ -1138,7 +1137,7 @@
             perceptionCars.viewer=gis3d.cesium.viewer;
 
             platCars.cacheAndInterpolateDataByVid = {},
-            platCars.models={};
+                platCars.models={};
             platCars.viewer = gis3d.cesium.viewer;
 
             this.delayTime= parseFloat(this.$route.query.delayTime).toFixed(3)*1000;
@@ -1227,7 +1226,7 @@
         /* padding-top: 10px;*/
     }
     .video-position{
-    @include layoutMode(both);
+        @include layoutMode(both);
         height:100%;
         background: #000000;
     }
@@ -1240,14 +1239,14 @@
         font-size: 16px;
         letter-spacing: 0px;
         z-index:1;
-    .detail1{
-        display: inline-block;
-        padding:5px 10px;
-    .detail2{
-        color: #37ba7b;
-        display: inline-block;
-        padding: 0px 2px;
-    }
-    }
+        .detail1{
+            display: inline-block;
+            padding:5px 10px;
+            .detail2{
+                color: #37ba7b;
+                display: inline-block;
+                padding: 0px 2px;
+            }
+        }
     }
 </style>

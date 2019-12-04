@@ -880,7 +880,7 @@
             onSpatMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
-                let data = json.result.spatDataDTO;
+                let data = json.result.data;
                 if(_this.isCapture=='true'){
                     if(_this.captureCount>1000){
                         return;

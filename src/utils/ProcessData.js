@@ -18,8 +18,12 @@ class ProcessCarTrack {
         });
     }
     receiveRouteData(data){
-        console.log(data.length,this.routeList.length)
-        this.routeList.push.apply(this.routeList,data);
+        let track = data.track;
+        let route = data.route;
+        track.forEach(item =>{
+            item.routeId = route.routeId;
+        })
+        this.routeList.push.apply(this.routeList,track);
     }
 
     processSpatData(time,delayTime){
@@ -44,7 +48,8 @@ class ProcessCarTrack {
         //找到满足条件的范围
         for(let i=0;i<cacheData.length;i++){
             let diff = Math.abs(time-cacheData[i].spatTime-delayTime);
-            // console.log(spatId,cacheData.length,time,parseInt(cacheData[i].spatTime),delayTime,diff,i)
+            console.log("-----"+cacheData[i])
+            console.log(spatId,cacheData.length,time,parseInt(cacheData[i].spatTime),delayTime,diff,i)
             if(diff<this.spatPulseInterval){
                 if(startIndex !=-1 && i != startIndex+1) {
                     break;
@@ -92,7 +97,7 @@ class ProcessCarTrack {
 
             }
         }
-        console.log("最小索引:"+minIndex+",插值"+rangeData&&rangeData.diff);
+        console.log("最小索引:"+minIndex);
         //找出的最小值无效
         if(minDiff&&minDiff>this.spatMaxValue){
             console.log("spat找到的最小值无效")
@@ -189,7 +194,7 @@ class ProcessCarTrack {
 
             }
         }
-        console.log("最小索引:"+minIndex+",插值"+rangeData&&rangeData.diff);
+        console.log("最小索引:"+minIndex);
         //找出的最小值无效
         if(minDiff&&minDiff>this.routeMaxValue){
             console.log("route找到的最小值无效")
