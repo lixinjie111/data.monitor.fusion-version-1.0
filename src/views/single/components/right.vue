@@ -108,7 +108,9 @@
                 delayTime:'',
                 spatPulseCount:0,
                 routePulseCount:0,
-                pulseInterval:40
+                pulseInterval:40,
+
+                tabIsExist:true
 
             }
 
@@ -978,11 +980,11 @@
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
                 if(this.pulseNowTime==''){
-//                    this.initPlatformWebSocket();
+                    this.initPlatformWebSocket();
 //                    this.initPerceptionWebSocket();
 //                    this.initWarningWebSocket();
 //                    this.initSpatWebSocket();
-                    this.initRouteWebSocket();
+//                    this.initRouteWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
@@ -1000,11 +1002,11 @@
                         }
                     }
                 }
-                if (Object.keys(perceptionCars.devObj).length > 0) {
+             /*   if (Object.keys(perceptionCars.devObj).length > 0) {
                     for (let devId in perceptionCars.devObj) {
                         let devList = perceptionCars.devObj[devId];
-                        /*console.log("*****")
-                        console.log(vehicleId,dataList.length)*/
+                        /!*console.log("*****")
+                        console.log(vehicleId,dataList.length)*!/
                         if (devList.length > 0) {
                             //分割之前将车辆移动到上一个点
                             //将第一个点进行分割
@@ -1050,7 +1052,7 @@
                     }
                     this.spatPulseCount++;
                     this.routePulseCount++;
-                }
+                }*/
             },
             onPulseClose(data){
                 console.log("感知车结束连接");
@@ -1095,6 +1097,14 @@
                 //重连不能超过5次
                 this.pulseConnectCount++;
             },
+
+            processTab(){
+                if(document.visibilityState == "hidden") {
+                    this.tabIsExist=false;
+                } else if (document.visibilityState == "visible") {
+                    this.tabIsExist=true;
+                }
+            },
         },
         mounted(){
             this.getDeviceInfo();
@@ -1107,7 +1117,8 @@
             platCars.processPlatformCarsTrack(gis3d.cesium.viewer);
             this.delayTime= parseFloat(this.$route.query.delayTime).toFixed(3)*1000;
             this.onMapComplete();
-
+            //判断当前标签页是否被隐藏
+            document.addEventListener("visibilitychange",this.processTab);
 
 //            this.initLightWebSocket();
         },
