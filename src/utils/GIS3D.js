@@ -60,14 +60,14 @@ class GIS3D {
           }));
          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/map3d/data/2.geojson', {
             stroke: Cesium.Color.ALICEBLUE.withAlpha(0.996),// Cesium.Color.ORANGE, new Cesium.Color(135,75,43,1)
-            strokeWidth: 2,
+            strokeWidth: 1,
             markerSymbol: '?'
         }));
-          this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/map3d/data/1.geojson', {
-            stroke: new Cesium.Color(0.5372549019607843, 0.2941176470588235, 0.1686274509803922, 0.996),// Cesium.Color.ALICEBLUE.withAlpha(0.996),
-            strokeWidth: 2,
-            markerSymbol: '?'
-          })); 
+        //   this.cesium.viewer.dataSources.add(Cesium.GeoJsonDataSource.load('static/map3d/data/1.geojson', {
+        //     stroke: new Cesium.Color(0.5372549019607843, 0.2941176470588235, 0.1686274509803922, 0.996),// Cesium.Color.ALICEBLUE.withAlpha(0.996),
+        //     strokeWidth: 2,
+        //     markerSymbol: '?'
+        //   })); 
 
         //业务数据
           this.cesium.viewer.imageryLayers.addImageryProvider(new Cesium.WebMapTileServiceImageryProvider({
