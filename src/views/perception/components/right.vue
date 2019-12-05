@@ -45,7 +45,8 @@
             </div>
         </div>
         <div class="map-left"></div>
-        <div id="cesiumContainer" class="c-map">
+         <div   id="cesiumContainer" class="c-map"> 
+       
         </div>
         <div class="per-data-list">
             <p v-for="item in perDataList">
@@ -65,7 +66,7 @@
     import PerceptionCars from '@/utils/PerceptionCars.js'
     import ProcessCarTrack from '@/utils/ProcessCarTrack.js'
     import ProcessData from '@/utils/ProcessData.js'
-    let gis3d=new GIS3D();
+    let gis3d;
     let perceptionCars = new PerceptionCars();
     let platCars = new ProcessCarTrack();
     let processData = new ProcessData();
@@ -103,9 +104,7 @@
                 platformConnectCount:0,
                 perceptionConnectCount:0,
                 spatConnectCount:0,
-                pulseConnectCount:0,
-                gis3d:null,
-
+                pulseConnectCount:0, 
                 perDataList:[], //感知数据实时滚动
 
                 warningObj:{}, // 参数待定
@@ -156,6 +155,7 @@
         },
         mounted() {
             let _this = this;
+            gis3d=new GIS3D();
             gis3d.initload("cesiumContainer",false);
             perceptionCars.viewer=gis3d.cesium.viewer;
 //            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
@@ -198,7 +198,10 @@
                 return time;
             },
             onMapComplete(){
-
+// debugger
+//    let d=  THREE.Math.radToDeg(-0.5812456902047951);
+//   let h= Cesium.Math.toRadians(d);
+//  let a= Cesium.Math.toDegrees(h);
 //                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
                 /*setInterval(()=>{
                     let camera = this.$refs.perceptionMap.getCamera();
@@ -221,10 +224,11 @@
                 let count=0;
                 let flag=false;
                 let camParam;
+                debugger
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
-
+debugger
 //                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
 //                    gis3d.updateCameraPosition(121.1727923, 31.2840917,39,70,-0.2369132859032279, 0.0029627735803421373);
                      gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
@@ -236,7 +240,7 @@
                 this.mapInitTime = setInterval(()=>{
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
-//                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+    //    gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
                          gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
                         this.getData();
                         clearInterval(this.mapInitTime);
@@ -1303,7 +1307,7 @@
                 let json = JSON.parse(mesasge.data);
                 let result = json.result;
                 if(this.pulseNowTime==''){
-//                   this.initPerceptionWebSocket();
+                  this.initPerceptionWebSocket();
                    this.initPlatformWebSocket();
 //                   this.initWarningWebSocket();
 //                   this.initSpatWebSocket();
@@ -1409,16 +1413,37 @@
                 //重连不能超过5次
                 this.pulseConnectCount++;
             },
+            aa()
+            {
+                debugger
+   //获取到3d的盒子
+                var gis = document.getElementById("cesiumContainer");
+                //隐藏
+                gis.style.display = "none";
+                //从当前页面中移除
+                document.getElementById("cesiumDIV").removeChild(gis);
+                //重新挂载回body
+                document.body.appendChild(gis);
+            }
         },
+      beforeDestroy()
+      {
+  
+      },
         destroyed(){
+             
+        
+
+            gis3d.destroyed(); 
+            gis3d=null
             clearInterval(this.mapInitTime);
             this.warningWebsocket&&this.warningWebsocket.close();
             this.platformWebsocket&&this.platformWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.spatWebsocket&&this.spatWebsocket.close();
             this.pulseWebsocket&&this.pulseWebsocket.close();
-        }
-    }
+        } 
+    }  
 </script>
 
 <style lang="scss" scoped>
