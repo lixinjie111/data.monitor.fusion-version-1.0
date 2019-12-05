@@ -6,22 +6,21 @@ import light3D from '@/utils/GIS/light3D.js'
  * 地图基础库
  */
 class GIS3D {
-    constructor() {
-        this.cesiumContainer = null;
+    constructor() { 
         this.cesium = { viewer: null };
         this.models = {};
         this.defualtZ = window.defualtZ;
         this.light3DList=[];//灯集合
     }
-    initload(id, isFXAA) {
-        this.cesiumContainer = document.getElementById(id);
-        this.initCesium(); // Initialize Cesium renderer  
+    initload(id, isFXAA) {  document.getElementById(id);
+        let cesiumContainer=document.getElementById(id);
+        this.initCesium(cesiumContainer); // Initialize Cesium renderer  
         if (!isFXAA) {
             this.cesium.viewer.scene.screenSpaceCameraController.minimumZoomDistance = this.defualtZ + 5; //距离地形的距离？这个值可以多测试几个值，，我这不太好描述
         }
     }
-    initCesium() {
-        this.cesium.viewer = new Cesium.Viewer(this.cesiumContainer, {
+    initCesium(cesiumContainer) {
+        this.cesium.viewer = new Cesium.Viewer(cesiumContainer, {
             projectionPicker: true, 
             animation: false,  //动画控制不显示     
             timeline: false
@@ -38,8 +37,7 @@ class GIS3D {
             vrButton: false,
             // orderIndependentTranslucency: false,
             baseLayerPicker: false, //是否显示图层选择控件
-            infoBox: false, //是否显示点击要素之后显示的信息
-            
+            infoBox: false, //是否显示点击要素之后显示的信息 
         });
         this.cesium.viewer.scene.globe.depthTestAgainstTerrain = false;
         // this.cesium.viewer.scene.postProcessStages.fxaa.enabled = true;
@@ -50,7 +48,13 @@ class GIS3D {
         // this.cesium.viewer.scene.terrainProvider = terrainProvider;
          //解决面的问题
          this.cesium.viewer.scene.logarithmicDepthBuffer = false; 
+          
+        //  this.cesium.viewer.scene.sun.glowFactor=100;
         // this.cesium.viewer.scene.skyBox.show = false
+        this.cesium.viewer.scene.sun.destroy(); //去掉太阳
+        this.cesium.viewer.scene.sun = undefined; //去掉太阳
+        this.cesium.viewer.scene.moon.destroy(); //去掉月亮
+        this.cesium.viewer.scene.moon = undefined; //去掉月亮 
         // this.cesium.viewer.scene.backgroundColor =Cesium.Color.fromCssColorString('#758152').withAlpha(0.1);
 
         //去除版权信息
@@ -102,18 +106,18 @@ class GIS3D {
         var item = sessionStorage.getItem("sideList");
         
         this.initModel_pole(item,this.cesium.viewer); 
-        this.initlight();
+        // this.initlight();
     }
     updateLight(light)
     { 
-        debugger
-        if(light.id==277)
-        {
-            this.light3DList[0].idd=light.id;
-            this.light3DList[0].img1=light.img1; 
-            this.light3DList[0].img2=light.img2; 
-            this.light3DList[0].img3=light.img3;  
-        } 
+        // debugger
+        // if(light.id==277)
+        // {
+        //     this.light3DList[0].idd=light.id;
+        //     this.light3DList[0].img1=light.img1; 
+        //     this.light3DList[0].img2=light.img2; 
+        //     this.light3DList[0].img3=light.img3;  
+        // } 
                    
     }
     /**
@@ -246,8 +250,8 @@ class GIS3D {
         this.cesium.viewer.scene.primitives.add(entity);
     }
     updateCameraPosition(x, y, z, radius, pitch, yaw) {
-        var heading = radius;// Cesium.Math.toRadians(radius);
-        var hpr = new Cesium.HeadingPitchRoll(heading, pitch, yaw);
+    // debugger Cesium.Math.toRadians(radius)
+        var hpr = new Cesium.HeadingPitchRoll(radius, pitch, yaw);
         this.cesium.viewer.camera.flyTo({
             destination: Cesium.Cartesian3.fromDegrees(x, y,z),
             orientation: hpr
@@ -321,6 +325,15 @@ class GIS3D {
                 scale: 10.0
             }));
         }
+    }
+    destroyed()
+    {
+        this.cesium.viewer.scene.imageryLayers.removeAll()    
+        this.cesium.viewer.dataSources.removeAll(); 
+        this.cesium.viewer.scene.primitives.removeAll();
+        this.cesium.viewer.entities.removeAll(); 
+        this.cesium.viewer=null; 
+        this.cesium.viewer.render=null;
     }
 }
 export default GIS3D
