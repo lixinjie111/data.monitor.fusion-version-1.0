@@ -1,7 +1,7 @@
 class light3D {
     constructor() {
         //viewer=null;
-        this.idd;
+        this.id;
         this.num=0; 
         this.img1;
         this.img2;

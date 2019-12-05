@@ -7,10 +7,10 @@
                     <span class="vehicle-number">{{singleVehicle.platNo}}</span>
                     <div class="real-content">
                         <!--左-->
-                        <img src="@/assets/images/single/left.png"  class="turn-img" v-if="realData.turnLight=='left'">
+                        <img src="@/assets/images/single/left.png"  class="turn-img" v-if="canData.turnLight=='left'">
                         <img src="@/assets/images/single/right.png" class="turn-img director-left " v-else>
                         <!--向右转 亮-->
-                        <img src="@/assets/images/single/left.png" class="director-right" v-if="realData.turnLight=='right'">
+                        <img src="@/assets/images/single/left.png" class="director-right" v-if="canData.turnLight=='right'">
                         <img src="@/assets/images/single/right.png" v-else >
                     </div>
                 </div>
@@ -26,45 +26,6 @@
                     </div>
                 </div>
             </div>
-         <!--   <ul class="single-real clearfix">
-                    <li class="real-li">
-                        <p>方向盘转角</p>
-                        <div class="real-content">
-                            <span class="real-img">
-                                 <img src="@/assets/images/single/turn.png" class="real-turn" :style="{transform:'rotate('+realData.angle+'deg)'}"/>
-                            </span>
-                            <span class="real-text">{{realData.angle}}°</span>
-                        </div>
-                    </li>
-                    <li>
-                        <p>转向灯</p>
-                        <div class="real-content">
-                            &lt;!&ndash;左&ndash;&gt;
-                            <img src="@/assets/images/single/left.png"  class="turn-img" v-if="realData.turnLight=='left'">
-                            <img src="@/assets/images/single/right.png" class="turn-img director-left " v-else>
-                            &lt;!&ndash;向右转 亮&ndash;&gt;
-                            &lt;!&ndash;<img src="@/assets/images/car/car-12.png" class="director-right" v-if="realData.turnLight=='right'">&ndash;&gt;
-                            <img src="@/assets/images/single/left.png" class="director-right" v-if="realData.turnLight=='right'">
-                            <img src="@/assets/images/single/right.png" v-else >
-                        </div>
-                    </li>
-                    <li class="real-li">
-                        <p>油门</p>
-                        <div class="real-content">
-                            <div class="real-img-base oil-base">
-                                <span class="real-img-style oil-style" :style="{left:oilLeftWidth+ 'px'}"></span>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <p>刹车</p>
-                        <div class="real-content">
-                            <div class="real-img-base brake-base">
-                                <span class="real-img-style brake-style" :style="{left:brakeLeftWidth+ 'px'}"></span>
-                            </div>
-                        </div>
-                    </li>
-                </ul>-->
             <div class="fusion-left-map">
                 <div class="map-style" id="singleMap"></div>
             </div>
@@ -106,23 +67,15 @@
         },
         computed:{
             oilLeftWidth(){
-                let oilData = parseFloat(this.realData.oilDoor/100);
+                let oilData = parseFloat(this.canData.oilDoor/100);
                 return parseInt(oilData*80);
             },
             brakeLeftWidth(){
-                let brakeData = parseFloat(this.realData.brakePedal/100);
+                let brakeData = parseFloat(this.canData.brakePedal/100);
                 return parseInt(brakeData*80)
             },
         },
         props:{
-            realData:{
-                type:Object,
-                default() {
-                    return {
-
-                    };
-                }
-            },
             routeData:{
                 type:Object,
                 default() {
@@ -130,6 +83,20 @@
 
                     };
                 }
+            },
+            canData:{
+                type:Object,
+                default() {
+                    return {
+                        oilDoor:0,
+                        brakePedal:0,
+                        turnLight:'',
+                    };
+                }
+            },
+            pulseStart:{
+                type:Boolean,
+                default:false
             }
         },
         watch:{

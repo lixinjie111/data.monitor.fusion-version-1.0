@@ -104,26 +104,39 @@ class GIS3D {
         this.initModel_pole(item,this.cesium.viewer); 
         this.initlight();
     }
-    updateLight(light)
-    { 
-        debugger
-        if(light.id==277)
-        {
-            this.light3DList[0].idd=light.id;
-            this.light3DList[0].img1=light.img1; 
-            this.light3DList[0].img2=light.img2; 
-            this.light3DList[0].img3=light.img3;  
-        } 
-                   
+    updateLight(light){
+        /*this.light3DList.forEach(item=>{
+            if(item.id==light.id){
+                item.id = light.id;
+                item.img1 = light.img1;
+                item.img2=light.img2;
+                item.img3=light.img3
+            }
+        })*/
+        if(light.img1!=''){
+            this.light3DList[0].img1=light.img1;
+        }
+        this.light3DList[0].id=light.id;
+        this.light3DList[0].img2=light.img2;
+        this.light3DList[0].img3=light.img3;
     }
     /**
      * 初始化红绿灯
      */
     initlight()
     {
-        let l1=new  light3D(); 
+        // let light1=new  light3D();
+        // light1.addLight(this.cesium.viewer,"275",121.17551589465815,31.281617738453047,60,90,90,90);
+        // this.light3DList.push(light1);
+        //
+        // let light2=new  light3D();
+        // light2.addLight(this.cesium.viewer,"277",121.17510881207043,31.281747510005268,60,90,90,90);
+        // this.light3DList.push(light2);
+
+        let l1=new  light3D();
         l1.addLight(this.cesium.viewer,"277",121.17533995826606,31.282071700494583,60,90,90,90);
         this.light3DList.push(l1);
+
     }
 
 

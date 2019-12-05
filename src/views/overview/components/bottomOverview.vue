@@ -38,9 +38,9 @@ export default {
         // action: 'vehicleList',
         action: "can_real_data",
         token: "fpx",
-        vehicleIds: "B21E-00-017,B21E-00-018,B21E-00-019,B21E-00-020",
-        canConnectCount:0
-      }
+        vehicleIds: "B21E-00-017,B21E-00-018,B21E-00-019,B21E-00-020"
+      },
+      canConnectCount:0
     };
   },
   mounted() {
@@ -92,7 +92,7 @@ export default {
       // console.log('websocket获取指定车辆实时信息');
         try{
             if ("WebSocket" in window) {
-                this.webSocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
+                this.webSocket = new WebSocket(window.config.socketTestUrl); //获得WebSocket对象
                 this.webSocket.onmessage = this.onmessage;
                 this.webSocket.onclose = this.onclose;
                 this.webSocket.onopen = this.onopen;
@@ -106,12 +106,15 @@ export default {
 
     },
     onmessage(message) {
-      let _json = JSON.parse(message.data),
-        _result = _json.result,
-        _vehicleId = _result.vehicleId;
+      let _json = JSON.parse(message.data);
+      let _result = _json.result[_json.result.length-1];
+      let _vehicleId = _result.vehicleId;
       this.responseData.forEach((item, index) => {
         if (item.vehicleId === _vehicleId) {
           item.transmission = _result.transmission;
+//          console.log("transmission:"+item.transmission )
+//          console.log(_result.headingAngle)
+//          console.log(_result.gpsTime)
           if (_result.transmission != "P") {
             item.speed = _result.speed;
             item.headingAngle = _result.headingAngle;

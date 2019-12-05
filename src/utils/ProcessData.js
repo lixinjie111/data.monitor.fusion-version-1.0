@@ -3,9 +3,12 @@ class ProcessCarTrack {
         this.spatObj={};
         this.spatPulseInterval='';//阈值范围
         this.routePulseInterval='';
+        this.canPulseInterval='';
         this.spatMaxValue = '';
         this.routeMaxValue = '';
+        this.canMaxValue='';
         this.routeList=[];
+        this.canList=[];
     }
 
     receiveLightData(data){
@@ -24,6 +27,9 @@ class ProcessCarTrack {
             item.routeId = route.routeId;
         })
         this.routeList.push.apply(this.routeList,track);
+    }
+    receiveCanData(data){
+        this.canList.push.apply(this.canList,data);
     }
 
     processSpatData(time,delayTime){
@@ -44,12 +50,12 @@ class ProcessCarTrack {
         let cacheData = this.spatObj[spatId];
         let rangeData=null;
         let startIndex=-1;
-        console.log("spatId:"+spatId+",找到最小值前："+cacheData.length);
+        // console.log("spatId:"+spatId+",找到最小值前："+cacheData.length);
         //找到满足条件的范围
         for(let i=0;i<cacheData.length;i++){
             let diff = Math.abs(time-cacheData[i].spatTime-delayTime);
-            console.log("-----"+cacheData[i])
-            console.log(spatId,cacheData.length,time,parseInt(cacheData[i].spatTime),delayTime,diff,i)
+            // console.log("-----"+cacheData[i])
+            // console.log(spatId,cacheData.length,time,parseInt(cacheData[i].spatTime),delayTime,diff,i)
             if(diff<this.spatPulseInterval){
                 if(startIndex !=-1 && i != startIndex+1) {
                     break;
@@ -76,7 +82,7 @@ class ProcessCarTrack {
         let minData = {};
         let minDiff;
         //如果能找到最小范围
-        console.log(rangeData)
+        // console.log(rangeData)
         if(rangeData){
             minIndex = rangeData.index;
             minData = rangeData.data;
@@ -97,7 +103,7 @@ class ProcessCarTrack {
 
             }
         }
-        console.log("最小索引:"+minIndex);
+        // console.log("最小索引:"+minIndex);
         //找出的最小值无效
         if(minDiff&&minDiff>this.spatMaxValue){
             console.log("spat找到的最小值无效")
@@ -173,7 +179,7 @@ class ProcessCarTrack {
         let minData = {};
         let minDiff;
         //如果能找到最小范围
-        console.log(rangeData)
+        // console.log(rangeData)
         if(rangeData){
             minIndex = rangeData.index;
             minData = rangeData.data;
@@ -220,6 +226,104 @@ class ProcessCarTrack {
             return index>minIndex;
         })
         console.log("找到最小值后"+this.routeList.length);
+
+        //返回距离标尺的最小插值的数据
+        return minData;
+    }
+
+    processCanData(time,delayTime){
+        let canData;
+        if(this.canList.length>0){
+            canData = this.getCanMinValue(time,delayTime);
+            if(!canData){
+                return;
+            }
+        }else {
+            console.log("can没有数据")
+        }
+        return canData;
+    }
+    getCanMinValue(time,delayTime){
+        let rangeData=null;
+        let startIndex=-1;
+        // console.log("找到最小值前："+this.canList.length);
+        //找到满足条件的范围
+        for(let i=0;i<this.canList.length;i++){
+            let diff = Math.abs(time-this.canList[i].gpsTime-delayTime);
+            // console.log(this.canList.length,time,parseInt(this.canList[i].gpsTime),delayTime,diff,i)
+            if(diff<this.canPulseInterval){
+                if(startIndex !=-1 && i != startIndex+1) {
+                    break;
+                }
+                if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
+                    startIndex=i;
+                    let obj={
+                        index:i,
+                        delayTime: diff,
+                        data:this.canList[i],
+                        diff:diff
+                    }
+                    rangeData = obj;
+                }else {
+                    break;
+                }
+            }else {
+                if(rangeData) {
+                    break;
+                }
+            }
+        }
+        let minIndex=-1;
+        let minData = {};
+        let minDiff;
+        //如果能找到最小范围
+        // console.log(rangeData)
+        if(rangeData){
+            minIndex = rangeData.index;
+            minData = rangeData.data;
+        }else{
+            console.log("can***********************");
+            minIndex = 0;
+            minData = this.canList[0];
+            minDiff = Math.abs(time-minData.gpsTime-delayTime);
+            for(let i=0;i<this.canList.length;i++){
+                let diff = Math.abs(time-parseInt(this.canList[i].gpsTime)-delayTime);
+                // let diff = time-cacheData[i].gpsTime-insertTime;
+                // console.log(vid,cacheData.length, time, parseInt(cacheData[i].gpsTime) , diff)
+                if(diff<minDiff){
+                    minData = this.canList[i];
+                    minIndex = i;
+                    minDiff = diff;
+                }
+
+            }
+        }
+        // console.log("最小索引:"+minIndex);
+        //找出的最小值无效
+        if(minDiff&&minDiff>this.canMaxValue){
+            console.log("route找到的最小值无效")
+            return;
+        }
+        //打印出被舍弃的点
+        let lostData = this.canList.filter((item,index)=>{
+            return index<minIndex;
+        })
+        /*if(lostData.length>0){
+
+        }*/
+        lostData.forEach(item=>{
+            let minDiff = Math.abs(time-this.canList[minIndex].gpsTime);
+            // console.log("插值最小的索引"+minIndex,minDiff);
+            let d =  Math.abs(time-item.gpsTime);
+            // console.log("##"+d);
+        })
+
+
+        //找到最小值后，将数据之前的数值清除
+        this.canList = this.canList.filter((item,index)=>{
+            return index>minIndex;
+        })
+        // console.log("找到最小值后"+this.canList.length);
 
         //返回距离标尺的最小插值的数据
         return minData;
