@@ -224,7 +224,7 @@
                 let count=0;
                 let flag=false;
                 let camParam;
-                debugger
+                // debugger
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
