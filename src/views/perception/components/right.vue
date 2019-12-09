@@ -257,14 +257,14 @@
                 },100)
             },
             getData(){
-                // this.typeRoadData();
-                // this.initPulseWebSocket();
+                this.typeRoadData();
+                this.initPulseWebSocket();
 //                this.initPerceptionWebSocket();
 //                this.initPlatformWebSocket();
                 /*   this.initSpatWebSocket();*/
  //                           //地图不连续移动，判断红绿灯的位置受否再可视区
 //                 this.initWarningWebSocket();
-                // this.getMap();
+                this.getMap();
             },
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
