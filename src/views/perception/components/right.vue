@@ -403,20 +403,23 @@
             changeMap(param){
                 if(param==-1){
                     this.param=-1;
-                    this.isActive=-1;
-                     gis3d.updatePosition(112.75003033070373, 28.106432159727982,113.05003033070373, 28.526432159727982);
-                    // gis3d.updatePosition(121.063,31.113,121.431,31.371);
+                    this.isActive=-1; 
+                    //  gis3d.updatePosition(112.75003033070373, 28.106432159727982, 121.431, 28.526432159727982);
+                    gis3d.updatePosition(121.063,31.113,121.431,31.371);
                     return;
                 }
                 if(this.camList.length>0){
                     let cameraParam = this.camList[param].camParam;
                     if(cameraParam){
-                        gis3d.updateCameraPosition(this.x,this.y,cameraParam.z,70,-0.2369132859032279, 0.0029627735803421373);
+                         gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        // gis3d.updateCameraPosition(this.x,this.y,cameraParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                     }else{
-                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                         gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        // gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,70,-0.2369132859032279, 0.00296277358034？21373);
                     }
                 }else{
-                    gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                     gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                    // gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,70,-0.2369132859032279, 0.0029627735803421373);
                 }
                 this.isActive=param;
                 this.param=param;
