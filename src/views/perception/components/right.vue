@@ -65,7 +65,7 @@
     import PerceptionCars from '@/utils/PerceptionCars.js'
     import ProcessCarTrack from '@/utils/ProcessCarTrack.js'
     import ProcessData from '@/utils/ProcessData.js'
-    let gis3d=new GIS3D();
+    let gis3d;
     let perceptionCars = new PerceptionCars();
     let platCars = new ProcessCarTrack();
     let processData = new ProcessData();
@@ -104,8 +104,6 @@
                 perceptionConnectCount:0,
                 spatConnectCount:0,
                 pulseConnectCount:0,
-                gis3d:null,
-
                 perDataList:[], //感知数据实时滚动
 
                 warningObj:{}, // 参数待定
@@ -156,6 +154,7 @@
         },
         mounted() {
             let _this = this;
+            gis3d=new GIS3D();
             gis3d.initload("cesiumContainer",false);
             perceptionCars.viewer=gis3d.cesium.viewer;
 //            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
@@ -1494,6 +1493,11 @@
             },
         },
         destroyed(){
+
+
+
+            gis3d.destroyed();
+            gis3d=null
             clearInterval(this.mapInitTime);
             this.warningWebsocket&&this.warningWebsocket.close();
             this.platformWebsocket&&this.platformWebsocket.close();

@@ -372,13 +372,14 @@ class PerceptionCars {
         minimumPixelSize: 1,
         show: true,
         maximumScale: 5,
-        // color : Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE  , parseFloat(1)),
+        // color : Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE  , parseFloat(0)),
         // silhouetteColor : Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1)),//轮廓线
         colorBlendMode: Cesium.ColorBlendMode.Mix
-        //   ,
-        //   scale : 3.0     //放大倍数
+          // ,
+          // scale : 30.0     //放大倍数
         // debugWireframe:true
       }));
+      
   
     }
     removeModelPrimitives(name) {
@@ -433,11 +434,22 @@ class PerceptionCars {
       if (d.heading >= 360) {
         carmodel.color = Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1));
       }
+      else
+      {
+        //清除第一次 出现360数据，第二次颜色问题
+        if(carmodel.color.green==0)
+        {
+          carmodel.color = new Cesium.Color(1, 1, 1, 1);
+        }
+      }
       let fixedFrameTransforms = Cesium.Transforms.localFrameToFixedFrameGenerator('north', 'west')
       Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, carmodel.modelMatrix)
   
     }
     addModeCarLabel(d) {
+      let h = d.heading.toFixed(1);
+      let s = d.speed.toFixed(1);
+      let veh = d.vehicleId.substr(0,4); 
       var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + 5);
       ///////////////增加文字
       let entityLabel = this.viewer.entities.add({
@@ -448,7 +460,7 @@ class PerceptionCars {
         //   pixelSize: 0          //像素点大小
         // }, 
         label: {
-          text: "",
+          text:  "[" + h + ", " + s +", "+ veh+"]",
           fillColor: Cesium.Color.BLACK,
           backgroundColor: Cesium.Color.fromCssColorString('#fff'),
           font: '12px sans-serif',

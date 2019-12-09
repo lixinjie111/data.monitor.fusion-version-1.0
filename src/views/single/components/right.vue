@@ -177,8 +177,8 @@
             keepStream(item){
                 sendStreamHeart({
                     'vehicleId': this.vehicleId,
-                    'camId':item.serialNum,
-                    'protocal':item.protocol
+                    'camId':item.camId,
+                    'protocal':item.protocal
                 }).then(res => {
                 });
             },
