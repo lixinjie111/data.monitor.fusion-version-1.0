@@ -25,9 +25,9 @@ class GIS3D {
             animation: false,  //动画控制不显示     
             timeline: false
             ,    //时间线不显示
-            imageryProvider: new Cesium.SingleTileImageryProvider({
-                url: 'static/map3d/images/back.png'//透明图片
-            }),
+            // imageryProvider: new Cesium.SingleTileImageryProvider({
+            //     url: 'static/map3d/images/back.png'//透明图片
+            // }),
             geocoder: false,
             homeButton: false,
             sceneModePicker: false,
@@ -50,13 +50,15 @@ class GIS3D {
          this.cesium.viewer.scene.logarithmicDepthBuffer = false; 
 
         //  this.cesium.viewer.scene.sun.glowFactor=100;
-        // this.cesium.viewer.scene.skyBox.show = false
+        this.cesium.viewer.scene.skyBox.show = false
         this.cesium.viewer.scene.sun.destroy(); //去掉太阳
         this.cesium.viewer.scene.sun = undefined; //去掉太阳
         this.cesium.viewer.scene.moon.destroy(); //去掉月亮
         this.cesium.viewer.scene.moon = undefined; //去掉月亮
-        // this.cesium.viewer.scene.backgroundColor =Cesium.Color.fromCssColorString('#758152').withAlpha(0.1);
+        this.cesium.viewer.scene.backgroundColor =Cesium.Color.fromCssColorString('#758152').withAlpha(0.1);
 
+        // this.add3DInfoLabel("sdf", "sdf", 121.17533995826606,31.282071700494583, 1)
+        // this.add3DInfoLabel("111", "aaa",121.1960677,31.2967565,1)
         //去除版权信息
         this.cesium.viewer._cesiumWidget._creditContainer.style.display = "none";
       
@@ -106,7 +108,7 @@ class GIS3D {
         var item = sessionStorage.getItem("sideList");
         
         this.initModel_pole(item,this.cesium.viewer); 
-        // this.initlight();
+        this.initlight();
     }
     updateLight(light){
         /*this.light3DList.forEach(item=>{
@@ -117,6 +119,7 @@ class GIS3D {
                 item.img3=light.img3
             }
         })*/
+        // console.log(light)
         if(light.img1!=''){
             this.light3DList[0].img1=light.img1;
         }
@@ -195,37 +198,48 @@ class GIS3D {
         return positions;
     }
     remove3DInforLabel(name) {
-
+debugger
         let label = this.models[name];
         if (label != null) {
             this.cesium.viewer.entities.remove(label);
             delete this.models[name];
         }
     }
+    /**
+          * 修改事件数值
+          */
+    update3DInfoLabel(id,text){
+        let entities = this.cesium.viewer.entities.getById(id);
+        if(!entities){
+            this.cesium.viewer.entities.getById(id).label.text=text;
+        }
+    }
     add3DInfoLabel(name, text, x, y, z) {
-        let positions = [];
-        positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 0));
-        positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 10));
-        let lableModel = this.cesium.viewer.entities.add({
-            id: name,
-            position: Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 10),
-            polyline: {
-                positions: positions,
-                width: 3,
-                material: Cesium.Color.fromCssColorString('#ab6503')
-            },
-            label: {
-                text: text,
-                backgroundColor: Cesium.Color.fromCssColorString('#894b2b'),
-                font: '30px sans-serif',
-                showBackground: true,
-                horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-                pixelOffset: new Cesium.Cartesian2(0.0, 0),
-                scaleByDistance: new Cesium.NearFarScalar(200, 1, 2000, 0)
-            }
-        });
+        if(!this.models[name]){
+            let positions = [];
+            positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 0));
+            positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 10));
+            let lableModel = this.cesium.viewer.entities.add({
+                id: name,
+                position: Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 10),
+                polyline: {
+                    positions: positions,
+                    width: 3,
+                    material: Cesium.Color.fromCssColorString('#ab6503')
+                },
+                label: {
+                    text: text,
+                    backgroundColor: Cesium.Color.fromCssColorString('#894b2b'),
+                    font: '3000px sans-serif',
+                    showBackground: true,
+                    horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                    pixelOffset: new Cesium.Cartesian2(0.0, 0),
+                    scaleByDistance: new Cesium.NearFarScalar(200, 1, 2000, 0)
+                }
+            });
 
-        this.models[name] = lableModel;
+            this.models[name] = lableModel;
+        }
     }
     getExtent() {
         // this.cesium.viewer
@@ -341,12 +355,12 @@ class GIS3D {
     }
     destroyed()
     {
-        this.cesium.viewer.scene.imageryLayers.removeAll()
-        this.cesium.viewer.dataSources.removeAll();
-        this.cesium.viewer.scene.primitives.removeAll();
-        this.cesium.viewer.entities.removeAll();
-        this.cesium.viewer=null;
-        this.cesium.viewer.render=null;
+        // this.cesium.viewer.scene.imageryLayers.removeAll()
+        // this.cesium.viewer.dataSources.removeAll();
+        // this.cesium.viewer.scene.primitives.removeAll();
+        // this.cesium.viewer.entities.removeAll();
+        // this.cesium.viewer=null;
+        // this.cesium.viewer.render=null;
     }
 }
 export default GIS3D

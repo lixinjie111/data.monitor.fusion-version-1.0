@@ -206,6 +206,7 @@ class ProcessCarTrack {
     processPlatformCarsTrack(time,delayTime) {
         // console.log("-------")
         let _this=this;
+        let mainCar = {};
         for (var vid in _this.cacheAndInterpolateDataByVid) {
             let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
             // console.log(carCacheData.nowReceiveData.gpsTime)
@@ -222,12 +223,14 @@ class ProcessCarTrack {
                     _this.moveCar(cardata);
                     _this.poleToCar(cardata);
                     if (_this.mainCarVID == cardata.vehicleId) {
+                        mainCar= cardata;
                         _this.moveTo(cardata);
                         //主车
                     }
                 }
             }
         }
+        return mainCar;
     }
      //检测感知杆和单车关联
      poleToCar(d) {

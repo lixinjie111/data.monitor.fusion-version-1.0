@@ -3,10 +3,10 @@ class light3D {
         //viewer=null;
         this.id;
         this.num=0; 
-        this.img1;
-        this.img2;
-        this.img3;
-        this.primitive;
+        this.img1='';
+        this.img2='';
+        this.img3='';
+        this.primitive={};
     } 
       //增加红路灯
       addLight(viewer,id,x,y,angle,stRotation1,stRotation2,stRotation3)

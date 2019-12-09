@@ -295,9 +295,9 @@ class PerceptionCars {
       // },0); //
     }
     clearModel(fusionList){
-        this.clearCar(fusionList, "carbox");
-        this.clearCar(fusionList, "person");
-        this.clearCarLabel(fusionList);
+        // this.clearCar(fusionList, "carbox");
+        // this.clearCar(fusionList, "person");
+        // this.clearCarLabel(fusionList);
     }
     clearCarLabel(fusionList) {
       /////////////////////////
@@ -395,7 +395,7 @@ class PerceptionCars {
       var entities = this.viewer.entities._entities._array;
       for (var i = 0; i < entities.length; i++) {
         if (!entitie[i].show && entitie[i].id.search("label") != -1) {
-          this.viewer.entities.remove(entitie[i]);
+         // this.viewer.entities.remove(entitie[i]);
         }
       }
     }
