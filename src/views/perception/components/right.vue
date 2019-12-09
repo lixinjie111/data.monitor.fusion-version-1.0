@@ -228,7 +228,6 @@
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
-debugger
 //                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
 //                    gis3d.updateCameraPosition(121.1727923, 31.2840917,39,70,-0.2369132859032279, 0.0029627735803421373);
                      gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
@@ -258,14 +257,14 @@ debugger
                 },100)
             },
             getData(){
-                this.typeRoadData();
-                this.initPulseWebSocket();
+                // this.typeRoadData();
+                // this.initPulseWebSocket();
 //                this.initPerceptionWebSocket();
 //                this.initPlatformWebSocket();
                 /*   this.initSpatWebSocket();*/
  //                           //地图不连续移动，判断红绿灯的位置受否再可视区
 //                 this.initWarningWebSocket();
-                this.getMap();
+                // this.getMap();
             },
             map1InitComplete(){
 //                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
