@@ -66,7 +66,7 @@ class GIS3D {
            this.cesium.viewer.scene.camera.moveEnd.addEventListener(function () { 
             if (v.dataSources.length == 0) return;  
             var currentMagnitude = v.camera.getMagnitude(); 
-            if (currentMagnitude <= 6372507.256225062) {
+            if (currentMagnitude <=6373505.039450169) {
                 if (v.dataSources.length > 0) {
                     if (!v.dataSources._dataSources[0].show) {
                         for (var i = 0; i < v.dataSources.length; i++) {
