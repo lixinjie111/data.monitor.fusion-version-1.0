@@ -62,8 +62,7 @@ function axiosFilter(vm) {
                         message: response.data.message || response.data || '操作失败',
                         showClose: true
                     });
-                return Promise.reject(response);
-                    return Promise.reject(response);
+                    return Promise.resolve(response);
                 }
             }
         // }else {
