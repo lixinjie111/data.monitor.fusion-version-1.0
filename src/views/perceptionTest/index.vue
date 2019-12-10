@@ -225,7 +225,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.perceptionWebsocket = new WebSocket(window.config.socketTestUrl);
+                        _this.perceptionWebsocket = new WebSocket(window.config.socketUrl);
                         _this.perceptionWebsocket.onmessage = _this.onPerceptionMessage;
                         _this.perceptionWebsocket.onclose = _this.onPerceptionClose;
                         _this.perceptionWebsocket.onopen = _this.onPerceptionOpen;

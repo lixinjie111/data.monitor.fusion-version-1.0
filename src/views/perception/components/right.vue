@@ -115,6 +115,8 @@
                 pulseCount:0,
                 spatPulseCount:0,
                 warningPulseCount:0,
+                staticPulseCount:0,
+                staticCacheCount:0,
                 warningCacheCount:0,
 
                 staticWarning:[],
@@ -451,7 +453,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.warningWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                         _this.warningWebsocket.onmessage = _this.onWarningMessage;
                         _this.warningWebsocket.onclose = _this.onWarningClose;
                         _this.warningWebsocket.onopen = _this.onWarningOpen;
@@ -471,35 +473,30 @@
                 if(data&&data.length>0){
                     data.forEach(rcuItem=>{
                         let item = rcuItem.data;
-                        //如果是静态事件
-                        if(!item.isD){
-                            //如果是静态事件，收到确认
-                            let warning = {
-                                "action":"cloud_event",
-                                "body":{
-                                    "warnId":item.warnId,
-                                    "status":1
-                                },
-                                "type":2
-                            }
-                            let warningMsg = JSON.stringify(warning);
-                            this.sendWarningMsg(warningMsg);
-                            let staticArray = this.staticWarning[item.warnId];
-                            if(!staticArray){
-                                processData.staticWarning[item.warnId] = new Array();
-                            }else {
-                                processData.staticWarning[item.warnId].push(item);
-                            }
-                           /* //静态事件不用缓存
-                            gis3d.add3DInfoLabel(item.warnId,item.warnMsg,item.longitude,item.latitude,20);
-                            //告警事件的数量
-                            _this.warningCount++;*/
-                        }else{
-                            let array = processData.dynamicWarning[item.warnId];
-                            if(!array){
-                                processData.dynamicWarning[item.warnId] = new Array();
-                            }else {
-                                processData.dynamicWarning[item.warnId].push(item);
+                        //判断事件是否被取消
+                        if(processData.cancelWarning.indexOf(item.warnId)==-1){
+//                            console.log(processData.cancelWarning.indexOf(item.warnId)==-1);
+                            //如果是静态事件
+                            if(!item.isD){
+                                //如果是静态事件，收到确认
+                                let warning = {
+                                    "action":"cloud_event",
+                                    "body":{
+                                        "warnId":item.warnId,
+                                        "status":1
+                                    },
+                                    "type":2
+                                }
+                                let warningMsg = JSON.stringify(warning);
+                                this.sendWarningMsg(warningMsg);
+                                processData.staticWarning.push(item);
+                            }else{
+                                let array = processData.dynamicWarning[item.warnId];
+                                if(!array){
+                                    processData.dynamicWarning[item.warnId] = new Array();
+                                }else {
+                                    processData.dynamicWarning[item.warnId].push(item);
+                                }
                             }
                         }
 //                       let warningData = rcuItem.data;
@@ -581,7 +578,6 @@
                     //判断是否需要更新
                     if(item.longitude != _this.warningData[warnId].longitude || item.latitude != _this.warningData[warnId].latitude) {
 //                        gis3d.remove3DInforLabel(_this.warningData[warnId].id);
-
 //                        gis3d.add3DInfoLabel(_this.warningData[warnId].id,_this.warningData[warnId].msg,_this.warningData[warnId].longitude,_this.warningData[warnId].latitude,20);
                     }
                 }
@@ -635,7 +631,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.cancelWarningWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.cancelWarningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                         _this.cancelWarningWebsocket.onmessage = _this.onCancelWarningMessage;
                         _this.cancelWarningWebsocket.onclose = _this.onCancelWarningClose;
                         _this.cancelWarningWebsocket.onopen = _this.onCancelWarningOpen;
@@ -651,8 +647,16 @@
             onCancelWarningMessage(message){
                 let _this=this;
                 let json = JSON.parse(message.data);
-                let data = json.result;
-                processData.cancelWarning.push(data);
+                let data = JSON.parse(json.result);
+                let cancelWarning ={
+                    "action":"event_cancel",
+                    "body":{"events":json.result,"status":1},
+                    "type":2
+                }
+                let cancelWarningMsg = JSON.stringify(cancelWarning);
+                this.sendCancelWarningMsg(cancelWarningMsg);
+
+                processData.cancelWarning.push.apply(processData.cancelWarning,data);
 //                this.processWarn(json);
             },
             onCancelWarningClose(data){
@@ -703,6 +707,7 @@
                         this.$parent.warningCount = this.warningCount;
                         console.log("移除事件")
                         delete this.warningData[data.warnId];
+                        gis3d.remove3DInforLabel(data.warnId);
                     }
                 }
             },
@@ -712,7 +717,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.platformWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.platformWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
 //                        _this.platformWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                         _this.platformWebsocket.onmessage = _this.onPlatformMessage;
                         _this.platformWebsocket.onclose = _this.onPlatformClose;
@@ -845,7 +850,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.perceptionWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.perceptionWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
 //                        _this.perceptionWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                         _this.perceptionWebsocket.onmessage = _this.onPerceptionMessage;
                         _this.perceptionWebsocket.onclose = _this.onPerceptionClose;
@@ -1003,7 +1008,7 @@
                 let _this=this;
                 try {
                     if ('WebSocket' in window){
-                        _this.spatWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.spatWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                         _this.spatWebsocket.onmessage = _this.onSpatMessage;
                         _this.spatWebsocket.onclose = _this.onSpatClose;
                         _this.spatWebsocket.onopen = _this.onSpatOpen;
@@ -1444,6 +1449,7 @@
                 //缓存的时间
                 let pulseNum = this.delayTime*2/40;
                 if(this.pulseCount>=pulseNum) {
+
                     //当平台车开始插值时，调用其他接口
                     this.processDataTime = result.timestamp-this.delayTime;
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
@@ -1473,7 +1479,11 @@
                        let warningData = processData.processCancelWarning(result.timestamp,this.delayTime);
                        this.processCancelWarn(warningData);
                     }
+
+
                 }
+
+                //执行动态告警
                 if(this.warningCacheCount>pulseNum&&(this.warningPulseCount==0||this.warningPulseCount>=10)){
                     this.warningPulseCount=1;
                     if(processData.dynamicWarning.length>0){
@@ -1483,20 +1493,28 @@
                             this.processWarn(data,warnId);
                         }
                     }
+                }
+                this.warningPulseCount++;
+                //执行静态告警
+                if(this.staticCacheCount>pulseNum&&(this.staticPulseCount==0||this.staticPulseCount>=10)){
+                    this.staticPulseCount=1;
+                    //静态事件的处理
                     if(processData.staticWarning.length>0){
-                        let statciData;
                         for(let warnId in processData.staticWarning){
-                            let statciData = processData.processStaticData(result.timestamp,this.delayTime,warnId);
-                            if(!statciData){
-                                //静态事件不用缓存
-                                gis3d.add3DInfoLabel(statciData.warnId,statciData.warnMsg,statciData.longitude,statciData.latitude,20);
-                                //告警事件的数量
-                                this.warningCount++;
+                            let staticData = processData.processStaticData(result.timestamp,this.delayTime,warnId);
+                            if(staticData&&staticData.length>0){
+//                                console.log("length:"+staticData.length)
+                                //静态事件
+                                staticData.forEach(item=>{
+                                    gis3d.add3DInfoLabel(item.warnId,item.warnMsg,item.longitude,item.latitude,20);
+                                    //告警事件的数量
+                                    this.warningCount++;
+                                })
                             }
                         }
                     }
                 }
-                this.warningPulseCount++;
+                this.staticPulseCount++;
             },
             onPulseClose(data){
                 console.log("感知车结束连接");

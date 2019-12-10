@@ -83,10 +83,13 @@
                 pulseWebsocket:null,
                 webSocket:null,
                 canWebsocket:null,
+                cancelWarningWebsocket:null,
 
                 alertCount:0,
                 warningData:{},
-                warningExist:{},
+                warningExist:[],//要进行距离计算
+                staticExist:[],//要进行距离计算
+                warningCount:0,
                 lastLightObj:{},
 
                 lightList:[],
@@ -113,9 +116,11 @@
                 routePulseCount:0,
                 pulseInterval:40,
                 warningPulseCount:0,
+                staticPulseCount:0,
                 perCount:0,
                 spatCount:0,
                 warningCacheCount:0,
+                staticCacheCount:0,
 
 
                 tabIsExist:true,
@@ -227,7 +232,7 @@
                 let _this=this;
                 try {
                     if ('WebSocket' in window){
-                        _this.spatWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.spatWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                         _this.spatWebsocket.onmessage = _this.onSpatMessage;
                         _this.spatWebsocket.onclose = _this.onSpatClose;
                         _this.spatWebsocket.onopen = _this.onSpatOpen;
@@ -576,35 +581,47 @@
             onWarningMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
-                let data = json.result.data;
-                data.forEach(item=>{
-                    //如果是静态事件
-                    if(!item.isD){
-                        //如果是静态事件，收到确认
-                        let warning = {
-                            "action":"cloud_event",
-                            "body":{
-                                "warnId":item.warnId,
-                                "status":1
-                            },
-                            "type":2
+                let data = json.result;
+                if(data&&data.length>0){
+                    processData.staticWarning=[];
+                    processData.dynamicWarning={};
+                    data.forEach(rcuItem=>{
+                        let item = rcuItem.data;
+                        //判断事件是否被取消
+                        if(processData.cancelWarning.indexOf(item.warnId)==-1){
+//                            console.log(processData.cancelWarning.indexOf(item.warnId)==-1);
+                            //如果是静态事件
+                            if(!item.isD){
+                                //如果是静态事件，收到确认
+//                                let warning = {
+//                                    "action":"warning",
+//                                    "body":{
+//                                        "warnId":item.warnId,
+//                                        "status":1
+//                                    },
+//                                    "type":2
+//                                }
+//                                let warningMsg = JSON.stringify(warning);
+//                                this.sendWarningMsg(warningMsg);
+                                processData.staticWarning.push(item);
+                            }else{
+                                let array = processData.dynamicWarning[item.warnId];
+                                if(!array){
+                                    processData.dynamicWarning[item.warnId] = new Array();
+                                }else {
+                                    processData.dynamicWarning[item.warnId].push(item);
+                                }
+                            }
                         }
-                        let warningMsg = JSON.stringify(warning);
-                        this.sendWarningMsg(warningMsg);
-                        this.warningExist[item.warnId]=item;
-                        //静态事件不用缓存
-                        gis3d.add3DInfoLabel(item.warnId,item.warnMsg,item.longitude,item.latitude,20);
-                        //告警事件的数量
-                    }else{
-                        let array = processData.dynamicWarning[item.warnId];
-                        if(!array){
-                            processData.dynamicWarning[item.warnId] = new Array();
-                        }else {
-                            item.time = json.time;
-                            processData.dynamicWarning[item.warnId].push(item);
-                        }
-                    }
-                });
+//                       let warningData = rcuItem.data;
+//                       if(warningData&&warningData.length>0){
+//                           warningData.forEach(item=>{
+//
+//                           })
+//                       }
+                    });
+                }
+//                this.processWarn(json);
             },
             onWarningClose(data){
                 console.log("结束连接");
@@ -651,28 +668,112 @@
                 //重连不能超过5次
                 this.warningConnectCount++;
             },
-            processWarn(warningData,warnId,distance){
+            processWarn(warningData,distance){
                 let _this = this;
-                warnId = warnId.substring(0,warnId.lastIndexOf("_"));
+                let warnId = warningData.warnId.substring(0,warningData.warnId.lastIndexOf("_"));
                 let warningMsg = warningData.warnMsg + ' ' +distance;
                 //如果告警第一次画
                 if(!_this.warningData[warnId]){
                     _this.warningCount++;
                     _this.warningData[warnId] = {
                         warnId: warnId,
-                        id:'alert'+_this.alertCount,
+                        id:warnId,
                         msg:warningMsg,
                         longitude:warningData.longitude,
                         latitude:warningData.latitude
                     }
-                    _this.alertCount++;
-                    gis3d.add3DInfoLabel(_this.warningData[warnId].id,warningMsg,_this.warningData[warnId].longitude,_this.warningData[warnId].latitude,20);
+                    gis3d.add3DInfoLabel(warnId,warningMsg,_this.warningData[warnId].longitude,_this.warningData[warnId].latitude,20);
                 }else{
+                    gis3d.update3DInfoLabel(warnId,warningMsg);
                     //判断是否需要更新
-                    if(item.longitude != _this.warningData[warnId].longitude || item.latitude != _this.warningData[warnId].latitude) {
-                        gis3d.remove3DInforLabel(_this.warningData[warnId].id);
+//                    if(warningData.longitude != _this.warningData[warnId].longitude || warningData.latitude != _this.warningData[warnId].latitude) {
+//                        gis3d.update3DInfoLabel(warnId,warningMsg);
+//                    }
+                }
+            },
 
-                        gis3d.add3DInfoLabel(_this.warningData[warnId].id,warningMsg,_this.warningData[warnId].longitude,_this.warningData[warnId].latitude,20);
+            //取消告警
+            initCancelWarningWebSocket(){
+                let _this=this;
+                try{
+                    if ('WebSocket' in window) {
+                        _this.cancelWarningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
+                        _this.cancelWarningWebsocket.onmessage = _this.onCancelWarningMessage;
+                        _this.cancelWarningWebsocket.onclose = _this.onCancelWarningClose;
+                        _this.cancelWarningWebsocket.onopen = _this.onCancelWarningOpen;
+                        _this.cancelWarningWebsocket.onerror = _this.onCancelWarningError;
+                    }else {
+                        _this.$message("此浏览器不支持websocket")
+                    }
+                }catch (e){
+                    _this.cancelWarningReconnect();
+                }
+
+            },
+            onCancelWarningMessage(message){
+                let _this=this;
+                let json = JSON.parse(message.data);
+                let data = JSON.parse(json.result);
+                let cancelWarning ={
+                    "action":"event_cancel",
+                    "body":{"events":json.result,"status":1},
+                    "type":2
+                }
+                let cancelWarningMsg = JSON.stringify(cancelWarning);
+                this.sendCancelWarningMsg(cancelWarningMsg);
+
+                processData.cancelWarning.push.apply(processData.cancelWarning,data);
+//                this.processWarn(json);
+            },
+            onCancelWarningClose(data){
+                console.log("告警结束连接");
+                this.cancelWarningReconnect();
+            },
+            onCancelWarningError(){
+                console.log("告警连接error");
+                this.cancelWarningReconnect();
+            },
+            onCancelWarningOpen(data){
+                //旁车
+                let cancelWarning ={
+                    "action":"event_cancel",
+                    "body":{},
+                    "type":1
+                }
+                let cancelWarningMsg = JSON.stringify(cancelWarning);
+                this.sendCancelWarningMsg(cancelWarningMsg);
+            },
+            sendCancelWarningMsg(msg) {
+                let _this=this;
+                if(window.WebSocket){
+                    if(_this.cancelWarningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
+                        _this.cancelWarningWebsocket.send(msg); //send()发送消息
+                    }
+                }else{
+                    return;
+                }
+            },
+            cancelWarningReconnect(){
+                //实例销毁后不进行重连
+                if(this._isDestroyed){
+                    return;
+                }
+                //重连不能超过10次
+                if(this.cancelWarningCount>=10){
+                    return;
+                }
+                this.initWarningWebSocket();
+                //重连不能超过5次
+                this.cancelWarningCount++;
+            },
+            processCancelWarn(data){
+                if(!data) {
+                    if (this.warningCount > 0) {
+                        this.warningCount--;
+                        this.$parent.warningCount = this.warningCount;
+                        console.log("移除事件")
+                        delete this.warningData[data.warnId];
+                        gis3d.remove3DInforLabel(data.warnId);
                     }
                 }
             },
@@ -682,7 +783,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.platformWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.platformWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
 //                        _this.platformWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                         _this.platformWebsocket.onmessage = _this.onPlatformMessage;
                         _this.platformWebsocket.onclose = _this.onPlatformClose;
@@ -758,7 +859,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.perceptionWebsocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.perceptionWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
 //                        _this.perceptionWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
                         _this.perceptionWebsocket.onmessage = _this.onPerceptionMessage;
                         _this.perceptionWebsocket.onclose = _this.onPerceptionClose;
@@ -857,7 +958,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.webSocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                         _this.webSocket.onmessage = _this.onRouteMessage;
                         _this.webSocket.onclose = _this.onRouteClose;
                         _this.webSocket.onopen = _this.onRouteOpen;
@@ -922,7 +1023,7 @@
                 let _this=this;
                 try{
                     if ('WebSocket' in window) {
-                        _this.canWebSocket = new WebSocket(window.config.socketTestUrl);  //获得WebSocket对象
+                        _this.canWebSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
                         _this.canWebSocket.onmessage = _this.onCanMessage;
                         _this.canWebSocket.onclose = _this.onCanClose;
                         _this.canWebSocket.onopen = _this.onCanOpen;
@@ -1070,6 +1171,17 @@
                         this.warningCacheCount++;
                     }
                 }
+
+                //缓存次数控制
+                if(this.staticCacheCount>0){
+                    this.staticCacheCount++;
+                }
+                //有告警事件开始缓存
+                if(processData.staticWarning.length>0){
+                    if(this.staticCacheCount==0){
+                        this.staticCacheCount++;
+                    }
+                }
                 let mainCar;
                 //平台车  缓存+40ms调用一次
                 if(this.pulseCount>=pulseNum) {
@@ -1078,19 +1190,37 @@
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
                         mainCar = platCars.processPlatformCarsTrack(result.timestamp,delayTime);
+                        //如果是主车 计算主车与告警事件之间的距离
+                        if(mainCar){
+                            //静态事件
+                            if(this.staticExist.length>0){
+                                this.staticExist.forEach(item=>{
+                                    let s = this.computeDistance(mainCar,item);
+                                    console.log(item.warnId,s)
+                                    this.processWarn(item,s);
+                                })
+                            }
+                            //动态事件
+                            if(this.warningExist.length>0){
+                                this.warningExist.forEach(item=>{
+                                    let s = this.computeDistance(mainCar,item);
+                                    this.processWarn(item,s);
+                                })
+                            }
+                        }
                     }
                     if(this.routePulseCount==0||this.routePulseCount>=25){
                         this.routePulseCount=1;
-                        console.log("length:"+processData.routeList.length);
                         if(processData.routeList.length>0){
                             let routeData = processData.processRouteData(result.timestamp,delayTime);
-                            if(!routeData){
+//                            console.log("length:"+processData.routeList.length,routeData.routeId);
+                            if(routeData){
                                 this.$parent.routeData=routeData;
                             }
                         }
                         if(processData.canList.length>0){
                             let canData = processData.processCanData(result.timestamp,delayTime);
-                            if(!canData){
+                            if(canData){
                                 this.canData = canData;
                                 this.$parent.canData=canData;
                             }
@@ -1116,27 +1246,53 @@
 //                        console.log(spatData)
                         this.drawnSpat(spatData);
                     }
-                    this.spatPulseCount++;
                 }
+                this.spatPulseCount++;
 
-                //执行告警
+                //执行动态告警
                 if(this.warningCacheCount>pulseNum&&(this.warningPulseCount==0||this.warningPulseCount>=10)){
+                    this.warningPulseCount=1;
+                    this.warningExist=[];
                     if(this.dynamicWarning.length>0){
-                        this.warningPulseCount=1;
                         let warningData;
                         for(let warnId in processData.dynamicWarning){
                             let data = processData.processWarningData(result.timestamp,this.delayTime,warnId);
-                            if(!data){
+                            this.warningExist.push(data);
+                            if(data){
                                 //计算两点间的距离
-                                if(!mainCar){
+                                if(mainCar){
                                     let s = this.computeDistance(mainCar,data);
-                                    this.processWarn(data,warnId,s);
+                                    this.processWarn(data,s);
                                 }
                             }
                         }
                     }
                 }
                 this.warningPulseCount++;
+
+                //执行静态告警
+                if(this.staticCacheCount>pulseNum&&(this.staticPulseCount==0||this.staticPulseCount>=10)){
+                    this.staticPulseCount=1;
+                    this.staticExist=[];
+                    //静态事件的处理
+                    if(processData.staticWarning.length>0){
+                        let staticData = processData.processStaticData(result.timestamp,this.delayTime);
+                        console.log("static:"+staticData.length)
+                        if(staticData&&staticData.length>0){
+//                                console.log("length:"+staticData.length)
+                            this.staticExist.push.apply(this.staticExist,staticData);
+                            //静态事件
+                            staticData.forEach(item=>{
+                                let s = this.computeDistance(mainCar,item);
+                                console.log("**********"+s);
+                                //起始与车的距离计算
+                                this.processWarn(item,s);
+                            })
+                        }
+                    }
+                }
+                this.staticPulseCount++;
+
             },
             computeDistance(mainCar,warningItem){
                 let lat1 = mainCar.latitude;
@@ -1150,7 +1306,7 @@
                 let s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) +
                     Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
                 s = s *6378.137 ;// EARTH_RADIUS;
-                s = Math.round(s * 10000) / 10;
+                s = parseInt(Math.round(s * 10000) / 10);
                 return s;
             },
             onPulseClose(data){
@@ -1263,6 +1419,7 @@
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.pulseWebsocket&&this.pulseWebsocket.close();
             this.webSocket&&this.webSocket.close();
+            this.cancelWarningWebsocket&&this.cancelWarningWebsocket.close();
 //            gis3d=null;
 //            perceptionCars = null;
 //            platCars = null;

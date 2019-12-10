@@ -124,7 +124,7 @@
                 try{
                     if ("WebSocket" in window) {
 //                        _this.platformWebsocket = new WebSocket(window.config.websocketUrl); //获得WebSocket对象
-                        _this.platformWebsocket = new WebSocket(window.config.socketTestUrl); //获得WebSocket对象
+                        _this.platformWebsocket = new WebSocket(window.config.socketUrl); //获得WebSocket对象
                         _this.platformWebsocket.onmessage = _this.onPlatformMessage;
                         _this.platformWebsocket.onclose = _this.onPlatformClose;
                         _this.platformWebsocket.onopen = _this.onPlatformOpen;

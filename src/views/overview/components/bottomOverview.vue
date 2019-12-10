@@ -92,7 +92,7 @@ export default {
       // console.log('websocket获取指定车辆实时信息');
         try{
             if ("WebSocket" in window) {
-                this.webSocket = new WebSocket(window.config.socketTestUrl); //获得WebSocket对象
+                this.webSocket = new WebSocket(window.config.socketUrl); //获得WebSocket对象
                 this.webSocket.onmessage = this.onmessage;
                 this.webSocket.onclose = this.onclose;
                 this.webSocket.onopen = this.onopen;

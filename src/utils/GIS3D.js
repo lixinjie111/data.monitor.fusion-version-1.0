@@ -210,12 +210,12 @@ debugger
           */
     update3DInfoLabel(id,text){
         let entities = this.cesium.viewer.entities.getById(id);
-        if(!entities){
+        if(entities){
             this.cesium.viewer.entities.getById(id).label.text=text;
         }
     }
     add3DInfoLabel(name, text, x, y, z) {
-        if(!this.models[name]){
+        if(name&&!this.models[name]){
             let positions = [];
             positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 0));
             positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 10));
@@ -230,7 +230,7 @@ debugger
                 label: {
                     text: text,
                     backgroundColor: Cesium.Color.fromCssColorString('#894b2b'),
-                    font: '3000px sans-serif',
+                    font: '30px sans-serif',
                     showBackground: true,
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                     pixelOffset: new Cesium.Cartesian2(0.0, 0),
