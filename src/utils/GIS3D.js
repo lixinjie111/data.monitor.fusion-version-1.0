@@ -248,34 +248,83 @@ debugger
             *获取相机参数
             */
     getCamera() {
-        let obj = {
-            x: this.cesium.viewer.camera.position.x,
-            y: this.cesium.viewer.camera.position.y,
-            z: this.cesium.viewer.camera.position.z,
-            radius: this.cesium.viewer.camera.heading,
-            pitch: this.cesium.viewer.camera.pitch,
-            yaw: this.cesium.viewer.camera.roll
-        };
-        return obj;
+        var cartesian3 = new Cesium.Cartesian3(this.cesium.viewer.camera.position.x, this.cesium.viewer.camera.position.y, this.cesium.viewer.camera.position.z);
+        var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(cartesian3);
+        var lat = Cesium.Math.toDegrees(cartographic.latitude);
+        var lng = Cesium.Math.toDegrees(cartographic.longitude);
+        var alt = cartographic.height;
+
+        let obj = {
+            x: lat,
+            y: lng,
+            z: alt,
+            radius: this.cesium.viewer.camera.heading,
+            pitch: this.cesium.viewer.camera.pitch,
+            yaw: this.cesium.viewer.camera.roll
+        };
+        return obj;
     }
     addModel(name, url, x, y, z) {
-        var position = Cesium.Cartesian3.fromDegrees(x, y, z);
-        var heading = Cesium.Math.toRadians(0);
+        //添加模型
+        let itemSide = [x, y, z]
+        var h1 = 360;
+        var h = -90 + h1;
+        var heading = Cesium.Math.toRadians(h);   
+        //合并写法
+        var instances = [];
+        // var labels = this.cesium.viewer.scene.primitives.add(new Cesium.LabelCollection()); 
+        // labels.add({
+        //     fillColor: Cesium.Color.BLACK,
+        //     backgroundColor: Cesium.Color.fromCssColorString('#fff'),
+        //     position: Cesium.Cartesian3.fromDegrees(itemSide[0], itemSide[1], 5),
+        //     text: "航向角" + h1,
+        //     font: '20px sans-serif',
+        //     showBackground: true,
+        //     horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+        //     pixelOffset: new Cesium.Cartesian2(0.0, 0),
+        //     // pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 3.0, 1.5e7, 0.0),
+        //     scaleByDistance: new Cesium.NearFarScalar(1000, 1, 8000, 0)
+        // });
+        var position = Cesium.Cartesian3.fromDegrees(itemSide[0], itemSide[1], 0); 
         var pitch = Cesium.Math.toRadians(0);
         var roll = 0;
         var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
         var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
-        var entity = Cesium.Model.fromGltf({
-            id: name,
-            modelMatrix: modelMatrix,
-            url: './static/map3d/model/car.glb',
-            minimumPixelSize: 80,
-            show: false,
-            maximumScale: 5
-        })
-        //e.cesium.viewer.entities.add(entity);
-        this.cesium.viewer.scene.primitives.add(entity);
+        instances.push({
+            modelMatrix: modelMatrix
+        });        
+        this.cesium.viewer.scene.primitives.add(new Cesium.ModelInstanceCollection({
+            id:name,
+            url: url,
+            instances: instances,
+        }));
+
     }
+    addModeCar(d, name, glbName) {
+      var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 0);
+      var heading = Cesium.Math.toRadians(d.heading);
+      var pitch = 0;
+      var roll = 0;
+      var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+      let fixedFrameTransforms = Cesium.Transforms.localFrameToFixedFrameGenerator('north', 'west')
+      var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms)
+  
+      let model = this.cesium.viewer.scene.primitives.add(Cesium.Model.fromGltf({
+        id: d.vehicleId + name,
+        modelMatrix: modelMatrix,
+        url: './static/map3d/model/' + glbName + '.glb',
+        minimumPixelSize: 1,
+        show: true,
+        maximumScale: 5,
+        // color : Cesium.Color.fromAlpha(Cesium.Color.CHARTREUSE  , parseFloat(1)),
+        // silhouetteColor : Cesium.Color.fromAlpha(Cesium.Color.RED, parseFloat(1)),//轮廓线
+        colorBlendMode: Cesium.ColorBlendMode.Mix
+          ,
+          scale : 30.0     //放大倍数
+        // debugWireframe:true
+      }));
+  
+    }
     updateCameraPosition(x, y, z, radius, pitch, yaw) {
     // debugger Cesium.Math.toRadians(radius)
         var hpr = new Cesium.HeadingPitchRoll(radius, pitch, yaw);
