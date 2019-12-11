@@ -5,44 +5,44 @@
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-pulse-time">{{processDataTime|dateFormat}} </div>
         <div class="video-style">
-            <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
-                <div class="style">
-                    <div class="video-mask" @click="screenMagnify(item)"></div>
-                    <live-player
-                            :requestVideoUrl="requestVideoUrl"
-                            :params="item.params"
-                            type="wsUrl"
-                            :autoplay="false"
-                            :ref="'player'+index"
-                    >
-                        <div class="video-num" @click="changeMap(index)">
-                            <span class="device-num">摄像头编号:{{item.devId}}</span>
-                            <span class="active-circle" :class="{'active-style':isActive==index}"></span>
-                            <span>{{item.rsPtName}}</span>
+            <div class="c-scroll-wrap">
+                <div class="c-scroll-inner">
+                    <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
+                        <div class="video-mask" @click="screenMagnify(item)"></div>
+                        <live-player
+                                :requestVideoUrl="requestVideoUrl"
+                                :params="item.params"
+                                type="wsUrl"
+                                :autoplay="false"
+                                :ref="'player'+index"
+                        >
+                            <div class="video-num" @click="changeMap(index)">
+                                <span class="device-num">摄像头编号:{{item.devId}}</span>
+                                <span class="active-circle" :class="{'active-style':isActive==index}"></span>
+                                <span>{{item.rsPtName}}</span>
+                            </div>
+                            <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
+                        </live-player>
+                    </div>
+                    <div v-for="item in new Array(2)" class="video-position style" v-if="camList.length==0">
+                        <div class="c-video-16-9 ">
+                            <div class="video-tip">
+                                暂无数据
+                            </div>
                         </div>
-                        <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
-                    </live-player>
-                </div>
-            </div>
-            <div v-for="item in new Array(2)" class="video-position style" v-if="camList.length==0">
-                <div class="c-video-16-9 ">
-                    <div class="video-tip">
-                        暂无数据
                     </div>
                 </div>
             </div>
         </div>
-        <div class="c-fusion-right map-right">
-            <div class="perception-road" id="mapRoad">
-                <tusvn-map1
-                        ref="map1"
-                        targetId="map1"
-                        overlayContainerId="overlay1"
-                        :isMasker='false'
-                        :isCircle='false'
-                        @MapInitComplete='map1InitComplete'>
-                </tusvn-map1>
-            </div>
+        <div class="perception-road" id="mapRoad">
+            <tusvn-map1
+                    ref="map1"
+                    targetId="map1"
+                    overlayContainerId="overlay1"
+                    :isMasker='false'
+                    :isCircle='false'
+                    @MapInitComplete='map1InitComplete'>
+            </tusvn-map1>
         </div>
         <div class="map-left"></div>
         <div id="cesiumContainer" class="c-map">
@@ -1579,11 +1579,6 @@
 
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
-    .map-right{
-        width: 270px;
-    }
-
-
     .map-time{
         margin-top:100px!important;
         background: #969090;
@@ -1598,9 +1593,6 @@
         background: #000;
         right: 10px;
         z-index:100;
-    }
-    .style{
-        position: relative;
     }
     .video-num{
         position: absolute;
@@ -1627,6 +1619,7 @@
         position: absolute;
         top: 86px;
         right: 10px;
+        bottom: 150px;
         z-index:3;
         width: 400px;
         .video-tip{
@@ -1675,12 +1668,15 @@
         background: #000;
     }
     .video-position{
+        position: relative;
         margin-bottom: 16px;
         box-sizing: border-box;
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
-        height: 226px;
         background: #00000082;
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
     .video-mask{
         position: absolute;
