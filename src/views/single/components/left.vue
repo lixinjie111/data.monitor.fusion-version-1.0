@@ -1,34 +1,32 @@
 <template>
-    <div class="fusion-left-style">
-        <div class="fusion-left-main">
-            <div class="single-info">
-                <div class="single-info-header">
-                    <span class="info-font">L{{singleVehicle.autoLevel}}</span>
-                    <span class="vehicle-number">{{singleVehicle.platNo}}</span>
-                    <div class="real-content">
-                        <!--左-->
-                        <img src="@/assets/images/single/left.png"  class="turn-img" v-if="canData.turnLight=='left'">
-                        <img src="@/assets/images/single/right.png" class="turn-img director-left " v-else>
-                        <!--向右转 亮-->
-                        <img src="@/assets/images/single/left.png" class="director-right" v-if="canData.turnLight=='right'">
-                        <img src="@/assets/images/single/right.png" v-else >
-                    </div>
-                </div>
-                <div class="info-img">
-                    <img :src="singleVehicle.vehicleLogo"/>
-                </div>
-                <div class="pedal-style">
-                    <div class="real-img-base oil-base">
-                        <span class="real-img-style oil-style" :style="{left:oilLeftWidth+ 'px'}"></span>
-                    </div>
-                    <div class="real-img-base brake-base">
-                        <span class="real-img-style brake-style" :style="{left:brakeLeftWidth+ 'px'}"></span>
-                    </div>
+    <div class="fusion-left-main">
+        <div class="single-info">
+            <div class="single-info-header">
+                <span class="info-font">L{{singleVehicle.autoLevel}}</span>
+                <span class="vehicle-number">{{singleVehicle.platNo}}</span>
+                <div class="real-content">
+                    <!--左-->
+                    <img src="@/assets/images/single/left.png"  class="turn-img" v-if="canData.turnLight=='left'">
+                    <img src="@/assets/images/single/right.png" class="turn-img director-left " v-else>
+                    <!--向右转 亮-->
+                    <img src="@/assets/images/single/left.png" class="director-right" v-if="canData.turnLight=='right'">
+                    <img src="@/assets/images/single/right.png" v-else >
                 </div>
             </div>
-            <div class="fusion-left-map">
-                <div class="map-style" id="singleMap"></div>
+            <div class="info-img">
+                <img :src="singleVehicle.vehicleLogo"/>
             </div>
+            <div class="pedal-style">
+                <div class="real-img-base oil-base">
+                    <span class="real-img-style oil-style" :style="{left:oilLeftWidth+ 'px'}"></span>
+                </div>
+                <div class="real-img-base brake-base">
+                    <span class="real-img-style brake-style" :style="{left:brakeLeftWidth+ 'px'}"></span>
+                </div>
+            </div>
+        </div>
+        <div class="fusion-left-map">
+            <div class="map-style" id="singleMap"></div>
         </div>
     </div>
 </template>
