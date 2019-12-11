@@ -197,7 +197,7 @@ let GisData = {
     //初始化模型
     initModeData(viewer) {
 
-        this.initStreetLamp(viewer);
+        // this.initStreetLamp(viewer);
         let itemSide = [
             [121.17598714521128, 31.28088057501294],
             [121.175908342116941, 31.281047481951688],
@@ -265,11 +265,12 @@ let GisData = {
             [121.170097826441022, 31.284233602719066]
         ]
 
-        this.initTree(itemSide, viewer, "Htree");
+        this.initTree(itemSide, viewer, "Htree",false);
 
-        let itemSide2 = [[121.17551589465815, 31.281617738453047, 0.0]]
-
-        this.initTree(itemSide2, viewer, "traffic_light_yellow");
+        let itemSide2 = [[121.17551589465815, 31.281617738453047, 0.0,270],
+        [121.17510881207043,31.281747510005268, 0.0,0],
+        [121.17533995826606,31.282071700494583, 0.0,60]] 
+        this.initTree(itemSide2, viewer, "I_RB",true);
 
 
 
@@ -361,7 +362,7 @@ let GisData = {
     /**
     * 加载灯杆
     */
-    initTree(itemSide, viewer, name) {
+    initTree(itemSide, viewer, name,isHeading) {
         //添加路灯杆和信息牌 
         // console.log(item)
         if (itemSide != null && itemSide.length > 0) {
@@ -371,7 +372,14 @@ let GisData = {
             for (var i = 0; i < itemSide.length; i++) {
                 var position = Cesium.Cartesian3.fromDegrees(itemSide[i][0], itemSide[i][1], 0);
                 //  
-                var heading = Cesium.Math.toRadians(30);
+                var heading = Cesium.Math.toRadians(0);
+                //是否旋转
+                if(isHeading)
+                {
+                    debugger
+                    heading = Cesium.Math.toRadians(itemSide[i][3]);
+                }
+                
                 var pitch = Cesium.Math.toRadians(0);
                 var roll = 0;
                 var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
