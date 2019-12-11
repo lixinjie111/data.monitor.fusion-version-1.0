@@ -69,40 +69,4 @@
             z-index: 555;
         }
     }
-    .base-info{
-        padding:30px 0px ;
-        text-align: center;
-        .weather-icon{
-            vertical-align: middle;
-            padding-left: 10px;
-        }
-    }
-    .style{
-        width: 260px;
-        height: 160px;
-        border:4px solid #666666;
-        position: absolute;
-        left: 800px;
-        /*top: calc(440px-160px-20px);*/
-        top:260px;
-        // z-index:1;
-        padding-top: 5px;
-        box-sizing: border-box;
-        animation: move 3s linear;;
-
-    }
-    @keyframes move {
-        0%{transform:translate(0,0);}
-        100%{transform:translate(50px,100px);}
-    }
-    .style:before{
-        position: absolute;
-        content: '';
-        width: 0;
-        height: 0;
-        border-top:20px solid #666666;
-        border-right:16px solid transparent;
-        bottom: -20px;
-        left:16px;
-    }
 </style>
