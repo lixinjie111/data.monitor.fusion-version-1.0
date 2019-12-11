@@ -1,45 +1,41 @@
 <template>
-    <div class="fusion-left-style">
-         <div class="left-overview">
-                <ul class="left-item-wrapper">
-                    <li class="left-item-list clearfix">
-                        <i class="left-item-icon icon-1"></i>
-                        <div class="left-item-text">
-                            <p class="left-item-title">车辆总数</p>
-                            <p class="left-item-num">{{filterData.vehNum || '--'}}</p>
-                        </div>
-                    </li>
-                    <li class="left-item-list clearfix">
-                        <i class="left-item-icon icon-2"></i>
-                        <div class="left-item-text">
-                            <p class="left-item-title">公路总里程数</p>
-                            <p class="left-item-num">{{filterData.roadToalMileage || '--'}}</p>
-                        </div>
-                    </li>
-                    <li class="left-item-list clearfix">
-                        <i class="left-item-icon icon-3"></i>
-                        <div class="left-item-text">
-                            <p class="left-item-title">路侧点总数</p>
-                            <p class="left-item-num">{{filterData.rCUNum || '--'}}</p>
-                        </div>
-                    </li>
-                    <li class="left-item-list clearfix">
-                        <i class="left-item-icon icon-4"></i>
-                        <div class="left-item-text">
-                            <p class="left-item-title">路侧设备总数</p>
-                            <p class="left-item-num">{{filterData.rCUDevNum || '--'}}</p>
-                        </div>
-                    </li>
-                    <li class="left-item-list clearfix">
-                        <i class="left-item-icon icon-5"></i>
-                        <div class="left-item-text">
-                            <p class="left-item-title">红绿灯总数</p>
-                            <p class="left-item-num">{{filterData.spatNum || '--'}}</p>
-                        </div>
-                    </li>
-                </ul>
+    <ul class="left-item-wrapper">
+        <li class="left-item-list clearfix">
+            <i class="left-item-icon icon-1"></i>
+            <div class="left-item-text">
+                <p class="left-item-title">车辆总数</p>
+                <p class="left-item-num">{{filterData.vehNum || '--'}}</p>
             </div>
-    </div>
+        </li>
+        <li class="left-item-list clearfix">
+            <i class="left-item-icon icon-2"></i>
+            <div class="left-item-text">
+                <p class="left-item-title">公路总里程数</p>
+                <p class="left-item-num">{{filterData.roadToalMileage || '--'}}</p>
+            </div>
+        </li>
+        <li class="left-item-list clearfix">
+            <i class="left-item-icon icon-3"></i>
+            <div class="left-item-text">
+                <p class="left-item-title">路侧点总数</p>
+                <p class="left-item-num">{{filterData.rCUNum || '--'}}</p>
+            </div>
+        </li>
+        <li class="left-item-list clearfix">
+            <i class="left-item-icon icon-4"></i>
+            <div class="left-item-text">
+                <p class="left-item-title">路侧设备总数</p>
+                <p class="left-item-num">{{filterData.rCUDevNum || '--'}}</p>
+            </div>
+        </li>
+        <li class="left-item-list clearfix">
+            <i class="left-item-icon icon-5"></i>
+            <div class="left-item-text">
+                <p class="left-item-title">红绿灯总数</p>
+                <p class="left-item-num">{{filterData.spatNum || '--'}}</p>
+            </div>
+        </li>
+    </ul>
 </template>
 <script>
     import { getBaseStat } from "@/api/overview/index.js";
@@ -77,9 +73,8 @@
 </script>
 <style lang="scss" scoped>
 @import '@/assets/scss/theme.scss';
-.left-overview {
-    .left-item-wrapper {
-    margin-top: 20px;
+.left-item-wrapper {
+    margin-top: 20px; 
     .left-item-list {
         margin-bottom: 60px;
         margin-left: 45px;
@@ -121,6 +116,5 @@
             color: #37ba7b;
         }
     }
-}
 }
 </style>
