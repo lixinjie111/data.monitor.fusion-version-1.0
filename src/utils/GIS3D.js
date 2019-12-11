@@ -38,6 +38,10 @@ class GIS3D {
             // orderIndependentTranslucency: false,
             baseLayerPicker: false, //是否显示图层选择控件
             infoBox: false, //是否显示点击要素之后显示的信息
+            scene3DOnly:true,
+            imageryProvider: new Cesium.SingleTileImageryProvider({
+                url: 'static/map3d/images/back.png'//透明图片
+            }),
         });
         this.cesium.viewer.scene.globe.depthTestAgainstTerrain = false;
         // this.cesium.viewer.scene.postProcessStages.fxaa.enabled = true;
@@ -54,9 +58,13 @@ class GIS3D {
         this.cesium.viewer.scene.sun.destroy(); //去掉太阳
         this.cesium.viewer.scene.sun = undefined; //去掉太阳
         this.cesium.viewer.scene.moon.destroy(); //去掉月亮
-        this.cesium.viewer.scene.moon = undefined; //去掉月亮
-        this.cesium.viewer.scene.backgroundColor =Cesium.Color.fromCssColorString('#758152').withAlpha(0.1);
+        this.cesium.viewer.scene.moon = undefined; //去掉月亮 
+        this.cesium.viewer.scene.backgroundColor =Cesium.Color.fromCssColorString('#758152').withAlpha(1);
+        this.cesium.viewer.scene.skyAtmosphere.show = false;
 
+         // //裁切地图
+         var coffeeBeltRectangle = Cesium.Rectangle.fromDegrees(72, 3, 136,56); 
+         this.cesium.viewer.scene.globe.cartographicLimitRectangle = coffeeBeltRectangle;
         // this.add3DInfoLabel("sdf", "sdf", 121.17533995826606,31.282071700494583, 1)
         // this.add3DInfoLabel("111", "aaa",121.1960677,31.2967565,1)
         //去除版权信息
