@@ -592,15 +592,13 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result;
                 if(data&&data.length>0){
-                    data.forEach(item=>{
-                        item.isD=true;
-                    });
                     data.forEach(rcuItem=>{
                         let item = rcuItem.data;
                         let warnId = item.warnId.substring(0,item.warnId.lastIndexOf("_"));
                         //判断事件是否被取消
                         if(!processData.cancelWarning[item.warnId]){
 //                            console.log(processData.cancelWarning.indexOf(item.warnId)==-1);
+//                            item.isD=true;
                             //如果是静态事件
                             if(!item.isD){
                                 //如果是静态事件，收到确认
@@ -621,12 +619,12 @@
                                 }
                                 processData.staticWarning[item.warnId]=item;
                             }else{
-                                let array = processData.dynamicWarning[item.warnId];
+                                let array = processData.dynamicWarning[warnId];
                                 if(!array){
-                                    processData.dynamicWarning[item.warnId] = new Array();
-                                }else {
-                                    processData.dynamicWarning[item.warnId].push(item);
+                                    processData.dynamicWarning[warnId] = new Array();
                                 }
+                                processData.dynamicWarning[warnId].push(item);
+
                             }
                         }
                     });
@@ -643,8 +641,7 @@
             },
             onWarningOpen(data){
                 //旁车
-                let warning =
-                    {
+                let warning = {
                         "action":"warning",
                         "body":{
                             "vehicleId":this.vehicleId
@@ -735,13 +732,11 @@
                 */
 
                 data.forEach(item=>{
-                    let warnId = item.warnId.substring(0,item.warnId.lastIndexOf("_"));
-                    let array = processData.cancelWarning[warnId];
+                    let array = processData.cancelWarning[item.warnId];
                     if(!array){
-                        processData.cancelWarning[warnId] = new Array();
-                    }else {
-                        processData.cancelWarning[warnId].push(item);
+                        processData.cancelWarning[item.warnId] = new Array();
                     }
+                    processData.cancelWarning[item.warnId].push(item);
                 });
 //                this.processWarn(json);
             },

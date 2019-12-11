@@ -494,16 +494,16 @@
                                 let array = processData.staticWarning[item.warnId];
                                 if(!array){
                                     processData.staticWarning[item.warnId] = new Object();
-                                }else {
-                                    processData.staticWarning[item.warnId]=item;
                                 }
+                                processData.staticWarning[item.warnId]=item;
+
                             }else{
                                 let array = processData.dynamicWarning[item.warnId];
                                 if(!array){
                                     processData.dynamicWarning[item.warnId] = new Array();
-                                }else {
-                                    processData.dynamicWarning[item.warnId].push(item);
                                 }
+                                processData.dynamicWarning[item.warnId].push(item);
+
                             }
                         }
 //                       let warningData = rcuItem.data;
@@ -579,7 +579,7 @@
                         longitude:warningData.longitude,
                         latitude:warningData.latitude
                     }
-                    gis3d.add3DInfoLabel(warnId,warningMsg,warningData.longitude,warningData.latitude,20);
+                    gis3d.add3DInfoLabel(warnId,warningData.warnMsg,warningData.longitude,warningData.latitude,20);
                 }else{
                     //判断是否需要更新
                     if(item.longitude != _this.warningData[warnId].longitude || item.latitude != _this.warningData[warnId].latitude) {
@@ -1404,6 +1404,17 @@
                         this.warningCacheCount++;
                     }
                 }
+                //静态事件缓存次数控制
+                if(this.staticCacheCount>0){
+                    this.staticCacheCount++;
+                }
+                //静态告警事件开始缓存
+                if(Object.keys(processData.staticWarning).length>0){
+                    if(this.staticCacheCount==0){
+                        this.staticCacheCount++;
+                    }
+                }
+
                 if (Object.keys(platCars.platObj).length > 0) {
                     for (let vehicleId in platCars.platObj) {
                         let dataList = platCars.platObj[vehicleId];
@@ -1500,7 +1511,7 @@
                         for(let warnId in processData.staticWarning){
                             let staticData = processData.processStaticData(result.timestamp,this.delayTime);
                             if(staticData&&staticData.length>0){
-//                                console.log("length:"+staticData.length)
+                                console.log("length:"+staticData.length)
                                 //静态事件
                                 staticData.forEach(item=>{
                                     this.processWarn(item);
