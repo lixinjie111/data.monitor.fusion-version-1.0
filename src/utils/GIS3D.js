@@ -198,7 +198,6 @@ class GIS3D {
         return positions;
     }
     remove3DInforLabel(name) {
-debugger
         let label = this.models[name];
         if (label != null) {
             this.cesium.viewer.entities.remove(label);

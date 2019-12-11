@@ -1514,7 +1514,7 @@
                         }
                     }
                 }
-                this.staticPulseCount++;
+
             },
             onPulseClose(data){
                 console.log("感知车结束连接");

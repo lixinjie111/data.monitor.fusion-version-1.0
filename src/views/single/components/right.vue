@@ -224,6 +224,14 @@
                 processData.canPulseInterval = canPulse*0.8;
                 processData.canMaxValue =  processData.canPulseInterval*1.5;
 
+                let warnPulse = this.pulseInterval*10;
+                processData.warnPulseInterval = warnPulse*0.8;
+                processData.warnMaxValue = warnPulse*1.5;
+
+                let cancelPulse = this.pulseInterval;
+                processData.cancelPulseInterval = cancelPulse*0.8;
+                processData.cancelMaxValue = cancelPulse*1.5;
+
                 this.initPulseWebSocket();
             },
 
@@ -583,27 +591,32 @@
                 let json = JSON.parse(mesasge.data);
                 let data = json.result;
                 if(data&&data.length>0){
-                    processData.staticWarning=[];
-                    processData.dynamicWarning={};
                     data.forEach(rcuItem=>{
                         let item = rcuItem.data;
+                        let warnId = item.warnId.substring(0,item.warnId.lastIndexOf("_"));
+                        item.warnId = warnId;
                         //判断事件是否被取消
                         if(processData.cancelWarning.indexOf(item.warnId)==-1){
 //                            console.log(processData.cancelWarning.indexOf(item.warnId)==-1);
                             //如果是静态事件
                             if(!item.isD){
                                 //如果是静态事件，收到确认
-//                                let warning = {
-//                                    "action":"warning",
-//                                    "body":{
-//                                        "warnId":item.warnId,
-//                                        "status":1
-//                                    },
-//                                    "type":2
-//                                }
-//                                let warningMsg = JSON.stringify(warning);
-//                                this.sendWarningMsg(warningMsg);
-                                processData.staticWarning.push(item);
+                                let warning = {
+                                    "action":"warning",
+                                    "body":{
+                                        "warnId":item.warnId,
+                                        "status":1
+                                    },
+                                    "type":2
+                                }
+                                let warningMsg = JSON.stringify(warning);
+                                this.sendWarningMsg(warningMsg);
+                                let array = processData.staticWarning[item.warnId];
+                                if(!array){
+                                    processData.staticWarning[item.warnId] = new Object();
+                                }else {
+                                    processData.staticWarning[item.warnId]=item;
+                                }
                             }else{
                                 let array = processData.dynamicWarning[item.warnId];
                                 if(!array){
@@ -613,12 +626,6 @@
                                 }
                             }
                         }
-//                       let warningData = rcuItem.data;
-//                       if(warningData&&warningData.length>0){
-//                           warningData.forEach(item=>{
-//
-//                           })
-//                       }
                     });
                 }
 //                this.processWarn(json);
@@ -670,15 +677,15 @@
             },
             processWarn(warningData,distance){
                 let _this = this;
-                let warnId = warningData.warnId.substring(0,warningData.warnId.lastIndexOf("_"));
-                let warningMsg = warningData.warnMsg + ' ' +distance;
+                let warnId = warningData.warnId;
+                let warningMsg = warningData.warnMsg + ' ' +distance+'米';
                 //如果告警第一次画
                 if(!_this.warningData[warnId]){
                     _this.warningCount++;
                     _this.warningData[warnId] = {
                         warnId: warnId,
                         id:warnId,
-                        msg:warningMsg,
+                        warnMsg:warningData.warnMsg,
                         longitude:warningData.longitude,
                         latitude:warningData.latitude
                     }
@@ -714,15 +721,25 @@
                 let _this=this;
                 let json = JSON.parse(message.data);
                 let data = JSON.parse(json.result);
-                let cancelWarning ={
+
+                /*let cancelWarning = {
                     "action":"event_cancel",
                     "body":{"events":json.result,"status":1},
                     "type":2
                 }
                 let cancelWarningMsg = JSON.stringify(cancelWarning);
                 this.sendCancelWarningMsg(cancelWarningMsg);
+                */
 
-                processData.cancelWarning.push.apply(processData.cancelWarning,data);
+                data.forEach(item=>{
+                    let warnId = item.warnId.substring(0,item.warnId.lastIndexOf("_"));
+                    let array = processData.cancelWarning[warnId];
+                    if(!array){
+                        processData.cancelWarning[warnId] = new Array();
+                    }else {
+                        processData.cancelWarning[warnId].push(item);
+                    }
+                });
 //                this.processWarn(json);
             },
             onCancelWarningClose(data){
@@ -767,14 +784,29 @@
                 this.cancelWarningCount++;
             },
             processCancelWarn(data){
-                if(!data) {
-                    if (this.warningCount > 0) {
-                        this.warningCount--;
-                        this.$parent.warningCount = this.warningCount;
-                        console.log("移除事件")
-                        delete this.warningData[data.warnId];
-                        gis3d.remove3DInforLabel(data.warnId);
+                if(data&&data.length>0) {
+                    data.forEach(item=>{
+                        if (this.warningCount > 0) {
+                            this.warningCount--;
+                            this.$parent.warningCount = this.warningCount;
+                            console.log("移除事件")
+                            delete this.warningData[item.warnId];
+                            gis3d.remove3DInforLabel(item.warnId);
+                            if(processData.dynamicWarning[item.warnId]){
+                                delete processData.dynamicWarning[item.warnId];
+                            }
+                            if(processData.staticWarning[item.warnId]){
+                                delete processData.staticWarning[item.warnId];
+                            }
+                        }
+                    })
+                    let cancelWarning = {
+                        "action":"event_cancel",
+                        "body":{"events":JSON.stringify(data),"status":1},
+                        "type":2
                     }
+                    let cancelWarningMsg = JSON.stringify(cancelWarning);
+                    this.sendCancelWarningMsg(cancelWarningMsg);
                 }
             },
 
@@ -871,7 +903,6 @@
                 }catch (e){
                     this.perceptionReconnect();
                 }
-
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
@@ -1098,8 +1129,8 @@
                 }
 
             },
-            onPulseMessage(mesasge){
-                let json = JSON.parse(mesasge.data);
+            onPulseMessage(message){
+                let json = JSON.parse(message.data);
                 let result = json.result;
                 if(this.pulseNowTime==''){
                     this.initPlatformWebSocket();
@@ -1128,6 +1159,12 @@
                         }
                     }
                 }
+                if(Object.keys(processData.cancelWarning).length>0){
+                    //查找取消告警最近的一项,找到后也不删除 （待定）
+                    let warningData = processData.processCancelWarning(result.timestamp,this.delayTime);
+                    this.processCancelWarn(warningData);
+                }
+
                 //感知数据缓存次数控制
                 if(this.perCount>0){
                     this.perCount++;
@@ -1166,7 +1203,7 @@
                     this.warningCacheCount++;
                 }
                 //有告警事件开始缓存
-                if(processData.dynamicWarning.length>0){
+                if(Object.keys(processData.dynamicWarning).length>0){
                     if(this.warningCacheCount==0){
                         this.warningCacheCount++;
                     }
@@ -1177,7 +1214,7 @@
                     this.staticCacheCount++;
                 }
                 //有告警事件开始缓存
-                if(processData.staticWarning.length>0){
+                if(Object.keys(processData.staticWarning).length>0){
                     if(this.staticCacheCount==0){
                         this.staticCacheCount++;
                     }
@@ -1192,12 +1229,18 @@
                         mainCar = platCars.processPlatformCarsTrack(result.timestamp,delayTime);
                         //如果是主车 计算主车与告警事件之间的距离
                         if(mainCar){
-                            //静态事件
+                            //静态事件  查找框内的事件 staticExist  存储静态事件
+                            let currentExtend = this.getExtend(mainCar.longitude,mainCar.latitude,0.005);
                             if(this.staticExist.length>0){
-                                this.staticExist.forEach(item=>{
-                                    let s = this.computeDistance(mainCar,item);
-                                    console.log(item.warnId,s)
-                                    this.processWarn(item,s);
+                                this.staticExist.forEach((item,index)=>{
+                                    if(item.longitude<currentExtend[1][0]&&item.latitude<currentExtend[1][1]&&item.longitude>currentExtend[3][0]&&item.latitude>currentExtend[3][1]){
+                                        let s = this.computeDistance(mainCar,item);
+//                                        console.log(item.warnId,s)
+                                        this.processWarn(item,s);
+                                    }
+//                                    else{
+//                                        gis3d.remove3DInforLabel(item.warnId);
+//                                    }
                                 })
                             }
                             //动态事件
@@ -1249,20 +1292,32 @@
                 }
                 this.spatPulseCount++;
 
-                //执行动态告警
+                //执行告警
                 if(this.warningCacheCount>pulseNum&&(this.warningPulseCount==0||this.warningPulseCount>=10)){
                     this.warningPulseCount=1;
-                    this.warningExist=[];
-                    if(this.dynamicWarning.length>0){
-                        let warningData;
+                    if(Object.keys(processData.dynamicWarning).length>0){
+                        this.warningExist = [];
                         for(let warnId in processData.dynamicWarning){
                             let data = processData.processWarningData(result.timestamp,this.delayTime,warnId);
-                            this.warningExist.push(data);
                             if(data){
+                                this.warningExist.push(warnId);
                                 //计算两点间的距离
                                 if(mainCar){
                                     let s = this.computeDistance(mainCar,data);
+//                                    console.log(s);
                                     this.processWarn(data,s);
+                                }
+                            }
+                        }
+                        if(this.warningExist.length>0){
+                            if(Object.keys(this.warningData).length>0){
+                                for(let warnId in this.warningData){
+                                    //如果历史告警不存在  进行删除
+                                    if(this.warningExist.indexOf(warnId)==-1){
+                                        delete this.warningExist[warnId];
+//                                        console.log("移除："+warnId)
+                                        gis3d.remove3DInforLabel(warnId);
+                                    }
                                 }
                             }
                         }
@@ -1273,9 +1328,8 @@
                 //执行静态告警
                 if(this.staticCacheCount>pulseNum&&(this.staticPulseCount==0||this.staticPulseCount>=10)){
                     this.staticPulseCount=1;
-                    this.staticExist=[];
                     //静态事件的处理
-                    if(processData.staticWarning.length>0){
+                    if(Object.keys(processData.staticWarning).length>0){
                         let staticData = processData.processStaticData(result.timestamp,this.delayTime);
                         console.log("static:"+staticData.length)
                         if(staticData&&staticData.length>0){
@@ -1284,7 +1338,7 @@
                             //静态事件
                             staticData.forEach(item=>{
                                 let s = this.computeDistance(mainCar,item);
-                                console.log("**********"+s);
+//                                console.log("**********"+s);
                                 //起始与车的距离计算
                                 this.processWarn(item,s);
                             })
@@ -1359,6 +1413,19 @@
                 } else if (document.visibilityState == "visible") {
                     this.tabIsExist=true;
                 }
+            },
+
+            getExtend(x,y,r){
+                let currentExtent=[];
+                let x0=x+r;
+                let y0=y+r;
+                let x1=x-r;
+                let y1=y-r;
+                currentExtent.push([x1, y0]);
+                currentExtent.push([x0, y0]);
+                currentExtent.push([x0, y1]);
+                currentExtent.push([x1, y1]);
+                return currentExtent;
             },
         },
         mounted(){
