@@ -6,9 +6,7 @@
       :key="item.vehicleId"
       @click="showView(item.vehicleId)"
     >
-      <div class="car-info">
-        <span class="car-index">{{index + 1}}</span>
-      </div>
+      <div class="car-index">{{index + 1}}</div>
       <div class="car-detail">
         <img :src="item.vehicleLogo" class="car-img" />
       </div>
@@ -30,7 +28,7 @@ export default {
   data() {
     return {
       items: "nihao",
-      vehicleIds: "B21E-00-017,B21E-00-018,B21E-00-019,B21E-00-020",
+      vehicleIds: "",
       responseData: [],
       // 获取指定车辆实时信息
       webSocket: null,
@@ -38,7 +36,7 @@ export default {
         // action: 'vehicleList',
         action: "can_real_data",
         token: "fpx",
-        vehicleIds: "B21E-00-017,B21E-00-018,B21E-00-019,B21E-00-020"
+        vehicleIds: ""
       },
       canConnectCount:0
     };
@@ -53,7 +51,9 @@ export default {
       getGpsRealConfig().then(res => {
         this.vehicleIds = res.data;
         this.webSocketData.vehicleIds = res.data;
-        this.initWebSocket();
+        if(this.vehicleIds) {
+          this.initWebSocket();
+        }
       });
     },
     getGpsRealList() {
@@ -188,19 +188,16 @@ export default {
   .car-info-li {
     list-style-type: none;
     display: flex;
-    // width: 269px;
     margin-right: 10px;
     cursor: pointer;
     background-color: rgba(94, 89, 112, 0.3);
     z-index:3;
     .car-index {
-      text-align: center;
+      @include layoutMode();
       width: 40px;
       font-size: 20px;
-      line-height: 80px;
       letter-spacing: 2px;
       color: #ccc;
-      display: inline-block;
       background-color: rgba(94, 89, 112, 0.3);
     }
     .car-detail {
@@ -214,8 +211,8 @@ export default {
       }
     }
     .car-detail-info {
-      // height: 100%;
       .car-plate {
+        @include lineClampOne();
         font-size: 14px;
         padding-right: 16px;
       }
