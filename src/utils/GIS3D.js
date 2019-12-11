@@ -248,6 +248,7 @@ class GIS3D {
             this.cesium.viewer.entities.getById(id).label.text = text;
         }
     }
+
     add3DInfoLabel(name, text, x, y, z) {
         if (name && !this.models[name]) {
             let positions = [];

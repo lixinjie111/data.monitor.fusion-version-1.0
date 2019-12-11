@@ -257,7 +257,6 @@ class ProcessCarTrack {
                 else {
                     if (this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId) == null) {
                         //连接线
-                        // debugger
                         var redLine = this.viewer.entities.add({
                             id: vid + "line" + itemSide[i].deviceId,
                             polyline: {
@@ -363,10 +362,10 @@ class ProcessCarTrack {
         //返回距离标尺的最小插值的数据
         return minData;
     }
-    destroyed() {
+    destroyed(){
         clearInterval(this.processPlatformCarsTrackIntervalId);
     }
-    moveCar(d) {
+    moveCar(d){
         let vid = d.vehicleId;
         let plateNo = d.plateNo;
         let carModel = this.models[vid];
@@ -452,11 +451,10 @@ class ProcessCarTrack {
         }
     }
      //添加光环
-     addEllipse(vid,position)
-     {
+     addEllipse(vid,position){
          //光环
          var r1 = 0, r2 = 3, r3 = 6;
-         function changeR1() { //这是callback，参数不能内传
+         function changeR1(){ //这是callback，参数不能内传
              r1 = r1 + 0.1;
              if (r1 >= 10) {
                  r1 = 0;
