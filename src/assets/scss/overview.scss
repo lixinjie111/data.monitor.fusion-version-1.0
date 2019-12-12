@@ -1,0 +1,104 @@
+@import '@/assets/scss/theme.scss';
+.left-overview {
+        margin-top: 20px;
+        .car-info-li {
+            position: relative;
+            display: flex;
+            width: 263px;
+            margin-bottom: 30px;
+            height: 80px;
+            cursor: pointer;
+            background-color: rgba(94, 89, 112, 0.5);
+            z-index:3;
+            .car-index {
+              @include layoutMode();
+              width: 40px;
+              font-size: 20px;
+              letter-spacing: 2px;
+              color: #ccc;
+              background-color: rgba(94, 89, 112, 1);
+            }
+            .car-detail {
+              height: 80px;
+              .car-img {
+                width: 98px;
+                height: 100%;
+                display: block;
+                padding: 0 9px;
+                object-fit: contain;
+              }
+            }
+            .rspt-detail-info{
+              position: absolute;
+              left: 60px;
+              right: 20px;
+              top: 50%;
+              transform: translate(0, -50%);
+              line-height: 1.5em;
+              .rspt-info{
+                @include lineClampOne();
+              }
+            }
+            .car-detail-info {
+              .car-plate {
+                @include lineClampOne();
+                font-size: 14px;
+                padding-right: 16px;
+              }
+              
+              .driving-info {
+                line-height: 26px;
+                height: 26px;
+                padding-right: 16px;
+                @include layoutMode(between);
+                .driving-level {
+                  width: 26px;
+                  text-align: center;
+                  letter-spacing: 2px;
+                  background-color: #0b5330;
+                  border-radius: 3px;
+                }
+                .driving-trans {
+                  font-size: 24px;
+                  color: #dc8c00;
+                  font-weight: bold;
+                }
+                .direction {
+                  width: 16px;
+                  background: url("../../../assets/images/carMonitor/arrow.png")
+                    no-repeat center center;
+                  background-size: auto 24px;
+                  transform-origin: center center !important;
+                }
+              }
+            }
+          }
+    .left-item-list {
+        margin-bottom: 30px;
+        .left-item-icon {
+            float: left;
+            width: 54px;
+            height: 54px;
+            background-size: 100% 100%;
+            &.icon-1 {
+                background-image: url(../../../assets/images/dataMonitor/icon-1.png);
+            }
+            &.icon-3 {
+                background-image: url(../../../assets/images/dataMonitor/icon-3.png);
+            }
+        }
+        .left-item-text {
+            margin-left: 75px;
+        }
+        .left-item-title {
+            font-size: 20px;
+            color: #ccc;
+            margin-top: -10px;
+        }
+        .left-item-num {
+            font-family: carfont;
+            font-size: 30px;
+            color: #37ba7b;
+        }
+    }
+}
