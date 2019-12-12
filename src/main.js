@@ -26,6 +26,10 @@ NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false })
 
 Vue.config.productionTip = false;
 
+// 模糊查询封装
+import SearchFilter from '@/assets/js/module/searchFilter.js'
+Vue.prototype.$searchFilter = SearchFilter;
+
 // 权限
 import { setAuthInfo, getAdminId, getAuthInfo, removeAuthInfo } from '@/session/index';
 // 在免登录白名单，直接进入
@@ -77,6 +81,20 @@ const vm = new Vue({
     components: { App },
     template: '<App/>'
 });
+
+Vue.directive('loadmore', {
+    bind (el, binding) {
+      // 获取element-ui定义好的scroll盒子
+      const SELECTWRAP_DOM = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap')
+      SELECTWRAP_DOM.addEventListener('scroll', function () {
+        
+        const CONDITION = this.scrollHeight - this.scrollTop <= this.clientHeight
+        if (CONDITION) {
+          binding.value()
+        }
+      })
+    }
+})  
 
 // axios 过滤器
 axiosFilter(vm);

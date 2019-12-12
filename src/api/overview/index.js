@@ -1,5 +1,6 @@
 //import axios from 'axios';
 import {HTTPURL} from '../requestUrl';
+import {OPERATEURL} from '../requestUrl';
 /**
  * 获取概览左侧的车辆数据
  */
@@ -61,3 +62,11 @@ export const getTopWeather = params => { return axios.post(`${HTTPURL}g/comStat/
  * I_VL1_01
  */
 export const getDevDis = params => {return axios.post(`${HTTPURL}lc/baseStat/getDevDis`, params).then(res => res.data); };
+/**
+ * 路测点
+ */
+export const requestRoadSide = params => { return axios.post(`${OPERATEURL}roadSideInfo/findPage`, params).then(res => res.data); };
+/**
+ * 车辆
+ */
+export const requestVehicle = params => { return axios.post(`${OPERATEURL}vehicle/query/page`, params).then(res => res.data); };
