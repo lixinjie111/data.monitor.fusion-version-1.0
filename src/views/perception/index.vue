@@ -24,7 +24,8 @@
                 signCount:0,
                 time:0,
                 perceptionData:{},
-                leftShow:true
+                leftShow:true,
+                warningCount:0
             }
         },
         components:{
