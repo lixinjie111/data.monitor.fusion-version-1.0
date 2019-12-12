@@ -170,12 +170,41 @@
     .el-select .el-input {
         width: 130px;
     }
-    .fusion-select{
-        .el-input-group__prepend, .el-input-group__append {
-            background-color: #7f7f7f;
-            color:#fff;
-            border: 1px solid #7f7f7f;
-        }
-    } 
+    .el-select .el-input.is-focus .el-input__inner {
+        border-color: #676767;
+    }
+    .el-select .el-input__inner:focus {
+        border-color: #676767;
+    }
+    .el-select:hover .el-input__inner {
+        border-color: #676767;
+    }
+}
+.el-select-dropdown__item.selected {
+    color: #f59307;
+}
+.el-select-dropdown{
+    border: 1px solid #676767;
+}
+.el-select-dropdown__wrap{
+    background:#676767;
+     color:#fff;
+}
+.el-select-dropdown__item{
+    color:#fff;
+    border-bottom: 1px solid #6f6f6f;
+}
+.el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
+    background:#7f7f7f;
+}
+.el-popper[x-placement^=bottom] .popper__arrow::after {
+    border-bottom-color: #676767;
+}
+.el-popper[x-placement^=bottom] .popper__arrow {
+    border-bottom-color: #676767;
+}
+.el-select-dropdown__empty{
+     background:#676767;
+     color:#fff;
 }
 </style>
