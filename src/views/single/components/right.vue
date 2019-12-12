@@ -278,7 +278,7 @@
                 //旁车
                 let spat = {
                     "action":"spat",
-                    "vehicleId":"B21E0002",
+                    "vehicleId":this.vehicleId,
                     "type":1
                 }
                 let spatMsg = JSON.stringify(spat);
@@ -595,8 +595,8 @@
                     data.forEach(rcuItem=>{
                         let item = rcuItem.data;
                         let warnId = item.warnId.substring(0,item.warnId.lastIndexOf("_"));
-                        //判断事件是否被取消
-                        if(!processData.cancelWarning[item.warnId]){
+                        //判断事件是否被取消 如果告警事件被画上 并且接收到取消 则不进行接收
+//                        if(!processData.cancelWarning[item.warnId]&&this.warningData[item.warnId]){
 //                            console.log(processData.cancelWarning.indexOf(item.warnId)==-1);
 //                            item.isD=true;
                             //如果是静态事件
@@ -626,7 +626,7 @@
                                 processData.dynamicWarning[warnId].push(item);
 
                             }
-                        }
+//                        }
                     });
                 }
 //                this.processWarn(json);
@@ -721,24 +721,21 @@
                 let _this=this;
                 let json = JSON.parse(message.data);
                 let data = JSON.parse(json.result);
-
-                /*let cancelWarning = {
+                let cancelWarning = {
                     "action":"event_cancel",
-                    "body":{"events":json.result,"status":1},
+                    "body":{
+                        "events":json.result,
+                        "status":1
+                    },
                     "type":2
                 }
                 let cancelWarningMsg = JSON.stringify(cancelWarning);
                 this.sendCancelWarningMsg(cancelWarningMsg);
-                */
-
-                data.forEach(item=>{
-                    let array = processData.cancelWarning[item.warnId];
-                    if(!array){
-                        processData.cancelWarning[item.warnId] = new Array();
+                data.forEach(warnId=>{
+                    if(processData.cancelWarning.indexOf(warnId)==-1){
+                        processData.cancelWarning.push(warnId);
                     }
-                    processData.cancelWarning[item.warnId].push(item);
                 });
-//                this.processWarn(json);
             },
             onCancelWarningClose(data){
                 console.log("告警结束连接");
@@ -782,30 +779,22 @@
                 this.cancelWarningCount++;
             },
             processCancelWarn(data){
-                if(data&&data.length>0) {
-                    data.forEach(warnId=>{
-                        if (this.warningCount > 0) {
-                            this.warningCount--;
-                            this.$parent.warningCount = this.warningCount;
-                            console.log("移除事件")
-                            delete this.warningData[warnId];
-                            gis3d.remove3DInforLabel(warnId);
-                            if(processData.dynamicWarning[warnId]){
-                                delete processData.dynamicWarning[warnId];
-                            }
-                            if(processData.staticWarning[warnId]){
-                                delete processData.staticWarning[warnId];
-                            }
+//                    debugger
+                data.forEach(warnId=>{
+                    if (this.warningCount > 0) {
+                        this.warningCount--;
+                        this.$parent.warningCount = this.warningCount;
+                        console.log("移除事件")
+                        delete this.warningData[warnId];
+                        gis3d.remove3DInforLabel(warnId);
+                        if(processData.dynamicWarning[warnId]){
+                            delete processData.dynamicWarning[warnId];
                         }
-                    })
-                    let cancelWarning = {
-                        "action":"event_cancel",
-                        "body":{"events":JSON.stringify(data),"status":1},
-                        "type":2
+                        if(processData.staticWarning[warnId]){
+                            delete processData.staticWarning[warnId];
+                        }
                     }
-                    let cancelWarningMsg = JSON.stringify(cancelWarning);
-                    this.sendCancelWarningMsg(cancelWarningMsg);
-                }
+                })
             },
 
             //平台车
@@ -925,7 +914,7 @@
                     "action":"road_real_data_per",
                     "data":{
                         "type":2,
-                        "vehicleId":"B21E0005"
+                        "vehicleId":this.vehicleId
                     }
                 }
                 let perceptionMsg = JSON.stringify(perception);
@@ -1132,7 +1121,7 @@
                 if(this.pulseNowTime==''){
                     this.initPlatformWebSocket();
 //                    this.initPerceptionWebSocket();
-                    this.initCanWebSocket();
+//                    this.initCanWebSocket();
                     this.initWarningWebSocket();
 //                    this.initSpatWebSocket();
                     this.initRouteWebSocket();
@@ -1160,16 +1149,18 @@
                 }
 
                 //取消告警
-                if(Object.keys(processData.cancelWarning).length>0){
+                if(processData.cancelWarning.length>0){
                     let cancelData = [];
                     //查找现有告警是否有取消告警
-                    for(let warnId in processCancelWarn){
+                    processData.cancelWarning.forEach(warnId=>{
                         //如果有告警 则进行删除
-                       if(this.warningData[warnId]){
-                           cancelData.push(warnId);
-                       }
+                        if(this.warningData[warnId]){
+                            cancelData.push(warnId);
+                        }
+                    })
+                    if(cancelData.length>0){
+                        this.processCancelWarn(cancelData);
                     }
-                    this.processCancelWarn(cancelData);
                 }
 
                 //感知数据缓存次数控制
@@ -1249,7 +1240,7 @@
                                 this.staticExist.forEach((item,index)=>{
                                     if(item.longitude<currentExtend[1][0]&&item.latitude<currentExtend[1][1]&&item.longitude>currentExtend[3][0]&&item.latitude>currentExtend[3][1]){
                                         let s = this.computeDistance(mainCar,item);
-                                        console.log(item.warnId,s)
+//                                        console.log(item.warnId,s)
                                         this.processWarn(item,s);
                                     }else{
                                         //如果不在区域内  不显示多少米  排查是否信息更新
@@ -1348,6 +1339,7 @@
                     this.staticPulseCount=1;
                     //静态事件的处理
                     if(Object.keys(processData.staticWarning).length>0){
+                        console.log(processData.staticWarning);
                         let staticData = processData.processStaticData(result.timestamp,this.delayTime);
                         console.log("static:"+staticData.length)
                         if(staticData&&staticData.length>0){
