@@ -26,6 +26,10 @@ NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false })
 
 Vue.config.productionTip = false;
 
+// 模糊查询封装
+import SearchFilter from '@/assets/js/module/searchFilter.js'
+Vue.prototype.$searchFilter = SearchFilter;
+
 // 权限
 import { setAuthInfo, getAdminId, getAuthInfo, removeAuthInfo } from '@/session/index';
 // 在免登录白名单，直接进入
