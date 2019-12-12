@@ -105,8 +105,8 @@ class GIS3D {
         this.initlight();
     }
     updateLight(light)
-    { 
-        debugger
+    {
+        console.log("*********"+11111)
         if(light.id==277)
         {
             this.light3DList[0].idd=light.id;

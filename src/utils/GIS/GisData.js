@@ -376,7 +376,6 @@ let GisData = {
                 //是否旋转
                 if(isHeading)
                 {
-                    debugger
                     heading = Cesium.Math.toRadians(itemSide[i][3]);
                 }
                 
