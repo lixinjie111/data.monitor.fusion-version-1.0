@@ -24,9 +24,9 @@ class ProcessCarTrack {
         data.forEach(item=>{
             if(!this.spatObj[item.spatId]){
                 this.spatObj[item.spatId] = new Array();
-            }else{
-                this.spatObj[item.spatId].push(item);
             }
+            this.spatObj[item.spatId].push(item);
+
         });
     }
     receiveRouteData(data){
@@ -41,7 +41,6 @@ class ProcessCarTrack {
         this.canList.push.apply(this.canList,data);
     }
     processSpatData(time,delayTime){
-        console.log("--------------")
         let data = [];
         for(let spatId in this.spatObj){
             if(this.spatObj[spatId].length>0){
@@ -111,7 +110,7 @@ class ProcessCarTrack {
 
             }
         }
-        // console.log("最小索引:"+minIndex);
+        // console.log("最小索引:",minIndex,minData);
         //找出的最小值无效
         if(minDiff&&minDiff>this.spatMaxValue){
             console.log("spat找到的最小值无效")
@@ -254,9 +253,9 @@ class ProcessCarTrack {
             for(let i=0;i<cacheData.length;i++){
                 let diff = Math.abs(time-cacheData[i].timestamp-delayTime);
                 let currentTime = time-delayTime;
-                console.log(DateFormat.formatTime(currentTime,'hh:mm:ss:ms'),DateFormat.formatTime(cacheData.timestamp,'hh:mm:ss:ms'),diff);
+                console.log(DateFormat.formatTime(currentTime,'hh:mm:ss:ms'),DateFormat.formatTime(cacheData.timestamp,'hh:mm:ss:ms'),diff,i);
                 if(diff<this.warnPulseInterval){
-                    if(startIndex !=-1 && i != startIndex+1) {
+                    if(startIndex !=-1 && i != startIndex+1){
                         break;
                     }
                     if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
@@ -277,7 +276,7 @@ class ProcessCarTrack {
                 }
             }
             //如果能找到最小范围
-            // console.log(rangeData)
+            console.log(rangeData)
             if(rangeData){
                 minIndex = rangeData.index;
                 minData = rangeData.data;
@@ -321,7 +320,7 @@ class ProcessCarTrack {
             this.dynamicWarning[warnId] = this.dynamicWarning[warnId].filter((item,index)=>{
                 return index>minIndex;
             })
-            // console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+            console.log("找到最小值后"+this.dynamicWarning[warnId].length);
 
             //返回距离标尺的最小插值的数据
         }

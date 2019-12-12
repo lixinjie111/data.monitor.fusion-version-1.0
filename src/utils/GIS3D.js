@@ -120,6 +120,9 @@ class GIS3D {
         this.initlight();
     }
     updateLight(light) {
+        // if(light.id==277){
+        //     console.log(light)
+        // }
         this.light3DList.forEach(item => {
             if (item.id == light.id) {
                 item.id = light.id;

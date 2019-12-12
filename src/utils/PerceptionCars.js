@@ -32,9 +32,9 @@ class PerceptionCars {
         sideList.forEach(item=>{
           if(!this.devObj[item.devId]){
               this.devObj[item.devId]=new Array();
-          }else {
-            this.devObj[item.devId].push(item);
           }
+          this.devObj[item.devId].push(item);
+
       });
     }
     cacheAndInterpolatePerCar(device) {
