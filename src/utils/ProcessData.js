@@ -58,6 +58,9 @@ class ProcessCarTrack {
         let cacheData = this.spatObj[spatId];
         let rangeData=null;
         let startIndex=-1;
+        let minIndex=-1;
+        let minData = {};
+        let minDiff;
         // console.log("spatId:"+spatId+",找到最小值前："+cacheData.length);
         //找到满足条件的范围
         for(let i=0;i<cacheData.length;i++){
@@ -86,9 +89,6 @@ class ProcessCarTrack {
                 }
             }
         }
-        let minIndex=-1;
-        let minData = {};
-        let minDiff;
         //如果能找到最小范围
         // console.log(rangeData)
         if(rangeData){
@@ -239,98 +239,92 @@ class ProcessCarTrack {
         return minData;
     }
     processWarningData(time,delayTime,warnId){
-        let warningData;
-        if(this.dynamicWarning[warnId].length>0){
-            warningData = this.getWarnMinValue(time,delayTime,warnId);
-            if(!warningData){
-                return;
-            }
-        }else {
-            console.log("#告警没有数据")
-        }
+        let warningData = this.getWarnMinValue(time,delayTime,warnId);
         return warningData;
     }
     getWarnMinValue(time,delayTime,warnId){
         let cacheData = this.dynamicWarning[warnId];
         let rangeData=null;
         let startIndex=-1;
-        // console.log("找到最小值前："+cacheData.length);
-        //找到满足条件的范围
-        for(let i=0;i<cacheData.length;i++){
-            let diff = Math.abs(time-cacheData[i].timestamp-delayTime);
-            // console.log(warnId,cacheData.length,time,cacheData[i].timestamp,delayTime,diff,i)
-            if(diff<this.warnPulseInterval){
-                if(startIndex !=-1 && i != startIndex+1) {
-                    break;
-                }
-                if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
-                    startIndex=i;
-                    let obj={
-                        index:i,
-                        delayTime: diff,
-                        data:cacheData[i]
-                    }
-                    rangeData = obj;
-                }else {
-                    break;
-                }
-            }else {
-                if(rangeData) {
-                    break;
-                }
-            }
-        }
         let minIndex=-1;
         let minData = {};
         let minDiff;
-        //如果能找到最小范围
-        // console.log(rangeData)
-        if(rangeData){
-            minIndex = rangeData.index;
-            minData = rangeData.data;
-        }else{
-           /* console.log("warn没有符合范围的");*/
-            minIndex = 0;
-            minData = cacheData[0];
-            minDiff = Math.abs(time-minData.timestamp-delayTime);
+        //找到满足条件的范围
+        if(cacheData.length>0){
             for(let i=0;i<cacheData.length;i++){
-                let diff = Math.abs(time-parseInt(cacheData[i].time)-delayTime);
-                // let diff = time-cacheData[i].gpsTime-insertTime;
-                // console.log(vid,cacheData.length, time, parseInt(cacheData[i].gpsTime) , diff)
-                if(diff<minDiff){
-                    minData = cacheData[i];
-                    minIndex = i;
+                let diff = Math.abs(time-cacheData[i].timestamp-delayTime);
+                let currentTime = time-delayTime;
+                console.log(DateFormat.formatTime(currentTime,'hh:mm:ss:ms'),DateFormat.formatTime(cacheData.timestamp,'hh:mm:ss:ms'),diff);
+                if(diff<this.warnPulseInterval){
+                    if(startIndex !=-1 && i != startIndex+1) {
+                        break;
+                    }
+                    if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
+                        startIndex=i;
+                        let obj={
+                            index:i,
+                            delayTime: diff,
+                            data:cacheData[i]
+                        }
+                        rangeData = obj;
+                    }else {
+                        break;
+                    }
+                }else {
+                    if(rangeData) {
+                        break;
+                    }
                 }
-
             }
+            //如果能找到最小范围
+            // console.log(rangeData)
+            if(rangeData){
+                minIndex = rangeData.index;
+                minData = rangeData.data;
+            }else{
+                /* console.log("warn没有符合范围的");*/
+                minIndex = 0;
+                minData = cacheData[0];
+                minDiff = Math.abs(time-minData.timestamp-delayTime);
+                for(let i=0;i<cacheData.length;i++){
+                    let diff = Math.abs(time-parseInt(cacheData[i].timestamp)-delayTime);
+                    // let diff = time-cacheData[i].gpsTime-insertTime;
+                    // console.log(vid,cacheData.length, time, parseInt(cacheData[i].gpsTime) , diff)
+                    if(diff<minDiff){
+                        minData = cacheData[i];
+                        minIndex = i;
+                    }
+
+                }
+            }
+            console.log("最小索引:"+minIndex);
+            if (minDiff&&minDiff>this.warnMaxValue){
+                console.log("warn找到最小值无效")
+                return;
+            }
+            //打印出被舍弃的点
+            let lostData = this.dynamicWarning[warnId].filter((item,index)=>{
+                return index<minIndex;
+            })
+            /*if(lostData.length>0){
+                debugger
+            }*/
+            lostData.forEach(item=>{
+                let minDiff = Math.abs(time-cacheData[minIndex].timestamp);
+                // console.log("插值最小的索引"+minIndex,minDiff);
+                let d =  Math.abs(time-item.timestamp);
+                // console.log("##"+d);
+            })
+
+
+            //找到最小值后，将数据之前的数值清除
+            this.dynamicWarning[warnId] = this.dynamicWarning[warnId].filter((item,index)=>{
+                return index>minIndex;
+            })
+            // console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
+
+            //返回距离标尺的最小插值的数据
         }
-        console.log("最小索引:"+minIndex);
-        if (minDiff&&minDiff>this.warnMaxValue){
-            console.log("warn找到最小值无效")
-            return;
-        }
-        //打印出被舍弃的点
-        let lostData = this.dynamicWarning[warnId].filter((item,index)=>{
-            return index<minIndex;
-        })
-        /*if(lostData.length>0){
-            debugger
-        }*/
-        lostData.forEach(item=>{
-            let minDiff = Math.abs(time-cacheData[minIndex].timestamp);
-            // console.log("插值最小的索引"+minIndex,minDiff);
-            let d =  Math.abs(time-item.timestamp);
-            // console.log("##"+d);
-        })
-
-
-        //找到最小值后，将数据之前的数值清除
-        this.dynamicWarning[warnId] = this.dynamicWarning[warnId].filter((item,index)=>{
-            return index>minIndex;
-        })
-        // console.log("找到最小值后"+this.cacheAndInterpolateDataByVid[vid].cacheData.length);
-
-        //返回距离标尺的最小插值的数据
         return minData;
     }
 
@@ -344,33 +338,19 @@ class ProcessCarTrack {
     }
     getStaticValue(time,delayTime){
         let rangeData=[];
-        let indexList = [];
         //找到满足条件的范围
         for(let warnId in this.staticWarning){
             let cacheData = this.staticWarning[warnId];
-            for(let i=0;i<cacheData.length;i++){
-                let currentTime = time-delayTime;
-                let diff = currentTime - cacheData[i].timestamp;
-                console.log(DateFormat.formatTime(currentTime,'hh:mm:ss:ms'),DateFormat.formatTime(cacheData[i].timestamp,'hh:mm:ss:ms'),diff);
-                if(cacheData[i].timestamp<currentTime){
-                    rangeData.push(cacheData[i]);
-                    indexList.push(i);
-                }
+            let currentTime = time-delayTime;
+            let diff = currentTime - cacheData.timestamp;
+            // console.log(DateFormat.formatTime(currentTime,'hh:mm:ss:ms'),DateFormat.formatTime(cacheData.timestamp,'hh:mm:ss:ms'),diff);
+            if(cacheData.timestamp<currentTime){
+                rangeData.push(cacheData);
+                delete this.staticWarning[warnId];
             }
         }
-        // console.log("length:"+indexList.length)
-        //将找到的值进行删除
-        this.staticWarning.forEach((item,index)=>{
-            if(indexList.indexOf(index)!=-1){
-                this.staticWarning.splice(index,1);
-            }
-        });
-        // console.log(this.staticWarning.length)
         return rangeData;
     }
-
-
-
 
     processCanData(time,delayTime){
         let canData;
@@ -470,54 +450,5 @@ class ProcessCarTrack {
         return minData;
     }
 
-    processCancelWarning(time,delayTime){
-        let cancelData;
-        cancelData = this.getCancelMinValue(time,delayTime);
-        if(!cancelData){
-            return;
-        }
-        return cancelData;
-    }
-    getCancelMinValue(time,delayTime){
-        let rangeData=[];
-        // console.log("找到最小值前："+this.canList.length);
-        //找到满足条件的范围
-        for(let i=0;i<this.cancelWarning.length;i++) {
-            let diff = Math.abs(time - this.cancelWarning[i].time - delayTime);
-            // console.log(this.canList.length,time,parseInt(this.canList[i].gpsTime),delayTime,diff,i)
-            if (diff < this.canPulseInterval) {
-                let obj = {
-                    index: i,
-                    delayTime: diff,
-                    data: this.canList[i],
-                    diff: diff
-                }
-                rangeData.push(obj);
-            }
-        }
-        let minIndex=-1;
-        let minData = {};
-        let minDiff;
-        //如果能找到最小范围
-        // console.log(rangeData)
-        if(rangeData&&rangeData.length<0){
-            for(let i=0;i<this.cancelWarning.length;i++) {
-                let diff = Math.abs(time - this.cancelWarning[i].time - delayTime);
-                // console.log(this.canList.length,time,parseInt(this.canList[i].gpsTime),delayTime,diff,i)
-                if (diff < this.cancelMaxValue) {
-                    let obj = {
-                        index: i,
-                        delayTime: diff,
-                        data: this.canList[i],
-                        diff: diff
-                    }
-                    rangeData.push(obj);
-                }
-            }
-        }
-
-        return rangeData;
-
-    }
 }
 export default ProcessCarTrack;
