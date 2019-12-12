@@ -378,10 +378,17 @@ class ProcessCarTrack {
             var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
             var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
             //e.cesium.viewer.entities.add(entity);
+
+            
+            let url='./static/map3d/model/car.glb';
+            if (this.mainCarVID == vid) 
+                {
+                    url='./static/map3d/model/carMian.glb';
+                }
             this.viewer.scene.primitives.add(Cesium.Model.fromGltf({
                 id: vid + "car",
                 modelMatrix: modelMatrix,
-                url: './static/map3d/model/car.glb',
+                url:url,
                 minimumPixelSize: 1,
                 show: true,
                 maximumScale: 100,
@@ -528,12 +535,12 @@ class ProcessCarTrack {
        //主车移动
     moveTo(d) {
         var heading = Cesium.Math.toRadians(d.heading);
-        var pitch = -0.2369132859032279;
+        var pitch =-0.2269132859032279;// -0.2469132859032279;
         var roll = 0.0029627735803421373;
-        var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+        var hpr = new Cesium.HeadingPitchRoll(heading,pitch, roll);
 
         this.viewer.camera.setView({
-            destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 10),
+            destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 2.6),
             orientation: hpr
         });
     }
