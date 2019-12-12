@@ -66,8 +66,19 @@
                    plateNo:'', 
                    rsPtName:''
                 },
-                searchUrl: requestVehicle,
-                searchUrl1: requestRoadSide,
+                searchUrl: null,
+                selectOption: {
+                    loading: false,
+                    filterOption: [],
+                    totalCount:'',
+                    loadMore:false,
+                    otherParams:{
+                        page:{
+                            pageSize: 10,
+                            pageIndex: 0,
+                        }
+                    }
+                },
                 plateNoOption: {
                     loading: false,
                     filterOption: [],
@@ -138,8 +149,10 @@
                     }
                 }
                 if(this.searchKey.field==1){
+                    this.searchUrl = requestVehicle;
                      this.plateNoRemoteMethod();
                 }else{
+                    this.searchUrl = requestRoadSide;
                      this.rsPtNameRemoteMethod();
                 }
             },
