@@ -17,7 +17,7 @@ class ProcessCarTrack {
         this.canList=[];
         this.dynamicWarning={};
         this.staticWarning={};
-        this.cancelWarning={};
+        this.cancelWarning=[];
     }
 
     receiveLightData(data){

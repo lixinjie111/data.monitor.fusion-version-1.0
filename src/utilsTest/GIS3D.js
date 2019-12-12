@@ -104,8 +104,7 @@ class GIS3D {
         this.initModel_pole(item,this.cesium.viewer); 
         this.initlight();
     }
-    updateLight(light)
-    { 
+    updateLight(light) { 
         if(light.id==277)
         {
             this.light3DList[0].idd=light.id;
