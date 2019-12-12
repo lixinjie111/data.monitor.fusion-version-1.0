@@ -480,16 +480,16 @@
                             //如果是静态事件
                             if(!item.isD){
                                 //如果是静态事件，收到确认
-//                                let warning = {
-//                                    "action":"cloud_event",
-//                                    "body":{
-//                                        "warnId":item.warnId,
-//                                        "status":1
-//                                    },
-//                                    "type":2
-//                                }
-//                                let warningMsg = JSON.stringify(warning);
-//                                this.sendWarningMsg(warningMsg);
+                                let warning = {
+                                    "action":"cloud_event",
+                                    "body":{
+                                        "warnId":item.warnId,
+                                        "status":1
+                                    },
+                                    "type":2
+                                }
+                                let warningMsg = JSON.stringify(warning);
+                                this.sendWarningMsg(warningMsg);
                                 item.warnId = warnId;
                                 let array = processData.staticWarning[item.warnId];
                                 if(!array){
@@ -1369,11 +1369,11 @@
                 let result = json.result;
                 let _this = this;
                 if(_this.pulseNowTime==''){
-//                   _this.initPerceptionWebSocket();
+                   _this.initPerceptionWebSocket();
                    _this.initPlatformWebSocket();
                    _this.initWarningWebSocket();
-//                   _this.initSpatWebSocket();
-//                   _this.initCancelWarningWebSocket();
+                   _this.initSpatWebSocket();
+                   _this.initCancelWarningWebSocket();
                     _this.initCancelWarningWebSocket();
                 }
                 _this.pulseNowTime = result.timestamp;

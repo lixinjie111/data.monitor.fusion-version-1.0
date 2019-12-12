@@ -1120,10 +1120,10 @@
                 let result = json.result;
                 if(this.pulseNowTime==''){
                     this.initPlatformWebSocket();
-//                    this.initPerceptionWebSocket();
-//                    this.initCanWebSocket();
+                    this.initPerceptionWebSocket();
+                    this.initCanWebSocket();
                     this.initWarningWebSocket();
-//                    this.initSpatWebSocket();
+                    this.initSpatWebSocket();
                     this.initRouteWebSocket();
                     this.initCancelWarningWebSocket();
                 }
