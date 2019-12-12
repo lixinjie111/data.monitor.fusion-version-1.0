@@ -1,11 +1,12 @@
 <template>
     <el-form ref="searchForm" :inline="true" :model="searchKey" :rules="rules" size="small" class="fusion-select">
-        <el-form-item>
-            <el-select v-model.trim="searchKey.field" @change="initChange()" class="select-fusion">
+        <el-form-item class="el">
+            <el-select v-model.trim="searchKey.field" @change="initChange()">
                 <el-option label="车辆" value="1"></el-option>
                 <el-option label="路侧点" value="2"></el-option>
             </el-select>
             <el-select
+                class="select-content"
                 v-if="searchKey.field==1"
                 v-model.trim="searchKey.plateNo"
                 filterable
@@ -26,6 +27,7 @@
                 </el-option>
             </el-select>
             <el-select
+                class="select-content"
                 v-else
                 v-model.trim="searchKey.rsPtName"
                 filterable
@@ -46,6 +48,8 @@
                     :value="item">
                 </el-option>
             </el-select>
+        </el-form-item>
+        <el-form-item>
             <el-button  @click="showView()" class="enter">进入</el-button>
         </el-form-item>
     </el-form>
@@ -158,26 +162,31 @@
     left: 0;
     right: 0;
     margin:auto;
+   
 }
 </style>
 <style lang="scss">
 .fusion-select {
     .el-input__inner,.el-button{
         background:#676767;
-        border: 1px solid #676767;
+        border: none;
         color:#fff;
+        border-radius:0 !important;
     }
-    .el-select .el-input {
-        width: 130px;
+    .el-select .el-input{
+        width: 85px;
+        background:#7f7f7f;
+        .el-input__inner{
+             background:#7f7f7f;
+        }
     }
-    .el-select .el-input.is-focus .el-input__inner {
-        border-color: #676767;
-    }
-    .el-select .el-input__inner:focus {
-        border-color: #676767;
-    }
-    .el-select:hover .el-input__inner {
-        border-color: #676767;
+    .select-content .el-input {
+        margin-left:-12px;
+        width: 230px;
+        background:#676767;
+        .el-input__inner{
+             background:#676767;
+        }
     }
 }
 .el-select-dropdown__item.selected {
