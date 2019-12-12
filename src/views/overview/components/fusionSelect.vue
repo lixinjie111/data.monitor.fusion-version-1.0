@@ -1,6 +1,6 @@
 <template>
     <el-form ref="searchForm" :inline="true" :model="searchKey" :rules="rules" size="small" class="fusion-select">
-        <el-form-item class="el">
+        <el-form-item>
             <el-select v-model.trim="searchKey.field" @change="initChange()">
                 <el-option label="车辆" value="1"></el-option>
                 <el-option label="路侧点" value="2"></el-option>
@@ -15,6 +15,7 @@
                 placeholder="请输入关键词"
                 :remote-method="plateNoRemoteMethod"
                 clearable
+                v-loadmore="loadMore"
                 @clear="$searchFilter.clearFunc(plateNoOption)"
                 @focus="$searchFilter.remoteMethodClick(plateNoOption, searchKey, 'plateNo',searchUrl)"
                 @blur="$searchFilter.remoteMethodBlur(searchKey, 'plateNo')"
@@ -59,6 +60,7 @@
     export default {
         data() {
             return {
+                query:'',
                 searchKey:{
                    field:'1',
                    plateNo:'', 
@@ -69,6 +71,8 @@
                 plateNoOption: {
                     loading: false,
                     filterOption: [],
+                    totalCount:'',
+                    loadMore:false,
                     otherParams:{
                         page:{
                             pageSize: 10,
@@ -79,6 +83,8 @@
                 rsPtNameOption: {
                     loading: false,
                     filterOption: [],
+                    totalCount:'',
+                    loadMore:false,
                     otherParams:{
                         page:{
                             pageSize: 10,
@@ -89,11 +95,48 @@
             }
         },
         methods: {
+            loadMore(){
+                var div = document.createElement('div');
+                div.innerHTML = '加载中';
+                div.setAttribute("class","el-select-dropdown__empty");
+                // let el1=document.querySelectorAll(".el-select-dropdown")[0];
+                // let el=document.querySelector(".popper__arrow");
+                // document.insertBefore(div,el);
+                if(this.searchKey.field==1){
+                     if(this.plateNoOption.totalCount==this.plateNoOption.filterOption.length){
+                        div.innerHTML = '已加载全部';
+                        return;
+                     }
+                     this.plateNoOption.loadMore=true;
+                     this.plateNoOption.otherParams.page.pageIndex++;
+                     this.plateNoRemoteMethod(this.query);
+                }else{
+                      if(this.rsPtNameOption.totalCount==this.rsPtNameOption.filterOption.length){
+                        div.innerHTML = '已加载全部';
+                        return;
+                     }
+                     this.rsPtNameOption.loadMore=true;
+                     this.rsPtNameOption.otherParams.page.pageIndex++;
+                     this.rsPtNameRemoteMethod(this.query);
+                }
+            },
             initChange(){
                 this.searchKey.plateNo='';
                 this.searchKey.rsPtName='';
                 this.rsPtNameOption.filterOption=[];
                 this.plateNoOption.filterOption=[];
+                this.rsPtNameOption.otherParams={
+                    page:{
+                        pageSize: 10,
+                        pageIndex: 0,
+                    }
+                }
+                this.plateNoOption.otherParams={
+                    page:{
+                        pageSize: 10,
+                        pageIndex: 0,
+                    }
+                }
                 if(this.searchKey.field==1){
                      this.plateNoRemoteMethod();
                 }else{
@@ -101,8 +144,9 @@
                 }
             },
             plateNoRemoteMethod(query){//输入时
+                this.query=query;
                 this.$searchFilter.publicRemoteMethod({
-                    query: query,
+                    query: query?query:'',
                     searchOption: this.plateNoOption,
                     searchObj: this.searchKey,
                     key: 'plateNo',
@@ -110,8 +154,9 @@
                 });
             },
             rsPtNameRemoteMethod(query){
+                 this.query=query;
                  this.$searchFilter.publicRemoteMethod({
-                    query: query,
+                    query: query?query:'',
                     searchOption: this.rsPtNameOption,
                     searchObj: this.searchKey,
                     key: 'rsPtName',
@@ -155,14 +200,14 @@
     }
 </script>
 <style lang="scss" scoped>
+@import "@/assets/scss/theme.scss";
 .fusion-select {
     position: absolute;
-    width:500px;
+    width: auto;
     top: 100px;
     left: 0;
     right: 0;
-    margin:auto;
-   
+   @include layoutMode(pack)
 }
 </style>
 <style lang="scss">

@@ -6,16 +6,15 @@ class SearchFilter {
         this.queryName = '';
     }
     static publicRemoteMethod(option) {
-        if (option.query !== '') {
+        //if (option.query !== '') {
             this.queryName = option.query;
             option.searchOption.loading = true;
                 this.requestRoadSideTypeahead(option);
-        } else {
-            option.searchOption.filterOption = [];
-        }
+        // } else {
+        //     option.searchOption.filterOption = [];
+        // }
     }
     static remoteMethodClick(searchOption, searchObj, key, searchUrl) {
-        searchOption.filterOption = [];
         this.queryName = searchObj[key];
             searchOption.loading = true;
             this.requestRoadSideTypeahead({
@@ -33,9 +32,13 @@ class SearchFilter {
             }, 
              option.searchOption.otherParams ? option.searchOption.otherParams : {});
         option.request(_params).then(res => {
-            if(res.status == 200){         
-                option.searchOption.filterOption = res.data.list;
-                console.log(option)
+            if(res.status == 200){ 
+                option.searchOption.totalCount=res.data.totalCount;    
+                if(option.searchOption.loadMore){
+                    option.searchOption.filterOption.push(...res.data.list)
+                }else{
+                    option.searchOption.filterOption = res.data.list;
+                }  
             }   
             option.searchOption.loading = false; 
         }).catch(err => {
