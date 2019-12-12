@@ -535,12 +535,12 @@ class ProcessCarTrack {
        //主车移动
     moveTo(d) {
         var heading = Cesium.Math.toRadians(d.heading);
-        var pitch =-0.2269132859032279;// -0.2469132859032279;
+        var pitch =-0.1569132859032279;// -0.2469132859032279;
         var roll = 0.0029627735803421373;
         var hpr = new Cesium.HeadingPitchRoll(heading,pitch, roll);
 
         this.viewer.camera.setView({
-            destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 2.6),
+            destination: Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 2.5),
             orientation: hpr
         });
     }
