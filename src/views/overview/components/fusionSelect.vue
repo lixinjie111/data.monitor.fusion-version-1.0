@@ -1,7 +1,7 @@
 <template>
     <el-form ref="searchForm" :inline="true" :model="searchKey" :rules="rules" size="small" class="fusion-select">
         <el-form-item>
-            <el-select v-model.trim="searchKey.field" class="el-field">
+            <el-select v-model.trim="searchKey.field" @change="initChange()" class="select-fusion">
                 <el-option label="车辆" value="1"></el-option>
                 <el-option label="路侧点" value="2"></el-option>
             </el-select>
@@ -46,7 +46,7 @@
                     :value="item">
                 </el-option>
             </el-select>
-            <el-button  @click="showView()">进入</el-button>
+            <el-button  @click="showView()" class="enter">进入</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -65,8 +65,6 @@
                 plateNoOption: {
                     loading: false,
                     filterOption: [],
-                    defaultOption: [],
-                    defaultFlag: false,
                     otherParams:{
                         page:{
                             pageSize: 10,
@@ -74,11 +72,9 @@
                         }
                     }
                 },
-                 rsPtNameOption: {
+                rsPtNameOption: {
                     loading: false,
                     filterOption: [],
-                    defaultOption: [],
-                    defaultFlag: false,
                     otherParams:{
                         page:{
                             pageSize: 10,
@@ -90,13 +86,17 @@
         },
         methods: {
             initChange(){
+                this.searchKey.plateNo='';
+                this.searchKey.rsPtName='';
+                this.rsPtNameOption.filterOption=[];
+                this.plateNoOption.filterOption=[];
                 if(this.searchKey.field==1){
                      this.plateNoRemoteMethod();
                 }else{
                      this.rsPtNameRemoteMethod();
                 }
             },
-            plateNoRemoteMethod(query){
+            plateNoRemoteMethod(query){//输入时
                 this.$searchFilter.publicRemoteMethod({
                     query: query,
                     searchOption: this.plateNoOption,
@@ -108,7 +108,7 @@
             rsPtNameRemoteMethod(query){
                  this.$searchFilter.publicRemoteMethod({
                     query: query,
-                    searchOption: this.plateNoOption,
+                    searchOption: this.rsPtNameOption,
                     searchObj: this.searchKey,
                     key: 'rsPtName',
                     request: this.searchUrl1
@@ -116,16 +116,34 @@
             },
             showView(){
                 if(this.searchKey.field==1){//车辆
-                    this.$router.push({
-                        path: "/single/" + this.searchKey.plateNo,
-                        query:{delayTime:4}
-                    });
+                    if(this.searchKey.plateNo!=""){
+                        this.$router.push({
+                            path: "/single/" + this.searchKey.plateNo,
+                            query:{delayTime:4}
+                        });
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            duration: '1500',
+                            message: '请选择数据!',
+                            showClose: true
+                        });
+                    }
                 }else{//路侧点
-                    let centPos = [this.searchKey.rsPtName.ptLon,this.searchKey.rsPtName.ptLat];
-                    this.$router.push({
-                        path: '/perception/'+this.searchKey.rsPtName.rsPtId+ "/"+4+"/"+0.004+"/"+true,
-                        query:{lng:centPos[0],lat:centPos[1],isShow:false}
-                    });
+                    if(this.searchKey.rsPtName!=""){
+                        let centPos = [this.searchKey.rsPtName.ptLon,this.searchKey.rsPtName.ptLat];
+                        this.$router.push({
+                            path: '/perception/'+this.searchKey.rsPtName.rsPtId+ "/"+4+"/"+0.004+"/"+true,
+                            query:{lng:centPos[0],lat:centPos[1],isShow:false}
+                        });
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            duration: '1500',
+                            message: '请选择数据!',
+                            showClose: true
+                        });
+                    }
                 }
                 
             }
@@ -144,7 +162,7 @@
 </style>
 <style lang="scss">
 .fusion-select {
-    .el-input__inner{
+    .el-input__inner,.el-button{
         background:#676767;
         border: 1px solid #676767;
         color:#fff;
