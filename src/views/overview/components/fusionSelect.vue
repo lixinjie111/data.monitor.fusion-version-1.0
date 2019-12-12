@@ -1,21 +1,21 @@
 <template>
-    <el-autocomplete 
+    <!-- <el-autocomplete 
         placeholder="请输入内容" 
         v-model="input3" 
         popper-class="my-autocomplete"
         :fetch-suggestions="querySearch"
         @select="handleSelect"
         class="fusion-select">
-        <!-- <el-select v-model="select" slot="prepend" placeholder="请选择">
+       <el-select v-model="select" slot="prepend" placeholder="请选择">
             <el-option label="车辆" value="1"></el-option>
             <el-option label="路侧点" value="2"></el-option>
         </el-select>
-        <el-button slot="append">进入</el-button> -->
+        <el-button slot="append">进入</el-button> 
         <template slot-scope="{ item }">
             <div class="name">{{ item.value }}</div>
             <span class="addr">{{ item.address }}</span>
         </template>
-    <el-autocomplete>
+    <el-autocomplete> -->
 </template>
 <script>
     export default {
