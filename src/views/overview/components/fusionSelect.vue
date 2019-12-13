@@ -40,8 +40,12 @@
                 bind (el, binding) {
                     const SELECTWRAP_DOM = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap')
                     SELECTWRAP_DOM.addEventListener('scroll', function () {
-                        const CONDITION = this.scrollHeight - this.scrollTop <= this.clientHeight
+                        const CONDITION = this.scrollHeight - this.scrollTop < this.clientHeight+20;
+                        if(this.scrollHeight==0){
+                            return;
+                        }
                         if (CONDITION) {
+                           
                             binding.value(SELECTWRAP_DOM)
                         }
                     })
