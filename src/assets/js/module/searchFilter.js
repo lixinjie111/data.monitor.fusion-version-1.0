@@ -6,21 +6,13 @@ class SearchFilter {
         this.queryName = '';
     }
     static publicRemoteMethod(option) {
-        //if (option.query !== '') {
-            this.queryName = option.query;
-            option.searchOption.loading = true;
-                this.requestRoadSideTypeahead(option);
-        // } else {
-        //     option.searchOption.filterOption = [];
-        // }
+           this.queryName = option.query;
+           this.requestRoadSideTypeahead(option);
     }
-    static remoteMethodClick(searchOption, searchObj, key, searchUrl) {
-        this.queryName = searchObj[key];
-            searchOption.loading = true;
+    static remoteMethodClick(searchOption,searchObj,key,searchUrl) {
+            this.queryName = searchObj[key];
             this.requestRoadSideTypeahead({
-                query: '',
                 searchOption: searchOption,
-                searchObj: searchObj,
                 request: searchUrl
             });
     }
@@ -34,9 +26,8 @@ class SearchFilter {
                     option.searchOption.filterOption = res.data.list;
                 }  
             }   
-            option.searchOption.loading = false; 
         }).catch(err => {
-            option.searchOption.loading = false;
+
         });
     }
     static clearFunc(searchOption) {
@@ -44,7 +35,6 @@ class SearchFilter {
     }
     static remoteMethodBlur(searchObj, key) {
         searchObj[key] = this.queryName;
-        this.queryName = "";
     }
 }
 export default SearchFilter;

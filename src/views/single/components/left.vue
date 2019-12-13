@@ -31,24 +31,21 @@
     </div>
 </template>
 <script>
-    import { getVehicleBaseData,getRouteDataByVehId } from '@/api/single'
+    import { getVehicleBaseData } from '@/api/single'
     import ConvertCoord from '@/utils/coordConvert.js'
     export default {
         data() {
             return {
                 mapOption:{},
                 singleVehicle:{},
-                routeId:'',
-                all: 1, //是否开启新的行程，1 是一个新的行程  0 不是一个新的行程
                 distanceMap: {}, //创建的地图对象
-                prevLastPointPath:[],//上次请求的终点，
+                prevLastPoint:[],//上次请求的终点，
                 carStartPoint:this.$parent.$parent.defaultCenterPoint,
                 markers: {
                     markerStart: null,
                     polyline: [],
                     markerEnd: null
                 },
-                wholePath: [],
                 webSocket:null,
                 scale: 10,
                 webSocketData: {
@@ -66,11 +63,17 @@
         computed:{
             oilLeftWidth(){
                 let oilData = parseFloat(this.canData.oilDoor/100);
+                if(!oilData){
+                   return 0;
+                }
                 return parseInt(oilData*80);
             },
             brakeLeftWidth(){
                 let brakeData = parseFloat(this.canData.brakePedal/100);
-                return parseInt(brakeData*80)
+                if(!brakeData){
+                    return 0;
+                }
+                return parseInt(brakeData*80);
             },
         },
         props:{
@@ -116,128 +119,49 @@
                     this.singleVehicle = res.vehicleBaseDetail[0];
                 });
             },
-            getRouteDataByVehId() {
-                getRouteDataByVehId({
-                    "scale": this.scale,
-                    'vehicleId': this.vehicleId,
-                }).then(res => {
-                    let _result = res.data.pointList;
-                    if(_result && _result.length > 0) {
-                        this.onmessage(_result);
-                    }
-//                    this.initWebSocket();
-                }).catch(error => {
-                });
-            },
             onmessage(data){
-                // console.log("行程概览 route *********************************************");
-                /*clearInterval(this.countTimer);
-                this.countTime = 0;
-                this.countTimer = setInterval(() => {
-                    this.countTime += 1000;
-                }, 1000);*/
                 let _this=this;
-                let pointList = [];
-                let isArray = false;
-                if(data &&Object.prototype.toString.call(data)=='[object Array]'){
-                    isArray = true;
-                }
-                //是一次新的行程
-                if(this.all == 1){
-                    //判断是历史数据还是新的轨迹
-                    //如果历史轨迹
-                    if(data &&isArray){
-                        pointList = data;
-                    }else{
-                        pointList = [{
-                            longitude: data.longitude,
-                            latitude: data.latitude,
-                            heading: data.heading
-                        }];
-                    }
+                let p = ConvertCoord.wgs84togcj02(data.longitude, data.latitude);
+                let point = new AMap.LngLat(p[0], p[1]);
+                let pointPath = [];
+                //绘制第一个点
+                if(!_this.markers.markerStart){
+                    _this.markers.markerStart = new AMap.Marker({
+                        position:point,   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+                        icon:'static/images/single/start.png',
+                        offset: new AMap.Pixel(-10, -10)
+                    });
+                    //记录上一个点
+                    // 将创建的点标记添加到已有的地图实例：
+                    _this.distanceMap.add(_this.markers.markerStart);
                 }else{
-                    pointList = [{
-                        longitude: data.longitude,
-                        latitude: data.latitude,
-                        heading: data.heading
-                    }];
+                    //绘制线
+                    pointPath.push(_this.prevLastPoint);
+                    pointPath.push(point);
+                    let polyline = new AMap.Polyline({
+                            map: _this.distanceMap,
+                            path: pointPath,
+                            strokeColor: "#03812e",
+                            strokeWeight: 2,
+                            // 折线样式还支持 'dashed'
+                            strokeStyle: "solid",
+                            /* // strokeStyle是dashed时有效
+                             strokeDasharray: [10, 5],*/
+                            lineJoin: 'round',
+                            lineCap: 'round',
+                            zIndex: 50
+                        });
+                    _this.markers.polyline.push(polyline);
+                    //绘制终点
+                    _this.distanceMapEnd(point,data.heading);
+                    // 缩放地图到合适的视野级别
+                    _this.distanceMap.setFitView();
+                    //获取缩放级别
                 }
-                if(pointList && pointList.length > 0) {
-
-                    let routeId;
-                    if(!isArray){
-                        routeId = data.routeId;
-                    }
-
-                    if(this.routeId != ""){
-                        if(this.routeId != routeId){
-                            console.log("重新开启行程");
-                            this.all = 1;
-                            this.routeId =routeId;
-                            return false;
-                        }
-                    }else{
-                        console.log("第一次开启行程");
-                        // console.log(this.routeId);
-                        _this.carStartPoint = ConvertCoord.wgs84togcj02(pointList[0].longitude, pointList[0].latitude);
-                        _this.distanceMapStart();
-                    }
-                    this.routeId =routeId;
-                    if(this.prevLastPointPath.length !=0 && pointList.length==1 && this.prevLastPointPath[0] == pointList[0].longitude && this.prevLastPointPath[1] == pointList[0].latitude){
-                        this.changeLngLat();
-                        return false;
-                    }
-
-                    if(pointList.length!=0){
-                        this.prevLastPointPath = [pointList[pointList.length-1].longitude, pointList[pointList.length-1].latitude];
-                    }
-
-                    let handlePointList = [];
-                    pointList.forEach((item, index) => {
-                        if(item.longitude && item.latitude){
-                            // let lnglatArr = new AMap.LngLat(item.gnss_LONG, item.gnss_LAT);
-                            let lnglatArr = [item.longitude, item.latitude];
-                            handlePointList.push(lnglatArr);
-                        }
-                    });
-                    // console.log(handlePointList);
-                    let _dataLength = handlePointList.length;
-                    this.wholePath.push( {
-                        angle: pointList[_dataLength-1].heading >= 0 ? pointList[_dataLength-1].heading : 90,
-                        routeId: this.routeId,
-                        pathList: handlePointList
-                    });
-                    this.changeLngLat();
-
-                    this.all = 0;
-                }
-            },
-            changeLngLat(){
-                let _this = this;
-                if(this.flag && _this.count < this.wholePath.length){
-                    // console.log("----------------------------------");
-                    this.flag = false;
-                    if(_this.count > 0) {
-                        _this.wholePath[_this.count].pathList.unshift(_this.wholePath[_this.count-1].pathList[_this.wholePath[_this.count-1].pathList.length-1]);
-                    }
-                    // console.log(_this.wholePath[_this.count].pathList);
-                    let _pathList = _this.wholePath[_this.count].pathList;
-                    _this.pointPath = [];
-                    for( let i = 0; i < _pathList.length; i++){
-                        let _position = ConvertCoord.wgs84togcj02(_pathList[i][0], _pathList[i][1]);
-                        _this.pointPath[i] = _position;
-                        // console.log(_position);
-                        if(i == _pathList.length-1) {
-                            //绘制线的轨迹
-                            _this.distanceMapLine();
-                            _this.count++;
-                            _this.flag = true;
-                        }
-                    };
-                }
+                _this.prevLastPoint=point;
             },
             //行程概览--绘制起点
-            distanceMapStart(){
+            distanceMapStart(startPoint){
                 let _this = this;
                 if(!this.markers.markerStart) {
                     this.markers.markerStart = new AMap.Marker({
@@ -252,51 +176,24 @@
                 }
                 this.distanceMap.setFitView(_this.markers.markerStart);
             },
-            //行程概览--绘制路径
-            distanceMapLine(){
-                let _this = this,
-                    polyline = new AMap.Polyline({
-                        map: _this.distanceMap,
-                        path: _this.pointPath,
-                        strokeColor: "#03812e",
-                        strokeWeight: 2,
-                        // 折线样式还支持 'dashed'
-                        strokeStyle: "solid",
-                        /* // strokeStyle是dashed时有效
-                         strokeDasharray: [10, 5],*/
-                        lineJoin: 'round',
-                        lineCap: 'round',
-                        zIndex: 50
-                    });
-                this.markers.polyline.push(polyline);
-                //绘制终点
-                _this.distanceMapEnd();
-                // 缩放地图到合适的视野级别
-                this.distanceMap.setFitView();
-                //获取缩放级别
-//                this.zoom = this.distanceMap.getZoom();
-
-            },
             //行程概览--绘制终点
-            distanceMapEnd(){
+            distanceMapEnd(point,heading){
                 let _this = this;
                 if(!this.markers.markerEnd) {
-                    let _pointPath = _this.pointPath;
                     this.markers.markerEnd = new AMap.Marker({
-                        position: _pointPath[_pointPath.length-1],
+                        position:point,
                         icon:'static/images/single/end.png',
                         offset: new AMap.Pixel(-20, -10),
                         autoRotation: true,
                         // angle: _this.direction-90
-                        angle: _this.wholePath[_this.count].angle ? _this.wholePath[_this.count].angle-90 : 0
+                        angle: heading-90
                     });
                     // 将创建的点标记添加到已有的地图实例：
                     this.distanceMap.add(_this.markers.markerEnd);
                 }else{
-                    this.markers.markerEnd.setPosition(_this.pointPath[_this.pointPath.length-1]);
-                    this.markers.markerEnd.setAngle(_this.wholePath[_this.count].angle-90);
+                    this.markers.markerEnd.setPosition(point);
+                    this.markers.markerEnd.setAngle(heading-90);
                 }
-                /*console.log("缩放级别:"+this.distanceMap.getZoom())*/
             }
         },
         mounted() {
@@ -307,7 +204,6 @@
                 this.distanceMap.setMapStyle(window.defaultMapOption.mapStyle);
             });
             this.getBaseData();
-            this.getRouteDataByVehId();
         },
         destroyed(){
             //销毁Socket

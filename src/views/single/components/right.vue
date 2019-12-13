@@ -819,14 +819,14 @@
                 this.warningConnectCount++;
             },
             processWarn(warningData,distance){
-                console.log(warnId)
+//                console.log(warnId)
                 let _this = this;
                 let warnId = warningData.warnId;
                 let warningMsg;
                 if(distance){
                     warningMsg = warningData.warnMsg + ' ' +distance+'米';
                 }
-                console.log(warnId,_this.warningData[warnId])
+//                console.log(warnId,_this.warningData[warnId])
                 //如果告警第一次画
                 if(!_this.warningData[warnId]){
                     _this.warningCount++;
@@ -1264,12 +1264,12 @@
                 let result = json.result;
                 if(this.pulseNowTime==''){
                     this.initPlatformWebSocket();
-                    this.initPerceptionWebSocket();
-                    this.initCanWebSocket();
-                    this.initWarningWebSocket();
-                    this.initSpatWebSocket();
-                    this.initRouteWebSocket();
-                    this.initCancelWarningWebSocket();
+//                    this.initPerceptionWebSocket();
+//                    this.initCanWebSocket();
+//                    this.initWarningWebSocket();
+//                    this.initSpatWebSocket();
+//                    this.initRouteWebSocket();
+//                    this.initCancelWarningWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
@@ -1405,13 +1405,16 @@
 
                     if(this.routePulseCount==0||this.routePulseCount>=25){
                         this.routePulseCount=1;
-                        if(processData.routeList.length>0){
+                        if(mainCar){
+                            this.$parent.routeData = mainCar;
+                        }
+                        /*if(processData.routeList.length>0){
                             let routeData = processData.processRouteData(result.timestamp,delayTime);
 //                            console.log("length:"+processData.routeList.length,routeData.routeId);
                             if(routeData){
                                 this.$parent.routeData=routeData;
                             }
-                        }
+                        }*/
                         if(processData.canList.length>0){
                             let canData = processData.processCanData(result.timestamp,delayTime);
                             if(canData){
