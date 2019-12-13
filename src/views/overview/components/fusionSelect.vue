@@ -42,7 +42,7 @@
                     SELECTWRAP_DOM.addEventListener('scroll', function () {
                         const CONDITION = this.scrollHeight - this.scrollTop <= this.clientHeight
                         if (CONDITION) {
-                            binding.value()
+                            binding.value(SELECTWRAP_DOM)
                         }
                     })
                 }
@@ -50,6 +50,7 @@
         },
         data() {
             return {
+                scrollDom:'',
                 query:'',
                 searchKey:{
                    field:'1',
@@ -76,7 +77,8 @@
            this.remoteMethod(); 
         },
         methods: {
-            loadMore(){
+            loadMore(dom){
+                this.scrollDom=dom;
                 if(this.searchOption.totalCount==this.searchOption.filterOption.length){
                     return;
                 }
@@ -121,7 +123,9 @@
                 }
             },
             remoteSearch(query){//输入时
-                document.querySelector('.el-select-dropdown .el-select-dropdown__wrap').scrollTop=0;
+                if(this.scrollDom!=""){
+                    this.scrollDom.scrollTop=0;
+                }
                 this.searchOption.filterOption = [];
                 this.searchOption.loadMore=false;
                 this.searchOption.otherParams.page.pageIndex=0;
