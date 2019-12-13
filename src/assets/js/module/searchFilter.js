@@ -21,17 +21,11 @@ class SearchFilter {
                 query: '',
                 searchOption: searchOption,
                 searchObj: searchObj,
-                key: key,
                 request: searchUrl
             });
     }
-    static requestRoadSideTypeahead(option) {
-        let _params = Object.assign({}, 
-            {
-                [option.key]: option.query
-            }, 
-             option.searchOption.otherParams ? option.searchOption.otherParams : {});
-        option.request(_params).then(res => {
+    static requestRoadSideTypeahead(option) { 
+        option.request(option.searchOption.otherParams).then(res => {
             if(res.status == 200){ 
                 option.searchOption.totalCount=res.data.totalCount;    
                 if(option.searchOption.loadMore){

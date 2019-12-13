@@ -10,6 +10,7 @@ const Err404 = resolve => require(['@/views/error/404'], resolve)
 const Refresh = resolve => require(['@/views/refresh'], resolve)
 
 const Single = resolve => require(['@/views/single'], resolve)
+const SingleNew = resolve => require(['@/views/singleNew'], resolve)
 const Perception = resolve => require(['@/views/perception'], resolve)
 const PerceptionTest = resolve => require(['@/views/perceptionTest'], resolve)
 const Overview = resolve => require(['@/views/overview'], resolve)
@@ -44,6 +45,11 @@ export default new VueRouter({
       path: '/single/:vehicleId',
       name: 'Single',
       component: Single,
+      meta: {}
+  },{
+      path: '/singleNew/:vehicleId',
+      name: 'SingleNew',
+      component: SingleNew,
       meta: {}
   },{
       path: '/perception/:crossId/:delayTime/:extend/:leftShow',

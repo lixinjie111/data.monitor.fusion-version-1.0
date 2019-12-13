@@ -7,46 +7,23 @@
             </el-select>
             <el-select
                 class="select-content"
-                v-if="searchKey.field==1"
-                v-model.trim="searchKey.plateNo"
+                v-model.trim="searchKey.value"
                 filterable
                 remote
                 reserve-keyword
                 placeholder="请输入关键词"
-                :remote-method="plateNoRemoteMethod"
+                :remote-method="remoteMethod"
                 clearable
                 v-loadmore="loadMore"
-                @clear="$searchFilter.clearFunc(plateNoOption)"
-                @focus="$searchFilter.remoteMethodClick(plateNoOption, searchKey, 'plateNo',searchUrl)"
-                @blur="$searchFilter.remoteMethodBlur(searchKey, 'plateNo')"
-                :loading="plateNoOption.loading">
+                @clear="$searchFilter.clearFunc(searchOption)"
+                @focus="$searchFilter.remoteMethodClick(searchOption, searchKey, 'value',searchUrl)"
+                @blur="$searchFilter.remoteMethodBlur(searchKey, 'value')"
+                :loading="searchOption.loading">
                 <el-option
-                    v-for="item in plateNoOption.filterOption"
-                    :key="item.plateNo"
-                    :label="item.plateNo"
-                    :value="item.vehicleId">
-                </el-option>
-            </el-select>
-            <el-select
-                class="select-content"
-                v-else
-                v-model.trim="searchKey.rsPtName"
-                filterable
-                remote
-                value-key="rsPtId"
-                reserve-keyword
-                placeholder="请输入关键词"
-                :remote-method="rsPtNameRemoteMethod"
-                clearable
-                @clear="$searchFilter.clearFunc(rsPtNameOption)"
-                @focus="$searchFilter.remoteMethodClick(rsPtNameOption, searchKey, 'rsPtName',searchUrl1)" 
-                @blur="$searchFilter.remoteMethodBlur(searchKey, 'rsPtName')" 
-                :loading="rsPtNameOption.loading">
-                <el-option
-                    v-for="item in rsPtNameOption.filterOption"
-                    :key="item.rsPtName"
-                    :label="item.rsPtName"
-                    :value="item">
+                    v-for="item in searchOption.filterOption"
+                    :key="searchKey.field == 1 ? item.plateNo : item.rsPtName"
+                    :label="searchKey.field == 1 ? item.plateNo : item.rsPtName"
+                    :value="searchKey.field == 1 ? item.vehicleId : item">
                 </el-option>
             </el-select>
         </el-form-item>
@@ -63,35 +40,11 @@
                 query:'',
                 searchKey:{
                    field:'1',
-                   plateNo:'', 
-                   rsPtName:''
+                   value: null
                 },
+                params: {},
                 searchUrl: null,
-                selectOption: {
-                    loading: false,
-                    filterOption: [],
-                    totalCount:'',
-                    loadMore:false,
-                    otherParams:{
-                        page:{
-                            pageSize: 10,
-                            pageIndex: 0,
-                        }
-                    }
-                },
-                plateNoOption: {
-                    loading: false,
-                    filterOption: [],
-                    totalCount:'',
-                    loadMore:false,
-                    otherParams:{
-                        page:{
-                            pageSize: 10,
-                            pageIndex: 0,
-                        }
-                    }
-                },
-                rsPtNameOption: {
+                searchOption: {
                     loading: false,
                     filterOption: [],
                     totalCount:'',
@@ -110,70 +63,35 @@
                 var div = document.createElement('div');
                 div.innerHTML = '加载中';
                 div.setAttribute("class","el-select-dropdown__empty");
-                // let el1=document.querySelectorAll(".el-select-dropdown")[0];
-                // let el=document.querySelector(".popper__arrow");
-                // document.insertBefore(div,el);
-                if(this.searchKey.field==1){
-                     if(this.plateNoOption.totalCount==this.plateNoOption.filterOption.length){
-                        div.innerHTML = '已加载全部';
-                        return;
-                     }
-                     this.plateNoOption.loadMore=true;
-                     this.plateNoOption.otherParams.page.pageIndex++;
-                     this.plateNoRemoteMethod(this.query);
-                }else{
-                      if(this.rsPtNameOption.totalCount==this.rsPtNameOption.filterOption.length){
-                        div.innerHTML = '已加载全部';
-                        return;
-                     }
-                     this.rsPtNameOption.loadMore=true;
-                     this.rsPtNameOption.otherParams.page.pageIndex++;
-                     this.rsPtNameRemoteMethod(this.query);
+
+                if(this.searchOption.totalCount==this.searchOption.filterOption.length){
+                    div.innerHTML = '已加载全部';
+                    return;
                 }
+                this.searchOption.loadMore=true;
+                this.searchOption.otherParams.page.pageIndex++;
+                this.remoteMethod(this.query);
             },
             initChange(){
-                this.searchKey.plateNo='';
-                this.searchKey.rsPtName='';
-                this.rsPtNameOption.filterOption=[];
-                this.plateNoOption.filterOption=[];
-                this.rsPtNameOption.otherParams={
+                this.searchKey.value='';
+                this.searchOption.filterOption=[];
+                this.searchOption.otherParams={
                     page:{
                         pageSize: 10,
                         pageIndex: 0,
                     }
                 }
-                this.plateNoOption.otherParams={
-                    page:{
-                        pageSize: 10,
-                        pageIndex: 0,
-                    }
-                }
-                if(this.searchKey.field==1){
-                    this.searchUrl = requestVehicle;
-                     this.plateNoRemoteMethod();
-                }else{
-                    this.searchUrl = requestRoadSide;
-                     this.rsPtNameRemoteMethod();
-                }
+                this.remoteMethod();
             },
-            plateNoRemoteMethod(query){//输入时
-                this.query=query;
+            remoteMethod(query){//输入时
+                this.query = query;
+                let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
+                this.searchOption.otherParams[_key] = this.searchKey.value;
                 this.$searchFilter.publicRemoteMethod({
                     query: query?query:'',
-                    searchOption: this.plateNoOption,
+                    searchOption: this.searchOption,
                     searchObj: this.searchKey,
-                    key: 'plateNo',
                     request: this.searchUrl
-                });
-            },
-            rsPtNameRemoteMethod(query){
-                 this.query=query;
-                 this.$searchFilter.publicRemoteMethod({
-                    query: query?query:'',
-                    searchOption: this.rsPtNameOption,
-                    searchObj: this.searchKey,
-                    key: 'rsPtName',
-                    request: this.searchUrl1
                 });
             },
             showView(){
