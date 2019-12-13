@@ -119,31 +119,22 @@ class GIS3D {
         this.initModel_pole(item, this.cesium.viewer);
         this.initlight();
     }
-    updateLight(light) {
-        // if(light.id==277){
-        //     console.log(light)
-        // }
-        this.light3DList.forEach(item => {
-            if (item.id == light.id) {
-                item.id = light.id;
-                item.img1 = light.img1;
-                item.img2 = light.img2;
-                item.img3 = light.img3
+    updateLight(light) { 
+        for(let i=0;i<this.light3DList.length;i++)
+        {
+            if (this.light3DList[i].id == light.id) {
+                this.light3DList[i].id = light.id;
+                this.light3DList[i].img1 = light.img1;
+                this.light3DList[i].img2 = light.img2;
+                this.light3DList[i].img3 = light.img3
             }
-        })
-        // console.log(light)
-        // if(light.img1!=''){
-        //     this.light3DList[0].img1=light.img1;
-        // }
-        // this.light3DList[0].id=light.id;
-        // this.light3DList[0].img2=light.img2;
-        // this.light3DList[0].img3=light.img3;
+        } 
     }
     /**
      * 初始化红绿灯
      */
     initlight() {
-        let l276 = new light3D();
+        let l276 = new light3D(); 
         l276.addLight2(this.cesium.viewer, "276", 121.17551589465815, 31.281617738453047, 250);
         this.light3DList.push(l276);
 
@@ -152,11 +143,11 @@ class GIS3D {
         this.light3DList.push(l275);
 
         let l277 = new light3D();
-        l277.addLight2(this.cesium.viewer, "277", 121.17510881207043, 31.281747510005268, -30);
+        l277.addLight2(this.cesium.viewer, "277", 121.17512933327903, 31.28169112844802, -30);
         this.light3DList.push(l277);
 
         let l278 = new light3D();
-        l278.addLight2(this.cesium.viewer, "278", 121.17512933327903, 31.28169112844802, -30);
+        l278.addLight2(this.cesium.viewer, "278", 121.17510881207043, 31.281747510005268, -30);
         this.light3DList.push(l278);
 
         let l282 = new light3D();
