@@ -64,7 +64,7 @@
             },
             getGpsRealList() {
             // console.log('初始化页面，获取典型车辆列表实时信息');
-                //this.responseData=[];
+                this.responseData=[];
                 getGpsRealList({
                     vehicleId: this.vehicleIds
                 }).then(res => {
