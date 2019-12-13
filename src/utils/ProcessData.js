@@ -29,14 +29,6 @@ class ProcessCarTrack {
 
         });
     }
-    receiveRouteData(data){
-        let track = data.track;
-        let route = data.route;
-        track.forEach(item =>{
-            item.routeId = route.routeId;
-        })
-        this.routeList.push.apply(this.routeList,track);
-    }
     receiveCanData(data){
         this.canList.push.apply(this.canList,data);
     }
@@ -110,7 +102,7 @@ class ProcessCarTrack {
 
             }
         }
-        // console.log("最小索引:",minIndex,minData);
+        console.log("红绿灯最小索引:",minIndex);
         //找出的最小值无效
         if(minDiff&&minDiff>this.spatMaxValue){
             console.log("spat找到的最小值无效")
@@ -140,103 +132,6 @@ class ProcessCarTrack {
         //返回距离标尺的最小插值的数据
         return minData;
     }
-    processRouteData(time,delayTime){
-        let routeData;
-        if(this.routeList.length>0){
-            routeData = this.getRouteMinValue(time,delayTime);
-            if(!routeData){
-                return;
-            }
-        }else {
-            console.log("行程没有数据")
-        }
-        return routeData;
-    }
-    getRouteMinValue(time,delayTime){
-        let rangeData=null;
-        let startIndex=-1;
-        // console.log("找到最小值前："+this.routeList.length);
-        //找到满足条件的范围
-        for(let i=0;i<this.routeList.length;i++){
-            let diff = Math.abs(time-this.routeList[i].gpsTime-delayTime);
-            // console.log(spatId,cacheData.length,time,parseInt(cacheData[i].spatTime),delayTime,diff,i)
-            if(diff<this.routePulseInterval){
-                if(startIndex !=-1 && i != startIndex+1) {
-                    break;
-                }
-                if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
-                    startIndex=i;
-                    let obj={
-                        index:i,
-                        delayTime: diff,
-                        data:this.routeList[i],
-                        diff:diff
-                    }
-                    rangeData = obj;
-                }else {
-                    break;
-                }
-            }else {
-                if(rangeData) {
-                    break;
-                }
-            }
-        }
-        let minIndex=-1;
-        let minData = {};
-        let minDiff;
-        //如果能找到最小范围
-        // console.log(rangeData)
-        if(rangeData){
-            minIndex = rangeData.index;
-            minData = rangeData.data;
-        }else{
-            console.log("spat***********************");
-            minIndex = 0;
-            minData = this.routeList[0];
-            minDiff = Math.abs(time-minData.gpsTime-delayTime);
-            for(let i=0;i<this.routeList.length;i++){
-                let diff = Math.abs(time-parseInt(this.routeList[i].gpsTime)-delayTime);
-                // let diff = time-cacheData[i].gpsTime-insertTime;
-                // console.log(vid,cacheData.length, time, parseInt(cacheData[i].gpsTime) , diff)
-                if(diff<minDiff){
-                    minData = this.routeList[i];
-                    minIndex = i;
-                    minDiff = diff;
-                }
-
-            }
-        }
-        // console.log("最小索引:"+minIndex);
-        //找出的最小值无效
-        if(minDiff&&minDiff>this.routeMaxValue){
-            console.log("route找到的最小值无效")
-            return;
-        }
-        //打印出被舍弃的点
-        let lostData = this.routeList.filter((item,index)=>{
-            return index<minIndex;
-        })
-        /*if(lostData.length>0){
-            
-        }*/
-        lostData.forEach(item=>{
-            let minDiff = Math.abs(time-this.routeList[minIndex].gpsTime);
-            // console.log("插值最小的索引"+minIndex,minDiff);
-            let d =  Math.abs(time-item.gpsTime);
-            // console.log("##"+d);
-        })
-
-
-        //找到最小值后，将数据之前的数值清除
-        this.routeList = this.routeList.filter((item,index)=>{
-            return index>minIndex;
-        })
-        // console.log("找到最小值后"+this.routeList.length);
-
-        //返回距离标尺的最小插值的数据
-        return minData;
-    }
     processWarningData(time,delayTime,warnId){
         let warningData = this.getWarnMinValue(time,delayTime,warnId);
         return warningData;
@@ -253,7 +148,7 @@ class ProcessCarTrack {
             for(let i=0;i<cacheData.length;i++){
                 let diff = Math.abs(time-cacheData[i].timestamp-delayTime);
                 let currentTime = time-delayTime;
-                console.log(DateFormat.formatTime(currentTime,'hh:mm:ss:ms'),DateFormat.formatTime(cacheData.timestamp,'hh:mm:ss:ms'),diff,i);
+                // console.log(DateFormat.formatTime(currentTime,'hh:mm:ss:ms'),DateFormat.formatTime(cacheData.timestamp,'hh:mm:ss:ms'),diff,i);
                 if(diff<this.warnPulseInterval){
                     if(startIndex !=-1 && i != startIndex+1){
                         break;
@@ -276,7 +171,7 @@ class ProcessCarTrack {
                 }
             }
             //如果能找到最小范围
-            console.log(rangeData)
+            // console.log(rangeData)
             if(rangeData){
                 minIndex = rangeData.index;
                 minData = rangeData.data;
@@ -296,7 +191,7 @@ class ProcessCarTrack {
 
                 }
             }
-            console.log("最小索引:"+minIndex);
+            console.log("实时告警最小索引:"+minIndex);
             if (minDiff&&minDiff>this.warnMaxValue){
                 console.log("warn找到最小值无效")
                 return;
@@ -320,7 +215,7 @@ class ProcessCarTrack {
             this.dynamicWarning[warnId] = this.dynamicWarning[warnId].filter((item,index)=>{
                 return index>minIndex;
             })
-            console.log("找到最小值后"+this.dynamicWarning[warnId].length);
+            // console.log("找到最小值后"+this.dynamicWarning[warnId].length);
 
             //返回距离标尺的最小插值的数据
         }
@@ -418,7 +313,7 @@ class ProcessCarTrack {
 
             }
         }
-        // console.log("最小索引:"+minIndex);
+        console.log("can最小索引:"+minIndex);
         //找出的最小值无效
         if(minDiff&&minDiff>this.canMaxValue){
             console.log("route找到的最小值无效")

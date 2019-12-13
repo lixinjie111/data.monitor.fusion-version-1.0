@@ -115,7 +115,10 @@
 
                 staticWarning:[],
                 dynamicWarning:[],
-                removeWarning:[]
+                removeWarning:[],
+
+                perceptionData:{},
+                vehData:{},
             }
         },
         props:{
@@ -604,22 +607,20 @@
             onCancelWarningMessage(message){
                 let _this=this;
                 let json = JSON.parse(message.data);
-                let data = JSON.parse(json.result);
+                let warnId = json.result;
                 let cancelWarning = {
                     "action":"event_cancel",
                     "body":{
-                        "events":json.result,
+                        "events":warnId,
                         "status":1
                     },
                     "type":2
                 }
                 let cancelWarningMsg = JSON.stringify(cancelWarning);
                 this.sendCancelWarningMsg(cancelWarningMsg);
-                data.forEach(warnId=>{
-                    if(processData.cancelWarning.indexOf(warnId)==-1){
-                        processData.cancelWarning.push(warnId);
-                    }
-                });
+                if(processData.cancelWarning.indexOf(warnId)==-1){
+                    processData.cancelWarning.push(warnId);
+                }
 //                this.processWarn(json);
             },
             onCancelWarningClose(data){
@@ -634,7 +635,7 @@
                 //旁车
                 let cancelWarning ={
                     "action":"event_cancel",
-                    "body":{},
+                    "body":{"busType":"rsi"},
                     "type":1
                 }
                 let cancelWarningMsg = JSON.stringify(cancelWarning);
@@ -699,64 +700,8 @@
             onPlatformMessage(mesasge){
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
-                if(_this.tabIsExist){
-                    platCars.receiveData(json,this.pulseNowTime);
-                }else{
-//                    console.log("****"+_this.tabIsExist)
-                    for(let vid in platCars.platObj){
-                        platCars.platObj[vid] = [];
-                    }
-                }
+                platCars.receiveData(json,this.pulseNowTime);
 
-//                console.log(_this.platObj[vehicleId].length);
-//                console.log("*********");
-
-           /*     if(_this.isCapture=='true'){
-                    if(_this.captureCount>1000){
-                        return;
-                    }
-//                    platCars.captureCarMessage(json);
-                    clearInterval(platCars.processPlatformCarsTrackIntervalId);
-                    platCars.cacheAndInterpolateDataByVid={};
-                    platCars.stepTime=100;
-                    platCars.onCarMessage(json,0);
-                    return;
-                }
-                /!*for(let i=6;i<1006;i++){
-                    _this.lat = _this.lat+0.0002;
-                    _this.lng = _this.lng+0.0002;
-                    let obj={
-                        devId : 'B21E000'+i,
-                        targetType: 2,
-                        type:1,
-                        heading:265.87136259902326,
-                        latitude:_this.lat,
-                        longitude:_this.lng,
-                        plateNo:'仿A22343'+i,
-                        gpsTime:new Date().getTime(),
-
-                        vehicleId: "B21E0003"+i,
-                        devType: 1,
-                        fuselLevel: 1,
-                        fuselStatus: 0,
-                        fuselType: 1,
-
-                        source: ["4G"],
-                        speed: 16.61343307525385
-
-
-                    }
-                    json.result.vehDataDTO.push(obj);
-                }*!/
-//                _this.lat=_this.lat+0.001;
-                platCars.onCarMessage(json,0);*/
-              /*  let keys = Object.keys(platCars.cacheAndInterpolateDataByVid);
-                if(keys&&keys.length>0){
-                    let key = keys[0];
-                    _this.$parent.vehData = platCars.cacheAndInterpolateDataByVid[key].data;
-                }*/
-//                _this.$parent.vehData = json.result.vehDataStat;
-//                _this.$emit("getPlatformData",json.result.vehDataStat);
             },
             onPlatformClose(data){
                 console.log("平台车结束连接");
@@ -831,55 +776,18 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-                /*  console.log("########");
-                  console.log(_this.tabIsExist);*/
-                if(_this.tabIsExist){
-                    let data = JSON.parse(mesasge.data)
-                    if(_this.isCapture=='true'){
-                        if(_this.captureCount>1000){
-                            return;
-                        }
-                        _this.perCaptureList.push(data);
-                        _this.captureCount++;
+                let data = JSON.parse(mesasge.data)
+                if(_this.isCapture=='true'){
+                    if(_this.captureCount>1000){
                         return;
                     }
-                    let sideList = data.result.perList;
-                    perceptionCars.receiveData(sideList);
-//                    _this.processPerData(sideList);
-                    /*if(data.result.vehDataDTO&&data.result.vehDataDTO.length>0){
-                        let result = data.result.vehDataDTO[0];
-                        let time = _this.formatTime(result.gpsTime);
-                        let obj  = {
-                            vehicleId:result.vehicleId,
-                            lng:parseFloat(result.longitude).toFixed(6),
-                            lat:parseFloat(result.latitude).toFixed(6),
-                            heading:parseFloat(result.heading).toFixed(1),
-                            gpsTime:time
-                        }
-                        //实时展示历史数据
-                        if(_this.perDataList.length<10){
-                            _this.perDataList.push(obj);
-                        }else{
-                            _this.perDataList.shift();
-                            _this.perDataList.push(obj);
-
-                        }
-                    }*/
-                   /* let obj =  perceptionCars.lastPerceptionMessage;
-                    if(obj!=null){
-                        _this.$parent.perceptionData= obj.result.vehDataStat;
-                        if(obj.result.vehDataDTO.length>0){
-                            _this.processDataTime = obj.result.vehDataDTO[0].gpsTime;
-                        }
-                    }*/
-                   /* if(time!=''){
-                        this.time1=time;
-                    }
-                    if(processTime!=''){
-                        this.processDataTime=processTime;
-                    }
-                    this.$parent.perceptionData=vehDataStat;*/
+                    _this.perCaptureList.push(data);
+                    _this.captureCount++;
+                    return;
                 }
+                let sideList = data.result.perList;
+                perceptionCars.receiveData(sideList);
+
             },
             onPerceptionClose(data){
                 console.log("感知车结束连接");
@@ -987,18 +895,7 @@
                 let _this=this;
                 let json = JSON.parse(mesasge.data);
                 let data = json.result.data;
-                if(_this.isCapture=='true'){
-                    if(_this.captureCount>1000){
-                        return;
-                    }
-                    _this.spatCaptureList.push(data);
-                    return;
-                }
                 processData.receiveLightData(data);
-//                _this.processSpat(data);
-//                let vehData = json.result.vehDataStat;
-//                _this.$emit("getPerceptionData",vehData);
-//                _this.vehData.push(vehData);
             },
             onSpatClose(data){
                 console.log("红绿灯结束连接");
@@ -1084,12 +981,10 @@
                         let img2;
                         let img3;
                         let lastItem;
-                            let keys = Object.keys(_this.lastLightObj);
-                            if(keys&&keys.length>0){
-                                lastItem = _this.lastLightObj[item.spatId];
-//                                console.log(lastItem)
-//                                console.log(lastItem.direction,lastItem.light,item.direction,item.light)
-                            }
+                        let keys = Object.keys(_this.lastLightObj);
+                        if(keys&&keys.length>0){
+                            lastItem = _this.lastLightObj[item.spatId];
+                        }
                         //cross
                         if(item.direction==1){
                             //cross red
@@ -1097,15 +992,16 @@
                                 //每个路灯相位都是固定的
                                 if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
                                     img1="";
+                                    //如果相位颜色不变
                                 }else{
                                     img1='./static/images/light/cross-red.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('RED',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('RED',array[1]);
@@ -1119,12 +1015,12 @@
                                 }else{
                                     img1='./static/images/light/cross-yellow.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('YELLOW',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('YELLOW',array[1]);
@@ -1138,12 +1034,12 @@
                                 }else{
                                     img1='./static/images/light/cross-green.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('GREEN',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('GREEN',array[1]);
@@ -1159,12 +1055,12 @@
                                 }else{
                                     img1='./static/images/light/left-red.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('RED',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('RED',array[1]);
@@ -1178,12 +1074,12 @@
                                 }else{
                                     img1='./static/images/light/left-yellow.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('YELLOW',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('YELLOW',array[1]);
@@ -1197,12 +1093,12 @@
                                 }else{
                                     img1='./static/images/light/left-green.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('GREEN',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('GREEN',array[1]);
@@ -1219,12 +1115,12 @@
                                 }else{
                                     img1='./static/images/light/turn-red.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('RED',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('RED',array[1]);
@@ -1238,12 +1134,12 @@
                                 }else{
                                     img1='./static/images/light/turn-yellow.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('YELLOW',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('YELLOW',array[1]);
@@ -1257,12 +1153,12 @@
                                 }else{
                                     img1='./static/images/light/turn-green.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('GREEN',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('GREEN',array[1]);
@@ -1279,12 +1175,12 @@
                                 }else{
                                     img1='./static/images/light/right-red.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('RED',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('RED',array[1]);
@@ -1298,12 +1194,12 @@
                                 }else{
                                     img1='./static/images/light/right-yellow.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('YELLOW',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('YELLOW',array[1]);
@@ -1317,12 +1213,12 @@
                                 }else{
                                     img1='./static/images/light/right-green.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('GREEN',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('GREEN',array[1]);
@@ -1340,17 +1236,17 @@
                             first:array[0],
                             second:array[1]
 
-                            }
+                        }
 //                        console.log(item.spatId,obj);
 //                        if(item.spatId==277){
 //                            console.log("---------")
 //                            console.log(item)
 //                        }
-                            _this.lastLightObj[item.spatId]=obj;
+                        _this.lastLightObj[item.spatId]=obj;
 //                            console.log(item.spatId,light);
-                            // _this.$refs.perceptionMap.addStaticModel_light_1(light);
-                            //地图渲染剩余时间
-                        })
+                        // _this.$refs.perceptionMap.addStaticModel_light_1(light);
+                        //地图渲染剩余时间
+                    })
                 }
             },
             getNumPng(color,num){
@@ -1498,11 +1394,11 @@
                 let result = json.result;
                 let _this = this;
                 if(_this.pulseNowTime==''){
-//                   _this.initPerceptionWebSocket();
+                   _this.initPerceptionWebSocket();
                    _this.initPlatformWebSocket();
-//                   _this.initWarningWebSocket();
+                   _this.initWarningWebSocket();
                    _this.initSpatWebSocket();
-//                   _this.initCancelWarningWebSocket();
+                   _this.initCancelWarningWebSocket();
                 }
                 _this.pulseNowTime = result.timestamp;
                 _this.pulseCount++;
@@ -1564,14 +1460,45 @@
                     _this.processDataTime = result.timestamp-_this.delayTime;
 //                    console.log(_this.pulseCount,_this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(perceptionCars.devObj).length>0){
-                        let processPerCar = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
-                        if(processPerCar){
-                            _this.processPerData(processPerCar);
+                        let perList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
+                        if(perList.length>0){
+                            _this.processPerData(perList[0]);
+                            let pcarnum = 0;
+                            let persons = 0;
+                            let zcarnum = 0;
+                            let perData={};
+                            perList.forEach(item=>{
+                                let cars = item.data;
+                                if(cars.length>0) {
+                                    for (let i = 0; i < cars.length; i++) {
+                                        let obj = cars[i];
+                                        if (obj.type == 1) {
+                                            zcarnum++;
+                                            continue;
+                                        }
+                                        if (
+                                            obj.targetType == 0 ||
+                                            obj.targetType == 1 ||
+                                            obj.targetType == 3
+                                        ) {
+                                            persons++;
+                                        } else {
+                                            pcarnum++;
+                                        }
+                                    }
+                                }
+                            });
+                            perData['veh']=zcarnum;
+                            perData['person'] = persons;
+                            perData['noMotor'] = zcarnum;
+                            debugger
+                            this.$parent.perceptionData = perData;
                         }
                     }
                     //平台车
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                        platCars.processPlatformCarsTrack(result.timestamp,_this.delayTime);
+                       let platCar =  platCars.processPlatformCarsTrack(result.timestamp,_this.delayTime);
+                       this.$parent.vehData = platCar;
                     }
 
                     //取消告警

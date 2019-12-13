@@ -81,7 +81,6 @@
                 platformWebsocket:null,
                 perceptionWebsocket:null,
                 pulseWebsocket:null,
-                webSocket:null,
                 canWebsocket:null,
                 cancelWarningWebsocket:null,
 
@@ -105,7 +104,6 @@
                 cancelConnectCount:0,
                 perceptionConnectCount:0,
                 pulseConnectCount:0,
-                routeConnectCount:0,
                 canConnectCount:0,
 
                 processDataTime:'',
@@ -315,7 +313,7 @@
                     data.forEach(item=>{
                         let option={
                             leftTime:item.leftTime,
-                            light:item.status,
+                            light:item.light,
                             direction:item.direction,
                             spatId:item.spatId
 
@@ -340,8 +338,6 @@
                         let keys = Object.keys(_this.lastLightObj);
                         if(keys&&keys.length>0){
                             lastItem = _this.lastLightObj[item.spatId];
-//                                console.log(lastItem)
-//                                console.log(lastItem.direction,lastItem.light,item.direction,item.light)
                         }
                         //cross
                         if(item.direction==1){
@@ -350,15 +346,16 @@
                                 //每个路灯相位都是固定的
                                 if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
                                     img1="";
+                                    //如果相位颜色不变
                                 }else{
                                     img1='./static/images/light/cross-red.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('RED',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('RED',array[1]);
@@ -372,12 +369,12 @@
                                 }else{
                                     img1='./static/images/light/cross-yellow.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('YELLOW',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('YELLOW',array[1]);
@@ -391,12 +388,12 @@
                                 }else{
                                     img1='./static/images/light/cross-green.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('GREEN',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('GREEN',array[1]);
@@ -412,12 +409,12 @@
                                 }else{
                                     img1='./static/images/light/left-red.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('RED',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('RED',array[1]);
@@ -431,12 +428,12 @@
                                 }else{
                                     img1='./static/images/light/left-yellow.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('YELLOW',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('YELLOW',array[1]);
@@ -450,12 +447,12 @@
                                 }else{
                                     img1='./static/images/light/left-green.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('GREEN',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('GREEN',array[1]);
@@ -472,12 +469,12 @@
                                 }else{
                                     img1='./static/images/light/turn-red.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('RED',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('RED',array[1]);
@@ -491,12 +488,12 @@
                                 }else{
                                     img1='./static/images/light/turn-yellow.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('YELLOW',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('YELLOW',array[1]);
@@ -510,12 +507,12 @@
                                 }else{
                                     img1='./static/images/light/turn-green.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('GREEN',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('GREEN',array[1]);
@@ -532,12 +529,12 @@
                                 }else{
                                     img1='./static/images/light/right-red.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('RED',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('RED',array[1]);
@@ -551,12 +548,12 @@
                                 }else{
                                     img1='./static/images/light/right-yellow.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('YELLOW',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('YELLOW',array[1]);
@@ -570,12 +567,12 @@
                                 }else{
                                     img1='./static/images/light/right-green.png';
                                 }
-                                if(lastItem&&lastItem.first==array[0]){
+                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
                                     img2=''
                                 }else {
                                     img2 = _this.getNumPng('GREEN',array[0]);
                                 }
-                                if(lastItem&&lastItem.second==array[1]){
+                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
                                     img3=''
                                 }else {
                                     img3 = _this.getNumPng('GREEN',array[1]);
@@ -735,6 +732,7 @@
                         let item = rcuItem.data;
                         let warnId = item.warnId.substring(0,item.warnId.lastIndexOf("_"));
                         //判断事件是否被取消 如果告警事件被画上 并且接收到取消 则不进行接收
+                        console.log(this.removeWarning,item.warnId,this.removeWarning.indexOf(item.warnId)==-1)
                         if(this.removeWarning.indexOf(item.warnId)==-1){
 //                            console.log(processData.cancelWarning.indexOf(item.warnId)==-1);
 //                            item.isD=true;
@@ -865,22 +863,20 @@
             onCancelWarningMessage(message){
                 let _this=this;
                 let json = JSON.parse(message.data);
-                let data = JSON.parse(json.result);
+                let warnId = json.result;
                 let cancelWarning = {
                     "action":"event_cancel",
                     "body":{
-                        "events":json.result,
+                        "events":warnId,
                         "status":1
                     },
                     "type":2
                 }
                 let cancelWarningMsg = JSON.stringify(cancelWarning);
                 this.sendCancelWarningMsg(cancelWarningMsg);
-                data.forEach(warnId=>{
-                    if(processData.cancelWarning.indexOf(warnId)==-1){
-                        processData.cancelWarning.push(warnId);
-                    }
-                });
+                if(processData.cancelWarning.indexOf(warnId)==-1){
+                    processData.cancelWarning.push(warnId);
+                }
             },
             onCancelWarningClose(data){
                 console.log("告警结束连接");
@@ -891,10 +887,9 @@
                 this.cancelWarningReconnect();
             },
             onCancelWarningOpen(data){
-                //旁车
                 let cancelWarning ={
                     "action":"event_cancel",
-                    "body":{},
+                    "body":{"busType":"rsi"},
                     "type":1
                 }
                 let cancelWarningMsg = JSON.stringify(cancelWarning);
@@ -933,7 +928,12 @@
                         delete this.warningData[warnId];
                         gis3d.remove3DInforLabel(warnId);
                         this.removeWarning.push(warnId);
-                        delete processData.cancelWarning[warnId];
+                        this.staticExist.forEach((item,index)=>{
+                            if(item.warnId == warnId){
+                                this.staticExist.splice(index,1)
+                            }
+                        })
+                        processData.cancelWarning.splice(processData.cancelWarning.indexOf(warnId),1);
                     }
                 })
             },
@@ -960,9 +960,7 @@
             onPlatformMessage(message){
                 let _this=this;
                 let json = JSON.parse(message.data);
-                if(_this.tabIsExist){
-                    platCars.receiveData(json,this.pulseNowTime,_this.vehicleId);
-                }
+                platCars.receiveData(json,this.pulseNowTime,_this.vehicleId);
             },
             onPlatformClose(data){
                 console.log("平台车结束连接");
@@ -1034,13 +1032,9 @@
             },
             onPerceptionMessage(mesasge){
                 let _this=this;
-                /*  console.log("########");
-                  console.log(_this.tabIsExist);*/
-                if(_this.tabIsExist){
-                    let data = JSON.parse(mesasge.data)
-                    let sideList = data.result.perList;
-                    perceptionCars.receiveData(sideList);
-                }
+                let data = JSON.parse(mesasge.data)
+                let sideList = data.result.perList;
+                perceptionCars.receiveData(sideList);
             },
             onPerceptionClose(data){
                 console.log("感知车结束连接");
@@ -1111,71 +1105,6 @@
                 }
             },
 
-            //行程
-            initRouteWebSocket(){
-                // debugger
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.webSocket.onmessage = _this.onRouteMessage;
-                        _this.webSocket.onclose = _this.onRouteClose;
-                        _this.webSocket.onopen = _this.onRouteOpen;
-                        _this.webSocket.onerror = _this.onRouteError;
-                    }else {
-                        _this.$message("此浏览器不支持websocket");
-                    }
-                }catch(e){
-                    _this.routeReconnect();
-                }
-
-            },
-            onRouteMessage(message){
-                let json = JSON.parse(message.data);
-                let result = json.result;
-                processData.receiveRouteData(result);
-            },
-            onRouteClose(data){
-                console.log("行程结束连接");
-                this.routeReconnect();
-            },
-            onRouteError(){
-                console.log("行程结束error");
-                this.routeReconnect();
-            },
-            onRouteOpen(data){
-                //行程
-                let route ={
-                    "action":"vehicle",
-                    "body":{
-                        "vehicleId": this.vehicleId
-                    },
-                    "type": 1
-                }
-                this.sendMsg(JSON.stringify(route));
-            },
-            sendMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.webSocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            routeReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.routeConnectCount>=10){
-                    return;
-                }
-                this.initWebSocket();
-                this.routeConnectCount++;
-            },
 
             //can数据
             initCanWebSocket(){
@@ -1263,10 +1192,9 @@
                     this.initPlatformWebSocket();
 //                    this.initPerceptionWebSocket();
 //                    this.initCanWebSocket();
-//                    this.initWarningWebSocket();
-//                    this.initSpatWebSocket();
-//                    this.initRouteWebSocket();
-//                    this.initCancelWarningWebSocket();
+                    this.initWarningWebSocket();
+                    this.initSpatWebSocket();
+                    this.initCancelWarningWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
                 this.pulseCount++;
@@ -1367,16 +1295,21 @@
                     this.processDataTime = result.timestamp-delayTime;
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                        mainCar = platCars.processPlatformCarsTrack(result.timestamp,delayTime);
+                        let platCar = platCars.processPlatformCarsTrack(result.timestamp,delayTime);
+                        if(platCar.mainCar){
+                            mainCar = platCar.mainCar;
+                        }
                     }
                     //距离计算次数的控制  1200ms计算一次
                     if(this.computePulseCount==0||this.computePulseCount>25){
                         this.computePulseCount=1;
                         //如果是主车 计算主车与告警事件之间的距离
                         if(mainCar){
+//                            console.log("主车航向角",mainCar.heading,mainCar.gpsTime,DateFormat.formatTime(mainCar.gpsTime));
                             //静态事件  查找框内的事件 staticExist  存储静态事件
                             let currentExtend = this.getExtend(mainCar.longitude,mainCar.latitude,0.005);
                             if(this.staticExist.length>0){
+
 //                                console.log(this.staticExist)
                                 this.staticExist.forEach((item,index)=>{
                                     if(item.longitude<currentExtend[1][0]&&item.latitude<currentExtend[1][1]&&item.longitude>currentExtend[3][0]&&item.latitude>currentExtend[3][1]){
@@ -1385,7 +1318,10 @@
                                         this.processWarn(item,s);
                                     }else{
                                         //如果不在区域内  不显示多少米  排查是否信息更新
-//                                        gis3d.update3DInfoLabel(item.warnId,item.warnMsg);
+                                        let msg = gis3d.get3DInfoLabel(item.warnId);
+                                        if(msg&&msg._value.indexOf('米')!=-1){
+                                            gis3d.update3DInfoLabel(item.warnId,item.warnMsg);
+                                        }
                                     }
                                 })
                             }
@@ -1403,15 +1339,9 @@
                     if(this.routePulseCount==0||this.routePulseCount>=25){
                         this.routePulseCount=1;
                         if(mainCar){
+                            mainCar.tabIsExist = this.tabIsExist;
                             this.$parent.routeData = mainCar;
                         }
-                        /*if(processData.routeList.length>0){
-                            let routeData = processData.processRouteData(result.timestamp,delayTime);
-//                            console.log("length:"+processData.routeList.length,routeData.routeId);
-                            if(routeData){
-                                this.$parent.routeData=routeData;
-                            }
-                        }*/
                         if(processData.canList.length>0){
                             let canData = processData.processCanData(result.timestamp,delayTime);
                             if(canData){
@@ -1576,8 +1506,8 @@
                 let y1=y-r;
                 currentExtent.push([x1, y0]);
                 currentExtent.push([x0, y0]);
-                currentExtent.push([x0, y1]);
-                currentExtent.push([x1, y1]);
+                currentExtent.push([x0, y1/2]);
+                currentExtent.push([x1, y1/2]);
                 return currentExtent;
             },
         },
@@ -1638,7 +1568,6 @@
             this.warningWebsocket&&this.warningWebsocket.close();
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.pulseWebsocket&&this.pulseWebsocket.close();
-            this.webSocket&&this.webSocket.close();
             this.cancelWarningWebsocket&&this.cancelWarningWebsocket.close();
 //            gis3d=null;
 //            perceptionCars = null;

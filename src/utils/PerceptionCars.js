@@ -99,17 +99,17 @@ class PerceptionCars {
         }
     }
     processPerTrack(time,delayTime){
+        let devList = [];
         for (let devId in this.cacheAndInterpolateDataByDevId) {
             let devCacheData = this.cacheAndInterpolateDataByDevId[devId];
             if(devCacheData&&devCacheData.cacheData.length>0){
                 let devData = this.getMinValue(devId,time,delayTime,devCacheData.cacheData);
-                console.log("-----------")
                 if(!devData){
                     console.log("没有找到相应的值")
                     return;
                 }
                 if(this.drawnObj[devId]!=''&&devData.batchId==this.drawnObj[devId]){
-                    console.log("重复绘制的点"+devId+"  ,"+DateFormat.formatTime(devData.batchId,'hh:mm:ss'))
+                    // console.log("重复绘制的点"+devId+"  ,"+DateFormat.formatTime(devData.batchId,'hh:mm:ss'))
                     return;
                 }
                 this.drawnObj[devId]=devData.batchId;
@@ -117,11 +117,12 @@ class PerceptionCars {
                 // console.log(devData)
                 // console.log("*****"+fusionList)
                 this.processPerceptionMesage(fusionList);
-                return devData;
+                devList.push(devData);
             }else{
-                console.log("缓存队列里没有值")
+                console.log(devId+"缓存队列里没有值")
             }
         }
+        return devList;
     }
     getMinValue(devId,time,delayTime,cacheData){
        /* let minDiff = Math.abs(time-minData.gpsTime-delayTime);*/
@@ -131,7 +132,7 @@ class PerceptionCars {
            //找到满足条件的范围
            for(let i=0;i<cacheData.length;i++){
                let diff = Math.abs(time-cacheData[i].gpsTime-delayTime);
-               console.log(devId,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
+               // console.log(devId,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
                if(diff<this.pulseInterval){
                    if(startIndex !=-1 && i != startIndex+1) {
                        break;
@@ -178,7 +179,7 @@ class PerceptionCars {
                }
            }
 
-           console.log("最小索引:"+minIndex);
+           // console.log("最小索引:"+minIndex);
            if(minDiff&&minDiff>this.perMaxValue){
                console.log("per找到最小值无效")
                return;
@@ -295,9 +296,9 @@ class PerceptionCars {
       // },0); //
     }
     clearModel(fusionList){
-        // this.clearCar(fusionList, "carbox");
-        // this.clearCar(fusionList, "person");
-        // this.clearCarLabel(fusionList);
+        this.clearCar(fusionList, "carbox");
+        this.clearCar(fusionList, "person");
+        this.clearCarLabel(fusionList);
     }
     clearCarLabel(fusionList) {
       /////////////////////////

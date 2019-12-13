@@ -57,7 +57,8 @@
                 vehicleId:this.$route.params.vehicleId,
                 flag: true,
                 count:0,
-                routeConnectCount:0
+                routeConnectCount:0,
+                isExist:false
             }
         },
         computed:{
@@ -122,8 +123,10 @@
             onmessage(data){
                 let _this=this;
                 let p = ConvertCoord.wgs84togcj02(data.longitude, data.latitude);
+                console.log("------------------")
                 let point = new AMap.LngLat(p[0], p[1]);
                 let pointPath = [];
+                //如果被隐藏
                 //绘制第一个点
                 if(!_this.markers.markerStart){
                     _this.markers.markerStart = new AMap.Marker({
@@ -135,8 +138,10 @@
                     // 将创建的点标记添加到已有的地图实例：
                     _this.distanceMap.add(_this.markers.markerStart);
                 }else{
-                    //绘制线
+                    console.log("****************")
+                    //当隐藏有点则将历史点进行绘制
                     pointPath.push(_this.prevLastPoint);
+                    //绘制线
                     pointPath.push(point);
                     let polyline = new AMap.Polyline({
                             map: _this.distanceMap,

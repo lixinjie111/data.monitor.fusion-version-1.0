@@ -242,6 +242,13 @@ class GIS3D {
             this.cesium.viewer.entities.getById(id).label.text = text;
         }
     }
+    get3DInfoLabel(id) {
+        let entities = this.cesium.viewer.entities.getById(id);
+        if (entities) {
+            return this.cesium.viewer.entities.getById(id).label.text
+        }
+
+    }
 
     add3DInfoLabel(name, text, x, y, z) {
         if (name && !this.models[name]) {

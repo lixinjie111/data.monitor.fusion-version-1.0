@@ -24,6 +24,7 @@
                 signCount:0,
                 time:0,
                 perceptionData:{},
+                vehData:{},
                 leftShow:true,
                 warningCount:0
             }

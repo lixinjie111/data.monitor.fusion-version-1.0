@@ -171,7 +171,6 @@ class ProcessCarTrack {
             if (deltaTime <= this.stepTime) {
                 // cdata.cacheData.push(cdata.nowReceiveData);
             } else {
-
                 //插值处理
                 let deltaLon = cdata.nowReceiveData.longitude - cdata.lastReceiveData.longitude;
                 let deltaLat = cdata.nowReceiveData.latitude - cdata.lastReceiveData.latitude;
@@ -185,29 +184,35 @@ class ProcessCarTrack {
                 let timeStep = deltaTime / steps;
                 let lonStep = deltaLon / steps;
                 let latStep = deltaLat / steps;
+                let headStep;
+                if(delheading>270){
+                    headStep = 0;
+                }else{
+                    headStep = delheading / steps;
+                }
                 for (let i = 1; i <= steps; i++) {
                     let d2 = {};
                     d2.longitude = cdata.lastReceiveData.longitude + lonStep * i;
                     d2.latitude = cdata.lastReceiveData.latitude + latStep * i;
                     d2.gpsTime = cdata.lastReceiveData.gpsTime + timeStep * i;
-                    d2.heading = cdata.lastReceiveData.heading+delheading/steps*i;
+                    d2.heading = cdata.lastReceiveData.heading+headStep*i;
                     d2.vehicleId = cdata.nowReceiveData.vehicleId;
                     d2.plateNo = cdata.nowReceiveData.plateNo,
                     d2.steps=i;
                     cdata.cacheData.push(d2);
                 }
             }
-            //  this.$emit("pcarDataTime",cdata.nowReceiveData.gpsTime,cdata.lastReceiveData.gpsTime);
             cdata.lastReceiveData = cdata.nowReceiveData;
-            /*if(vid=='B21E0004'){
-                console.log(vid,data.time,"***************")
-            }*/
         }
     }
     processPlatformCarsTrack(time,delayTime) {
         // console.log("-------")
         let _this=this;
         let mainCar = {};
+        let platCar = {
+            'mainCar':{},
+            'sideCar':new Array()
+        };
         for (var vid in _this.cacheAndInterpolateDataByVid) {
             let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
             // console.log(carCacheData.nowReceiveData.gpsTime)
@@ -223,15 +228,17 @@ class ProcessCarTrack {
                     }
                     _this.moveCar(cardata);
                     _this.poleToCar(cardata);
+                    platCar['sideCar'].push(cardata);
                     if (_this.mainCarVID == cardata.vehicleId) {
-                        mainCar= cardata;
+                        // mainCar= cardata;
+                        platCar['mainCar'] = cardata
                         _this.moveTo(cardata);
                         //主车
                     }
                 }
             }
         }
-        return mainCar;
+        return platCar;
     }
      //检测感知杆和单车关联
      poleToCar(d) {
@@ -319,7 +326,7 @@ class ProcessCarTrack {
             minIndex = rangeData.index;
             minData = rangeData.data;
         }else{
-            console.log("plat没有符合范围的");
+            // console.log("plat没有符合范围的");
             minIndex = 0;
             minData = cacheData[0];
             minDiff = Math.abs(time-minData.gpsTime-delayTime);
@@ -334,7 +341,7 @@ class ProcessCarTrack {
 
             }
         }
-        // console.log("最小索引:"+minIndex);
+        // console.log("平台车最小索引:"+minIndex);
         if (minDiff&&minDiff>this.platMaxValue){
             console.log("plat找到最小值无效")
             return;
