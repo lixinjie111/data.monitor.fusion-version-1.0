@@ -70,8 +70,9 @@
                 this.searchOption.loadMore=true;
                 this.searchOption.otherParams.page.pageIndex++;
                 this.remoteMethod(this.query);
+              
             },
-            initChange(){
+            initChange(){//切换
                 this.searchKey.value='';
                 this.searchOption.filterOption=[];
                 this.searchOption.clickFlag = false;
@@ -89,11 +90,14 @@
                 }
                 this.remoteMethod();
             },
-            clearFunc(){
+            clearFunc(){//清除
+                this.query="";
+                this.searchKey.value='';
                 this.searchOption.filterOption = [];
                 this.searchOption.clickFlag = true;
+                this.searchOption.otherParams.page.pageIndex=0;
             },
-            remoteMethodClick(){
+            remoteMethodClick(){//清除点击时
                 if(this.searchOption.clickFlag){
                     this.searchOption.loadMore=false;
                     let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
@@ -103,13 +107,13 @@
                     }
                 }
             },
-            remoteSearch(query){
-                document.querySelector('.el-select-dropdown .el-select-dropdown__wrap').scrollTop=0;
+            remoteSearch(query){//输入时
+                this.searchOption.filterOption = [];
                 this.searchOption.loadMore=false;
                 this.searchOption.otherParams.page.pageIndex=0;
                 this.remoteMethod(query);
             },
-            remoteMethod(query){//输入时
+            remoteMethod(query){
                 this.query = query;
                 let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
                 this.searchOption.otherParams[_key] = query?query:'';
