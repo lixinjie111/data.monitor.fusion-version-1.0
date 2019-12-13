@@ -14,11 +14,11 @@
                 placeholder="请输入关键词"
                 :remote-method="remoteMethod"
                 clearable
+                :value-key="searchKey.field == 1 ?'':'rsPtId'"
                 v-loadmore="loadMore"
                 @clear="$searchFilter.clearFunc(searchOption)"
-                @focus="$searchFilter.remoteMethodClick(searchOption, searchKey, 'value',searchUrl)"
-                @blur="$searchFilter.remoteMethodBlur(searchKey, 'value')"
-                :loading="searchOption.loading">
+                @focus="remoteMethodClick()"
+                @blur="$searchFilter.remoteMethodBlur(searchKey, 'value',)">
                 <el-option
                     v-for="item in searchOption.filterOption"
                     :key="searchKey.field == 1 ? item.plateNo : item.rsPtName"
@@ -43,7 +43,7 @@
                    value: null
                 },
                 params: {},
-                searchUrl: null,
+                searchUrl: requestVehicle,
                 searchOption: {
                     loading: false,
                     filterOption: [],
@@ -60,12 +60,7 @@
         },
         methods: {
             loadMore(){
-                var div = document.createElement('div');
-                div.innerHTML = '加载中';
-                div.setAttribute("class","el-select-dropdown__empty");
-
                 if(this.searchOption.totalCount==this.searchOption.filterOption.length){
-                    div.innerHTML = '已加载全部';
                     return;
                 }
                 this.searchOption.loadMore=true;
@@ -75,22 +70,36 @@
             initChange(){
                 this.searchKey.value='';
                 this.searchOption.filterOption=[];
+                this.searchOption.loadMore=false;
                 this.searchOption.otherParams={
                     page:{
                         pageSize: 10,
                         pageIndex: 0,
                     }
                 }
+                if(this.searchKey.field==1){//车辆
+                    this.searchUrl=requestVehicle;
+                }else{
+                    this.searchUrl=requestRoadSide;
+                }
                 this.remoteMethod();
+            },
+            remoteMethodClick(){
+                this.searchOption.loadMore=false;
+                let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
+                if(this.searchKey.value==""||this.searchKey.value==null){
+                    this.searchOption.otherParams[_key] = '';
+                    this.$searchFilter.remoteMethodClick(this.searchOption,this.searchKey,"value",this.searchUrl)
+                }
+               
             },
             remoteMethod(query){//输入时
                 this.query = query;
                 let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
-                this.searchOption.otherParams[_key] = this.searchKey.value;
+                this.searchOption.otherParams[_key] = query?query:'';
                 this.$searchFilter.publicRemoteMethod({
-                    query: query?query:'',
+                    query:query?query:'',
                     searchOption: this.searchOption,
-                    searchObj: this.searchKey,
                     request: this.searchUrl
                 });
             },
@@ -98,7 +107,7 @@
                 if(this.searchKey.field==1){//车辆
                     if(this.searchKey.plateNo!=""){
                         this.$router.push({
-                            path: "/single/" + this.searchKey.plateNo,
+                            path: "/single/" + this.searchKey.value,
                             query:{delayTime:4}
                         });
                     }else{
@@ -111,9 +120,9 @@
                     }
                 }else{//路侧点
                     if(this.searchKey.rsPtName!=""){
-                        let centPos = [this.searchKey.rsPtName.ptLon,this.searchKey.rsPtName.ptLat];
+                        let centPos = [this.searchKey.value.ptLon,this.searchKey.value.ptLat];
                         this.$router.push({
-                            path: '/perception/'+this.searchKey.rsPtName.rsPtId+ "/"+4+"/"+0.004+"/"+true,
+                            path: '/perception/'+this.searchKey.value.rsPtId+ "/"+4+"/"+0.004+"/"+true,
                             query:{lng:centPos[0],lat:centPos[1],isShow:false}
                         });
                     }else{
