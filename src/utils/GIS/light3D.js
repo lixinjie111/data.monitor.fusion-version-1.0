@@ -5,11 +5,11 @@ class light3D {
         this.num = 0;
         this.img1 = './static/images/light/cross-red.png';
         this.img2 = './static/images/light/1.png';
-        this.img3 = './static/images/light/2.png';
-        this.primitive = {};
+        this.img3 = './static/images/light/2.png'; 
     }
     //增加红路灯
     addLight(viewer, id, x, y, angle, stRotation1, stRotation2, stRotation3) {
+        this.id=id;
         //New color every time it's called
         let _this = this;
         let _img1 = function (time, result) {
@@ -95,6 +95,7 @@ class light3D {
     }
     //增加红路灯
     addLight2(viewer, id, x, y, angle) {
+        this.id=id;
         //New color every time it's called
         let _this = this;
         let _img1 = function (time, result) {
