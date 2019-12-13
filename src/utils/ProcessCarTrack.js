@@ -175,6 +175,7 @@ class ProcessCarTrack {
                 //插值处理
                 let deltaLon = cdata.nowReceiveData.longitude - cdata.lastReceiveData.longitude;
                 let deltaLat = cdata.nowReceiveData.latitude - cdata.lastReceiveData.latitude;
+                let delheading = cdata.nowReceiveData.heading - cdata.lastReceiveData.heading; 
                 // let steps = Math.floor(deltaTime / this.stepTime)-1;
                 let steps = Math.ceil(deltaTime / this.stepTime);
                 // let steps = 27;
@@ -189,7 +190,7 @@ class ProcessCarTrack {
                     d2.longitude = cdata.lastReceiveData.longitude + lonStep * i;
                     d2.latitude = cdata.lastReceiveData.latitude + latStep * i;
                     d2.gpsTime = cdata.lastReceiveData.gpsTime + timeStep * i;
-                    d2.heading = cdata.nowReceiveData.heading;
+                    d2.heading = cdata.lastReceiveData.heading+delheading/steps*i;
                     d2.vehicleId = cdata.nowReceiveData.vehicleId;
                     d2.plateNo = cdata.nowReceiveData.plateNo,
                     d2.steps=i;
