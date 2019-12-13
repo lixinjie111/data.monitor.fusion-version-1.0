@@ -35,6 +35,19 @@
 <script>
   import { requestVehicle,requestRoadSide } from "@/api/overview/index.js";
     export default {
+        directives:{
+            loadmore:{
+                bind (el, binding) {
+                    const SELECTWRAP_DOM = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap')
+                    SELECTWRAP_DOM.addEventListener('scroll', function () {
+                        const CONDITION = this.scrollHeight - this.scrollTop <= this.clientHeight
+                        if (CONDITION) {
+                            binding.value()
+                        }
+                    })
+                }
+            }
+        },
         data() {
             return {
                 query:'',
@@ -108,6 +121,7 @@
                 }
             },
             remoteSearch(query){//输入时
+                document.querySelector('.el-select-dropdown .el-select-dropdown__wrap').scrollTop=0;
                 this.searchOption.filterOption = [];
                 this.searchOption.loadMore=false;
                 this.searchOption.otherParams.page.pageIndex=0;
