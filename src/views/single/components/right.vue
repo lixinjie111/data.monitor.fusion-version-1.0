@@ -33,7 +33,10 @@
         <div class="c-pulse-time" >{{processDataTime|dateFormat}}</div>
         <div class="c-map" id="cesiumContainer">
         </div>
-        <div class="travel-detail">
+        <img class="single-car" src="@/assets/images/single/car-bottom.png"/>
+
+        <div class="travel-detail"  >
+
             <div class="detail1">
                 <span>{{canData.longitude? canData.longitude.toFixed(8):'--'}}</span>
                 <span class="detail2">E</span>
@@ -732,7 +735,6 @@
                         let item = rcuItem.data;
                         let warnId = item.warnId.substring(0,item.warnId.lastIndexOf("_"));
                         //判断事件是否被取消 如果告警事件被画上 并且接收到取消 则不进行接收
-                        console.log(this.removeWarning,item.warnId,this.removeWarning.indexOf(item.warnId)==-1)
                         if(this.removeWarning.indexOf(item.warnId)==-1){
 //                            console.log(processData.cancelWarning.indexOf(item.warnId)==-1);
 //                            item.isD=true;
@@ -889,7 +891,7 @@
             onCancelWarningOpen(data){
                 let cancelWarning ={
                     "action":"event_cancel",
-                    "body":{"busType":"rsi"},
+                    "body":{},
                     "type":1
                 }
                 let cancelWarningMsg = JSON.stringify(cancelWarning);
@@ -1190,10 +1192,11 @@
                 let result = json.result;
                 if(this.pulseNowTime==''){
                     this.initPlatformWebSocket();
-//                    this.initPerceptionWebSocket();
-//                    this.initCanWebSocket();
+                    this.initPerceptionWebSocket();
+                    this.initCanWebSocket();
                     this.initWarningWebSocket();
                     this.initSpatWebSocket();
+                    this.initRouteWebSocket();
                     this.initCancelWarningWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
@@ -1616,7 +1619,7 @@
         position: absolute;
         transform: translate(-50%,0);
         margin-left:50%;
-        bottom: 10px;
+        bottom: 260px;
         font-size: 16px;
         letter-spacing: 0px;
         z-index:1;
@@ -1629,5 +1632,12 @@
                 padding: 0px 2px;
             }
         }
+    }
+    .single-car {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
     }
 </style>

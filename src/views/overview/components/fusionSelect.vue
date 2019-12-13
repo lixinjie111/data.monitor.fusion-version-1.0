@@ -12,13 +12,13 @@
                 remote
                 reserve-keyword
                 placeholder="请输入关键词"
-                :remote-method="remoteMethod"
+                :remote-method="remoteSearch"
                 clearable
+                :value-key="searchKey.field == 1 ?'':'rsPtId'"
                 v-loadmore="loadMore"
-                @clear="$searchFilter.clearFunc(searchOption)"
-                @focus="$searchFilter.remoteMethodClick(searchOption, searchKey, 'value',searchUrl)"
-                @blur="$searchFilter.remoteMethodBlur(searchKey, 'value')"
-                :loading="searchOption.loading">
+                @clear="clearFunc()"
+                @focus="remoteMethodClick()"
+                @blur="$searchFilter.remoteMethodBlur(searchKey, 'value',)">
                 <el-option
                     v-for="item in searchOption.filterOption"
                     :key="searchKey.field == 1 ? item.plateNo : item.rsPtName"
@@ -35,6 +35,19 @@
 <script>
   import { requestVehicle,requestRoadSide } from "@/api/overview/index.js";
     export default {
+        directives:{
+            loadmore:{
+                bind (el, binding) {
+                    const SELECTWRAP_DOM = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap')
+                    SELECTWRAP_DOM.addEventListener('scroll', function () {
+                        const CONDITION = this.scrollHeight - this.scrollTop <= this.clientHeight
+                        if (CONDITION) {
+                            binding.value()
+                        }
+                    })
+                }
+            }
+        },
         data() {
             return {
                 query:'',
@@ -43,12 +56,13 @@
                    value: null
                 },
                 params: {},
-                searchUrl: null,
+                searchUrl: requestVehicle,
                 searchOption: {
                     loading: false,
                     filterOption: [],
                     totalCount:'',
                     loadMore:false,
+                    clickFlag:false,
                     otherParams:{
                         page:{
                             pageSize: 10,
@@ -58,39 +72,68 @@
                 },
             }
         },
+        created() {
+           this.remoteMethod(); 
+        },
         methods: {
             loadMore(){
-                var div = document.createElement('div');
-                div.innerHTML = '加载中';
-                div.setAttribute("class","el-select-dropdown__empty");
-
                 if(this.searchOption.totalCount==this.searchOption.filterOption.length){
-                    div.innerHTML = '已加载全部';
                     return;
                 }
                 this.searchOption.loadMore=true;
                 this.searchOption.otherParams.page.pageIndex++;
                 this.remoteMethod(this.query);
+              
             },
-            initChange(){
+            initChange(){//切换
                 this.searchKey.value='';
                 this.searchOption.filterOption=[];
+                this.searchOption.clickFlag = false;
+                this.searchOption.loadMore=false;
                 this.searchOption.otherParams={
                     page:{
                         pageSize: 10,
                         pageIndex: 0,
                     }
                 }
+                if(this.searchKey.field==1){//车辆
+                    this.searchUrl=requestVehicle;
+                }else{
+                    this.searchUrl=requestRoadSide;
+                }
                 this.remoteMethod();
             },
-            remoteMethod(query){//输入时
+            clearFunc(){//清除
+                this.query="";
+                this.searchKey.value='';
+                this.searchOption.filterOption = [];
+                this.searchOption.clickFlag = true;
+                this.searchOption.otherParams.page.pageIndex=0;
+            },
+            remoteMethodClick(){//清除点击时
+                if(this.searchOption.clickFlag){
+                    this.searchOption.loadMore=false;
+                    let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
+                    if(this.searchKey.value==""||this.searchKey.value==null){
+                        this.searchOption.otherParams[_key] = '';
+                        this.$searchFilter.remoteMethodClick(this.searchOption,this.searchKey,"value",this.searchUrl)
+                    }
+                }
+            },
+            remoteSearch(query){//输入时
+                document.querySelector('.el-select-dropdown .el-select-dropdown__wrap').scrollTop=0;
+                this.searchOption.filterOption = [];
+                this.searchOption.loadMore=false;
+                this.searchOption.otherParams.page.pageIndex=0;
+                this.remoteMethod(query);
+            },
+            remoteMethod(query){
                 this.query = query;
                 let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
-                this.searchOption.otherParams[_key] = this.searchKey.value;
+                this.searchOption.otherParams[_key] = query?query:'';
                 this.$searchFilter.publicRemoteMethod({
-                    query: query?query:'',
+                    query:query?query:'',
                     searchOption: this.searchOption,
-                    searchObj: this.searchKey,
                     request: this.searchUrl
                 });
             },
@@ -98,7 +141,7 @@
                 if(this.searchKey.field==1){//车辆
                     if(this.searchKey.plateNo!=""){
                         this.$router.push({
-                            path: "/single/" + this.searchKey.plateNo,
+                            path: "/single/" + this.searchKey.value,
                             query:{delayTime:4}
                         });
                     }else{
@@ -111,9 +154,9 @@
                     }
                 }else{//路侧点
                     if(this.searchKey.rsPtName!=""){
-                        let centPos = [this.searchKey.rsPtName.ptLon,this.searchKey.rsPtName.ptLat];
+                        let centPos = [this.searchKey.value.ptLon,this.searchKey.value.ptLat];
                         this.$router.push({
-                            path: '/perception/'+this.searchKey.rsPtName.rsPtId+ "/"+4+"/"+0.004+"/"+true,
+                            path: '/perception/'+this.searchKey.value.rsPtId+ "/"+4+"/"+0.004+"/"+true,
                             query:{lng:centPos[0],lat:centPos[1],isShow:false}
                         });
                     }else{
@@ -144,52 +187,52 @@
 <style lang="scss">
 .fusion-select {
     .el-input__inner,.el-button{
-        background:#676767;
-        border: none;
-        color:#fff;
+        background:#676767!important;
+        border: none!important;
+        color:#fff!important;
         border-radius:0 !important;
     }
     .el-select .el-input{
-        width: 85px;
-        background:#7f7f7f;
+        width: 85px!important;
+        background:#7f7f7f!important;
         .el-input__inner{
-             background:#7f7f7f;
+             background:#7f7f7f!important;
         }
     }
     .select-content .el-input {
-        margin-left:-12px;
-        width: 230px;
+        margin-left:-12px!important;
+        width: 230px!important;
         background:#676767;
         .el-input__inner{
-             background:#676767;
+             background:#676767!important;
         }
     }
 }
 .el-select-dropdown__item.selected {
-    color: #f59307;
+    color: #f59307!important;
 }
 .el-select-dropdown{
-    border: 1px solid #676767;
+    border: 1px solid #676767!important;
 }
 .el-select-dropdown__wrap{
-    background:#676767;
-     color:#fff;
+    background:#676767!important;
+     color:#fff!important;
 }
 .el-select-dropdown__item{
-    color:#fff;
-    border-bottom: 1px solid #6f6f6f;
+    color:#fff!important;
+    border-bottom: 1px solid #6f6f6f!important;
 }
 .el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
-    background:#7f7f7f;
+    background:#7f7f7f!important;
 }
 .el-popper[x-placement^=bottom] .popper__arrow::after {
-    border-bottom-color: #676767;
+    border-bottom-color: #676767!important;
 }
 .el-popper[x-placement^=bottom] .popper__arrow {
-    border-bottom-color: #676767;
+    border-bottom-color: #676767!important;
 }
 .el-select-dropdown__empty{
-     background:#676767;
-     color:#fff;
+     background:#676767!important;
+     color:#fff!important;
 }
 </style>

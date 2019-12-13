@@ -21,6 +21,7 @@ class ProcessCarTrack {
         this.processPlatformCarsTrackIntervalId = null;
         this.platObj = {};
         this.singleObj = {};
+        this.billboards = {};//存储发射信号
     }
 
     //路口视角  平台车
@@ -261,6 +262,13 @@ class ProcessCarTrack {
                     if (this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId) != null) {
                         this.viewer.entities.remove(this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId));
                     }
+                    let billboard = this.billboards[vid + "billboard" + itemSide[i].deviceId];
+                    if(billboard!=null)
+                    {
+                        debugger
+                        this.viewer.entities.remove(billboard);
+                    }
+
                 }
                 else {
                     if (this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId) == null) {
@@ -268,7 +276,7 @@ class ProcessCarTrack {
                         var redLine = this.viewer.entities.add({
                             id: vid + "line" + itemSide[i].deviceId,
                             polyline: {
-                                distanceDisplayCondition :new Cesium.DistanceDisplayCondition(0, 2000),
+                                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
                                 // This callback updates positions each frame.
                                 positions: new Cesium.CallbackProperty(_line, false),// Cesium.Cartesian3.fromDegreesArrayHeights([ d.longitude, d.latitude,0.1, 121.17070961131611, 31.285431834985424,1]),//
                                 width: 5,
@@ -278,8 +286,29 @@ class ProcessCarTrack {
                                 })
                             }
                         });
+
+                        var entity = this.viewer.entities.add({
+                            id:vid + "billboard" + itemSide[i].deviceId,
+                            position : Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, 2),
+                            billboard : {
+                                image : 'static/map3d/images/signal.png',
+                                scaleByDistance: new Cesium.NearFarScalar(100, 1, 2000, 0)
+                            }
+
+                        });
+                        //增加信号指示
+                        this.billboards[vid + "billboard" + itemSide[i].deviceId] = entity;
                     }
                     else {
+                        //增加信号指示
+                        let billboard = this.billboards[vid + "billboard" + itemSide[i].deviceId];
+                        if(billboard!=null)
+                        {
+                            billboard.position=Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude,2);
+                        }
+
+
+
                         this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId).show = true;
                         this.viewer.entities.getById(vid + "line" + itemSide[i].deviceId).polyline.positions = new Cesium.CallbackProperty(_line, false)
                     }
