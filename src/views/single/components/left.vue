@@ -73,7 +73,7 @@
                 if(!brakeData){
                     return 0;
                 }
-                return parseInt(brakeData*80)
+                return parseInt(brakeData*80);
             },
         },
         props:{
