@@ -89,6 +89,8 @@
         }
         .left-item-text {
             margin-left: 75px;
+            height: 54px;
+            @include layoutMode(align);
         }
         .left-item-title {
             font-size: 20px;

@@ -12,11 +12,11 @@
                 remote
                 reserve-keyword
                 placeholder="请输入关键词"
-                :remote-method="remoteMethod"
+                :remote-method="remoteSearch"
                 clearable
                 :value-key="searchKey.field == 1 ?'':'rsPtId'"
                 v-loadmore="loadMore"
-                @clear="$searchFilter.clearFunc(searchOption)"
+                @clear="clearFunc()"
                 @focus="remoteMethodClick()"
                 @blur="$searchFilter.remoteMethodBlur(searchKey, 'value',)">
                 <el-option
@@ -49,6 +49,7 @@
                     filterOption: [],
                     totalCount:'',
                     loadMore:false,
+                    clickFlag:false,
                     otherParams:{
                         page:{
                             pageSize: 10,
@@ -57,6 +58,9 @@
                     }
                 },
             }
+        },
+        created() {
+           this.remoteMethod(); 
         },
         methods: {
             loadMore(){
@@ -70,6 +74,7 @@
             initChange(){
                 this.searchKey.value='';
                 this.searchOption.filterOption=[];
+                this.searchOption.clickFlag = false;
                 this.searchOption.loadMore=false;
                 this.searchOption.otherParams={
                     page:{
@@ -84,14 +89,24 @@
                 }
                 this.remoteMethod();
             },
+            clearFunc(){
+                this.searchOption.filterOption = [];
+                this.searchOption.clickFlag = true;
+            },
             remoteMethodClick(){
-                this.searchOption.loadMore=false;
-                let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
-                if(this.searchKey.value==""||this.searchKey.value==null){
-                    this.searchOption.otherParams[_key] = '';
-                    this.$searchFilter.remoteMethodClick(this.searchOption,this.searchKey,"value",this.searchUrl)
+                if(this.searchOption.clickFlag){
+                    this.searchOption.loadMore=false;
+                    let _key = this.searchKey.field == 1 ? 'plateNo' : 'rsPtName';
+                    if(this.searchKey.value==""||this.searchKey.value==null){
+                        this.searchOption.otherParams[_key] = '';
+                        this.$searchFilter.remoteMethodClick(this.searchOption,this.searchKey,"value",this.searchUrl)
+                    }
                 }
-               
+            },
+            remoteSearch(query){
+                this.searchOption.loadMore=false;
+                this.searchOption.otherParams.page.pageIndex=0;
+                this.remoteMethod(query);
             },
             remoteMethod(query){//输入时
                 this.query = query;

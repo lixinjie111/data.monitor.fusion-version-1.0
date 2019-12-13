@@ -30,9 +30,6 @@ class SearchFilter {
 
         });
     }
-    static clearFunc(searchOption) {
-        searchOption.filterOption = [];
-    }
     static remoteMethodBlur(searchObj, key) {
         searchObj[key] = this.queryName;
     }

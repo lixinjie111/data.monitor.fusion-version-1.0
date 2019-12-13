@@ -3,8 +3,8 @@
         <div class="left-item-list clearfix">
             <i class="left-item-icon icon-1"></i>
             <div class="left-item-text">
-                <p class="left-item-title">车辆总数</p>
-                <p class="left-item-num">{{filterData || '--'}}</p>
+                <span class="left-item-title">车辆：</span>
+                <span class="left-item-num"> {{filterData || '--'}}</span>
             </div>
         </div>
         <ul class="left-item-wrapper">
@@ -64,6 +64,7 @@
             },
             getGpsRealList() {
             // console.log('初始化页面，获取典型车辆列表实时信息');
+                //this.responseData=[];
                 getGpsRealList({
                     vehicleId: this.vehicleIds
                 }).then(res => {
