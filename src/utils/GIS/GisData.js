@@ -5,7 +5,6 @@ let GisData = {
     //地图矢量数据初始化
     initDate(viewer) {
         //业务数据
-        debugger
         viewer.imageryLayers.addImageryProvider(new Cesium.WebMapTileServiceImageryProvider({
             url: window.mapUrl,
             maximumLevel: 22,

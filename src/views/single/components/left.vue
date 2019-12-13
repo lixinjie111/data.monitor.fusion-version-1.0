@@ -65,15 +65,17 @@
             oilLeftWidth(){
                 let oilData = parseFloat(this.canData.oilDoor/100);
                 if(!oilData){
-                   return 0;
+                   return 10;
                 }
+//                console.log("油门"+parseInt(oilData*80))
                 return parseInt(oilData*80);
             },
             brakeLeftWidth(){
                 let brakeData = parseFloat(this.canData.brakePedal/100);
                 if(!brakeData){
-                    return 0;
+                    return 10;
                 }
+//                console.log("刹车"+parseInt(brakeData*80))
                 return parseInt(brakeData*80);
             },
         },
@@ -123,7 +125,6 @@
             onmessage(data){
                 let _this=this;
                 let p = ConvertCoord.wgs84togcj02(data.longitude, data.latitude);
-                console.log("------------------")
                 let point = new AMap.LngLat(p[0], p[1]);
                 let pointPath = [];
                 //如果被隐藏
@@ -138,7 +139,6 @@
                     // 将创建的点标记添加到已有的地图实例：
                     _this.distanceMap.add(_this.markers.markerStart);
                 }else{
-                    console.log("****************")
                     //当隐藏有点则将历史点进行绘制
                     pointPath.push(_this.prevLastPoint);
                     //绘制线

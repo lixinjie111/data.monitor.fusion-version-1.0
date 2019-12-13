@@ -1196,7 +1196,6 @@
                     this.initCanWebSocket();
                     this.initWarningWebSocket();
                     this.initSpatWebSocket();
-                    this.initRouteWebSocket();
                     this.initCancelWarningWebSocket();
                 }
                 this.pulseNowTime = result.timestamp;
@@ -1299,7 +1298,7 @@
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
                         let platCar = platCars.processPlatformCarsTrack(result.timestamp,delayTime);
-                        if(platCar.mainCar){
+                        if(platCar&&platCar.mainCar){
                             mainCar = platCar.mainCar;
                         }
                     }

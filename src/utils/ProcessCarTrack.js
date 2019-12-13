@@ -265,7 +265,6 @@ class ProcessCarTrack {
                     let billboard = this.billboards[vid + "billboard" + itemSide[i].deviceId];
                     if(billboard!=null)
                     {
-                        debugger
                         this.viewer.entities.remove(billboard);
                     }
 
