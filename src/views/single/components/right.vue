@@ -33,7 +33,10 @@
         <div class="c-pulse-time" >{{processDataTime|dateFormat}}</div>
         <div class="c-map" id="cesiumContainer">
         </div>
-        <div class="travel-detail">
+        <img class="single-car" src="@/assets/images/single/car-bottom.png"/>
+  
+        <div class="travel-detail"  >
+           
             <div class="detail1">
                 <span>{{canData.longitude? canData.longitude.toFixed(8):'--'}}</span>
                 <span class="detail2">E</span>
@@ -1697,5 +1700,12 @@
                 padding: 0px 2px;
             }
         }
+    }
+    .single-car {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
     }
 </style>
