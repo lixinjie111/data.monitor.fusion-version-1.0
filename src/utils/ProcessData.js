@@ -22,12 +22,11 @@ class ProcessCarTrack {
 
     receiveLightData(data){
         data.forEach(item=>{
-            if(item.spatId==276){
-                if(!this.spatObj[item.spatId]){
-                    this.spatObj[item.spatId] = new Array();
-                }
-                this.spatObj[item.spatId].push(item);
+            if(!this.spatObj[item.spatId]){
+                this.spatObj[item.spatId] = new Array();
             }
+            this.spatObj[item.spatId].push(item);
+
         });
     }
     receiveCanData(data){

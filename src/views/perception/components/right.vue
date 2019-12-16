@@ -235,6 +235,7 @@
                 let count=0;
                 let flag=false;
                 let camParam;
+                gis3d.addRectangle(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
@@ -955,6 +956,9 @@
                         if(keys&&keys.length>0){
                             lastItem = _this.lastLightObj[item.spatId];
                         }
+                        if(!_this.tabIsExist){
+                            lastItem={};
+                        }
 //                        console.log(lastItem,item)
                         let _direction = '';
                         if(item.direction==1) {
@@ -991,7 +995,7 @@
                         light.img1=img1;
                         light.img2=img2;
                         light.img3=img3;
-                        console.log(light)
+//                        console.log(light)
                         gis3d.updateLight(light);
                         let obj = {
                             direction:item.direction, //直行 左转 右转
