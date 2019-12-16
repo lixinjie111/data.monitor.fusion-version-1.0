@@ -316,7 +316,7 @@
                     data.forEach(item=>{
                         let option={
                             leftTime:item.leftTime,
-                            light:item.light,
+                            light:item.status,
                             direction:item.direction,
                             spatId:item.spatId
 
@@ -342,7 +342,10 @@
                         if(keys&&keys.length>0){
                             lastItem = _this.lastLightObj[item.spatId];
                         }
-                        
+                        if(!_this.tabIsExist){
+                            lastItem={};
+                        }
+//                        console.log(lastItem,item)
                         let _direction = '';
                         if(item.direction==1) {
                             _direction = 'cross';
@@ -378,6 +381,7 @@
                         light.img1=img1;
                         light.img2=img2;
                         light.img3=img3;
+//                        console.log(light)
                         gis3d.updateLight(light);
                         let obj = {
                             direction:item.direction, //直行 左转 右转
