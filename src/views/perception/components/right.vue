@@ -247,26 +247,26 @@
                     this.mapShow=true;
                     return;
                 }
-                //5s没有 默认值
-//                this.mapInitTime = setInterval(()=>{
-//                    if(this.camList.length>0&&this.camList[0].camParam){
-//                        camParam = this.camList[0].camParam;
-////                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-//                         gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
-//                        this.getData();
-//                        clearInterval(this.mapInitTime);
-//                        this.mapShow=true;
-//                        return;
-//                    }
-//                    count++;
-//                    if(count==10){
-////                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-//                            gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
-//                        this.getData();
-//                        this.mapShow=true;
-//                        clearInterval(this.mapInitTime);
-//                    }
-//                },100)
+//                5s没有 默认值
+                this.mapInitTime = setInterval(()=>{
+                    if(this.camList.length>0&&this.camList[0].camParam){
+                        camParam = this.camList[0].camParam;
+//                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+                         gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        this.getData();
+                        clearInterval(this.mapInitTime);
+                        this.mapShow=true;
+                        return;
+                    }
+                    count++;
+                    if(count==10){
+//                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                            gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        this.getData();
+                        this.mapShow=true;
+                        clearInterval(this.mapInitTime);
+                    }
+                },100)
             },
             getData(){
                 this.typeRoadData();
