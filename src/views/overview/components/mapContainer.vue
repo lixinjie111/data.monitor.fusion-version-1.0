@@ -22,8 +22,8 @@
                 count: 0,
                 flag: true,
                 prevData: [],
-                onlineConnectCount:0
-
+                onlineConnectCount:0,
+                timeOut:1000*60*5
             }
         },
         mounted() {
@@ -72,13 +72,16 @@
                             speed: _result[vehicleId].speed,
                             position: ConvertCoord.wgs84togcj02(_result[vehicleId].longitude, _result[vehicleId].latitude),
                             marker: null,
-                            plateNoMarker: null
+                            plateNoMarker: null,
                         };
                     }
                 }
                 if (Object.keys(_filterData).length>0) {
                     for (let id in _this.prevData) {
                         if(_filterData[id]) {   //表示有该点，做setPosition
+                            if(_this.prevData[id].timer){
+                                clearTimeout(_this.prevData[id].timer)
+                            }
                             let _currentCar = _filterData[id];
                             _this.prevData[id].marker.setAngle(_currentCar.heading);
                             _this.prevData[id].marker.setPosition(_currentCar.position);
@@ -88,7 +91,6 @@
                     }
                     for (let id in _filterData) {
                         if(!_this.prevData[id]) {   //表示新增该点，做add
-                            // console.log(_filterData[id].plateNo, "add");
                             _this.addMarker(id,_filterData);
                             _this.addPlateNoMarker(id,_filterData);
                         }
@@ -100,22 +102,30 @@
                             _this.setFitViewFlag = false;
                         },500)
                     }
-//                    _this.prevData = _filterData;
+
+
+                    // _this.prevData[_filterData.vehicleId] = _filterData;
+                    // console.log(_this.prevData)
+                    for(let vehicleId in data){
+                        _this.prevData[vehicleId].timer = setTimeout(() => {
+                            _this.prevData[vehicleId].plateNoMarker.setText(data[vehicleId][0].plateNo+"<br/><span style='color:red'>离线</span>")
+                        }, this.timeOut); 
+                    }
+                      
+
+
+
+
                 } else {
                     // 返回的数据为空
                     for (let id in _this.prevData) {
                         // console.log("delete:-"+_this.prevData[id].plateNo);
                         _this.prevData[id].marker.off('click', _this.showView);
                         _this.prevData[id].plateNoMarker.off('click', _this.showView);
-                        // _this.prevData[id].marker.setMap(null);
-                        // _this.prevData[id].plateNoMarker.setMap(null);
-                        // _this.prevData[id].marker.stopMove();
-                        // _this.prevData[id].plateNoMarker.stopMove();
                         _this.AMap.remove(_this.prevData[id].marker);
                         _this.AMap.remove(_this.prevData[id].plateNoMarker);
                         delete _this.prevData[id];
                     }
-                    // this.prevData = {};
                 }
             },
             addMarker(id,_filterData) {

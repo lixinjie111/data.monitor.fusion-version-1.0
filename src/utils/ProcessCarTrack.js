@@ -133,6 +133,7 @@ class ProcessCarTrack {
                 latitude: car.latitude,
                 gpsTime: car.gpsTime,
                 heading: car.heading,
+                devType:car.devType
             };
             cdata.cacheData.push(d);
             cdata.lastReceiveData = d;
@@ -147,6 +148,7 @@ class ProcessCarTrack {
                 gpsTime: car.gpsTime,
                 plateNo: car.plateNo,
                 heading: car.heading,
+                devType:car.devType
             };
             cdata.nowReceiveData = d;
             // console.log("积压长度")
@@ -198,7 +200,9 @@ class ProcessCarTrack {
                     d2.gpsTime = cdata.lastReceiveData.gpsTime + timeStep * i;
                     d2.heading = cdata.lastReceiveData.heading+headStep*i;
                     d2.vehicleId = cdata.nowReceiveData.vehicleId;
-                    d2.plateNo = cdata.nowReceiveData.plateNo,
+                    d2.plateNo = cdata.nowReceiveData.plateNo;
+                    d2.devType = cdata.nowReceiveData.devType;
+
                     d2.steps=i;
                     cdata.cacheData.push(d2);
                 }
@@ -209,10 +213,13 @@ class ProcessCarTrack {
     processPlatformCarsTrack(time,delayTime) {
         // console.log("-------")
         let _this=this;
-        let mainCar = {};
+        let platVeh = 0;
+        let v2xVeh = 0;
+        let vehData = {};
+
         let platCar = {
             'mainCar':{},
-            'sideCar':new Array()
+            'vehData':new Object()
         };
         for (var vid in _this.cacheAndInterpolateDataByVid) {
             let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
@@ -227,9 +234,15 @@ class ProcessCarTrack {
                     if (!cardata) {
                         return;
                     }
+                    // console.log(cardata)
+                    if(cardata.devType==1){
+                        platVeh++;
+                    }
+                    if(cardata.devType==2){
+                        v2xVeh++;
+                    }
                     _this.moveCar(cardata);
                     _this.poleToCar(cardata);
-                    platCar['sideCar'].push(cardata);
                     if (_this.mainCarVID == cardata.vehicleId) {
                         // mainCar= cardata;
                         platCar['mainCar'] = cardata
@@ -239,6 +252,9 @@ class ProcessCarTrack {
                 }
             }
         }
+        vehData.platVeh = platVeh;
+        vehData.v2xVeh = v2xVeh;
+        platCar['vehData'] = vehData;
         return platCar;
     }
      //检测感知杆和单车关联
