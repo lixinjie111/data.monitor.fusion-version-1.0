@@ -270,11 +270,6 @@
             getData(){
                 this.typeRoadData();
                 this.initPulseWebSocket();
-//                this.initPerceptionWebSocket();
-//                this.initPlatformWebSocket();
-                /*   this.initSpatWebSocket();*/
- //                           //地图不连续移动，判断红绿灯的位置受否再可视区
-//                 this.initWarningWebSocket();
                 this.getMap();
             },
             map1InitComplete(){
@@ -985,6 +980,7 @@
                         if(keys&&keys.length>0){
                             lastItem = _this.lastLightObj[item.spatId];
                         }
+                        console.log("lastItem:",lastItem);
                         //cross
                         if(item.direction==1){
                             //cross red

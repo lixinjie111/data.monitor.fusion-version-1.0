@@ -22,11 +22,12 @@ class ProcessCarTrack {
 
     receiveLightData(data){
         data.forEach(item=>{
-            if(!this.spatObj[item.spatId]){
-                this.spatObj[item.spatId] = new Array();
+            if(item.spatId==276){
+                if(!this.spatObj[item.spatId]){
+                    this.spatObj[item.spatId] = new Array();
+                }
+                this.spatObj[item.spatId].push(item);
             }
-            this.spatObj[item.spatId].push(item);
-
         });
     }
     receiveCanData(data){
@@ -59,7 +60,7 @@ class ProcessCarTrack {
             // console.log("-----"+cacheData[i])
             // console.log(spatId,cacheData.length,time,parseInt(cacheData[i].spatTime),delayTime,diff,i)
             if(diff<this.spatPulseInterval){
-                if(startIndex !=-1 && i != startIndex+1) {
+                if(startIndex !=-1 && i != startIndex+1){
                     break;
                 }
                 if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
