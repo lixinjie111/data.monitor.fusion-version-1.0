@@ -168,7 +168,7 @@
 
             platCars.models={};
             platCars.viewer=gis3d.cesium.viewer;
-             platCars.processPlatformCarsTrack();
+            // platCars.processPlatformCarsTrack();
 
             _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
@@ -697,9 +697,9 @@
                 }
 
             },
-            onPlatformMessage(mesasge){
+            onPlatformMessage(message){
                 let _this=this;
-                let json = JSON.parse(mesasge.data);
+                let json = JSON.parse(message.data);
                 platCars.receiveData(json,this.pulseNowTime);
 
             },
@@ -774,9 +774,9 @@
                 }
 
             },
-            onPerceptionMessage(mesasge){
+            onPerceptionMessage(message){
                 let _this=this;
-                let data = JSON.parse(mesasge.data)
+                let data = JSON.parse(message.data)
                 if(_this.isCapture=='true'){
                     if(_this.captureCount>1000){
                         return;
@@ -891,9 +891,9 @@
 
 
             },
-            onSpatMessage(mesasge){
+            onSpatMessage(message){
                 let _this=this;
-                let json = JSON.parse(mesasge.data);
+                let json = JSON.parse(message.data);
                 let data = json.result.data;
                 processData.receiveLightData(data);
             },

@@ -258,9 +258,9 @@
 
 
             },
-            onSpatMessage(mesasge){
+            onSpatMessage(message){
                 let _this=this;
-                let json = JSON.parse(mesasge.data);
+                let json = JSON.parse(message.data);
                 let data = json.result.data;
                 processData.receiveLightData(data);
 //                _this.processSpat(data);
@@ -423,9 +423,9 @@
                 }
 
             },
-            onWarningMessage(mesasge){
+            onWarningMessage(message){
                 let _this=this;
-                let json = JSON.parse(mesasge.data);
+                let json = JSON.parse(message.data);
                 let data = json.result;
                 if(data&&data.length>0){
                     data.forEach(rcuItem=>{
@@ -729,9 +729,9 @@
                     this.perceptionReconnect();
                 }
             },
-            onPerceptionMessage(mesasge){
+            onPerceptionMessage(message){
                 let _this=this;
-                let data = JSON.parse(mesasge.data)
+                let data = JSON.parse(message.data)
                 let sideList = data.result.perList;
                 perceptionCars.receiveData(sideList);
             },
