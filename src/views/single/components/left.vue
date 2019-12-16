@@ -18,10 +18,10 @@
             </div>
             <div class="pedal-style">
                 <div class="real-img-base oil-base">
-                    <span class="real-img-style oil-style" :style="{left:oilLeftWidth+ 'px'}"></span>
+                    <span class="real-img-style oil-style" :style="{left:oilLeftWidth+ 'px!important'}"></span>
                 </div>
                 <div class="real-img-base brake-base">
-                    <span class="real-img-style brake-style" :style="{left:brakeLeftWidth+ 'px'}"></span>
+                    <span class="real-img-style brake-style" :style="{left:brakeLeftWidth+ 'px!important'}"></span>
                 </div>
             </div>
         </div>
@@ -257,6 +257,7 @@
                     height: 16px;
                     position: absolute;
                     top: -8px;
+                    left: 0;
                 }
             }
         }

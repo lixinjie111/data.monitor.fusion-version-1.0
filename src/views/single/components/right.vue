@@ -316,7 +316,7 @@
                     data.forEach(item=>{
                         let option={
                             leftTime:item.leftTime,
-                            light:item.status,
+                            light:item.light,
                             direction:item.direction,
                             spatId:item.spatId
 
