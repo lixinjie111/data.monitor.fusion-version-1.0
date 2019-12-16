@@ -1066,7 +1066,7 @@
 
                 //红绿灯  缓存+1200ms调用一次
                 if(this.spatCount>=pulseNum&&(this.spatPulseCount==0||this.spatPulseCount>=30)){
-                    console.log(this.spatPulseCount);
+//                    console.log(this.spatPulseCount);
                     this.spatPulseCount=1;
                     if(Object.keys(processData.spatObj).length>0){
 //                            console.log("spatPulseCount:"+this.spatPulseCount)
