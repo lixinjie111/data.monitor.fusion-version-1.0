@@ -1252,7 +1252,7 @@
                             //将第一个点进行分割
                             let data = devList.shift();
                             perceptionCars.cacheAndInterpolatePerCar(data);
-                            console.log(devId+"————————"+perceptionCars.cacheAndInterpolateDataByDevId[devId].cacheData.length)
+//                            console.log(devId+"————————"+perceptionCars.cacheAndInterpolateDataByDevId[devId].cacheData.length)
 //                            console.log(devId+"————————"+perceptionCars.cacheAndInterpolateDataByDevId[devId].cacheData.length)
                         }
                     }

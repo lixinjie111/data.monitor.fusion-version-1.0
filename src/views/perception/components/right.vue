@@ -116,9 +116,6 @@
                 staticWarning:[],
                 dynamicWarning:[],
                 removeWarning:[],
-
-                perceptionData:{},
-                vehData:{},
             }
         },
         props:{
@@ -567,21 +564,24 @@
             processWarn(warningData){
                 let _this = this;
                 let warnId = warningData.warnId;
-                //如果告警第一次画
-                if(!_this.warningData[warnId]){
-                    _this.warningCount++;
-                    _this.warningData[warnId] = {
-                        warnId: warnId,
-                        id:warnId,
-                        msg:warningData.warnMsg,
-                        longitude:warningData.longitude,
-                        latitude:warningData.latitude
-                    }
-                    gis3d.add3DInfoLabel(warnId,warningData.warnMsg,warningData.longitude,warningData.latitude,20);
-                }else{
-                    //判断是否需要更新
-                    if(warningData.longitude != _this.warningData[warnId].longitude || warningData.latitude != _this.warningData[warnId].latitude) {
-                        gis3d.update3DInfoLabel(warnId,warningData.warnMsg);
+                if(warnId){
+                    //如果告警第一次画
+                    if(!_this.warningData[warnId]){
+                        console.log(warnId);
+                        _this.warningCount++;
+                        _this.warningData[warnId] = {
+                            warnId: warnId,
+                            id:warnId,
+                            msg:warningData.warnMsg,
+                            longitude:warningData.longitude,
+                            latitude:warningData.latitude
+                        }
+                        gis3d.add3DInfoLabel(warnId,warningData.warnMsg,warningData.longitude,warningData.latitude,20);
+                    }else{
+                        //判断是否需要更新
+                        if(warningData.longitude != _this.warningData[warnId].longitude || warningData.latitude != _this.warningData[warnId].latitude) {
+                            gis3d.update3DInfoLabel(warnId,warningData.warnMsg);
+                        }
                     }
                 }
             },
@@ -1461,44 +1461,46 @@
 //                    console.log(_this.pulseCount,_this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(perceptionCars.devObj).length>0){
                         let perList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
-                        if(perList.length>0){
-                            _this.processPerData(perList[0]);
-                            let pcarnum = 0;
-                            let persons = 0;
-                            let zcarnum = 0;
-                            let perData={};
-                            perList.forEach(item=>{
-                                let cars = item.data;
-                                if(cars.length>0) {
-                                    for (let i = 0; i < cars.length; i++) {
-                                        let obj = cars[i];
-                                        if (obj.type == 1) {
-                                            zcarnum++;
-                                            continue;
-                                        }
-                                        if (
-                                            obj.targetType == 0 ||
-                                            obj.targetType == 1 ||
-                                            obj.targetType == 3
-                                        ) {
-                                            persons++;
-                                        } else {
-                                            pcarnum++;
+                        if(perList){
+                            if(perList.length>0){
+                                _this.processPerData(perList[0]);
+                                let pernum = 0;
+                                let persons = 0;
+                                let nonNum = 0;
+                                let perData={};
+                                perList.forEach(item=>{
+                                    let cars = item.data;
+                                    if(cars.length>0) {
+                                        for (let i = 0; i < cars.length; i++) {
+                                            let obj = cars[i];
+                                            if (obj.targetType == 0){
+                                                persons++;
+                                            }
+
+                                            if (obj.targetType == 2||obj.targetType == 5 || obj.targetType == 7) {
+                                                pernum++;
+                                            }
+
+                                            if(obj.targetType == 1 || obj.targetType == 3){
+                                                nonNum++;
+                                            }
                                         }
                                     }
-                                }
-                            });
-                            perData['veh']=zcarnum;
-                            perData['person'] = persons;
-                            perData['noMotor'] = zcarnum;
-                            debugger
-                            this.$parent.perceptionData = perData;
+                                });
+                                perData['veh']=pernum;
+                                perData['person'] = persons;
+                                perData['noMotor'] = nonNum;
+//                                console.log(perData)
+                                this.$parent.perceptionData = perData;
+                            }
                         }
                     }
                     //平台车
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
                        let platCar =  platCars.processPlatformCarsTrack(result.timestamp,_this.delayTime);
-                       this.$parent.vehData = platCar;
+                       if(platCar){
+                           this.$parent.vehData = platCar['vehData'];
+                       }
                     }
 
                     //取消告警
