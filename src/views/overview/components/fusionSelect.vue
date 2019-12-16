@@ -40,9 +40,9 @@
                 bind (el, binding) {
                     const SELECTWRAP_DOM = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap')
                     SELECTWRAP_DOM.addEventListener('scroll', function () {
-                        const CONDITION = this.scrollHeight - this.scrollTop <= this.clientHeight
+                        const CONDITION = this.scrollHeight - this.scrollTop < this.clientHeight+20;
                         if (CONDITION) {
-                            binding.value()
+                            binding.value(SELECTWRAP_DOM)
                         }
                     })
                 }
@@ -50,6 +50,7 @@
         },
         data() {
             return {
+                scrollDom:'',
                 query:'',
                 searchKey:{
                    field:'1',
@@ -76,7 +77,8 @@
            this.remoteMethod(); 
         },
         methods: {
-            loadMore(){
+            loadMore(dom){
+                this.scrollDom=dom;
                 if(this.searchOption.totalCount==this.searchOption.filterOption.length){
                     return;
                 }
@@ -121,8 +123,9 @@
                 }
             },
             remoteSearch(query){//输入时
-                document.querySelector('.el-select-dropdown .el-select-dropdown__wrap').scrollTop=0;
-                this.searchOption.filterOption = [];
+                if(this.scrollDom!=""){
+                    this.scrollDom.scrollTop=0;
+                }
                 this.searchOption.loadMore=false;
                 this.searchOption.otherParams.page.pageIndex=0;
                 this.remoteMethod(query);
