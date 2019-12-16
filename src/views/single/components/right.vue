@@ -342,7 +342,10 @@
                         if(keys&&keys.length>0){
                             lastItem = _this.lastLightObj[item.spatId];
                         }
-                        
+                        if(!_this.tabIsExist){
+                            lastItem={};
+                        }
+//                        console.log(lastItem,item)
                         let _direction = '';
                         if(item.direction==1) {
                             _direction = 'cross';
@@ -378,6 +381,7 @@
                         light.img1=img1;
                         light.img2=img2;
                         light.img3=img3;
+//                        console.log(light)
                         gis3d.updateLight(light);
                         let obj = {
                             direction:item.direction, //直行 左转 右转
@@ -1062,7 +1066,7 @@
 
                 //红绿灯  缓存+1200ms调用一次
                 if(this.spatCount>=pulseNum&&(this.spatPulseCount==0||this.spatPulseCount>=30)){
-                    console.log(this.spatPulseCount);
+//                    console.log(this.spatPulseCount);
                     this.spatPulseCount=1;
                     if(Object.keys(processData.spatObj).length>0){
 //                            console.log("spatPulseCount:"+this.spatPulseCount)

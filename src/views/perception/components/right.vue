@@ -235,10 +235,11 @@
                 let count=0;
                 let flag=false;
                 let camParam;
+                gis3d.addRectangle(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
 //                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
-
+//                    gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
 //                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
 //                    gis3d.updateCameraPosition(121.1727923, 31.2840917,39,70,-0.2369132859032279, 0.0029627735803421373);
                      gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
@@ -247,34 +248,29 @@
                     return;
                 }
                 //5s没有 默认值
-                this.mapInitTime = setInterval(()=>{
-                    if(this.camList.length>0&&this.camList[0].camParam){
-                        camParam = this.camList[0].camParam;
-//                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-                         gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
-                        this.getData();
-                        clearInterval(this.mapInitTime);
-                        this.mapShow=true;
-                        return;
-                    }
-                    count++;
-                    if(count==10){
-//                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-                            gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
-                        this.getData();
-                        this.mapShow=true;
-                        clearInterval(this.mapInitTime);
-                    }
-                },100)
+//                this.mapInitTime = setInterval(()=>{
+//                    if(this.camList.length>0&&this.camList[0].camParam){
+//                        camParam = this.camList[0].camParam;
+////                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+//                         gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+//                        this.getData();
+//                        clearInterval(this.mapInitTime);
+//                        this.mapShow=true;
+//                        return;
+//                    }
+//                    count++;
+//                    if(count==10){
+////                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+//                            gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+//                        this.getData();
+//                        this.mapShow=true;
+//                        clearInterval(this.mapInitTime);
+//                    }
+//                },100)
             },
             getData(){
                 this.typeRoadData();
                 this.initPulseWebSocket();
-//                this.initPerceptionWebSocket();
-//                this.initPlatformWebSocket();
-                /*   this.initSpatWebSocket();*/
- //                           //地图不连续移动，判断红绿灯的位置受否再可视区
-//                 this.initWarningWebSocket();
                 this.getMap();
             },
             map1InitComplete(){
@@ -805,19 +801,6 @@
                         "polygon":this.currentExtent
                     }
                 }
-//                //旁车
-//                let perception = {
-//                    "action": "road_real_data_per",
-//                    "data": {
-//                        /*"polygon": [
-//                            [121.17979423666091, 31.279518991604288],
-//                            [121.16305725240798, 31.279518991604288],
-//                            [121.16305725240798, 31.289571910992105],
-//                            [121.17979423666091, 31.289571910992105]
-//                        ]*/
-//                        "polygon":this.currentExtent
-//                    }
-//                }
                 let perceptionMsg = JSON.stringify(perception);
                 this.sendPerceptionMsg(perceptionMsg);
             },
@@ -914,18 +897,6 @@
                     },
                     "type":2
                 }
-              /*  let spat = {
-                    "action": "road_real_data_spat",
-                    "data": {
-                        /!*"polygon": [
-                            [121.17979423666091, 31.279518991604288],
-                            [121.16305725240798, 31.279518991604288],
-                            [121.16305725240798, 31.289571910992105],
-                            [121.17979423666091, 31.289571910992105]
-                        ]*!/
-                        "polygon":this.currentExtent
-                    }
-                }*/
                 let spatMsg = JSON.stringify(spat);
                 this.sendSpatMsg(spatMsg);
             },
@@ -985,7 +956,10 @@
                         if(keys&&keys.length>0){
                             lastItem = _this.lastLightObj[item.spatId];
                         }
-                        
+                        if(!_this.tabIsExist){
+                            lastItem={};
+                        }
+//                        console.log(lastItem,item)
                         let _direction = '';
                         if(item.direction==1) {
                             _direction = 'cross';
@@ -1021,6 +995,7 @@
                         light.img1=img1;
                         light.img2=img2;
                         light.img3=img3;
+//                        console.log(light)
                         gis3d.updateLight(light);
                         let obj = {
                             direction:item.direction, //直行 左转 右转

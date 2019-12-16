@@ -59,7 +59,7 @@ class ProcessCarTrack {
             // console.log("-----"+cacheData[i])
             // console.log(spatId,cacheData.length,time,parseInt(cacheData[i].spatTime),delayTime,diff,i)
             if(diff<this.spatPulseInterval){
-                if(startIndex !=-1 && i != startIndex+1) {
+                if(startIndex !=-1 && i != startIndex+1){
                     break;
                 }
                 if(!rangeData || (rangeData && diff < rangeData.delayTime)) {
