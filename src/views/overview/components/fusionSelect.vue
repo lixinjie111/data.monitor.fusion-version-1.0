@@ -41,11 +41,7 @@
                     const SELECTWRAP_DOM = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap')
                     SELECTWRAP_DOM.addEventListener('scroll', function () {
                         const CONDITION = this.scrollHeight - this.scrollTop < this.clientHeight+20;
-                        if(this.scrollHeight==0){
-                            return;
-                        }
                         if (CONDITION) {
-                           
                             binding.value(SELECTWRAP_DOM)
                         }
                     })
@@ -130,7 +126,6 @@
                 if(this.scrollDom!=""){
                     this.scrollDom.scrollTop=0;
                 }
-                this.searchOption.filterOption = [];
                 this.searchOption.loadMore=false;
                 this.searchOption.otherParams.page.pageIndex=0;
                 this.remoteMethod(query);
