@@ -19,8 +19,6 @@ window.config = {
     dlUrl: 'http://117.114.144.227:8085/', //迪路
     dlWmsUrl: 'http://117.114.144.227:8080/', //迪路
 
-    socketTestUrl:'ws://172.17.1.16:8888/ws',
-
     //上海正式环境  外网
     // staticUrl: "http://116.236.72.204:49090/", //静态文件路径
     // url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
@@ -112,6 +110,6 @@ window.defaultRoadParam={
 
 window.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
 //地图服务
-window.mapUrl="http://10.0.1.22:8080/geoserver/gwc/service/wmts?layer=shanghai_qcc%3A3dmaptest&style=&tilematrixset=EPSG%3A900913&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A900913%3A{TileMatrix}&TileCol={TileCol}&TileRow={TileRow}"
+window.mapUrl=window.config.dlWmsUrl+"geoserver/gwc/service/wmts?layer=shanghai_qcc%3A3dmaptest&style=&tilematrixset=EPSG%3A900913&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A900913%3A{TileMatrix}&TileCol={TileCol}&TileRow={TileRow}"
 //地图初始化高度
 window.defualtZ=0.1; 
