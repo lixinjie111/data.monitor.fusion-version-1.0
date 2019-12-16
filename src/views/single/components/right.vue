@@ -342,246 +342,38 @@
                         if(keys&&keys.length>0){
                             lastItem = _this.lastLightObj[item.spatId];
                         }
-                        //cross
-                        if(item.direction==1){
-                            //cross red
-                            if(item.light=='RED'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                    //如果相位颜色不变
-                                }else{
-                                    img1='./static/images/light/cross-red.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('RED',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('RED',array[1]);
-                                }
-                            }
-                            //cross yellow
-                            if(item.light=='YELLOW'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/cross-yellow.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('YELLOW',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('YELLOW',array[1]);
-                                }
-                            }
-                            //cross green
-                            if(item.light=='GREEN'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/cross-green.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('GREEN',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('GREEN',array[1]);
-                                }
-                            }
+                        
+                        let _direction = '';
+                        if(item.direction==1) {
+                            _direction = 'cross';
                         }
-                        //left
-                        if(item.direction==2){
-                            //left red
-                            if(item.light=='RED'){
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/left-red.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('RED',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('RED',array[1]);
-                                }
-                            }
-                            //left yellow
-                            if(item.light=='YELLOW'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/left-yellow.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('YELLOW',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('YELLOW',array[1]);
-                                }
-                            }
-                            //left green
-                            if(item.light=='GREEN'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/left-green.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('GREEN',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('GREEN',array[1]);
-                                }
-                            }
+                        if(item.direction==2) {
+                            _direction = 'left';
                         }
-                        //turn
-                        if(item.direction==3){
-                            //turn red
-                            if(item.light=='RED'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/turn-red.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('RED',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('RED',array[1]);
-                                }
-                            }
-                            //turn yellow
-                            if(item.light=='YELLOW'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/turn-yellow.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('YELLOW',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('YELLOW',array[1]);
-                                }
-                            }
-                            //turn green
-                            if(item.light=='GREEN'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/turn-green.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('GREEN',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('GREEN',array[1]);
-                                }
-                            }
+                        if(item.direction==3) {
+                            _direction = 'turn';
                         }
-                        //right
-                        if(item.direction==4){
-                            //right red
-                            if(item.light=='RED'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/right-red.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('RED',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('RED',array[1]);
-                                }
-                            }
-                            //right yellow
-                            if(item.light=='YELLOW'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/right-yellow.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('YELLOW',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('YELLOW',array[1]);
-                                }
-                            }
-                            //right green
-                            if(item.light=='GREEN'){
-                                //每个路灯相位都是固定的
-                                if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
-                                    img1="";
-                                }else{
-                                    img1='./static/images/light/right-green.png';
-                                }
-                                if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
-                                    img2=''
-                                }else {
-                                    img2 = _this.getNumPng('GREEN',array[0]);
-                                }
-                                if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
-                                    img3=''
-                                }else {
-                                    img3 = _this.getNumPng('GREEN',array[1]);
-                                }
-                            }
+                        if(item.direction==4) {
+                            _direction = 'right';
                         }
+                        let _color = item.light.toLowerCase();
+                        //每个路灯相位都是固定的
+                        if(lastItem&&lastItem.light==item.light&&lastItem.direction==item.direction){
+                            img1="";
+                        }else{
+                            img1='./static/images/light/'+_direction+'-'+_color+'.png';
+                        }
+                        if(lastItem&&lastItem.first==array[0]&&lastItem.light==item.light){
+                            img2=''
+                        }else {
+                            img2 = _this.getNumPng(_color,array[0]);
+                        }
+                        if(lastItem&&lastItem.second==array[1]&&lastItem.light==item.light){
+                            img3=''
+                        }else {
+                            img3 = _this.getNumPng(_color,array[1]);
+                        }
+
                         light.id=item.spatId;
                         light.img1=img1;
                         light.img2=img2;
@@ -607,103 +399,8 @@
                 }
             },
             getNumPng(color,num){
-                let img;
-                if(color=='RED'){
-                    if(num==0){
-                        img='./static/images/light/0.png'
-                    }
-                    if(num==1){
-                        img='./static/images/light/1.png'
-                    }
-                    if(num==2){
-                        img='./static/images/light/2.png'
-                    }
-                    if(num==3){
-                        img='./static/images/light/3.png'
-                    }
-                    if(num==4){
-                        img='./static/images/light/4.png'
-                    }
-                    if(num==5){
-                        img='./static/images/light/5.png'
-                    }
-                    if(num==6){
-                        img='./static/images/light/6.png'
-                    }
-                    if(num==7){
-                        img='./static/images/light/7.png'
-                    }
-                    if(num==8){
-                        img='./static/images/light/8.png'
-                    }
-                    if(num==9){
-                        img='./static/images/light/9.png'
-                    }
-                }
-                if(color=='YELLOW'){
-                    if(num==0){
-                        img='./static/images/light/0-2.png'
-                    }
-                    if(num==1){
-                        img='./static/images/light/1-2.png'
-                    }
-                    if(num==2){
-                        img='./static/images/light/2-2.png'
-                    }
-                    if(num==3){
-                        img='./static/images/light/3-2.png'
-                    }
-                    if(num==4){
-                        img='./static/images/light/4-2.png'
-                    }
-                    if(num==5){
-                        img='./static/images/light/5-2.png'
-                    }
-                    if(num==6){
-                        img='./static/images/light/6-2.png'
-                    }
-                    if(num==7){
-                        img='./static/images/light/7-2.png'
-                    }
-                    if(num==8){
-                        img='./static/images/light/8-2.png'
-                    }
-                    if(num==9){
-                        img='./static/images/light/9-2.png'
-                    }
-                }
-                if(color=='GREEN'){
-                    if(num==0){
-                        img='./static/images/light/0-1.png'
-                    }
-                    if(num==1){
-                        img='./static/images/light/1-1.png'
-                    }
-                    if(num==2){
-                        img='./static/images/light/2-1.png'
-                    }
-                    if(num==3){
-                        img='./static/images/light/3-1.png'
-                    }
-                    if(num==4){
-                        img='./static/images/light/4-1.png'
-                    }
-                    if(num==5){
-                        img='./static/images/light/5-1.png'
-                    }
-                    if(num==6){
-                        img='./static/images/light/6-1.png'
-                    }
-                    if(num==7){
-                        img='./static/images/light/7-1.png'
-                    }
-                    if(num==8){
-                        img='./static/images/light/8-1.png'
-                    }
-                    if(num==9){
-                        img='./static/images/light/9-1.png'
-                    }
-                }
+                let _color = color.toLowerCase();
+                let img = './static/images/light/'+_color+'_'+num+'.png';
                 return img;
 
             },
@@ -1571,6 +1268,7 @@
             this.perceptionWebsocket&&this.perceptionWebsocket.close();
             this.pulseWebsocket&&this.pulseWebsocket.close();
             this.cancelWarningWebsocket&&this.cancelWarningWebsocket.close();
+            this.canWebSocket&&this.canWebSocket.close();
 //            gis3d=null;
 //            perceptionCars = null;
 //            platCars = null;
