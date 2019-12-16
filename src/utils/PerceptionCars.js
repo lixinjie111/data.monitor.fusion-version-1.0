@@ -119,7 +119,7 @@ class PerceptionCars {
                 this.processPerceptionMesage(fusionList);
                 devList.push(devData);
             }else{
-                console.log(devId+"缓存队列里没有值")
+                console.log("缓存队列里没有值")
             }
         }
         return devList;

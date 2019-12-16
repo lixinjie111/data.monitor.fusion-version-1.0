@@ -64,16 +64,18 @@
         computed:{
             oilLeftWidth(){
                 let oilData = parseFloat(this.canData.oilDoor/100);
-                if(!oilData){
+                if(oilData==0){
+//                    console.log("油门:"+this.canData.oilDoor);
                    return 10;
                 }
-//                console.log("油门"+parseInt(oilData*80))
                 return parseInt(oilData*80);
             },
             brakeLeftWidth(){
+//                console.log("刹车:"+this.canData.brakePedal);
                 let brakeData = parseFloat(this.canData.brakePedal/100);
-                if(!brakeData){
-                    return 10;
+                if(brakeData==0){
+//                    console.log("刹车:"+this.canData.brakePedal);
+                    return 0;
                 }
 //                console.log("刹车"+parseInt(brakeData*80))
                 return parseInt(brakeData*80);

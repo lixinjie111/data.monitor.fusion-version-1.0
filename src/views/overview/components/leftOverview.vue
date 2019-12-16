@@ -45,7 +45,8 @@
                     token: "fpx",
                     vehicleIds: ""
                 },
-                canConnectCount:0
+                canConnectCount:0,
+                timeOut:1000*60*5,
             };
         },
         mounted() {
@@ -88,6 +89,7 @@
                 _filterResult.autoLevel = result.autoLevel;
                 _filterResult.vehicleLogo = result.vehicleLogo;
                 _filterResult.plateNo = result.plateNo;
+                _filterResult.timer = null;
                 this.responseData.push(_filterResult);
             },
             initWebSocket() {
@@ -111,18 +113,26 @@
                 let _json = JSON.parse(message.data);
                 let _result = _json.result[_json.result.length-1];
                 let _vehicleId = _result.vehicleId;
+
+                // console.log(_json)
+               
                 this.responseData.forEach((item, index) => {
                     if (item.vehicleId === _vehicleId) {
+                        clearTimeout(item.timer);
                         item.transmission = _result.transmission;
+
                         if (_result.transmission != "P") {
-                            item.speed = _result.speed;
                             item.headingAngle = _result.headingAngle;
-                            item.turnLight = _result.turnLight;
-                        } else {
-                            item.speed = 0;
-                        }
+                        } 
+                        item.timer = setTimeout(() => {
+                            item.transmission='P';
+                        }, this.timeOut);
+
                     }
                 });
+
+              
+
             },
             onclose(data) {
                 console.log("can数据结束连接");

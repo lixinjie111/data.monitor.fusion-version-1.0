@@ -86,7 +86,7 @@ class ProcessCarTrack {
             minIndex = rangeData.index;
             minData = rangeData.data;
         }else{
-            console.log("spat***********************");
+            // console.log("spat***********************");
             minIndex = 0;
             minData = cacheData[0];
             minDiff = Math.abs(time-minData.spatTime-delayTime);
@@ -102,7 +102,7 @@ class ProcessCarTrack {
 
             }
         }
-        console.log("红绿灯最小索引:",minIndex);
+        // console.log("红绿灯最小索引:",minIndex);
         //找出的最小值无效
         if(minDiff&&minDiff>this.spatMaxValue){
             console.log("spat找到的最小值无效")
@@ -313,7 +313,7 @@ class ProcessCarTrack {
 
             }
         }
-        console.log("can最小索引:"+minIndex);
+        // console.log("can最小索引:"+minIndex);
         //找出的最小值无效
         if(minDiff&&minDiff>this.canMaxValue){
             console.log("route找到的最小值无效")
