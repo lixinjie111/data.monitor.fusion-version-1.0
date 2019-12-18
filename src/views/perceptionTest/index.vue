@@ -185,17 +185,11 @@
                                     //计算data里面车辆数据的距离值
                                     let data = perceptionCars.drawObj[attr];
                                     if(this.isFirst){
-                                        this.$set(this.drawObj,attr,{});
-                                        this.$set(this.drawObj[attr],"data",data);
-                                        this.$set(this.drawObj[attr],"gpsTime",data[0].gpsTime);
-                                        this.$set(this.drawObj[attr],"updateTime",data[0].updateTime);
-                                        this.$set(this.drawObj[attr],"devIsComputed",false);
-                                        this.isFirst=false;
-                                        this.drawObj[attr]["data"].forEach(item=>{
-                                            //如果没计算过距离以及没有时间差 则其加上字段
-                                            this.$set(item,"distance",0);
-                                            this.$set(item,"diff",0);
+                                        data.forEach(item=>{
+                                            item.distance=0;
+                                            item.diff=0;
                                         });
+                                        this.isFirst=false;
                                     }else{
                                         //车辆向历史数据开始找，直到找到为止，如果找不到，距离为0
                                         for(let i=0;i<this.drawObj[attr].length;i++){
@@ -218,13 +212,11 @@
 
                                             }
                                         }
-
                                     }
-                                    // this.drawObj[attr] = {};
-                                    // this.drawObj[attr].rcuId = attr;
-                                    // this.drawObj[attr].data = perceptionCars.drawObj[attr];
-                                    // this.drawObj[attr].gpsTime = perceptionCars.drawObj[attr][0].gpsTime;
-                                    // this.drawObj[attr].updateTime =  perceptionCars.drawObj[attr][0].updateTime;
+                                    this.$set(this.drawObj,attr,{});
+                                    this.$set(this.drawObj[attr],"data",data);
+                                    this.$set(this.drawObj[attr],"gpsTime",data[0].gpsTime);
+                                    this.$set(this.drawObj[attr],"updateTime",data[0].updateTime);
                                 }
                             }
                             console.log(this.drawObj);
