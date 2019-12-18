@@ -115,6 +115,7 @@
                 delayTime:'',
                 spatPulseCount:0,
                 routePulseCount:0,
+                canPulseCount:0,
                 pulseInterval:40,
                 warningPulseCount:0,
                 staticPulseCount:0,
@@ -216,7 +217,7 @@
                 perceptionCars.pulseInterval = parseInt(this.pulseInterval)*0.8;
                 perceptionCars.perMaxValue = perceptionCars.pulseInterval*1.5;
 
-                let spatPulse = this.pulseInterval*30;
+                let spatPulse = this.pulseInterval*10;
                 processData.spatPulseInterval = spatPulse*0.8;
                 processData.spatMaxValue =  processData.pulseInterval*1.5;
 
@@ -224,7 +225,7 @@
                 processData.routePulseInterval = routePulse*0.8;
                 processData.routeMaxValue =  processData.routePulseInterval*1.5;
 
-                let canPulse = this.pulseInterval*25;
+                let canPulse = this.pulseInterval*10;
                 processData.canPulseInterval = canPulse*0.8;
                 processData.canMaxValue =  processData.canPulseInterval*1.5;
 
@@ -1043,9 +1044,13 @@
                     if(this.routePulseCount==0||this.routePulseCount>=25){
                         this.routePulseCount=1;
                         if(mainCar){
-                            mainCar.tabIsExist = this.tabIsExist;
                             this.$parent.routeData = mainCar;
                         }
+                    }
+                    this.routePulseCount++;
+
+                    if(this.canPulseCount==0||this.canPulseCount>=10){
+                        this.canPulseCount=1;
                         if(processData.canList.length>0){
                             let canData = processData.processCanData(result.timestamp,delayTime);
                             if(canData){
@@ -1054,7 +1059,7 @@
                             }
                         }
                     }
-                    this.routePulseCount++;
+                    this.canPulseCount++;
                 }
 
                 //感知车 缓存+40ms调用一次
@@ -1066,7 +1071,7 @@
                 }
 
                 //红绿灯  缓存+1200ms调用一次
-                if(this.spatCount>=pulseNum&&(this.spatPulseCount==0||this.spatPulseCount>=30)){
+                if(this.spatCount>=pulseNum&&(this.spatPulseCount==0||this.spatPulseCount>=10)){
 //                    console.log(this.spatPulseCount);
                     this.spatPulseCount=1;
                     if(Object.keys(processData.spatObj).length>0){

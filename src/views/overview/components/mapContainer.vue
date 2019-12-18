@@ -23,7 +23,7 @@
                 flag: true,
                 prevData: [],
                 onlineConnectCount:0,
-                timeOut:1000*60*5
+                timeOut:3000
             }
         },
         mounted() {
@@ -93,6 +93,7 @@
                         if(!_this.prevData[id]) {   //表示新增该点，做add
                             _this.addMarker(id,_filterData);
                             _this.addPlateNoMarker(id,_filterData);
+                            _this.$parent.onlineCount++;
                         }
                     }
 
@@ -108,8 +109,14 @@
                     // console.log(_this.prevData)
                     for(let vehicleId in data){
                         _this.prevData[vehicleId].timer = setTimeout(() => {
-                            _this.prevData[vehicleId].plateNoMarker.setText(data[vehicleId][0].plateNo+"<br/><span style='color:red'>离线</span>")
-                        }, this.timeOut); 
+//                            _this.prevData[vehicleId].plateNoMarker.setText(data[vehicleId][0].plateNo+"<br/><span style='color:red'>离线</span>")
+                            //3s后消失
+                            _this.AMap.remove(_this.prevData[vehicleId].marker);
+                            _this.AMap.remove(_this.prevData[vehicleId].plateNoMarker);
+                            console.log("消失车辆",vehicleId)
+                            delete _this.prevData[vehicleId];
+                            _this.$parent.onlineCount--;
+                        }, this.timeOut);
                     }
                       
 
@@ -275,7 +282,7 @@
                                         }
                                         marker.on('click', function(e) {
                                             _this.$router.push({
-                                                path: '/perception/'+subItem.deviceId+ "/"+4+ "/"+0.004+"/"+true,
+                                                path: '/perception/'+subItem.deviceId+ "/"+4+ "/"+0.005+"/"+true,
                                                 query:{lng:subItem.longitude,lat:subItem.latitude,isShow:false}
                                             });
                                         });

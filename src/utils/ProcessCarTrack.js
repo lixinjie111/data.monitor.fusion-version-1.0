@@ -1,4 +1,5 @@
 import GisUtils from '@/utils/GIS/GisUtils.js'
+import DateFormat from '@/utils/date.js'
 /**
  * 平台车类
  */
@@ -335,6 +336,9 @@ class ProcessCarTrack {
         let cacheData = this.cacheAndInterpolateDataByVid[vid].cacheData;
         let rangeData=null;
         let startIndex=-1;
+        let minIndex=-1;
+        let minData = {};
+        let minDiff;
         // console.log("找到最小值前："+cacheData.length);
         //找到满足条件的范围
         for(let i=0;i<cacheData.length;i++){
@@ -349,9 +353,11 @@ class ProcessCarTrack {
                     let obj={
                         index:i,
                         delayTime: diff,
-                        data:cacheData[i]
+                        data:cacheData[i],
+                        diff:diff
                     }
                     rangeData = obj;
+                    minDiff=diff;
                 }else {
                     break;
                 }
@@ -361,9 +367,6 @@ class ProcessCarTrack {
                 }
             }
         }
-        let minIndex=-1;
-        let minData = {};
-        let minDiff;
         //如果能找到最小范围
         // console.log(rangeData)
         if(rangeData){
@@ -381,11 +384,12 @@ class ProcessCarTrack {
                 if(diff<minDiff){
                     minData = cacheData[i];
                     minIndex = i;
+                    minDiff = diff;
                 }
 
             }
         }
-        // console.log("平台车最小索引:"+minIndex);
+        console.log("平台车最小索引:",vid,minIndex,cacheData.length,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'));
         if (minDiff&&minDiff>this.platMaxValue){
             console.log("plat找到最小值无效")
             return;
@@ -510,7 +514,7 @@ class ProcessCarTrack {
         }
     }
      //添加光环
-     addEllipse(vid,position){
+    addEllipse(vid,position){
          //光环
          var r1 = 0, r2 = 3, r3 = 6;
          function changeR1(){ //这是callback，参数不能内传

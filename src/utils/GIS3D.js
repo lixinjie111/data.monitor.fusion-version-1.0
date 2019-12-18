@@ -24,8 +24,7 @@ class GIS3D {
         this.cesium.viewer = new Cesium.Viewer(cesiumContainer, {
             projectionPicker: true,
             animation: false,  //动画控制不显示     
-            timeline: false
-            ,    //时间线不显示
+            timeline: false,    //时间线不显示
             // imageryProvider: new Cesium.SingleTileImageryProvider({
             //     url: 'static/map3d/images/back.png'//透明图片
             // }),

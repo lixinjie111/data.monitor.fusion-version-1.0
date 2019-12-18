@@ -126,6 +126,9 @@ class PerceptionCars {
        /* let minDiff = Math.abs(time-minData.gpsTime-delayTime);*/
            let rangeData=null;
            let startIndex=-1;
+        let minIndex=-1;
+        let minData = {};
+        let minDiff;
            // console.log("找到最小值前："+cacheData.length);
            //找到满足条件的范围
            for(let i=0;i<cacheData.length;i++){
@@ -152,9 +155,6 @@ class PerceptionCars {
                    }
                }
            }
-           let minIndex=-1;
-           let minData = {};
-           let minDiff;
            //如果能找到最小范围
            // console.log(rangeData)
            if(rangeData){

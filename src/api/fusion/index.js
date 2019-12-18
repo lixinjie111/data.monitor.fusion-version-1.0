@@ -1,6 +1,7 @@
 
 //import axios from 'axios';
 import {HTTPURL} from '../requestUrl';
+import {OPERATEURL} from '../requestUrl';
 /**
  * 获取单车基本数据
  */
@@ -20,3 +21,9 @@ export const typeRoadData = params => {return axios.post(`${HTTPURL}ehb/road/typ
  * 根据路侧点id获取摄像头参数
  */
 export const getCameraByRsId = params => {return axios.post(`${HTTPURL}/ehb/road/sTypeRoad`, params).then(res => res.data); };
+
+
+/**
+ * 根据路侧点查询设备
+ */
+export const getAreaByRsId = params => {return axios.post(`${OPERATEURL}/openApi/v2x/device/findRSBindDevList`, params).then(res => res.data); };
