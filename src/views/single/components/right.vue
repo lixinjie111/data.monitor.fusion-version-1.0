@@ -205,7 +205,8 @@
             },
             onMapComplete:function(){
                 console.log("onMapComplete");
-                gis3d.updateCameraPosition(window.defaultSingleParam.x,window.defaultSingleParam.y,window.defaultSingleParam.z,70,-0.2369132859032279, 0.0029627735803421373);
+                let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+                gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
                 //初始化车辆步长以及平台车阀域范围
                 platCars.stepTime = this.pulseInterval;
                 platCars.pulseInterval = this.pulseInterval*0.8;//设置阀域范围 脉冲时间的100%

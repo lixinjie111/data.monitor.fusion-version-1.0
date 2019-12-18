@@ -162,17 +162,12 @@
             processData = new ProcessData();
 
             gis3d.initload("cesiumContainer",false);
-//            gis3d.add3DInfoLabel("TI02_40_20191114151017374_rsi", "限速",  121.1960677,31.2967565, 20)
             perceptionCars.viewer=gis3d.cesium.viewer;
-//            perceptionCars.initPerceptionCount(gis3d.cesium.viewer);
 
             platCars.models={};
             platCars.viewer=gis3d.cesium.viewer;
-            // platCars.processPlatformCarsTrack();
 
-            _this.mapParam=window.mapParam;
             _this.rsId = _this.$route.params.crossId;
-            /* this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];*/
 
             let longitude=parseFloat(_this.$route.query.lng);
             let latitude=parseFloat(_this.$route.query.lat);
@@ -180,18 +175,11 @@
             _this.delayTime= parseFloat(_this.$route.params.delayTime).toFixed(3)*1000;
             //设置地图的中心点
             if(longitude||latitude) {
-//                let utm = gis3d.coordinateTransfer("EPSG:4326", "+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs", longitude, latitude);
-//                _this.x = utm[0];
-//                _this.y = utm[1];
                 _this.x = longitude;
                 _this.y = latitude;
                 _this.getExtend(longitude,latitude,extend);
                 console.log(_this.currentExtent)
                 _this.center=[longitude ,latitude];
-            }else{
-                _this.currentExtent=window.currentExtent;
-//                _this.center=[121.247,31.242];
-                _this.getExtentCenter();
             }
             _this.getCameraByRsId();
             _this.onMapComplete();
@@ -204,12 +192,6 @@
                 return time;
             },
             onMapComplete(){
-
-//                    this.$refs.perceptionMap.updateCameraPosition(x,y,219.80550560213806,214.13348995135274,-1.5707963267948966,-2.7070401557402715);
-                /*setInterval(()=>{
-                    let camera = this.$refs.perceptionMap.getCamera();
-                    console.log(camera.x,camera.y,camera.z,camera.radius,camera.pitch,camera.yaw)
-                },500)*/
 
                 //初始化车辆步长以及平台车阀域范围
                 platCars.stepTime = this.pulseInterval;
@@ -234,39 +216,37 @@
 
                 let count=0;
                 let flag=false;
-                let camParam;
                 gis3d.addRectangle(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
-//                this.$refs.perceptionMap.updateCameraPosition(325858.13269265386,3462417.7786351065,2217.2500985424986,2215.0552566139654,-1.5707963267948966,-2.7837857073883954);
-                if(this.camList.length>0&&this.camList[0].camParam){
-                    camParam = this.camList[0].camParam;
-//                    gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-//                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
-//                    gis3d.updateCameraPosition(121.1727923, 31.2840917,39,70,-0.2369132859032279, 0.0029627735803421373);
-                     gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
-                    this.getData();
-                    this.mapShow=true;
-                    return;
-                }
-//                5s没有 默认值
+
+                this.updateCameraPosition();
+                // 5s没有 默认值
                 this.mapInitTime = setInterval(()=>{
-                    if(this.camList.length>0&&this.camList[0].camParam){
-                        camParam = this.camList[0].camParam;
-//                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-                         gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
-                        this.getData();
-                        clearInterval(this.mapInitTime);
-                        this.mapShow=true;
-                        return;
-                    }
+                    this.updateCameraPosition();
                     count++;
                     if(count==10){
-//                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-                            gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
-                        this.getData();
-                        this.mapShow=true;
-                        clearInterval(this.mapInitTime);
+                        this.updateCameraPosition();
                     }
                 },100)
+            },
+            updateCameraPosition() {
+                if(this.camList.length>0&&this.camList[0].camParam){
+                    let {x, y, z, radius, pitch, yaw} = this.camList[0].camParam;
+                    gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
+                    this.getData();
+                    this.mapShow=true;
+                    if(this.mapInitTime) {
+                        clearInterval(this.mapInitTime);
+                    }
+                    return;
+                }else {
+                    let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+                    gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
+                    this.getData();
+                    this.mapShow=true;
+                    if(this.mapInitTime) {
+                        clearInterval(this.mapInitTime);
+                    }
+                }
             },
             getData(){
                 this.typeRoadData();
@@ -274,7 +254,6 @@
                 this.getMap();
             },
             map1InitComplete(){
-//                this.$refs.map1.centerAt(121.17265957261286,31.284096076877844);
                 this.$refs.map1.centerAt(window.mapOption.center);
                 this.$refs.map1.zoomTo(10);
                 this.$refs.map1.addWms(window.dlWmsOption.LAYERS_withoutz,window.dlWmsDefaultOption.url,window.dlWmsOption.LAYERS_withoutz,window.dlWmsOption.GD_ROAD_CENTERLINE,1,true,null); // 上海汽车城
@@ -316,68 +295,11 @@
                     }
                 });
             },
-            loadComplete(param){
-                this.camList.forEach((item,index)=>{
-                    if(param.serialNum==item.serialNum){
-                        item.videoUrl = params.videoUrl;
-                    }
-                });
-            },
-            getCurrentExtent() {
-                this.currentExtent = [];
-                let result = this.$refs.perceptionMap.getExtent();
-                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
-
-                let x1 = utm1[0];
-                let y1 = utm1[1];
-                let x2 = utm2[0];
-                let y2 = utm2[1];
-//                this.getNewCurrentExtent(x1,y1,x2,y2);
-                /* this.currentExtent.push([x2, y1]);
-                 this.currentExtent.push([x1, y1]);
-                 this.currentExtent.push([x1, y2]);
-                 this.currentExtent.push([x2, y2]);*/
-                this.currentExtent=[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]];
-                console.log("边界值："+this.currentExtent);
-//                this.currentExtent=[[121.17979423666091,31.279518991604288],[121.16305725240798,31.279518991604288],[121.16305725240798,31.289571910992105],[121.17979423666091,31.289571910992105]];
-            },
-            getCenter(){
-                this.center= [];
-                let result = this.$refs.perceptionMap.getExtent();
-                let utm1 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.max.x, result.max.y);
-                let utm2 = this.$refs.perceptionMap.coordinateTransfer("+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs","EPSG:4326",result.min.x, result.min.y);
-                /*let utm1 = [121.16305725240798,31.279518991604288];
-                let utm2 = [121.17979423666091,31.289571910992105];*/
-                let x1 = utm1[0];
-                let y1 = utm1[1];
-                let x2 = utm2[0];
-                let y2 = utm2[0];
-                let x0 = (x1+x2)/2;
-                let y0 = (y1+y2)/2;
-//                this.center.push([x0,y0]);
-                this.center=[121.247,31.242];
-                console.log("中心点："+this.center)
-//                console.log("中心点："+this.center);
-            },
-            getExtentCenter(){
-                let extent = window.currentExtent;
-                this.center = [];
-                let x0 = extent[1][0];
-                let x1 = extent[3][0];
-                let y0 = extent[1][1];
-                let y1 = extent[3][1];
-                let centerX = (x0+x1)/2;
-                let centerY = (y0+y1)/2;
-                this.center.push(centerX);
-                this.center.push(centerY);
-            },
             typeRoadData(){
                 typeRoadData(
                     [
                         {
                             "polygon":this.currentExtent
-//                            "polygon":[[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
                         }
 
                     ]
@@ -389,9 +311,6 @@
                     if(signs&&signs.length>0){
                         signs.forEach(item=>{
                             this.signCount++;
-                            //将小的转成大的3
-//                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
-//                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
                         })
                     }
                     if(spats&&spats.length>0) {
