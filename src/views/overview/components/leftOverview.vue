@@ -4,7 +4,7 @@
             <i class="left-item-icon icon-1"></i>
             <div class="left-item-text">
                 <span class="left-item-title">车辆：</span>
-                <span class="left-item-num"> {{filterData || '--'}}</span>
+                <span class="left-item-num">{{$parent.onlineCount}}/{{filterData || '--'}}</span>
             </div>
         </div>
         <ul class="left-item-wrapper">

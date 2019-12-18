@@ -17,6 +17,7 @@ class PerceptionCars {
       this.cacheAndInterpolateDataByDevId={};
       this.stepTime='';
       this.drawObj = {};
+      this.historyObj=[];
     }
   
     //接受数据
@@ -38,6 +39,7 @@ class PerceptionCars {
       });
     }
     processPerTrack(time){
+        //保存一帧的数据
         let _drawObj = {};
         for (let devId in this.devObj) {
             let devCacheData = this.devObj[devId];
@@ -58,6 +60,7 @@ class PerceptionCars {
             }
         }
         this.drawObj = _drawObj;
+        this.historyObj[time]=_drawObj;
         console.log("过滤数据--------------");
         console.log(this.drawObj);
         if(!Object.keys(this.drawObj).length) {

@@ -37,7 +37,8 @@ export default {
     },
     data() {
         return {
-             responseData: {}
+            responseData: {},
+            onlineCount:0
         }
     },
     created() {
