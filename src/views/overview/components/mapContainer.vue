@@ -112,6 +112,8 @@
 //                            _this.prevData[vehicleId].plateNoMarker.setText(data[vehicleId][0].plateNo+"<br/><span style='color:red'>离线</span>")
                             //3s后消失
                             _this.AMap.remove(_this.prevData[vehicleId].marker);
+                            _this.AMap.remove(_this.prevData[vehicleId].plateNoMarker);
+                            console.log("消失车辆",vehicleId)
                             delete _this.prevData[vehicleId];
                             _this.$parent.onlineCount--;
                         }, this.timeOut);
