@@ -112,6 +112,7 @@
                 sectionTime: 55,
                 domDateFormat: DateFormat,
                 drawObj: {},
+                historyDrawObj:{},
                 isFirst:true
             }
         },
@@ -217,6 +218,7 @@
                                     this.$set(this.drawObj[attr],"data",data);
                                     this.$set(this.drawObj[attr],"gpsTime",data[0].gpsTime);
                                     this.$set(this.drawObj[attr],"updateTime",data[0].updateTime);
+                                    this.historyDrawObj[pulseTime] = this.drawObj;
                                 }
                             }
                             console.log(this.drawObj);
@@ -227,23 +229,30 @@
                         if(this.drawCount>0) {
                             this.drawCount--;
                             if(Object.keys(perceptionCars.devObj).length>0){
-                                perceptionCars.processPerTrack(this.startGpsTime+(this.drawCount*this.runTime));
-                                console.log("**************************");
-                                console.log(perceptionCars.drawObj);
-                                for(let attr in perceptionCars.drawObj) {
-                                    if(perceptionCars.drawObj[attr].length) {
-                                        this.$set(this.drawObj,attr,{});
-                                        this.$set(this.drawObj[attr],"data",perceptionCars.drawObj[attr]);
-                                        this.$set(this.drawObj[attr],"gpsTime",perceptionCars.drawObj[attr][0].gpsTime);
-                                        this.$set(this.drawObj[attr],"updateTime",perceptionCars.drawObj[attr][0].updateTime);
-                                        // this.drawObj[attr] = {};
-                                        // this.drawObj[attr].rcuId = attr;
-                                        // this.drawObj[attr].data = perceptionCars.drawObj[attr];
-                                        // this.drawObj[attr].gpsTime = perceptionCars.drawObj[attr][0].gpsTime;
-                                        // this.drawObj[attr].updateTime =  perceptionCars.drawObj[attr][0].updateTime;
+                                let upPulseTime = this.startGpsTime+(this.drawCount*this.runTime);
+                                for(let time in this.historyDrawObj){
+                                    if(time==upPulseTime){
+                                        this.drawObj={};
+                                        this.drawObj=this.historyDrawObj[time];
                                     }
                                 }
-                                console.log(this.drawObj);
+//                                perceptionCars.processPerTrack(this.startGpsTime+(this.drawCount*this.runTime));
+//                                console.log("**************************");
+//                                console.log(perceptionCars.drawObj);
+//                                for(let attr in perceptionCars.drawObj) {
+//                                    if(perceptionCars.drawObj[attr].length) {
+//                                        this.$set(this.drawObj,attr,{});
+//                                        this.$set(this.drawObj[attr],"data",perceptionCars.drawObj[attr]);
+//                                        this.$set(this.drawObj[attr],"gpsTime",perceptionCars.drawObj[attr][0].gpsTime);
+//                                        this.$set(this.drawObj[attr],"updateTime",perceptionCars.drawObj[attr][0].updateTime);
+//                                        // this.drawObj[attr] = {};
+//                                        // this.drawObj[attr].rcuId = attr;
+//                                        // this.drawObj[attr].data = perceptionCars.drawObj[attr];
+//                                        // this.drawObj[attr].gpsTime = perceptionCars.drawObj[attr][0].gpsTime;
+//                                        // this.drawObj[attr].updateTime =  perceptionCars.drawObj[attr][0].updateTime;
+//                                    }
+//                                }
+//                                console.log(this.drawObj);
                             }
                         }
                     }
