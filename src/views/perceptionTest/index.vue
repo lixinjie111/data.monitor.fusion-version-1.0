@@ -34,7 +34,8 @@
                     </li> -->
                     <li v-for="items in item.data">
                         <span class="overview-sign perception-sign"></span>
-                        <span>{{items.vehicleId.substr(0,4)+"_"+items.vehicleId.substring(items.vehicleId.length-4)}}: {{items.longitude.toFixed(9)}}, {{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>
+                        <!--<span>{{items.vehicleId.substr(0,4)+"_"+items.vehicleId.substring(items.vehicleId.length-4)}}: {{items.longitude.toFixed(9)}}, {{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>-->
+                        <span>{{items.vehicleId}}: {{items.longitude.toFixed(9)}}, {{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>
                     </li>
                 </ul>
             </div>
@@ -110,7 +111,7 @@
                 runTime: 80,
                 sectionTime: 55,
                 domDateFormat: DateFormat,
-                drawObj: {}
+                drawObj: {},
             }
         },
         filters: {
@@ -132,7 +133,7 @@
             gis3d.initload("cesiumContainer",false);
             perceptionCars.viewer=gis3d.cesium.viewer;
             //获取地图的感知区域
-            // this.getExtend(this.center[0],this.center[1],this.extend);
+            this.getExtend(this.center[0],this.center[1],this.extend);
             this.onMapComplete();
             document.addEventListener('keydown',this.stepHandle);
         },

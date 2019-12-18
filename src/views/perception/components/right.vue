@@ -54,7 +54,7 @@
     import TusvnMap1 from './TusvnMap.vue';
     import DateFormat from '@/utils/date.js'
     import LivePlayer from '@/components/livePlayer'
-    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId} from '@/api/fusion'
+    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId,getAreaByRsId} from '@/api/fusion'
 
     import GIS3D from '@/utils/GIS3D.js' 
     import PerceptionCars from '@/utils/PerceptionCars.js'
@@ -67,8 +67,6 @@
     export default {
         data() {
             return {
-                spatCount:0,
-                signCount:0,
                 center:[],
                 platformWebsocke:null,
                 perceptionWebsocket:null,
@@ -185,7 +183,7 @@
 //                _this.y = utm[1];
                 _this.x = longitude;
                 _this.y = latitude;
-                _this.getExtend(longitude,latitude,extend);
+                _this.currentExtent = _this.getExtend(longitude,latitude,extend);
                 console.log(_this.currentExtent)
                 _this.center=[longitude ,latitude];
             }else{
@@ -194,6 +192,7 @@
                 _this.getExtentCenter();
             }
             _this.getCameraByRsId();
+            _this.getAreaByRsId();
             _this.onMapComplete();
             //判断当前标签页是否被隐藏
             document.addEventListener("visibilitychange",this.processTab);
@@ -220,7 +219,7 @@
                 perceptionCars.pulseInterval = parseInt(this.pulseInterval)*0.8;
                 perceptionCars.perMaxValue = this.pulseInterval*1.5;
 
-                let spatPulse = this.pulseInterval*30;
+                let spatPulse = this.pulseInterval*10;
                 processData.pulseInterval = spatPulse*0.8;
                 processData.spatMaxValue =  spatPulse*1.5;
 
@@ -316,6 +315,21 @@
                     }
                 });
             },
+            getAreaByRsId(){
+                getAreaByRsId({
+                    "rsPtId": this.rsId,
+                    "typeList": ["N","S"]
+                }).then(res=>{
+                    let data = res.data;
+                    let sensingArea = [];
+                    data.forEach(item=>{
+                        if(item.sensingArea!=''){
+                            sensingArea.push(item.sensingArea)
+                        }
+                    });
+
+                });
+            },
             loadComplete(param){
                 this.camList.forEach((item,index)=>{
                     if(param.serialNum==item.serialNum){
@@ -384,26 +398,20 @@
                 ).then(res=>{
                     let signs = res.data[0].baseData.signs;
                     let spats = res.data[0].baseData.spats;
-                    this.signCount=0;
-                    this.spatCount=0;
+                    let signCount=0;
+                    let spatCount=0;
                     if(signs&&signs.length>0){
                         signs.forEach(item=>{
-                            this.signCount++;
+                            signCount++;
                             //将小的转成大的3
 //                            let utm = this.$refs.perceptionMap.coordinateTransfer("EPSG:4326","+proj=utm +zone=49 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",item.centerX, item.centerY);
 //                            this.$refs.perceptionMap.addModel('traffic_sign_stop_0','./static/map3d/models/traffic_sign_stop.3ds',utm[0],utm[1],20);
                         })
                     }
                     if(spats&&spats.length>0) {
-                        spats.forEach(item => {
-                            let spatList = item.spats;
-                            spatList.forEach(spat => {
-                                this.spatCount++;
-                            });
-                        })
+                        this.$parent.spatCount = spats.length;
                     }
-                    this.$parent.spatCount = this.spatCount;
-                    this.$parent.signCount = this.signCount;
+                    this.$parent.signCount = signCount;
 //                    this.$emit("count", this.signCount, this.spatCount);
                 })
             },
@@ -516,11 +524,11 @@
                 this.warningReconnect();
             },
             onWarningOpen(data){
-                //旁车
+                let currentExtent = this.getExtend(this.x,this.y,0.02);
                 let warning ={
                     "action":"cloud_event",
                     "body":{
-                        "region":this.currentExtent,
+                        "region":currentExtent,
                     },
                     "type":1
                 }
@@ -708,11 +716,11 @@
                 this.platformReconnect();
             },
             onPlatformOpen(data){
-
+                let currentExtent = this.getExtend(this.x,this.y,0.02);
                 let platform ={
                     "action": "vehicle",
                     "body": {
-                        "polygon": this.currentExtent
+                        "polygon": currentExtent
                     },
                     "type": 3
                 }
@@ -1022,15 +1030,16 @@
                 return img;
             },
             getExtend(x,y,r){
-                this.currentExtent=[];
+                let currentExtent=[];
                 let x0=x+r;
                 let y0=y+r;
                 let x1=x-r;
                 let y1=y-r;
-                this.currentExtent.push([x1, y0]);
-                this.currentExtent.push([x0, y0]);
-                this.currentExtent.push([x0, y1]);
-                this.currentExtent.push([x1, y1]);
+                currentExtent.push([x1, y0]);
+                currentExtent.push([x0, y0]);
+                currentExtent.push([x0, y1]);
+                currentExtent.push([x1, y1]);
+                return currentExtent;
             },
             processTab(){
                 if(document.visibilityState == "hidden") {
@@ -1096,14 +1105,15 @@
                 if (Object.keys(platCars.platObj).length > 0) {
                     for (let vehicleId in platCars.platObj) {
                         let dataList = platCars.platObj[vehicleId];
-                        /*console.log("*****")
-                        console.log(vehicleId,dataList.length)*/
+                        if(dataList.length>0){
+                            console.log("*******",vehicleId,dataList.length)
+                        }
                         if (dataList.length > 0) {
                             //分割之前将车辆移动到上一个点
                             //将第一个点进行分割
                             let data = dataList.shift();
                             platCars.cacheAndInterpolatePlatformCar(data);
-//                            console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
+                            console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
                         }
                     }
                 }
@@ -1188,7 +1198,7 @@
                     }
 
                     //每隔80ms一次
-                    if(_this.spatPulseCount==0||_this.spatPulseCount>=30){
+                    if(_this.spatPulseCount==0||_this.spatPulseCount>=10){
 //                        console.log(_this.spatPulseCount);
                         _this.spatPulseCount=1;
                         if(Object.keys(processData.spatObj).length>0){

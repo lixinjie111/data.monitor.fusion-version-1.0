@@ -275,7 +275,7 @@
                                         }
                                         marker.on('click', function(e) {
                                             _this.$router.push({
-                                                path: '/perception/'+subItem.deviceId+ "/"+4+ "/"+0.004+"/"+true,
+                                                path: '/perception/'+subItem.deviceId+ "/"+4+ "/"+0.005+"/"+true,
                                                 query:{lng:subItem.longitude,lat:subItem.latitude,isShow:false}
                                             });
                                         });

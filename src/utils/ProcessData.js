@@ -71,6 +71,7 @@ class ProcessCarTrack {
                         diff:diff
                     }
                     rangeData = obj;
+                    minDiff=diff;
                 }else {
                     break;
                 }
@@ -105,7 +106,7 @@ class ProcessCarTrack {
         // console.log("红绿灯最小索引:",minIndex);
         //找出的最小值无效
         if(minDiff&&minDiff>this.spatMaxValue){
-            console.log("spat找到的最小值无效")
+            // console.log("spat找到的最小值无效")
             return;
         }
         //打印出被舍弃的点
@@ -116,10 +117,8 @@ class ProcessCarTrack {
             
         }*/
         lostData.forEach(item=>{
-            let minDiff = Math.abs(time-cacheData[minIndex].spatTime);
-            // console.log("插值最小的索引"+minIndex,minDiff);
-            let d =  Math.abs(time-item.spatTime);
-            // console.log("##"+d);
+            //最小的值
+            console.log("#spat:",minDiff,item.leftTime,item.status,item.spatTime)
         })
 
 
