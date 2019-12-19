@@ -56,9 +56,8 @@
             onmessage(message){
                 let _this = this;
                 let jsonData = JSON.parse(message.data);
-                let result = jsonData.result;
 
-                let data = result.data;
+                let data = jsonData.result.data;
                 let _result = {};
                 let _filterData = {};
                 for(let vehicleId in data){
@@ -109,8 +108,10 @@
                     // console.log(_this.prevData)
                     for(let vehicleId in data){
                         _this.prevData[vehicleId].timer = setTimeout(() => {
-//                            _this.prevData[vehicleId].plateNoMarker.setText(data[vehicleId][0].plateNo+"<br/><span style='color:red'>离线</span>")
+                           // _this.prevData[vehicleId].plateNoMarker.setText(data[vehicleId][0].plateNo+"<br/><span style='color:red'>离线</span>")
                             //3s后消失
+                            _this.prevData[vehicleId].marker.off('click', _this.showView);
+                            _this.prevData[vehicleId].plateNoMarker.off('click', _this.showView);
                             _this.AMap.remove(_this.prevData[vehicleId].marker);
                             _this.AMap.remove(_this.prevData[vehicleId].plateNoMarker);
                             console.log("消失车辆",vehicleId)
@@ -118,16 +119,16 @@
                             _this.$parent.onlineCount--;
                         }, this.timeOut);
                     }
-                } else {
-                    // 返回的数据为空
-                    for (let id in _this.prevData) {
-                        // console.log("delete:-"+_this.prevData[id].plateNo);
-                        _this.prevData[id].marker.off('click', _this.showView);
-                        _this.prevData[id].plateNoMarker.off('click', _this.showView);
-                        _this.AMap.remove(_this.prevData[id].marker);
-                        _this.AMap.remove(_this.prevData[id].plateNoMarker);
-                        delete _this.prevData[id];
-                    }
+                // } else {
+                //     // 返回的数据为空
+                //     for (let id in _this.prevData) {
+                //         // console.log("delete:-"+_this.prevData[id].plateNo);
+                //         _this.prevData[id].marker.off('click', _this.showView);
+                //         _this.prevData[id].plateNoMarker.off('click', _this.showView);
+                //         _this.AMap.remove(_this.prevData[id].marker);
+                //         _this.AMap.remove(_this.prevData[id].plateNoMarker);
+                //         delete _this.prevData[id];
+                //     }
                 }
             },
             addMarker(id,_filterData) {
