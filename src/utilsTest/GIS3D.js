@@ -39,7 +39,7 @@ class GIS3D {
             // orderIndependentTranslucency: false,
             baseLayerPicker: false, //是否显示图层选择控件
             infoBox: false, //是否显示点击要素之后显示的信息
-            
+            shouldAnimate: true
         });
         this.cesium.viewer.scene.globe.depthTestAgainstTerrain = false;
         // this.cesium.viewer.scene.postProcessStages.fxaa.enabled = true;
