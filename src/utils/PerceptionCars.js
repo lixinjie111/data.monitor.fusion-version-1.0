@@ -242,10 +242,10 @@ class PerceptionCars {
         //移动标签
         var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
         if (carlabel == null || carlabel == undefined) {
-          this.addModeCarLabel(d);
+          this.addModeCarLabel(d,3);
         }
         else {
-          this.moveModelLabel(carlabel, d);
+          this.moveModelLabel(carlabel, d,3);
         }
       }
       else if (d.targetType == 3) //摩托车
@@ -254,11 +254,27 @@ class PerceptionCars {
       }
       else if (d.targetType == 5) //公交车
       {
-        this.addMoveModel(true, d, "bus");
+        this.addMoveModel(false, d, "bus");
+        //移动标签
+        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
+        if (carlabel == null || carlabel == undefined) {
+          this.addModeCarLabel(d,5);
+        }
+        else {
+          this.moveModelLabel(carlabel, d,5);
+        }
       }
       else if (d.targetType == 7) //卡车
       {
-        this.addMoveModel(true, d, "truck");
+        this.addMoveModel(false, d, "truck");
+        //移动标签
+        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
+        if (carlabel == null || carlabel == undefined) {
+          this.addModeCarLabel(d,5);
+        }
+        else {
+          this.moveModelLabel(carlabel, d,5);
+        }
       }
 
     }
@@ -462,8 +478,8 @@ class PerceptionCars {
     Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, carmodel.modelMatrix)
 
   }
-  addModeCarLabel(d) {
-    var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + 3);
+  addModeCarLabel(d,height) {
+    var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + height);
     ///////////////增加文字
     let h = d.heading.toFixed(1);
     let s = d.speed.toFixed(1);
@@ -492,9 +508,9 @@ class PerceptionCars {
   /**
    * 移动文字标签
    */
-  moveModelLabel(carlabel, d) {
+  moveModelLabel(carlabel, d,height) {
     //var carlabel = this.viewer.entities.getById( d.vehicleId + "label");
-    carlabel.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + 3);
+    carlabel.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ +height);
     let h = d.heading.toFixed(1);
     let s = d.speed.toFixed(1);
     let veh = d.vehicleId.substr(0, 4);
