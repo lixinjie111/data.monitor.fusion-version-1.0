@@ -34,7 +34,8 @@
                     </li> -->
                     <li v-for="items in item.data">
                         <span class="overview-sign perception-sign"></span>
-                        <span>{{items.vehicleId.substr(0,4)+"_"+items.vehicleId.substring(items.vehicleId.length-4)}}: {{items.longitude.toFixed(9)}}, {{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>
+                        <!--<span>{{items.vehicleId.substr(0,4)+"_"+items.vehicleId.substring(items.vehicleId.length-4)}}: {{items.longitude.toFixed(9)}}, {{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>-->
+                        <span>{{items.vehicleId}}: {{items.longitude.toFixed(9)}}, {{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>
                     </li>
                 </ul>
             </div>
@@ -84,14 +85,15 @@
 </template>
 <script>
     import DateFormat from '@/utils/date.js'
-    import GIS3D from '@/utilsTest2/GIS3D.js'
-    import PerceptionCars from '@/utilsTest2/PerceptionCars.js'
+    import GIS3D from '@/utilsTest/GIS3D.js'
+    import PerceptionCars from '@/utilsTest/PerceptionCars.js'
     let gis3d=new GIS3D();
     let perceptionCars = new PerceptionCars();
     export default {
         data() {
             return {
-                center: [parseFloat(this.$route.query.lng), parseFloat(this.$route.query.lat)],
+//                center: [parseFloat(this.$route.query.lng), parseFloat(this.$route.query.lat)],
+                center: [121.169471,31.283857],
                 extend: parseFloat(this.$route.params.extend),
                 currentExtent: [
                             [121.17403069999999,31.2836193],
@@ -110,7 +112,9 @@
                 runTime: 80,
                 sectionTime: 55,
                 domDateFormat: DateFormat,
-                drawObj: {}
+                drawObj: {},
+                historyDrawObj:{},
+                isFirst:true
             }
         },
         filters: {
@@ -132,7 +136,7 @@
             gis3d.initload("cesiumContainer",false);
             perceptionCars.viewer=gis3d.cesium.viewer;
             //获取地图的感知区域
-            // this.getExtend(this.center[0],this.center[1],this.extend);
+            this.getExtend(this.center[0],this.center[1],this.extend);
             this.onMapComplete();
             document.addEventListener('keydown',this.stepHandle);
         },
@@ -174,20 +178,48 @@
                         // }
                         this.drawCount++;
                         if(Object.keys(perceptionCars.devObj).length>0){
-                            perceptionCars.processPerTrack(this.startGpsTime+(this.drawCount*this.runTime));
+                            let pulseTime = this.startGpsTime+(this.drawCount*this.runTime);
+                            perceptionCars.processPerTrack(pulseTime);
                             console.log("**************************");
                             console.log(perceptionCars.drawObj);
                             for(let attr in perceptionCars.drawObj) {
                                 if(perceptionCars.drawObj[attr].length) {
+                                    //计算data里面车辆数据的距离值
+                                    let data = perceptionCars.drawObj[attr];
+                                    if(this.isFirst){
+                                        data.forEach(item=>{
+                                            item.distance=0;
+                                            item.diff=0;
+                                        });
+                                        this.isFirst=false;
+                                    }else{
+                                        //车辆向历史数据开始找，直到找到为止，如果找不到，距离为0
+                                        for(let i=0;i<this.drawObj[attr].length;i++){
+                                            for(let time in perceptionCars.historyObj){
+                                                if(time<pulseTime){
+                                                    let item = this.drawObj[attr][i];
+                                                    let historyData = perceptionCars.historyObj[time][attr];
+                                                    if(item.diff==0){
+                                                        for(let j=0;j<historyData.length;j++){
+                                                            if(item.vehicleId==historyData[j].vehicleId){
+                                                                let distance = this.computeDistance(item,historyData[j]);
+                                                                let diff = item.gpsTime-historyData[j].gpsTime;
+                                                                item.distance = distance;
+                                                                item.diff = diff;
+                                                                return;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    }
                                     this.$set(this.drawObj,attr,{});
-                                    this.$set(this.drawObj[attr],"data",perceptionCars.drawObj[attr]);
-                                    this.$set(this.drawObj[attr],"gpsTime",perceptionCars.drawObj[attr][0].gpsTime);
-                                    this.$set(this.drawObj[attr],"updateTime",perceptionCars.drawObj[attr][0].updateTime);
-                                    // this.drawObj[attr] = {};
-                                    // this.drawObj[attr].rcuId = attr;
-                                    // this.drawObj[attr].data = perceptionCars.drawObj[attr];
-                                    // this.drawObj[attr].gpsTime = perceptionCars.drawObj[attr][0].gpsTime;
-                                    // this.drawObj[attr].updateTime =  perceptionCars.drawObj[attr][0].updateTime;
+                                    this.$set(this.drawObj[attr],"data",data);
+                                    this.$set(this.drawObj[attr],"gpsTime",data[0].gpsTime);
+                                    this.$set(this.drawObj[attr],"updateTime",data[0].updateTime);
+                                    this.historyDrawObj[pulseTime] = this.drawObj;
                                 }
                             }
                             console.log(this.drawObj);
@@ -198,27 +230,55 @@
                         if(this.drawCount>0) {
                             this.drawCount--;
                             if(Object.keys(perceptionCars.devObj).length>0){
-                                perceptionCars.processPerTrack(this.startGpsTime+(this.drawCount*this.runTime));
-                                console.log("**************************");
-                                console.log(perceptionCars.drawObj);
-                                for(let attr in perceptionCars.drawObj) {
-                                    if(perceptionCars.drawObj[attr].length) {
-                                        this.$set(this.drawObj,attr,{});
-                                        this.$set(this.drawObj[attr],"data",perceptionCars.drawObj[attr]);
-                                        this.$set(this.drawObj[attr],"gpsTime",perceptionCars.drawObj[attr][0].gpsTime);
-                                        this.$set(this.drawObj[attr],"updateTime",perceptionCars.drawObj[attr][0].updateTime);
-                                        // this.drawObj[attr] = {};
-                                        // this.drawObj[attr].rcuId = attr;
-                                        // this.drawObj[attr].data = perceptionCars.drawObj[attr];
-                                        // this.drawObj[attr].gpsTime = perceptionCars.drawObj[attr][0].gpsTime;
-                                        // this.drawObj[attr].updateTime =  perceptionCars.drawObj[attr][0].updateTime;
+                                let upPulseTime = this.startGpsTime+(this.drawCount*this.runTime);
+                                for(let time in this.historyDrawObj){
+                                    if(time==upPulseTime){
+                                        this.drawObj={};
+                                        this.drawObj=this.historyDrawObj[time];
+                                        for(let devId in this.drawObj){
+                                            let fusionList = this.drawObj[devId].data;
+                                            if(fusionList.length) {
+                                                this.processPerceptionMesage(fusionList,false,time);
+                                            }
+                                        }
                                     }
                                 }
-                                console.log(this.drawObj);
+//                                perceptionCars.processPerTrack(this.startGpsTime+(this.drawCount*this.runTime));
+//                                console.log("**************************");
+//                                console.log(perceptionCars.drawObj);
+//                                for(let attr in perceptionCars.drawObj) {
+//                                    if(perceptionCars.drawObj[attr].length) {
+//                                        this.$set(this.drawObj,attr,{});
+//                                        this.$set(this.drawObj[attr],"data",perceptionCars.drawObj[attr]);
+//                                        this.$set(this.drawObj[attr],"gpsTime",perceptionCars.drawObj[attr][0].gpsTime);
+//                                        this.$set(this.drawObj[attr],"updateTime",perceptionCars.drawObj[attr][0].updateTime);
+//                                        // this.drawObj[attr] = {};
+//                                        // this.drawObj[attr].rcuId = attr;
+//                                        // this.drawObj[attr].data = perceptionCars.drawObj[attr];
+//                                        // this.drawObj[attr].gpsTime = perceptionCars.drawObj[attr][0].gpsTime;
+//                                        // this.drawObj[attr].updateTime =  perceptionCars.drawObj[attr][0].updateTime;
+//                                    }
+//                                }
+//                                console.log(this.drawObj);
                             }
                         }
                     }
                 }
+            },
+            computeDistance(drawCar,historyCar){
+                let lat1 = drawCar.latitude;
+                let lat2 = historyCar.latitude;
+                let lng1 = drawCar.longitude;
+                let lng2 = historyCar.longitude;
+                let radLat1 = lat1*Math.PI / 180.0;
+                let radLat2 = lat2*Math.PI / 180.0;
+                let a = radLat1 - radLat2;
+                let  b = lng1*Math.PI / 180.0 - lng2*Math.PI / 180.0;
+                let s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) +
+                    Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
+                s = s *6378.137 ;// EARTH_RADIUS;
+                s = parseInt(Math.round(s * 10000) / 10);
+                return s;
             },
             //感知车
             initPerceptionWebSocket(){

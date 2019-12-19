@@ -41,6 +41,7 @@ class PerceptionCars {
     processPerTrack(time){
         //保存一帧的数据
         let _drawObj = {};
+        let list = [];
         for (let devId in this.devObj) {
             let devCacheData = this.devObj[devId];
             if(devCacheData&&devCacheData.length>0){
@@ -52,7 +53,7 @@ class PerceptionCars {
                 let fusionList = devData.data.data;
                 if(fusionList.length) {
                   _drawObj[devId] = fusionList;
-                  this.processPerceptionMesage(devData.data.data,false,time);
+                    list.push.apply(list,fusionList);
                 }
                 // return devData;
             }else{
@@ -60,12 +61,20 @@ class PerceptionCars {
             }
         }
         this.drawObj = _drawObj;
-        this.historyObj[time]=_drawObj;
-        console.log("过滤数据--------------");
-        console.log(this.drawObj);
-        if(!Object.keys(this.drawObj).length) {
-          this.clearAllModel();
-        }
+        // if(!Object.keys(this.drawObj).length) {
+        //     this.clearAllModel();
+        // }
+        console.log("集合的长度："+list.length);
+        this.processPerceptionMesage(list,false,time);
+
+        // if(!Object.keys(this.drawObj).length) {
+        //   this.clearAllModel();
+        // }else{
+        //     this.drawObj = _drawObj;
+        //     this.historyObj[time]=_drawObj;
+        //     console.log("过滤数据--------------");
+        //     console.log(this.drawObj);
+        // }
 
     }
     getMinValue(devId,time,cacheData){
@@ -173,13 +182,13 @@ class PerceptionCars {
             let carModel = this.getModelForPrimitive(d.vehicleId + "carbox");//this.deviceModels.cars[d.vehicleId+"car"];
             if (carModel == null) {
               let modelShow = this.getShowModelPrimitive("carbox");
-              if (modelShow != null) {
-                this.moveModel(modelShow, d, "carbox");
-              } else {
+              // if (modelShow != null) {
+              //   this.moveModel(modelShow, d, "carbox");
+              // } else {
                   //判断如果等或者大于360度，设置红色
                 //初始化增加车辆 如果没有隐藏车辆的模型
                 this.addModeCar(d, "carbox", "carbox");
-              }
+              // }
             }
             else {
               this.moveModel(carModel, d, "carbox");
@@ -189,13 +198,13 @@ class PerceptionCars {
             //移动标签
             var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
             if (carlabel == null || carlabel == undefined) {
-              let modelLabelshow = this.getShowModelLabelEntitie();
-              if (modelLabelshow) {
-                this.moveModelLabel(modelLabelshow, d, time);
-              }
-              else {
+              // let modelLabelshow = this.getShowModelLabelEntitie();
+              // if (modelLabelshow) {
+              //   this.moveModelLabel(modelLabelshow, d, time);
+              // }
+              // else {
                 this.addModeCarLabel(d, time);
-              }
+              // }
             }
             else {
               this.moveModelLabel(carlabel, d, time);
@@ -433,7 +442,7 @@ class PerceptionCars {
       let handleTime = d.updateTime-d.gpsTime;
       carlabel.show = true;
       // carlabel.label.text = "[航向角:" + h + ", 速度:" + s +", 车辆ID:"+ veh+", 设备ID:"+ devId+", gpsTime:"+ gpsTime+", updateTime:"+updateTime+", 处理时间:"+handleTime+", 当前绘制的gpsTime:"+time+", 当前绘制的gpsTime-gpsTime:"+(time-gpsTime)+"]";
-      text: veh;
+      carlabel.label.text=veh;
     }
     getShowModelLabelEntitie() {
       var entities = this.viewer.entities._entities._array;

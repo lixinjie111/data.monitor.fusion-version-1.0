@@ -389,7 +389,7 @@ class ProcessCarTrack {
 
             }
         }
-        console.log("平台车最小索引:",vid,minIndex,cacheData.length,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'));
+        console.log("平台车最小索引:",vid,minIndex,cacheData.length,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'),DateFormat.formatTime(new Date().getTime(),'hh:mm:ss:ms'));
         if (minDiff&&minDiff>this.platMaxValue){
             console.log("plat找到最小值无效")
             return;
