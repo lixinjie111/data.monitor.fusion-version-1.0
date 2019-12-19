@@ -217,7 +217,6 @@
                 let camParam;
                 gis3d.addRectangle(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
 
-
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
                     gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
@@ -232,8 +231,8 @@
                 this.mapInitTime = setInterval(()=>{
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
-                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-//                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+//                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
                         this.getData();
                         clearInterval(this.mapInitTime);
                         this.mapShow=true;
@@ -731,9 +730,16 @@
                     "action":"road_real_data_per",
                     "data":{
                         "type":1,
-                        "polygon":this.currentExtent
+                        "polygon":[[121.164471,31.288857],[121.174471,31.288857],[121.174471,31.278857000000002],[121.164471,31.278857000000002]]
                     }
                 }
+//                let perception ={
+//                    "action":"road_real_data_per",
+//                    "data":{
+//                        "type":1,
+//                        "polygon":this.currentExtent
+//                    }
+//                }
                 let perceptionMsg = JSON.stringify(perception);
                 this.sendPerceptionMsg(perceptionMsg);
             },

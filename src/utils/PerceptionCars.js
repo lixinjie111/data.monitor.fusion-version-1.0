@@ -100,6 +100,7 @@ class PerceptionCars {
     }
     processPerTrack(time,delayTime){
         let devList = [];
+        let list = [];
         for (let devId in this.cacheAndInterpolateDataByDevId) {
             let devCacheData = this.cacheAndInterpolateDataByDevId[devId];
             if(devCacheData&&devCacheData.cacheData.length>0){
@@ -116,10 +117,13 @@ class PerceptionCars {
                 let fusionList = devData.data;
                 // console.log(devData)
                 // console.log("*****"+fusionList)
-                this.processPerceptionMesage(fusionList);
+                if(fusionList.length) {
+                    list.push.apply(list,fusionList);
+                }
                 devList.push(devData);
             }
         }
+        this.processPerceptionMesage(list);
         return devList;
     }
     getMinValue(devId,time,delayTime,cacheData){
