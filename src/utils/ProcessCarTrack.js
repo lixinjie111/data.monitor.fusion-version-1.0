@@ -270,7 +270,7 @@ class ProcessCarTrack {
                 let x = itemSide[i].longitude;
                 let y = itemSide[i].latitude;
                 let _line = function line(result) {
-                    return Cesium.Cartesian3.fromDegreesArrayHeights([d.longitude, d.latitude, 1, x, y, 10], Cesium.Ellipsoid.WGS84, result);
+                    return Cesium.Cartesian3.fromDegreesArrayHeights([d.longitude, d.latitude, 1, x, y, 6.3], Cesium.Ellipsoid.WGS84, result);
                 }
 
                 if (Math.abs(GisUtils.getDistance(itemSide[i].latitude, itemSide[i].longitude, d.latitude, d.longitude)) > 0.1)

@@ -216,7 +216,7 @@ class GIS3D {
                 labels.add({
                     fillColor: Cesium.Color.BLACK,
                     backgroundColor: Cesium.Color.fromCssColorString('#fff'),
-                    position: Cesium.Cartesian3.fromDegrees(itemSide[i].longitude, itemSide[i].latitude, 10 + this.defualtZ),
+                    position: Cesium.Cartesian3.fromDegrees(itemSide[i].longitude, itemSide[i].latitude, 8 + this.defualtZ),
                     text: itemSide[i].devName,
                     font: '14px sans-serif',
                     showBackground: true,

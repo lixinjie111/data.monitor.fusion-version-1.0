@@ -227,25 +227,40 @@ class PerceptionCars {
         // 不处理小于0的的数据
         continue;
       }
-      if (d.targetType == 0 || d.targetType == 1 || d.targetType == 3) {
+      if (d.targetType == 0) {//人
         this.addMoveModel(true, d, "person");
-      } else {
-        if (d.fuselStatus == 0) {
-          // console.log(d.vehicleId)
-          /////////////处理感知车数据
-          this.addMoveModel(false, d, "carbox");
-          ///////////////////////////end
-
-          //移动标签
-          var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
-          if (carlabel == null || carlabel == undefined) {
-            this.addModeCarLabel(d);
-          }
-          else {
-            this.moveModelLabel(carlabel, d);
-          }
+      }
+      else if (d.targetType == 1) //自行车
+      {
+        this.addMoveModel(true, d, "bicycle");
+      }
+      else if (d.targetType == 2) { //感知车
+        // console.log(d.vehicleId)
+        /////////////处理感知车数据
+        this.addMoveModel(false, d, "carbox");
+        ///////////////////////////end 
+        //移动标签
+        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
+        if (carlabel == null || carlabel == undefined) {
+          this.addModeCarLabel(d);
+        }
+        else {
+          this.moveModelLabel(carlabel, d);
         }
       }
+      else if (d.targetType == 3) //摩托车
+      {
+        this.addMoveModel(true, d, "motorbike");
+      }
+      else if (d.targetType == 5) //公交车
+      {
+        this.addMoveModel(true, d, "bus");
+      }
+      else if (d.targetType == 7) //卡车
+      {
+        this.addMoveModel(true, d, "truck");
+      }
+
     }
     // },0); //
   }
@@ -288,6 +303,11 @@ class PerceptionCars {
   clearModel(fusionList) {
     this.clearCar(fusionList, "carbox");
     this.clearCar(fusionList, "person");
+    this.clearCar(fusionList, "bicycle");
+    this.clearCar(fusionList, "motorbike"); 
+    this.clearCar(fusionList, "bus");
+    this.clearCar(fusionList, "truck");
+
     this.clearCarLabel(fusionList);
   }
   clearCarLabel(fusionList) {
