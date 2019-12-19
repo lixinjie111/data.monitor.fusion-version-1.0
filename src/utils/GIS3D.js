@@ -42,6 +42,7 @@ class GIS3D {
             imageryProvider: new Cesium.SingleTileImageryProvider({
                 url: 'static/map3d/images/back.png'//透明图片
             }),
+            shouldAnimate: true
         });
         this.cesium.viewer.scene.globe.depthTestAgainstTerrain = false;
         // this.cesium.viewer.scene.postProcessStages.fxaa.enabled = true;
@@ -216,7 +217,7 @@ class GIS3D {
                 labels.add({
                     fillColor: Cesium.Color.BLACK,
                     backgroundColor: Cesium.Color.fromCssColorString('#fff'),
-                    position: Cesium.Cartesian3.fromDegrees(itemSide[i].longitude, itemSide[i].latitude, 10 + this.defualtZ),
+                    position: Cesium.Cartesian3.fromDegrees(itemSide[i].longitude, itemSide[i].latitude, 8 + this.defualtZ),
                     text: itemSide[i].devName,
                     font: '14px sans-serif',
                     showBackground: true,
