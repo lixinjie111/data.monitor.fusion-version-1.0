@@ -214,37 +214,40 @@
                 processData.cancelMaxValue = cancelPulse*1.5;
 
                 let count=0;
+                let camParam;
                 gis3d.addRectangle(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
 
-                this.updateCameraPosition();
-                // 5s没有 默认值
+
+                if(this.camList.length>0&&this.camList[0].camParam){
+                    camParam = this.camList[0].camParam;
+                    gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+//                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
+//                    gis3d.updateCameraPosition(121.1727923, 31.2840917,39,70,-0.2369132859032279, 0.0029627735803421373);
+//                    gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                    this.getData();
+                    this.mapShow=true;
+                    return;
+                }
+
                 this.mapInitTime = setInterval(()=>{
-                    this.updateCameraPosition();
+                    if(this.camList.length>0&&this.camList[0].camParam){
+                        camParam = this.camList[0].camParam;
+                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+//                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        this.getData();
+                        clearInterval(this.mapInitTime);
+                        this.mapShow=true;
+                        return;
+                    }
                     count++;
                     if(count==10){
-                        this.updateCameraPosition();
+                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+//                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        this.getData();
+                        this.mapShow=true;
+                        clearInterval(this.mapInitTime);
                     }
                 },100)
-                this.getData();
-            },
-            updateCameraPosition() {
-                if(this.camList && this.camList.length>0 && this.camList[0].camParam){
-                    let {x, y, z, radius, pitch, yaw} = this.camList[0].camParam;
-                    gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
-                    this.mapShow=true;
-                    if(this.mapInitTime) {
-                        clearInterval(this.mapInitTime);
-                    }
-                    this.getData();
-                    return;
-                }else {
-                    let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
-                    gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
-                    this.mapShow=true;
-                    if(this.mapInitTime) {
-                        clearInterval(this.mapInitTime);
-                    }
-                }
             },
             getData(){
                 this.typeRoadData();
@@ -302,6 +305,13 @@
                             sensingArea.push(item.sensingArea)
                         }
                     });
+                    // let hierarchy = [
+                    //     112.953651652808389, 28.329121301607586, 50,
+                    //     112.953927670284997, 28.328597820186189, 50,
+                    //     112.952570766104373, 28.327743594794072, 50,
+                    //     112.952201968003351, 28.328177801283175, 50,
+                    //     112.953651652808276, 28.329121301607586, 50
+                    // ];
 
                 });
             },
@@ -333,7 +343,7 @@
                 if(param==-1){
                     this.param=-1;
                     this.isActive=-1;
-                    gis3d.updatePosition(121.063,31.113,121.431,31.371);
+                    gis3d.updatePosition(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
                     // gis3d.updatePosition(this.x,this.y,121.431,31.371);
                     return;
                 }
