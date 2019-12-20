@@ -59,15 +59,17 @@
                   border-radius: 3px;
                 }
                 .driving-trans {
+                  width: 26px;
                   font-size: 24px;
                   color: #dc8c00;
                   font-weight: bold;
+                  text-align: center;
                 }
                 .direction {
                   width: 16px;
                   background: url("../../../assets/images/carMonitor/arrow.png")
                     no-repeat center center;
-                  background-size: auto 24px;
+                  background-size: 16px auto;
                   transform-origin: center center !important;
                 }
               }

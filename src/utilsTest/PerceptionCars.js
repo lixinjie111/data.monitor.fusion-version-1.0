@@ -155,8 +155,8 @@ class PerceptionCars {
       data: minData
     };
   }
-  //绘制感知车
-  processPerceptionMesage(fusionList, flag, time) {
+   //绘制感知车
+   processPerceptionMesage(fusionList, flag) {
     let _this = this;
 
     // _this.processPerceptionDataIntervalId = setInterval(() => {
@@ -178,34 +178,65 @@ class PerceptionCars {
         // 不处理小于0的的数据
         continue;
       }
-      if (d.targetType == 0 || d.targetType == 1 || d.targetType == 3) {
-        this.addMoveModel(true,d, "person");
-      } else {
-        if (d.fuselStatus == 0) {
-          // console.log(d.vehicleId)
-          /////////////处理感知车数据
-          this.addMoveModel(false,d, "carbox");
-          ///////////////////////////end
-
-          //移动标签
-          var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
-          if (carlabel == null || carlabel == undefined) { 
-            this.addModeCarLabel(d, time); 
-          }
-          else {
-            this.moveModelLabel(carlabel, d, time);
-          } 
+      if (d.targetType == 0) {//人
+        this.addMoveModel(true, d, "person");
+      }
+      else if (d.targetType == 1) //自行车
+      {
+        this.addMoveModel(true, d, "bicycle");
+      }
+      else if (d.targetType == 2) { //感知车
+        // console.log(d.vehicleId)
+        /////////////处理感知车数据
+        this.addMoveModel(false, d, "carbox");
+        ///////////////////////////end 
+        //移动标签
+        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
+        if (carlabel == null || carlabel == undefined) {
+          this.addModeCarLabel(d,3);
+        }
+        else {
+          this.moveModelLabel(carlabel, d,3);
         }
       }
+      else if (d.targetType == 3) //摩托车
+      {
+        this.addMoveModel(true, d, "motorbike");
+      }
+      else if (d.targetType == 5) //公交车
+      {
+        this.addMoveModel(false, d, "bus");
+        //移动标签
+        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
+        if (carlabel == null || carlabel == undefined) {
+          this.addModeCarLabel(d,5);
+        }
+        else {
+          this.moveModelLabel(carlabel, d,5);
+        }
+      }
+      else if (d.targetType == 7) //卡车
+      {
+        this.addMoveModel(false, d, "truck");
+        //移动标签
+        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
+        if (carlabel == null || carlabel == undefined) {
+          this.addModeCarLabel(d,5);
+        }
+        else {
+          this.moveModelLabel(carlabel, d,5);
+        }
+      }
+
     }
     // },0); //
   }
   //增加移动模型
-  addMoveModel(isAnimation,d, name) {
+  addMoveModel(isAnimation, d, name) {
     let carModel = this.getModelForPrimitive(d.vehicleId + name);//this.deviceModels.cars[d.vehicleId+"car"];
     if (carModel == null) {
       //初始化增加车辆 如果没有隐藏车辆的模型
-      this.addModeCar(isAnimation,d, name, name);
+      this.addModeCar(isAnimation, d, name, name);
     }
     else {
       this.moveModel(carModel, d, name);
@@ -239,6 +270,10 @@ class PerceptionCars {
   clearModel(fusionList) {
     this.clearCar(fusionList, "carbox");
     this.clearCar(fusionList, "person");
+    this.clearCar(fusionList, "bicycle");
+    this.clearCar(fusionList, "motorbike"); 
+    this.clearCar(fusionList, "bus");
+    this.clearCar(fusionList, "truck");
     this.clearCarLabel(fusionList);
   }
   clearCarLabel(fusionList) {
@@ -297,7 +332,7 @@ class PerceptionCars {
    * 增加车辆
    * @param {数据} d 
    */
-  addModeCar(isAnimation,d, name, glbName) {
+  addModeCar(isAnimation, d, name, glbName) {
     var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ);
     var heading = Cesium.Math.toRadians(d.heading);
     var pitch = 0;
@@ -320,19 +355,18 @@ class PerceptionCars {
       //   scale : 3.0     //放大倍数
       // debugWireframe:true
     }));
-    if(isAnimation)
-    {
-  //添加动画
-            Cesium.when(model.readyPromise).then(function (model) {
-              model.activeAnimations.addAll({
-                    loop: Cesium.ModelAnimationLoop.REPEAT,//控制重复
-                    speedup: 0.5, // 速度，相对于clock
-                    reverse: false // 动画反转
-                })
-            });
+    if (isAnimation) {
+      //添加动画
+      Cesium.when(model.readyPromise).then(function (model) {
+        model.activeAnimations.addAll({
+          loop: Cesium.ModelAnimationLoop.REPEAT,//控制重复
+          speedup: 0.5, // 速度，相对于clock
+          reverse: false // 动画反转
+        })
+      });
     }
-     
-             
+
+
   }
   removeModelPrimitives(name) {
     var primitives = this.viewer.scene.primitives;
@@ -394,8 +428,8 @@ class PerceptionCars {
     Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, carmodel.modelMatrix)
 
   }
-  addModeCarLabel(d, time) {
-    var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + 3);
+  addModeCarLabel(d, height) {
+    var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + height);
     ///////////////增加文字
     let h = d.heading.toFixed(1);
     let s = d.speed.toFixed(1);
@@ -428,9 +462,9 @@ class PerceptionCars {
   /**
    * 移动文字标签
    */
-  moveModelLabel(carlabel, d, time) {
+  moveModelLabel(carlabel, d, height) {
     //var carlabel = this.viewer.entities.getById( d.vehicleId + "label");
-    carlabel.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + 3);
+    carlabel.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + height);
     let h = d.heading.toFixed(1);
     let s = d.speed.toFixed(1);
     let veh = d.vehicleId.substr(0, 4) + "_" + d.vehicleId.substring(d.vehicleId.length - 4);
