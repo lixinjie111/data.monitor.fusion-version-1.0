@@ -1,7 +1,7 @@
 <template>
     <div class="fusion-left-style">
         <div class="fusion-left-main left-style">
-            <p class="c-title" style="margin-top: 0px;">融合结果</p>
+            <!--<p class="c-title" style="margin-top: 0px;">融合结果</p>
             <ul class="perception-style">
                 <li>
                     <span class="overview-sign fusion-sign"></span>
@@ -15,7 +15,7 @@
                     <span class="overview-sign fusion-sign"></span>
                     <span>融合后行人：{{perceptionData.person || 0}}</span>
                 </li>
-            </ul>
+            </ul>-->
             <p class="c-title">感知数据</p>
             <ul  class="perception-style">
                 <li>

@@ -1,5 +1,7 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
+        <!--<div style="position: absolute;top: 200px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="shutDown">关闭</div>-->
+        <!--<div style="position: absolute;top: 300px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="open">开启</div>-->
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
@@ -110,10 +112,14 @@
                 staticPulseCount:0,
                 staticCacheCount:0,
                 warningCacheCount:0,
+                perPulseCount:0,
+
 
                 staticWarning:[],
                 dynamicWarning:[],
                 removeWarning:[],
+
+                isShutDown:false
             }
         },
         props:{
@@ -670,6 +676,9 @@
                 }
             },
             platformReconnect(){
+                if(this.isShutDown){
+                    return;
+                }
                 //实例销毁后不进行重连
                 if(this._isDestroyed){
                     return;
@@ -754,6 +763,9 @@
                 }
             },
             perceptionReconnect(){
+                if(this.isShutDown){
+                    return;
+                }
                 //实例销毁后不进行重连
                 if(this._isDestroyed){
                     return;
@@ -850,6 +862,9 @@
                 }
             },
             spatReconnect(){
+                if(this.isShutDown){
+                    return;
+                }
                 //实例销毁后不进行重连
                 if(this._isDestroyed){
                     return;
@@ -1005,9 +1020,9 @@
                 if(_this.pulseNowTime==''){
                    _this.initPerceptionWebSocket();
                    _this.initPlatformWebSocket();
-                   _this.initWarningWebSocket();
+//                   _this.initWarningWebSocket();
                    _this.initSpatWebSocket();
-                   _this.initCancelWarningWebSocket();
+//                   _this.initCancelWarningWebSocket();
                 }
                 _this.pulseNowTime = result.timestamp;
                 _this.pulseCount++;
@@ -1069,42 +1084,6 @@
                     //当平台车开始插值时，调用其他接口
                     _this.processDataTime = result.timestamp-_this.delayTime;
 //                    console.log(_this.pulseCount,_this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
-                    if(Object.keys(perceptionCars.devObj).length>0){
-                        let perList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
-                        if(perList){
-                            if(perList.length>0){
-                                _this.processPerData(perList[0]);
-                                let pernum = 0;
-                                let persons = 0;
-                                let nonNum = 0;
-                                let perData={};
-                                perList.forEach(item=>{
-                                    let cars = item.data;
-                                    if(cars.length>0) {
-                                        for (let i = 0; i < cars.length; i++) {
-                                            let obj = cars[i];
-                                            if (obj.targetType == 0){
-                                                persons++;
-                                            }
-
-                                            if (obj.targetType == 2||obj.targetType == 5 || obj.targetType == 7) {
-                                                pernum++;
-                                            }
-
-                                            if(obj.targetType == 1 || obj.targetType == 3){
-                                                nonNum++;
-                                            }
-                                        }
-                                    }
-                                });
-                                perData['veh']=pernum;
-                                perData['person'] = persons;
-                                perData['noMotor'] = nonNum;
-//                                console.log(perData)
-                                this.$parent.perceptionData = perData;
-                            }
-                        }
-                    }
                     //平台车
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
                        let platCar =  platCars.processPlatformCarsTrack(result.timestamp,_this.delayTime);
@@ -1141,6 +1120,47 @@
                         }
                     }
                     _this.spatPulseCount++;
+
+                    if(_this.perPulseCount==0||_this.perPulseCount>=2){
+                        _this.perPulseCount=1;
+                        if(Object.keys(perceptionCars.devObj).length>0){
+                            let perList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
+                            if(perList){
+                                if(perList.length>0){
+                                    _this.processPerData(perList[0]);
+                                    let pernum = 0;
+                                    let persons = 0;
+                                    let nonNum = 0;
+                                    let perData={};
+                                    perList.forEach(item=>{
+                                        let cars = item.data;
+                                        if(cars.length>0) {
+                                            for (let i = 0; i < cars.length; i++) {
+                                                let obj = cars[i];
+                                                if (obj.targetType == 0){
+                                                    persons++;
+                                                }
+
+                                                if (obj.targetType == 2||obj.targetType == 5 || obj.targetType == 7) {
+                                                    pernum++;
+                                                }
+
+                                                if(obj.targetType == 1 || obj.targetType == 3){
+                                                    nonNum++;
+                                                }
+                                            }
+                                        }
+                                    });
+                                    perData['veh']=pernum;
+                                    perData['person'] = persons;
+                                    perData['noMotor'] = nonNum;
+//                                console.log(perData)
+                                    this.$parent.perceptionData = perData;
+                                }
+                            }
+                        }
+                    }
+                    _this.perPulseCount++
                 }
 
                 //执行动态告警
@@ -1179,6 +1199,8 @@
                     }
                 }
                 _this.staticPulseCount++;
+
+
             },
             onPulseClose(data){
                 console.log("感知车结束连接");
@@ -1211,6 +1233,9 @@
                 }
             },
             pulseReconnect(){
+                if(this.isShutDown){
+                    return;
+                }
                 //实例销毁后不进行重连
                 if(this._isDestroyed){
                     return;
@@ -1223,6 +1248,19 @@
                 //重连不能超过5次
                 this.pulseConnectCount++;
             },
+            shutDown(){
+                this.isShutDown=true;
+                this.warningWebsocket&&this.warningWebsocket.close();
+                this.cancelWarningWebsocket&&this.cancelWarningWebsocket.close();
+                this.platformWebsocket&&this.platformWebsocket.close();
+                this.perceptionWebsocket&&this.perceptionWebsocket.close();
+                this.spatWebsocket&&this.spatWebsocket.close();
+                this.pulseWebsocket&&this.pulseWebsocket.close();
+            },
+            open(){
+                this.isShutDown=false;
+                this.initPulseWebSocket();
+            }
         },
         destroyed(){
             gis3d.destroyed();
