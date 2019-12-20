@@ -11,7 +11,7 @@
                     <live-player
                             :requestVideoUrl="requestVideoUrl"
                             :params="item.params"
-                            type="wsUrl"
+                            type="flvUrl"
                             :autoplay="false"
                             :ref="'player'+index"
                     >
