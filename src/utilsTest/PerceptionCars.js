@@ -162,7 +162,7 @@ class PerceptionCars {
         continue;
       }
       if (d.targetType == 0 || d.targetType == 1 || d.targetType == 3) {
-        this.addMoveModel(true,d, "man_zou");
+        this.addMoveModel(true,d, "person");
       } else {
         if (d.fuselStatus == 0) {
           // console.log(d.vehicleId)
