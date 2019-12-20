@@ -343,7 +343,7 @@ class ProcessCarTrack {
         //找到满足条件的范围
         for(let i=0;i<cacheData.length;i++){
             let diff = Math.abs(time-cacheData[i].gpsTime-delayTime);
-            console.log(vid,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
+            // console.log(vid,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
             if(diff<this.pulseInterval){
                 if(startIndex !=-1 && i != startIndex+1) {
                     break;
@@ -389,10 +389,10 @@ class ProcessCarTrack {
 
             }
         }
-        console.log("平台车最小索引:",vid,minIndex)
+        // console.log("平台车最小索引:",vid,minIndex)
         // console.log("平台车最小索引:",vid,minIndex,cacheData.length,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'),DateFormat.formatTime(new Date().getTime(),'hh:mm:ss:ms'));
         if (minDiff&&minDiff>this.platMaxValue){
-            console.log("plat找到最小值无效")
+            // console.log("plat找到最小值无效")
             return;
         }
         //打印出被舍弃的点

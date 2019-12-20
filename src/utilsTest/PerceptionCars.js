@@ -80,10 +80,13 @@ class PerceptionCars {
   getMinValue(devId, time, cacheData) {
     let rangeData = null;
     let startIndex = -1;
+      let minIndex = -1;
+      let minData = {};
+      let minDiff;
     //找到满足条件的范围
     for (let i = 0; i < cacheData.length; i++) {
       let diff = Math.abs(time - cacheData[i].gpsTime);
-      // console.log(devId,cacheData.length,time,parseInt(cacheData[i].gpsTime),diff,i)
+      console.log(devId,cacheData.length,time,parseInt(cacheData[i].gpsTime),diff,i)
       if (diff < this.pulseInterval) {
         if (startIndex != -1 && i != startIndex + 1) {
           break;
@@ -95,6 +98,7 @@ class PerceptionCars {
             delayTime: diff,
             data: cacheData[i]
           }
+          minDiff=diff;
           rangeData = obj;
         } else {
           break;
@@ -105,9 +109,6 @@ class PerceptionCars {
         }
       }
     }
-    let minIndex = -1;
-    let minData = {};
-    let minDiff;
     //如果能找到最小范围
     // console.log(rangeData)
     if (rangeData) {
@@ -122,6 +123,7 @@ class PerceptionCars {
         if (diff < minDiff) {
           minData = cacheData[i];
           minIndex = i;
+          minDiff=diff;
         }
 
       }
@@ -132,6 +134,21 @@ class PerceptionCars {
       console.log("per找到最小值无效")
       return;
     }
+      //打印出被舍弃的点
+      let lostData = cacheData.filter((item, index) => {
+          return index < minIndex;
+      })
+      if(lostData.length>0){
+          console.log("丢失数据长度",lostData.length);
+      }
+      // lostData.forEach(item => {
+      //     let d = Math.abs(time - parseInt(item.gpsTime));
+      //     console.log("丢失的数据：",devId,item.gpsTime,d,minDiff);
+      //     console.log("此帧车辆数据的长度：",item.data.length);
+      //     item.data.forEach(data=>{
+      //         console.log("车辆数据：",data);
+      //     });
+      // })
     //返回距离标尺的最小插值的数据
     return {
       index: minIndex,

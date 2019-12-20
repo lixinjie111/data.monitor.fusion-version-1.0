@@ -100,30 +100,39 @@ class PerceptionCars {
   }
   processPerTrack(time, delayTime) {
     let devList = [];
+      let list = [];
     for (let devId in this.cacheAndInterpolateDataByDevId) {
       let devCacheData = this.cacheAndInterpolateDataByDevId[devId];
       if (devCacheData && devCacheData.cacheData.length > 0) {
         let devData = this.getMinValue(devId, time, delayTime, devCacheData.cacheData);
-        if (!devData) {
+        if (!devData){
           console.log("没有找到相应的值")
           return;
         }
-        if (this.drawnObj[devId] != '' && devData.batchId == this.drawnObj[devId]) {
-          // console.log("重复绘制的点"+devId+"  ,"+DateFormat.formatTime(devData.batchId,'hh:mm:ss'))
-          return;
-        }
+        // if (this.drawnObj[devId] != '' && devData.batchId == this.drawnObj[devId]) {
+        //   // console.log("重复绘制的点"+devId+"  ,"+DateFormat.formatTime(devData.batchId,'hh:mm:ss'))
+        //   return;
+        // }
         this.drawnObj[devId] = devData.batchId;
         let fusionList = devData.data;
+          if(fusionList.length) {
+              list.push.apply(list,fusionList);
+          }
         // console.log(devData)
         // console.log("*****"+fusionList)
         this.processPerceptionMesage(fusionList);
         devList.push(devData);
       }
     }
+    // list.forEach(item=>{
+    //   item.vehicleId =Math.random()*1000+"a" ;
+    // })
+      this.processPerceptionMesage(list);
     return devList;
   }
   getMinValue(devId, time, delayTime, cacheData) {
     /* let minDiff = Math.abs(time-minData.gpsTime-delayTime);*/
+    console.log("-----------");
     let rangeData = null;
     let startIndex = -1;
     let minIndex = -1;
@@ -145,6 +154,7 @@ class PerceptionCars {
             delayTime: diff,
             data: cacheData[i]
           }
+            minDiff=diff;
           rangeData = obj;
         } else {
           break;
@@ -172,34 +182,42 @@ class PerceptionCars {
         if (diff < minDiff) {
           minData = cacheData[i];
           minIndex = i;
+          minDiff = diff;
         }
 
       }
     }
-
+      console.log("感知车最小索引:",devId,minIndex,cacheData.length,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'),DateFormat.formatTime(new Date().getTime(),'hh:mm:ss:ms'));
+    console.log("找到最小值",parseInt(minData.gpsTime),minData.batchId)
+      minData.data.forEach(item=>{
+        console.log(parseInt(minData.gpsTime),item.vehicleId);
+      });
     // console.log("最小索引:"+minIndex);
     if (minDiff && minDiff > this.perMaxValue) {
       console.log("per找到最小值无效")
       return;
     }
     //打印出被舍弃的点
-    let lostData = this.cacheAndInterpolateDataByDevId[devId].cacheData.filter((item, index) => {
-      return index < minIndex;
-    })
-    lostData.forEach(item => {
-      // let minDiff = Math.abs(time-cacheData[minIndex].gpsTime-insertTime);
-      // console.log("插值最小的索引"+minIndex,minDiff);
-      // console.log("##"+item.devId,item.gpsTime);
-      // let d =  Math.abs(time-item.gpsTime-insertTime);
-      // console.log("##"+d);
-    })
-
+    // let lostData = this.cacheAndInterpolateDataByDevId[devId].cacheData.filter((item, index) => {
+    //   return index < minIndex;
+    // })
+    //   if(lostData.length>0){
+    //       console.log("丢失数据长度",lostData.length);
+    //       lostData.forEach(item => {
+    //           let d = Math.abs(time - parseInt(item.gpsTime) - delayTime);
+    //           console.log("丢失的数据：",parseInt(item.gpsTime),d,minDiff,item.batchId);
+    //           console.log("此帧车辆数据的长度："+item.data.length);
+    //           item.data.forEach(data=>{
+    //               console.log("车辆数据：",data);
+    //           });
+    //       })
+    //   }
     //找到最小值后，将数据之前的数值清除
     this.cacheAndInterpolateDataByDevId[devId].cacheData = this.cacheAndInterpolateDataByDevId[devId].cacheData.filter((item, index) => {
       return index > minIndex;
     });
     // console.log("找到最小值后"+this.cacheAndInterpolateDataByDevId[devId].cacheData.length);
-
+      console.log("************")
     //返回距离标尺的最小插值的数据
     return minData;
   }

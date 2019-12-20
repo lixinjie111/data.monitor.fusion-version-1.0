@@ -1037,14 +1037,14 @@
                     for (let vehicleId in platCars.platObj) {
                         let dataList = platCars.platObj[vehicleId];
                         if(dataList.length>0){
-                            console.log("*******",vehicleId,dataList.length)
+//                            console.log("*******",vehicleId,dataList.length)
                         }
                         if (dataList.length > 0) {
                             //分割之前将车辆移动到上一个点
                             //将第一个点进行分割
                             let data = dataList.shift();
                             platCars.cacheAndInterpolatePlatformCar(data);
-                            console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
+//                            console.log(vehicleId+"————————"+platCars.cacheAndInterpolateDataByVid[vehicleId].cacheData.length)
                         }
                     }
                 }

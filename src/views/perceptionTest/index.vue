@@ -34,7 +34,7 @@
                     </li> -->
                     <li v-for="items in item.data">
                         <span class="overview-sign perception-sign"></span>
-                        <span>{{items.vehicleId}}, {{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>
+                        <span>{{items.vehicleId}}, {{items.longitude.toFixed(9)}},{{items.latitude.toFixed(9)}}, {{items.speed.toFixed(1)}}km/h, {{items.heading.toFixed(1)}}°, {{items.gpsTime}},{{domDateFormat.formatTime(items.gpsTime, "hh:mm:ss:ms")}}, {{domDateFormat.formatTime(items.updateTime, "hh:mm:ss:ms")}}, {{items.updateTime-items.gpsTime}}, {{startGpsTime+(runTime*drawCount)-items.gpsTime}}</span>
                     </li>
                 </ul>
             </div>
