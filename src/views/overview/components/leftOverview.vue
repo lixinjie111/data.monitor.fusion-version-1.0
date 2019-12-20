@@ -59,7 +59,7 @@
                     this.vehicleIds = res.data;
                     this.webSocketData.vehicleIds = res.data;
                     if(this.vehicleIds) {
-                        this.initWebSocket();
+                        this.getGpsRealList();
                     }
                 });
             },
@@ -73,6 +73,7 @@
                     _responseData.forEach(item => {
                         this.initResult(item.vehicleId, item);
                     });
+                    this.initWebSocket();
                 });
             },
             initResult(attr, result) {
@@ -91,6 +92,17 @@
                 _filterResult.plateNo = result.plateNo;
                 _filterResult.timer = null;
                 this.responseData.push(_filterResult);
+
+                this.responseData.forEach((item, index) => {
+                    this.resetData(item);
+                });
+            },
+            resetData(obj) {
+                obj.timer = setTimeout(() => {
+                    obj.transmission = "P";
+                    obj.turnLight = "";
+                    obj.speed = 0;
+                }, this.timeOut);
             },
             initWebSocket() {
             // console.log('websocket获取指定车辆实时信息');
@@ -123,11 +135,9 @@
 
                         if (_result.transmission != "P") {
                             item.headingAngle = _result.headingAngle;
-                        } 
-                        item.timer = setTimeout(() => {
-                            item.transmission='P';
-                        }, this.timeOut);
+                        }
 
+                        this.resetData(item);
                     }
                 });
 
@@ -154,7 +164,6 @@
                         //如果WebSocket是打开状态
                         this.webSocket.send(msg); //send()发送消息
                         // console.log("vehicleList--已发送消息:"+ msg);
-                        this.getGpsRealList();
                     }
                 } else {
                     return;
