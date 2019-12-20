@@ -85,6 +85,7 @@
 </template>
 <script>
     import DateFormat from '@/utils/date.js'
+    import WebSocketObj from '@/assets/js/webSocket.js'
     import GIS3D from '@/utilsTest/GIS3D.js'
     import PerceptionCars from '@/utilsTest/PerceptionCars.js'
     let gis3d=new GIS3D();
@@ -102,7 +103,6 @@
                             [121.17403069999999,31.2816193]
                         ],
                 perceptionWebsocket: null,
-                perceptionConnectCount: 0,
                 delayTime: parseFloat(this.$route.params.delayTime).toFixed(3)*1000*3,
                 nowTime: '',
                 nowTimeCount: -1,
@@ -282,21 +282,14 @@
             },
             //感知车
             initPerceptionWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.perceptionWebsocket = new WebSocket(window.config.socketUrl);
-                        _this.perceptionWebsocket.onmessage = _this.onPerceptionMessage;
-                        _this.perceptionWebsocket.onclose = _this.onPerceptionClose;
-                        _this.perceptionWebsocket.onopen = _this.onPerceptionOpen;
-                        _this.perceptionWebsocket.onerror= _this.onPerceptionError;
-                    }else{
-                        _this.$message("此浏览器不支持websocket");
+                let _params ={
+                    "action":"road_real_data_per",
+                    "data":{
+                        "type": 1,
+                        "polygon": this.currentExtent
                     }
-                }catch (e){
-                    this.perceptionReconnect();
                 }
-
+                this.perceptionWebsocket = new WebSocketObj(this, window.config.socketUrl, _params, this.onPerceptionMessage);
             },
             onPerceptionMessage(mesasge){
                 if(this.nowTimeCount < 1000) {
@@ -311,53 +304,12 @@
                     this.countTimeList.push(data.time);
                 }else {
                     console.log(perceptionCars.devObj);
-                    this.perceptionWebsocket&&this.perceptionWebsocket.close();
+                    this.perceptionWebsocket&&this.perceptionWebsocket.webSocket.close();
                 }
-            },
-            onPerceptionClose(data){
-                console.log("感知车结束连接");
-            },
-            onPerceptionError(){
-                console.log("感知车连接error");
-                this.perceptionReconnect();
-            },
-            onPerceptionOpen(data){
-                let perception ={
-                    "action":"road_real_data_per",
-                    "data":{
-                        "type": 1,
-                        "polygon": this.currentExtent
-                    }
-                }
-                let perceptionMsg = JSON.stringify(perception);
-                this.sendPerceptionMsg(perceptionMsg);
-            },
-            sendPerceptionMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.perceptionWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.perceptionWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            perceptionReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.perceptionConnectCount>=10){
-                    return;
-                }
-                this.initPerceptionWebSocket();
-                //重连不能超过5次
-                this.perceptionConnectCount++;
             },
         },
         destroyed(){
-            this.perceptionWebsocket&&this.perceptionWebsocket.close();
+            this.perceptionWebsocket&&this.perceptionWebsocket.webSocket.close();
             document.removeEventListener('keydown', this.stepHandle);
         }
     }

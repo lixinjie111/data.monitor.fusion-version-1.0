@@ -4,6 +4,7 @@
 <script>
     import { getRoadCenterIds, getRoadCenterPoints,getDevDis} from '@/api/overview/index.js';
     import ConvertCoord from '@/assets/js/coordConvert.js'
+    import WebSocketObj from '@/assets/js/webSocket.js'
     export default {
         name: "MapContainer",
         data () {
@@ -22,7 +23,6 @@
                 count: 0,
                 flag: true,
                 prevData: [],
-                onlineConnectCount:0,
                 timeOut:3000
             }
         },
@@ -38,20 +38,7 @@
         },
         methods: {
             initWebSocket(){
-                // console.log('websocket获取地图行驶车辆展示');
-                try{
-                    if ('WebSocket' in window) {
-                        this.webSocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        this.webSocket.onmessage = this.onmessage;
-                        this.webSocket.onclose = this.onclose;
-                        this.webSocket.onopen = this.onopen;
-                        this.webSocket.onerror = this.onerror;
-                    }else{
-                        this.$message("此浏览器不支持websocket");
-                    }
-                }catch (e){
-                    this.carReconnect();
-                }
+                this.webSocket = new WebSocketObj(this, window.config.socketUrl, this.webSocketData, this.onmessage);
             },
             onmessage(message){
                 let _this = this;
@@ -184,45 +171,6 @@
                     query:{delayTime:4}
                 });
             },
-            onclose(data){
-                console.log("vehicleOnline结束连接");
-                this.carReconnect();
-            },
-            onerror(){
-                console.log("vehicleOnline连接error");
-                this.carReconnect();
-            },
-            onopen(data){
-                // console.log("建立--vehicleOnline--连接");
-                //行程
-                this.sendMsg(JSON.stringify(this.webSocketData));
-            },
-            sendMsg(msg) {
-                // console.log("vehicleOnline--连接状态："+this.webSocket.readyState);
-                if(window.WebSocket){
-                    if(this.webSocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        this.webSocket.send(msg); //send()发送消息
-                        // console.log("vehicleOnline--已发送消息:"+ msg);
-                    }
-                }else{
-                    return;
-                }
-            },
-            carReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.onlineConnectCount>=10){
-                    return;
-                }
-                this.initWebSocket();
-                //重连不能超过5次
-                this.onlineConnectCount++;
-            },
-
-
             getDevDis(disParams){
                 getDevDis({
                     'devTypes': disParams,
@@ -335,7 +283,7 @@
         },
         destroyed(){
             //销毁Socket
-            this.webSocket&&this.webSocket.close();
+            this.webSocket&&this.webSocket.webSocket.close();
         }
     }
 </script>
