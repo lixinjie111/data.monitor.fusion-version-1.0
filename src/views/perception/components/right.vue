@@ -50,11 +50,11 @@
     </div>
 </template>
 <script>
-    const isProduction = process.env.NODE_ENV === 'production'
     import TusvnMap from './TusvnMap.vue';
     import DateFormat from '@/utils/date.js'
     import LivePlayer from '@/components/livePlayer'
     import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId,getAreaByRsId} from '@/api/fusion'
+    import WebSocketObj from '@/assets/js/webSocket.js'
 
     import GIS3D from '@/utils/GIS3D.js' 
     import PerceptionCars from '@/utils/PerceptionCars.js'
@@ -72,6 +72,7 @@
                 perceptionWebsocket:null,
                 spatWebsocket:null,
                 warningWebsocket:null,
+                cancelWarningWebsocket:null,
                 pulseWebsocket:null,
                 param:1, //平面 俯视
                 statisticData:'',
@@ -91,13 +92,6 @@
                 camList:[],
                 requestVideoUrl:getVideoByNum,
                 tabIsExist:true,
-                warningConnectCount:0,
-                cancelConnectCount:0,
-                platformConnectCount:0,
-                perceptionConnectCount:0,
-                spatConnectCount:0,
-                pulseConnectCount:0,
-                cancelWarningCount:0, //取消告警重连数量
 
                 warningObj:{}, // 参数待定
                 pulseNowTime:'',
@@ -374,21 +368,15 @@
 
             //告警
             initWarningWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.warningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.warningWebsocket.onmessage = _this.onWarningMessage;
-                        _this.warningWebsocket.onclose = _this.onWarningClose;
-                        _this.warningWebsocket.onopen = _this.onWarningOpen;
-                        _this.warningWebsocket.onerror = _this.onWarningError;
-                    }else {
-                        _this.$message("此浏览器不支持websocket")
-                    }
-                }catch (e){
-                    _this.warningReconnect();
-                }
-
+                let currentExtent = this.getExtend(this.x,this.y,0.02);
+                let _params = {
+                    "action":"cloud_event",
+                    "body":{
+                        "region":currentExtent,
+                    },
+                    "type":1
+                };
+                this.warningWebsocket = new WebSocketObj(this, window.config.socketUrl, _params, this.onWarningMessage);
             },
             onWarningMessage(message){
                 let _this=this;
@@ -411,9 +399,9 @@
                                         "status":1
                                     },
                                     "type":2
-                                }
+                                };
                                 let warningMsg = JSON.stringify(warning);
-                                this.sendWarningMsg(warningMsg);
+                                this.warningWebsocket.sendMsg(warningMsg);
                                 item.warnId = warnId;
                                 let array = processData.staticWarning[warnId];
                                 if(!array){
@@ -439,56 +427,6 @@
                     });
                 }
 //                this.processWarn(json);
-            },
-            onWarningClose(data){
-                console.log("告警结束连接");
-                this.warningReconnect();
-            },
-            onWarningError(){
-                console.log("告警连接error");
-                this.warningReconnect();
-            },
-            onWarningOpen(data){
-                let currentExtent = this.getExtend(this.x,this.y,0.02);
-                let warning ={
-                    "action":"cloud_event",
-                    "body":{
-                        "region":currentExtent,
-                    },
-                    "type":1
-                }
-//                let warning ={
-//                    "action":"cloud_event",
-//                    "body":{
-//                        "region":this.currentExtent,
-//                    },
-//                    "type":1    //发请求
-//                }
-                let warningMsg = JSON.stringify(warning);
-                this.sendWarningMsg(warningMsg);
-            },
-            sendWarningMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.warningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.warningWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            warningReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.warningConnectCount>=10){
-                    return;
-                }
-                this.initWarningWebSocket();
-                //重连不能超过5次
-                this.warningConnectCount++;
             },
             processWarn(warningData){
                 let _this = this;
@@ -517,21 +455,12 @@
 
             //取消告警
             initCancelWarningWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.cancelWarningWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.cancelWarningWebsocket.onmessage = _this.onCancelWarningMessage;
-                        _this.cancelWarningWebsocket.onclose = _this.onCancelWarningClose;
-                        _this.cancelWarningWebsocket.onopen = _this.onCancelWarningOpen;
-                        _this.cancelWarningWebsocket.onerror = _this.onCancelWarningError;
-                    }else {
-                        _this.$message("此浏览器不支持websocket")
-                    }
-                }catch (e){
-                    _this.cancelWarningReconnect();
-                }
-
+                let _params = {
+                    "action":"event_cancel",
+                    "body":{"busType":"rsi"},
+                    "type":1
+                };
+                this.cancelWarningWebsocket = new WebSocketObj(this, window.config.socketUrl, _params, this.onCancelWarningMessage);
             },
             onCancelWarningMessage(message){
                 let _this=this;
@@ -544,54 +473,13 @@
                         "status":1
                     },
                     "type":2
-                }
+                };
                 let cancelWarningMsg = JSON.stringify(cancelWarning);
-                this.sendCancelWarningMsg(cancelWarningMsg);
+                this.cancelWarningWebsocket.sendMsg(cancelWarningMsg);
                 if(processData.cancelWarning.indexOf(warnId)==-1){
                     processData.cancelWarning.push(warnId);
                 }
 //                this.processWarn(json);
-            },
-            onCancelWarningClose(data){
-                console.log("告警结束连接");
-                this.cancelWarningReconnect();
-            },
-            onCancelWarningError(){
-                console.log("告警连接error");
-                this.cancelWarningReconnect();
-            },
-            onCancelWarningOpen(data){
-                //旁车
-                let cancelWarning ={
-                    "action":"event_cancel",
-                    "body":{"busType":"rsi"},
-                    "type":1
-                }
-                let cancelWarningMsg = JSON.stringify(cancelWarning);
-                this.sendCancelWarningMsg(cancelWarningMsg);
-            },
-            sendCancelWarningMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.cancelWarningWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.cancelWarningWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            cancelWarningReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.cancelWarningCount>=10){
-                    return;
-                }
-                this.initWarningWebSocket();
-                //重连不能超过5次
-                this.cancelWarningCount++;
             },
             processCancelWarn(data){
                 data.forEach(warnId=>{
@@ -609,22 +497,15 @@
 
             //平台车
             initPlatformWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.platformWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-//                        _this.platformWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                        _this.platformWebsocket.onmessage = _this.onPlatformMessage;
-                        _this.platformWebsocket.onclose = _this.onPlatformClose;
-                        _this.platformWebsocket.onopen = _this.onPlatformOpen;
-                        _this.platformWebsocket.onerror=_this.onPlatformError;
-                    }else{
-                        _this.$message("此浏览器不支持websocket");
-                    }
-                }catch (e){
-                    this.platformReconnect();
-                }
-
+                let currentExtent = this.getExtend(this.x,this.y,0.02);
+                let _params = {
+                    "action": "vehicle",
+                    "body": {
+                        "polygon": currentExtent
+                    },
+                    "type": 3
+                };
+                this.platformWebsocket = new WebSocketObj(this, window.config.socketUrl, _params, this.onPlatformMessage);
             },
             onPlatformMessage(message){
                 let _this=this;
@@ -632,76 +513,16 @@
                 platCars.receiveData(json,this.pulseNowTime);
 
             },
-            onPlatformClose(data){
-                console.log("平台车结束连接");
-                this.platformReconnect();
-            },
-            onPlatformError(){
-                console.log("平台车连接error");
-                this.platformReconnect();
-            },
-            onPlatformOpen(data){
-                let currentExtent = this.getExtend(this.x,this.y,0.02);
-                let platform ={
-                    "action": "vehicle",
-                    "body": {
-                        "polygon": currentExtent
-                    },
-                    "type": 3
-                }
-                //旁车
-                /*let platform = {
-                    "action": "road_real_data_reg",
-                    "data": {
-//                        "polygon": [[121.431,31.113],[121.063,31.113],[121.063,31.371],[121.431,31.371]]
-                        "polygon":this.currentExtent
-                    }
-                }*/
-                let platformMsg = JSON.stringify(platform);
-                this.sendPlatformMsg(platformMsg);
-            },
-            sendPlatformMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.platformWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.platformWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            platformReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.platformConnectCount>=10){
-                    return;
-                }
-                this.initPlatformWebSocket();
-                //重连不能超过5次
-                this.platformConnectCount++;
-            },
-
             //感知车
             initPerceptionWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.perceptionWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-//                        _this.perceptionWebsocket = new WebSocket(window.config.websocketUrl);  //获得WebSocket对象
-                        _this.perceptionWebsocket.onmessage = _this.onPerceptionMessage;
-                        _this.perceptionWebsocket.onclose = _this.onPerceptionClose;
-                        _this.perceptionWebsocket.onopen = _this.onPerceptionOpen;
-                        _this.perceptionWebsocket.onerror= _this.onPerceptionError;
-                    }else{
-                        _this.$message("此浏览器不支持websocket");
+                let _params = {
+                    "action":"road_real_data_per",
+                    "data":{
+                        "type":1,
+                        "polygon":this.currentExtent
                     }
-                }catch (e){
-                    this.perceptionReconnect();
-                }
-
+                };
+                this.perceptionWebsocket = new WebSocketObj(this, window.config.socketUrl, _params, this.onPerceptionMessage);
             },
             onPerceptionMessage(message){
                 let _this=this;
@@ -717,48 +538,6 @@
                 let sideList = data.result.perList;
                 perceptionCars.receiveData(sideList);
 
-            },
-            onPerceptionClose(data){
-                console.log("感知车结束连接");
-                this.perceptionReconnect();
-            },
-            onPerceptionError(){
-                console.log("感知车连接error");
-                this.perceptionReconnect();
-            },
-            onPerceptionOpen(data){
-                let perception ={
-                    "action":"road_real_data_per",
-                    "data":{
-                        "type":1,
-                        "polygon":this.currentExtent
-                    }
-                }
-                let perceptionMsg = JSON.stringify(perception);
-                this.sendPerceptionMsg(perceptionMsg);
-            },
-            sendPerceptionMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.perceptionWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.perceptionWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            perceptionReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.perceptionConnectCount>=10){
-                    return;
-                }
-                this.initPerceptionWebSocket();
-                //重连不能超过5次
-                this.perceptionConnectCount++;
             },
             processPerData(data){
                 let _this = this;
@@ -789,72 +568,20 @@
 
             //红绿灯
             initSpatWebSocket(){
-                let _this=this;
-                try {
-                    if ('WebSocket' in window){
-                        _this.spatWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.spatWebsocket.onmessage = _this.onSpatMessage;
-                        _this.spatWebsocket.onclose = _this.onSpatClose;
-                        _this.spatWebsocket.onopen = _this.onSpatOpen;
-                        _this.spatWebsocket.onerror = _this.onSpatError;
-                    }
-                    else{
-                        _this.$message("此浏览器不支持websocket")
-                    }
-                } catch (e) {
-                    _this.spatReconnect();
-                }
-
-
+                let _params = {
+                    "action":"spat",
+                    "data":{
+                        "polygon":this.currentExtent
+                    },
+                    "type":2
+                };
+                this.spatWebsocket = new WebSocketObj(this, window.config.socketUrl, _params, this.onSpatMessage);
             },
             onSpatMessage(message){
                 let _this=this;
                 let json = JSON.parse(message.data);
                 let data = json.result.data;
                 processData.receiveLightData(data);
-            },
-            onSpatClose(data){
-                console.log("红绿灯结束连接");
-                this.spatReconnect();
-            },
-            onSpatError(){
-                console.log("红绿灯连接error");
-                this.spatReconnect();
-            },
-            onSpatOpen(data){
-                //旁车
-                let spat ={
-                    "action":"spat",
-                    "data":{
-                        "polygon":this.currentExtent
-                    },
-                    "type":2
-                }
-                let spatMsg = JSON.stringify(spat);
-                this.sendSpatMsg(spatMsg);
-            },
-            sendSpatMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.spatWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.spatWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            spatReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.spatConnectCount>=10){
-                    return;
-                }
-                this.initSpatWebSocket();
-                //重连不能超过5次
-                this.spatConnectCount++;
             },
             drawnSpat(data){
                 let _this = this;
@@ -976,21 +703,14 @@
 
             //脉冲
             initPulseWebSocket(){
-                let _this=this;
-                try{
-                    if ('WebSocket' in window) {
-                        _this.pulseWebsocket = new WebSocket(window.config.socketUrl);  //获得WebSocket对象
-                        _this.pulseWebsocket.onmessage = _this.onPulseMessage;
-                        _this.pulseWebsocket.onclose = _this.onPulseClose;
-                        _this.pulseWebsocket.onopen = _this.onPulseOpen;
-                        _this.pulseWebsocket.onerror= _this.onPulseError;
-                    }else{
-                        _this.$message("此浏览器不支持websocket");
+                let _params = {
+                    "action":"pulse",
+                    "data":{
+//                        "frequency":39
+                        "frequency":this.pulseInterval
                     }
-                }catch (e){
-                    this.pulseReconnect();
-                }
-
+                };
+                this.pulseWebsocket = new WebSocketObj(this, window.config.socketUrl, _params, this.onPulseMessage);
             },
             onPulseMessage(message){
                 let json = JSON.parse(message.data);
@@ -1174,49 +894,6 @@
                 }
                 _this.staticPulseCount++;
             },
-            onPulseClose(data){
-                console.log("感知车结束连接");
-                this.pulseReconnect();
-            },
-            onPulseError(){
-                console.log("感知车连接error");
-                this.pulseReconnect();
-            },
-            onPulseOpen(data){
-                //旁车
-                let pulse = {
-                    "action":"pulse",
-                    "data":{
-//                        "frequency":39
-                        "frequency":this.pulseInterval
-                    }
-                }
-                let pulseMsg = JSON.stringify(pulse);
-                this.sendPulseMsg(pulseMsg);
-            },
-            sendPulseMsg(msg) {
-                let _this=this;
-                if(window.WebSocket){
-                    if(_this.pulseWebsocket.readyState == WebSocket.OPEN) { //如果WebSocket是打开状态
-                        _this.pulseWebsocket.send(msg); //send()发送消息
-                    }
-                }else{
-                    return;
-                }
-            },
-            pulseReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.pulseConnectCount>=10){
-                    return;
-                }
-                this.initPulseWebSocket();
-                //重连不能超过5次
-                this.pulseConnectCount++;
-            },
         },
         destroyed(){
             gis3d.destroyed();
@@ -1225,12 +902,12 @@
             platCars=null;
             processData=null;
             clearInterval(this.mapInitTime);
-            this.warningWebsocket&&this.warningWebsocket.close();
-            this.cancelWarningWebsocket&&this.cancelWarningWebsocket.close();
-            this.platformWebsocket&&this.platformWebsocket.close();
-            this.perceptionWebsocket&&this.perceptionWebsocket.close();
-            this.spatWebsocket&&this.spatWebsocket.close();
-            this.pulseWebsocket&&this.pulseWebsocket.close();
+            this.warningWebsocket&&this.warningWebsocket.webSocket.close();
+            this.cancelWarningWebsocket&&this.cancelWarningWebsocket.webSocket.close();
+            this.platformWebsocket&&this.platformWebsocket.webSocket.close();
+            this.perceptionWebsocket&&this.perceptionWebsocket.webSocket.close();
+            this.spatWebsocket&&this.spatWebsocket.webSocket.close();
+            this.pulseWebsocket&&this.pulseWebsocket.webSocket.close();
         }
     }
 </script>

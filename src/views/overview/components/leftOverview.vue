@@ -32,6 +32,7 @@
 </template>
 <script>
     import { getGpsRealConfig, getGpsRealList } from "@/api/overview/index.js";
+    import WebSocketObj from '@/assets/js/webSocket.js'
     export default {
         props:['filterData'],
         data() {
@@ -45,7 +46,6 @@
                     token: "fpx",
                     vehicleIds: ""
                 },
-                canConnectCount:0,
                 timeOut:1000*60*5,
             };
         },
@@ -105,21 +105,7 @@
                 }, this.timeOut);
             },
             initWebSocket() {
-            // console.log('websocket获取指定车辆实时信息');
-                try{
-                    if ("WebSocket" in window) {
-                        this.webSocket = new WebSocket(window.config.socketUrl); //获得WebSocket对象
-                        this.webSocket.onmessage = this.onmessage;
-                        this.webSocket.onclose = this.onclose;
-                        this.webSocket.onopen = this.onopen;
-                        this.webSocket.onerror = this.onerror;
-                    }else{
-                        this.$message("此浏览器不支持websocket");
-                    }
-                }catch (e){
-                    this.canReconnect();
-                }
-
+                this.webSocket = new WebSocketObj(this, window.config.socketUrl, this.webSocketData, this.onmessage);
             },
             onmessage(message) {
                 let _json = JSON.parse(message.data);
@@ -140,47 +126,6 @@
                         this.resetData(item);
                     }
                 });
-
-              
-
-            },
-            onclose(data) {
-                console.log("can数据结束连接");
-                this.canReconnect();
-            },
-            onerror(){
-                console.log("can数据连接error");
-                this.canReconnect();
-            },
-            onopen(data) {
-                // console.log("建立--vehicleList--连接");
-                //行程
-                this.sendMsg(JSON.stringify(this.webSocketData));
-            },
-            sendMsg(msg) {
-                // console.log("vehicleList--连接状态："+this.webSocket.readyState);
-                if (window.WebSocket) {
-                    if (this.webSocket.readyState == WebSocket.OPEN) {
-                        //如果WebSocket是打开状态
-                        this.webSocket.send(msg); //send()发送消息
-                        // console.log("vehicleList--已发送消息:"+ msg);
-                    }
-                } else {
-                    return;
-                }
-            },
-            canReconnect(){
-                //实例销毁后不进行重连
-                if(this._isDestroyed){
-                    return;
-                }
-                //重连不能超过10次
-                if(this.canConnectCount>=10){
-                    return;
-                }
-                this.initWebSocket();
-                //重连不能超过5次
-                this.canConnectCount++;
             },
             showView(carId) {
                 this.$router.push({
@@ -191,7 +136,7 @@
         },
         destroyed() {
             //销毁Socket
-            this.webSocket&&this.webSocket.close();
+            this.webSocket&&this.webSocket.webSocket.close();
         }
     }
 </script>
