@@ -118,7 +118,7 @@ class PerceptionCars {
         }*/
         this.drawnObj[devId] = devData.batchId;
         let fusionList = devData.data;
-          if(fusionList&&fusionList.length) {
+          if(!fusionList&&fusionList.length) {
               list.push.apply(list,fusionList);
           }
         // console.log(devData)
