@@ -190,7 +190,7 @@ class GIS3D {
                     material: Cesium.Color.AZURE.withAlpha(0.1),
                     outline: true,
                     height :0,
-                   outlineColor: Cesium.Color.AZURE
+                   outlineColor: Cesium.Color.BLUE
                 }
              });
         }
@@ -318,7 +318,7 @@ class GIS3D {
             x: lng,
             y: lat,
             z: alt,
-            radius: this.cesium.viewer.camera.heading,
+            radius: Cesium.Math.toDegrees(this.cesium.viewer.camera.heading),
             pitch: this.cesium.viewer.camera.pitch,
             yaw: this.cesium.viewer.camera.roll
         };

@@ -874,6 +874,8 @@
             //判断当前标签页是否被隐藏
             document.addEventListener("visibilitychange",this.processTab);
 
+            platCars.sideList = sessionStorage.getItem("sideList");
+
 //            this.initLightWebSocket();
         },
         watch: {
