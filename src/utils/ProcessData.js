@@ -1,5 +1,5 @@
 import DateFormat from '@/utils/date.js'
-class ProcessCarTrack {
+class ProcessData {
     constructor(){
         this.spatObj={};
         this.spatPulseInterval='';//阈值范围
@@ -344,4 +344,4 @@ class ProcessCarTrack {
     }
 
 }
-export default ProcessCarTrack;
+export default ProcessData;

@@ -221,10 +221,10 @@
 
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
-                    gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-//                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
-//                    gis3d.updateCameraPosition(121.1727923, 31.2840917,39,70,-0.2369132859032279, 0.0029627735803421373);
-//                    gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        camParam = this.camList[0].camParam;
+                        let {x, y, z, radius, pitch, yaw} = camParam;
+                        // let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+                        gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
                     this.getData();
                     this.mapShow=true;
                     return;
@@ -233,8 +233,9 @@
                 this.mapInitTime = setInterval(()=>{
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
-                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-//                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        let {x, y, z, radius, pitch, yaw} = camParam;
+                        // let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+                        gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
                         this.getData();
                         clearInterval(this.mapInitTime);
                         this.mapShow=true;
@@ -242,8 +243,8 @@
                     }
                     count++;
                     if(count==10){
-                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-//                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                        let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+                        gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
                         this.getData();
                         this.mapShow=true;
                         clearInterval(this.mapInitTime);
