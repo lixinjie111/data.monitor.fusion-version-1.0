@@ -121,10 +121,11 @@
                 warningPulseCount:0,
                 staticPulseCount:0,
                 computePulseCount:0,
-                perCount:0,
+                perPulseCount:0,
                 spatCount:0,
                 warningCacheCount:0,
                 staticCacheCount:0,
+                perCacheCount:0,
 
 
                 tabIsExist:true,
@@ -215,8 +216,8 @@
                 platCars.platMaxValue = platCars.pulseInterval*1.5;
 
                 perceptionCars.stepTime = this.pulseInterval;
-                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*0.8;
-                perceptionCars.perMaxValue = perceptionCars.pulseInterval*1.5;
+                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2*0.8;
+                perceptionCars.perMaxValue = perceptionCars.pulseInterval*2*1.5;
 
                 let spatPulse = this.pulseInterval*10;
                 processData.spatPulseInterval = spatPulse*0.8;
@@ -623,13 +624,16 @@
                 }
 
                 //感知数据缓存次数控制
-                if(this.perCount>0){
-                    this.perCount++;
+                if(this.perCacheCount>0){
+                    this.perCacheCount++;
                 }
+
+
+//                console.log(this.perCacheCount);
                 if (Object.keys(perceptionCars.devObj).length > 0) {
                     //当有感知数据时
-                    if(this.perCount==0){
-                        this.perCount++;
+                    if(this.perCacheCount==0){
+                        this.perCacheCount++;
                     }
                     for (let devId in perceptionCars.devObj) {
                         let devList = perceptionCars.devObj[devId];
@@ -677,7 +681,6 @@
                         this.staticCacheCount++;
                     }
                 }
-
                 let mainCar;
                 //平台车  缓存+40ms调用一次
                 if(this.pulseCount>=pulseNum) {
@@ -747,13 +750,15 @@
                     this.canPulseCount++;
                 }
 
-                //感知车 缓存+40ms调用一次
-                if(this.perCount>=pulseNum){
+                //感知车 缓存+80ms调用一次
+                if(this.perCacheCount>pulseNum&&this.perPulseCount==0||this.perPulseCount>=2){
+                    this.perPulseCount=1;
                     if(Object.keys(perceptionCars.devObj).length>0){
                         let processPerCar = perceptionCars.processPerTrack(result.timestamp,delayTime);
 //                        this.processPerData(processPerCar);
                     }
                 }
+                this.perPulseCount++;
 
                 //红绿灯  缓存+1200ms调用一次
                 if(this.spatCount>=pulseNum&&(this.spatPulseCount==0||this.spatPulseCount>=10)){

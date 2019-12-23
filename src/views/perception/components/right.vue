@@ -104,9 +104,11 @@
                 spatPulseCount:0,
                 warningPulseCount:0,
                 staticPulseCount:0,
+                perPulseCount:0,
                 staticCacheCount:0,
                 warningCacheCount:0,
-                perPulseCount:0,
+                perCacheCount:0,
+
 
 
                 staticWarning:[],
@@ -198,8 +200,8 @@
                 platCars.platMaxValue = this.pulseInterval*1.5;
 
                 perceptionCars.stepTime = this.pulseInterval;
-                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*0.8;
-                perceptionCars.perMaxValue = this.pulseInterval*1.5;
+                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2*0.8;
+                perceptionCars.perMaxValue = this.pulseInterval*2*1.5;
 
                 let spatPulse = this.pulseInterval*10;
                 processData.pulseInterval = spatPulse*0.8;
@@ -219,10 +221,10 @@
 
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
-                    gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+//                    gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
 //                    gis3d.updateCameraPosition(112.94760914128275, 28.325093927226323,39,70,-0.2369132859032279, 0.0029627735803421373);
 //                    gis3d.updateCameraPosition(121.1727923, 31.2840917,39,70,-0.2369132859032279, 0.0029627735803421373);
-//                    gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+                    gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
                     this.getData();
                     this.mapShow=true;
                     return;
@@ -231,8 +233,8 @@
                 this.mapInitTime = setInterval(()=>{
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
-                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
-//                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+//                      gis3d.updateCameraPosition(camParam.x,camParam.y,camParam.z,camParam.radius,camParam.pitch,camParam.yaw);
+                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
                         this.getData();
                         clearInterval(this.mapInitTime);
                         this.mapShow=true;
@@ -240,8 +242,8 @@
                     }
                     count++;
                     if(count==10){
-                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
-//                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
+//                        gis3d.updateCameraPosition(window.defaultMapParam.x,window.defaultMapParam.y,window.defaultMapParam.z,window.defaultMapParam.radius,window.defaultMapParam.pitch,window.defaultMapParam.yaw);
+                        gis3d.updateCameraPosition(121.17659986110053,31.28070920407326,39.142101722743725,5.573718449729121,-0.23338301782710902,6.281191529370343);
                         this.getData();
                         this.mapShow=true;
                         clearInterval(this.mapInitTime);
@@ -573,10 +575,11 @@
 
             //红绿灯
             initSpatWebSocket(){
+                let currentExtent = this.getExtend(this.x,this.y,0.02);
                 let _params = {
                     "action":"spat",
                     "data":{
-                        "polygon":this.currentExtent
+                        "polygon":currentExtent
                     },
                     "type":2
                 };
@@ -745,6 +748,10 @@
                 if(_this.staticCacheCount>0){
                     _this.staticCacheCount++;
                 }
+                //感知车缓存次数控制
+                if(_this.perCacheCount>0){
+                    _this.perCacheCount++;
+                }
                 //静态告警事件开始缓存
                 if(Object.keys(processData.staticWarning).length>0){
                     if(_this.staticCacheCount==0){
@@ -768,6 +775,9 @@
                     }
                 }
                 if (Object.keys(perceptionCars.devObj).length > 0){
+                    if(_this.perCacheCount==0){
+                        _this.perCacheCount++;
+                    }
                     for (let devId in perceptionCars.devObj) {
                         let devList = perceptionCars.devObj[devId];
                         /*console.log("*****")
@@ -825,47 +835,48 @@
                     }
                     _this.spatPulseCount++;
 
-                    if(_this.perPulseCount==0||_this.perPulseCount>=2){
-                        _this.perPulseCount=1;
-                        if(Object.keys(perceptionCars.devObj).length>0){
-                            let perList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
-                            if(perList){
-                                if(perList.length>0){
-                                    _this.processPerData(perList[0]);
-                                    let pernum = 0;
-                                    let persons = 0;
-                                    let nonNum = 0;
-                                    let perData={};
-                                    perList.forEach(item=>{
-                                        let cars = item.data;
-                                        if(cars.length>0) {
-                                            for (let i = 0; i < cars.length; i++) {
-                                                let obj = cars[i];
-                                                if (obj.targetType == 0){
-                                                    persons++;
-                                                }
+                }
 
-                                                if (obj.targetType == 2||obj.targetType == 5 || obj.targetType == 7) {
-                                                    pernum++;
-                                                }
+                if(_this.perCacheCount>pulseNum&&_this.perPulseCount==0||_this.perPulseCount>=2){
+                    _this.perPulseCount=1;
+                    if(Object.keys(perceptionCars.devObj).length>0){
+                        let perList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
+                        if(perList){
+                            if(perList.length>0){
+                                _this.processPerData(perList[0]);
+                                let pernum = 0;
+                                let persons = 0;
+                                let nonNum = 0;
+                                let perData={};
+                                perList.forEach(item=>{
+                                    let cars = item.data;
+                                    if(cars&&cars.length>0) {
+                                        for (let i = 0; i < cars.length; i++) {
+                                            let obj = cars[i];
+                                            if (obj.targetType == 0){
+                                                persons++;
+                                            }
 
-                                                if(obj.targetType == 1 || obj.targetType == 3){
-                                                    nonNum++;
-                                                }
+                                            if (obj.targetType == 2||obj.targetType == 5 || obj.targetType == 7) {
+                                                pernum++;
+                                            }
+
+                                            if(obj.targetType == 1 || obj.targetType == 3){
+                                                nonNum++;
                                             }
                                         }
-                                    });
-                                    perData['veh']=pernum;
-                                    perData['person'] = persons;
-                                    perData['noMotor'] = nonNum;
+                                    }
+                                });
+                                perData['veh']=pernum;
+                                perData['person'] = persons;
+                                perData['noMotor'] = nonNum;
 //                                console.log(perData)
-                                    this.$parent.perceptionData = perData;
-                                }
+                                this.$parent.perceptionData = perData;
                             }
                         }
                     }
-                    _this.perPulseCount++
                 }
+                _this.perPulseCount++
 
                 //执行动态告警
                 if(_this.warningCacheCount>pulseNum&&(_this.warningPulseCount==0||_this.warningPulseCount>=10)){
@@ -906,6 +917,7 @@
 
 
             },
+
         },
         destroyed(){
             gis3d.destroyed();

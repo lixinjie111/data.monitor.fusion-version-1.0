@@ -57,6 +57,7 @@ class PerceptionCars {
         cacheData: new Array(),
         lastRecieveData: null,
         nowRecieveData: null,
+        isFirst:false
       };
       cdata.cacheData.push(d);
       cdata.lastRecieveData = d;
@@ -118,12 +119,11 @@ class PerceptionCars {
         }*/
         this.drawnObj[devId] = devData.batchId;
         let fusionList = devData.data;
-          if(!fusionList&&fusionList.length) {
+          if(fusionList&&fusionList.length) {
               list.push.apply(list,fusionList);
           }
         // console.log(devData)
         // console.log("*****"+fusionList)
-        this.processPerceptionMesage(fusionList);
         devList.push(devData);
       }
     }
@@ -133,6 +133,9 @@ class PerceptionCars {
     // list.forEach(item=>{
     //   item.vehicleId =Math.random()*1000+"a" ;
     // })
+    //   if(list&&list.length<=0){
+    //      return;
+    //   }
       this.processPerceptionMesage(list);
       // console.log("************")
     return devList;
@@ -176,6 +179,7 @@ class PerceptionCars {
     if (rangeData) {
       minIndex = rangeData.index;
       minData = rangeData.data;
+        this.cacheAndInterpolateDataByDevId[devId].isFirst=true;
     } else {
       // console.log("plat***********************");
       minIndex = 0;
@@ -190,17 +194,22 @@ class PerceptionCars {
           minIndex = i;
           minDiff = diff;
         }
-
       }
     }
-    // console.log("感知车最小索引:",devId,minIndex,cacheData.length,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'),DateFormat.formatTime(new Date().getTime(),'hh:mm:ss:ms'));
+    // console.log("感知车最小索引:",devId,minIndex,minDiff,cacheData.length,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'),DateFormat.formatTime(new Date().getTime(),'hh:mm:ss:ms'));
     // console.log("找到最小值",parseInt(minData.gpsTime),minData.batchId);
     //   minData.data.forEach(item=>{
     //     console.log(parseInt(minData.gpsTime),item.vehicleId);
     //   });
-    // console.log("最小索引:"+minIndex);
-    if (minDiff && minDiff > this.perMaxValue) {
-      // console.log("per找到最小值无效");
+    // console.log("最小索引:",devId,minIndex,minDiff);
+    // console.log(this.cacheAndInterpolateDataByDevId[devId].isFirst);
+    //标尺还没对齐  return;
+    if(minDiff && minDiff > this.perMaxValue&&!this.cacheAndInterpolateDataByDevId[devId].isFirst){
+      return;
+    }
+    //对其后，找不到符合范围的  最小值保留
+    if (minDiff && minDiff > this.perMaxValue&&this.cacheAndInterpolateDataByDevId[devId].isFirst) {
+      // console.log("per找到最小值无效",this.cacheAndInterpolateDataByDevId[devId].isFirst);
     }else{
         this.cacheAndInterpolateDataByDevId[devId].cacheData = this.cacheAndInterpolateDataByDevId[devId].cacheData.filter((item, index) => {
             return index > minIndex;
@@ -383,6 +392,8 @@ class PerceptionCars {
     for (var i = 0; i < primitives.length; i++) {
       var primitive = primitives.get(i);
       let isTrue = false;
+      // console.log("---------")
+      //   console.log(typeof fusionList);
       for (var kk = 0; kk < fusionList.length; kk++) {
         if (primitive instanceof Cesium.Model && (primitive.id != fusionList[kk].vehicleId + name)) {
           isTrue = true;
