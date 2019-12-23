@@ -55,7 +55,7 @@
     import TusvnMap from './TusvnMap.vue';
     import DateFormat from '@/utils/date.js'
     import LivePlayer from '@/components/livePlayer'
-    import {getPerceptionAreaInfo,getVideoByNum,typeRoadData,getCameraByRsId,getAreaByRsId} from '@/api/fusion'
+    import {getVideoByNum,typeRoadData,getCameraByRsId,getAreaByRsId} from '@/api/fusion'
     import WebSocketObj from '@/assets/js/webSocket.js'
 
     import GIS3D from '@/utils/GIS3D.js' 
