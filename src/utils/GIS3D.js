@@ -386,8 +386,8 @@ class GIS3D {
 
     }
     updateCameraPosition(x, y, z, radius, pitch, yaw) {
-        // var heading = Cesium.Math.toRadians(radius);
-        var hpr = new Cesium.HeadingPitchRoll(radius, pitch, yaw);
+        var heading = Cesium.Math.toRadians(radius);
+        var hpr = new Cesium.HeadingPitchRoll(heading, pitch, yaw);
         this.cesium.viewer.camera.flyTo({
             destination: Cesium.Cartesian3.fromDegrees(x, y, z),
             orientation: hpr
