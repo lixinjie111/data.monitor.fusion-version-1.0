@@ -308,21 +308,21 @@ class GIS3D {
             *获取相机参数
             */
     getCamera() {
-        var cartesian3 = new Cesium.Cartesian3(this.cesium.viewer.camera.position.x, this.cesium.viewer.camera.position.y, this.cesium.viewer.camera.position.z);
-        var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(cartesian3);
-        var lat = Cesium.Math.toDegrees(cartographic.latitude);
-        var lng = Cesium.Math.toDegrees(cartographic.longitude);
-        var alt = cartographic.height;
+        var cartesian3 = new Cesium.Cartesian3(this.cesium.viewer.camera.position.x, this.cesium.viewer.camera.position.y, this.cesium.viewer.camera.position.z);
+        var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(cartesian3);
+        var lat = Cesium.Math.toDegrees(cartographic.latitude);
+        var lng = Cesium.Math.toDegrees(cartographic.longitude);
+        var alt = cartographic.height;
 
-        let obj = {
-            x: lat,
-            y: lng,
-            z: alt,
-            radius: this.cesium.viewer.camera.heading,
-            pitch: this.cesium.viewer.camera.pitch,
-            yaw: this.cesium.viewer.camera.roll
-        };
-        return obj;
+        let obj = {
+            x: lng,
+            y: lat,
+            z: alt,
+            radius: this.cesium.viewer.camera.heading,
+            pitch: this.cesium.viewer.camera.pitch,
+            yaw: this.cesium.viewer.camera.roll
+        };
+        return obj;
     }
     addModel(name, url, x, y, z) {
         //添加模型
@@ -386,7 +386,7 @@ class GIS3D {
 
     }
     updateCameraPosition(x, y, z, radius, pitch, yaw) {
-        // debugger Cesium.Math.toRadians(radius)
+        // var heading = Cesium.Math.toRadians(radius);
         var hpr = new Cesium.HeadingPitchRoll(radius, pitch, yaw);
         this.cesium.viewer.camera.flyTo({
             destination: Cesium.Cartesian3.fromDegrees(x, y, z),
