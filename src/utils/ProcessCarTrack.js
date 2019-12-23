@@ -115,7 +115,16 @@ class ProcessCarTrack {
     cacheAndInterpolatePlatformCar(car) {
         let vid = car.vehicleId;
         let cdata = this.cacheAndInterpolateDataByVid[vid];
-
+        let d = {
+            vehicleId: vid,
+            plateNo: car.plateNo,
+            longitude: car.longitude,
+            latitude: car.latitude,
+            gpsTime: car.gpsTime,
+            heading: car.heading,
+            devType:car.devType,
+            type:car.type
+        };
         if (cdata == null)//没有该车的数据
         {
             cdata = {
@@ -127,30 +136,14 @@ class ProcessCarTrack {
                 // nowProcessData: null,
                 plateNo: null
             };
-            let d = {
-                vehicleId: vid,
-                plateNo: car.plateNo,
-                longitude: car.longitude,
-                latitude: car.latitude,
-                gpsTime: car.gpsTime,
-                heading: car.heading,
-                devType:car.devType
-            };
+
             cdata.cacheData.push(d);
             cdata.lastReceiveData = d;
             cdata.nowReceiveData = d;
             this.cacheAndInterpolateDataByVid[vid] = cdata;
         } else {//存在该车的数据
 
-            let d = {
-                vehicleId: vid,
-                longitude: car.longitude,
-                latitude: car.latitude,
-                gpsTime: car.gpsTime,
-                plateNo: car.plateNo,
-                heading: car.heading,
-                devType:car.devType
-            };
+
             cdata.nowReceiveData = d;
             // console.log("积压长度")
             //     console.log(cdata.cacheData.length,d.vehicleId)
