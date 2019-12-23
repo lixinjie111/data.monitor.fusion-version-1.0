@@ -102,14 +102,7 @@
                 forwardShow:false,
                 inShow:false,
                 timeObj:{},
-                spatConnectCount:0,
-                warningConnectCount:0,
-                platformConnectCount:0,
-                cancelConnectCount:0,
-                perceptionConnectCount:0,
-                pulseConnectCount:0,
-                canConnectCount:0,
-
+                
                 processDataTime:'',
                 pulseNowTime:'',
                 pulseCount:0,
