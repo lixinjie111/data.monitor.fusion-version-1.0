@@ -5,12 +5,12 @@ let GisData = {
     //地图矢量数据初始化
     initDate(viewer) {
         //业务数据
-        viewer.imageryLayers.addImageryProvider(new Cesium.WebMapTileServiceImageryProvider({
-            url: window.mapUrl,
-            maximumLevel: 22,
-            id: "layer1",
-           // show: false
-        }));
+        // viewer.imageryLayers.addImageryProvider(new Cesium.WebMapTileServiceImageryProvider({
+        //     url: window.mapUrl,
+        //     maximumLevel: 22,
+        //     id: "layer1",
+        //    // show: false
+        // }));
         var promise = Cesium.GeoJsonDataSource.load('static/map3d/data/bs.geojson');
         promise.then(function (dataSource) {
             viewer.dataSources.add(dataSource); 
