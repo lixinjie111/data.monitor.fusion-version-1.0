@@ -209,8 +209,8 @@
                 platCars.platMaxValue = platCars.pulseInterval*1.5;
 
                 perceptionCars.stepTime = this.pulseInterval;
-                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2*0.8;
-                perceptionCars.perMaxValue = perceptionCars.pulseInterval*2*1.5;
+                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*0.8;
+                perceptionCars.perMaxValue = perceptionCars.pulseInterval*1.5;
 
                 let spatPulse = this.pulseInterval*10;
                 processData.spatPulseInterval = spatPulse*0.8;
@@ -744,7 +744,7 @@
                 }
 
                 //感知车 缓存+80ms调用一次
-                if(this.perCacheCount>pulseNum&&this.perPulseCount==0||this.perPulseCount>=2){
+                if(this.perCacheCount>pulseNum&&(this.perPulseCount==0||this.perPulseCount>=2)){
                     this.perPulseCount=1;
                     if(Object.keys(perceptionCars.devObj).length>0){
                         let processPerCar = perceptionCars.processPerTrack(result.timestamp,delayTime);
@@ -754,7 +754,7 @@
                 this.perPulseCount++;
 
                 //红绿灯  缓存+1200ms调用一次
-                if(this.spatCount>=pulseNum&&(this.spatPulseCount==0||this.spatPulseCount>=10)){
+                if(this.spatCount>=pulseNum&&(this.spatPulseCount==0||this.spatPulseCount>10)){
 //                    console.log(this.spatPulseCount);
                     this.spatPulseCount=1;
                     if(Object.keys(processData.spatObj).length>0){
@@ -768,7 +768,7 @@
                 this.spatPulseCount++;
 
                 //执行告警
-                if(this.warningCacheCount>pulseNum&&(this.warningPulseCount==0||this.warningPulseCount>=10)){
+                if(this.warningCacheCount>pulseNum&&(this.warningPulseCount==0||this.warningPulseCount>10)){
                     this.warningPulseCount=1;
                     if(Object.keys(processData.dynamicWarning).length>0){
                         this.warningExist = [];
@@ -802,7 +802,7 @@
                 this.warningPulseCount++;
 
                 //执行静态告警
-                if(this.staticCacheCount>pulseNum&&(this.staticPulseCount==0||this.staticPulseCount>=10)){
+                if(this.staticCacheCount>pulseNum&&(this.staticPulseCount==0||this.staticPulseCount>10)){
                     this.staticPulseCount=1;
                     //静态事件的处理
                     if(Object.keys(processData.staticWarning).length>0){
