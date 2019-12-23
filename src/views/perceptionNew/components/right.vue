@@ -138,6 +138,12 @@
             onLoadMap() {
                 // 获取摄像头列表
                 this.getCameraByRsId();
+                
+                let _camData = {
+                    type: 'updateSideList',
+                    data: sessionStorage.getItem("sideList")
+                };
+                document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
             },
             getCameraByRsId(){
                 getCameraByRsId({"rsId":this.rsId}).then(res => {

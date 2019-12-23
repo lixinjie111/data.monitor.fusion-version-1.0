@@ -1,6 +1,11 @@
 <template>
     <div class="c-map">
-        <iframe :src="iframeUrl" class="c-iframe"></iframe>
+        <iframe 
+            @load ="onLoadMap" 
+            :src="iframeUrl" 
+            id="c-iframe" 
+            class="c-iframe">
+        </iframe>
         <right></right>
     </div>
 </template>
@@ -13,6 +18,14 @@
             }
         },
         components:{ Right },
-        mounted() {}
+        methods: {
+            onLoadMap() {
+                let _camData = {
+                    type: 'updateSideList',
+                    data: sessionStorage.getItem("sideList")
+                };
+                document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
+            },
+        }
     }
 </script>
