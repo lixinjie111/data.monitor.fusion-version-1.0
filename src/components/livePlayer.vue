@@ -73,7 +73,7 @@ export default {
             },
             videoLoadingDelay: {
                 timer: null,
-                countTime: 20,
+                countTime: 30,
                 reloadTime: 3,
                 reloadCountLimit: 3,
                 reloadCount: 0,
