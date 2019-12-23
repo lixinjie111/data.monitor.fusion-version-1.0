@@ -167,6 +167,8 @@
             platCars.models={};
             platCars.viewer=gis3d.cesium.viewer;
 
+            platCars.sideList = sessionStorage.getItem("sideList");
+
             _this.rsId = _this.$route.params.crossId;
 
             let longitude=parseFloat(_this.$route.query.lng);

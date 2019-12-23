@@ -80,36 +80,7 @@
 
                 statisticData:'',
                 isActive:0,
-                vehData:[],
-                alertCount:0,
-                warningData:{},
-                warningCount:0,
-                lastLightObj:{},
-                processDataTime:'',
-                requestVideoUrl:getVideoByNum,
-                tabIsExist:true,
-
-                warningObj:{}, // 参数待定
-                pulseNowTime:'',
-                delayTime:'',
-                pulseInterval:40,
-
-                pulseCount:0,
-                spatPulseCount:0,
-                warningPulseCount:0,
-                staticPulseCount:0,
-                perPulseCount:0,
-                staticCacheCount:0,
-                warningCacheCount:0,
-                perCacheCount:0,
-
-
-
-                staticWarning:[],
-                dynamicWarning:[],
-                removeWarning:[],
-
-                isShutDown:false
+                requestVideoUrl:getVideoByNum
             }
         },
         props:{
@@ -151,8 +122,19 @@
             this.currentExtent = this.getExtend(longitude,latitude,extend);
             this.center=[longitude ,latitude];
             this.typeRoadData();
+
+            window.addEventListener('message', this.getMessage);
         },
         methods: {
+            getMessage(e) {
+                // e.data为父页面发送的数据
+                let eventData = e.data;
+                if(eventData.isParent) {
+                    this.$parent[eventData.type] = eventData.data;
+                }else {
+                    this[eventData.type] = eventData.data
+                }
+            },
             onLoadMap() {
                 // 获取摄像头列表
                 this.getCameraByRsId();
@@ -264,6 +246,7 @@
             },
         },
         destroyed(){
+            window.removeEventListener("message", this.getMessage);
         }
     }
 </script>
