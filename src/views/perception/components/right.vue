@@ -219,11 +219,12 @@
                 let camParam;
                 gis3d.addRectangle(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
 
+//                debugger
                 if(this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
                         camParam = this.camList[0].camParam;
-                        let {x, y, z, radius, pitch, yaw} = camParam;
-                        // let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+//                        let {x, y, z, radius, pitch, yaw} = camParam;
+                         let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
                         gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
                     this.getData();
                     this.mapShow=true;
@@ -233,8 +234,8 @@
                 this.mapInitTime = setInterval(()=>{
                     if(this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
-                        let {x, y, z, radius, pitch, yaw} = camParam;
-                        // let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+//                        let {x, y, z, radius, pitch, yaw} = camParam;
+                         let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
                         gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
                         this.getData();
                         clearInterval(this.mapInitTime);
@@ -570,7 +571,7 @@
                             pcarnum++;
                         }
                     }
-                    this.statisticData = "当前数据包：" + cars.length + "=" + zcarnum + "(自车)+" + pcarnum + "(感知)+" + persons + "(人)";
+                    this.statisticData = "当前数据包：" + cars.length + "=" + zcarnum + "(平台车)+" + pcarnum + "(感知)+" + persons + "(人)";
                 }
             },
 

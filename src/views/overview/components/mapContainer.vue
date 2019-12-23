@@ -284,6 +284,9 @@
         destroyed(){
             //销毁Socket
             this.webSocket&&this.webSocket.webSocket.close();
+            for(let vehicleId in this.prevData){
+                clearTimeout(this.prevData[vehicleId].timer);
+            }
         }
     }
 </script>
