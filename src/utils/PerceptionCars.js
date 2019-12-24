@@ -104,8 +104,8 @@ class PerceptionCars {
   }
   processPerTrack(time, delayTime) {
     let devList = [];
-      let list = [];
-      console.log("-----------");
+    let list = [];
+    console.log("-----------");
     for (let devId in this.cacheAndInterpolateDataByDevId) {
       let devCacheData = this.cacheAndInterpolateDataByDevId[devId];
       if (devCacheData && devCacheData.cacheData.length > 0) {
@@ -130,6 +130,7 @@ class PerceptionCars {
       //     this.clearAllModel();
       // }
       this.processPerceptionMesage(list);
+    console.log("**************")
     return devList;
   }
   getMinValue(devId, time, delayTime, cacheData) {
@@ -194,16 +195,16 @@ class PerceptionCars {
     if(minDiff && minDiff > this.perMaxValue&&!this.cacheAndInterpolateDataByDevId[devId].isFirst){
       return;
     }
-      console.log("最小索引:",devId,minIndex,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'));
-      console.log(this.cacheAndInterpolateDataByDevId[devId].isFirst);
-      if(minData){
-          minData.data.forEach(item=>{
-              console.log(parseInt(minData.gpsTime),item.vehicleId);
-          });
-      }
+      // console.log("最小索引:",devId,minIndex,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'));
+      // console.log(this.cacheAndInterpolateDataByDevId[devId].isFirst);
+      // if(minData){
+      //     minData.data.forEach(item=>{
+      //         console.log(parseInt(minData.gpsTime),item.vehicleId,item.targetType);
+      //     });
+      // }
     //对其后，找不到符合范围的  最小值保留
     if (minDiff && minDiff > this.perMaxValue&&this.cacheAndInterpolateDataByDevId[devId].isFirst) {
-      console.log(devId,"不在范围内")
+      // console.log(devId,"不在范围内")
       // console.log("per找到最小值无效",this.cacheAndInterpolateDataByDevId[devId].isFirst);
     }else{
         this.cacheAndInterpolateDataByDevId[devId].cacheData = this.cacheAndInterpolateDataByDevId[devId].cacheData.filter((item, index) => {
@@ -237,7 +238,7 @@ class PerceptionCars {
 
     // _this.processPerceptionDataIntervalId = setInterval(() => {
     if (_this.deviceModels == undefined) return;
-    console.log("开始绘制");
+    // console.log("开始绘制");
     this.clearModel(fusionList);
     if (fusionList.length <= 0) return;
     for (let i = 0; i < fusionList.length; i++) {
@@ -256,12 +257,12 @@ class PerceptionCars {
         continue;
       }
       if (d.targetType == 0) {//人
-        this.addMoveModel(true, d, "person");
+        this.addMoveModel(false, d, "person");
         this.addMoveLable(d, "personlabel");
       }
       else if (d.targetType == 1) //自行车
       {
-        this.addMoveModel(true, d, "bicycle");
+        this.addMoveModel(false, d, "bicycle");
         this.addMoveLable(d, "bicyclelabel");
       }
       else if (d.targetType == 2) { //感知车
@@ -305,13 +306,14 @@ class PerceptionCars {
   }
   //增加移动模型
   addMoveModel(isAnimation, d, name) {
-      console.log("新增："+d.vehicleId + name)
     let carModel = this.getModelForPrimitive(d.vehicleId + name);//this.deviceModels.cars[d.vehicleId+"car"];
     if (carModel == null) {
+        // console.log("新增："+d.vehicleId + name)
       //初始化增加车辆 如果没有隐藏车辆的模型
       this.addModeCar(isAnimation, d, name, name);
     }
     else {
+        // console.log("移动："+d.vehicleId + name)
       this.moveModel(carModel, d, name);
     }
   }
@@ -408,6 +410,7 @@ class PerceptionCars {
         if (primitive.id) {
           if (primitive.id.indexOf(name) != -1) {
             primitive.show = false;
+            // console.log("隐藏",primitive.id)
             var carlabel = this.viewer.entities.getById(primitive.id +"label");
             if (carlabel!= null || carlabel != undefined) {
               carlabel.show = false;
@@ -506,7 +509,6 @@ class PerceptionCars {
   }
   //移动模型
   moveModel(carmodel, d, name) {
-      console.log("移动：",d.vehicleId + name)
     var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ);
     var heading = Cesium.Math.toRadians(d.heading);
     var pitch = 0;
