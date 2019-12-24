@@ -1,7 +1,6 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <!--<div style="position: absolute;top: 200px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="shutDown">关闭</div>-->
-        <!--<div style="position: absolute;top: 300px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="open">开启</div>-->
+        <div style="position: absolute;top: 200px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="shutDown">关闭</div>
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
@@ -167,6 +166,8 @@
             platCars.models={};
             platCars.viewer=gis3d.cesium.viewer;
 
+            platCars.sideList = sessionStorage.getItem("sideList");
+
             _this.rsId = _this.$route.params.crossId;
 
             let longitude=parseFloat(_this.$route.query.lng);
@@ -199,7 +200,7 @@
                 platCars.pulseInterval = this.pulseInterval*0.8;//设置阀域范围 脉冲时间的100%
                 platCars.platMaxValue = this.pulseInterval*1.5;
 
-                perceptionCars.stepTime = this.pulseInterval;
+                perceptionCars.stepTime = this.pulseInterval*2;
                 perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2*0.8;
                 perceptionCars.perMaxValue = this.pulseInterval*2*1.5;
 
@@ -220,7 +221,7 @@
                 gis3d.addRectangle(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
 
 //                debugger
-                if(this.camList.length>0&&this.camList[0].camParam){
+                if(this.camList&&this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
                         camParam = this.camList[0].camParam;
 //                        let {x, y, z, radius, pitch, yaw} = camParam;
@@ -232,7 +233,7 @@
                 }
 
                 this.mapInitTime = setInterval(()=>{
-                    if(this.camList.length>0&&this.camList[0].camParam){
+                    if(this.camList&&this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
 //                        let {x, y, z, radius, pitch, yaw} = camParam;
                          let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
@@ -788,6 +789,7 @@
                             //分割之前将车辆移动到上一个点
                             //将第一个点进行分割
                             let data = devList.shift();
+//                            console.log(data)
                             perceptionCars.cacheAndInterpolatePerCar(data);
 //                            console.log(devId+"————————"+perceptionCars.cacheAndInterpolateDataByDevId[devId].cacheData.length)
                         }
@@ -824,7 +826,7 @@
                     }
 
                     //每隔80ms一次
-                    if(_this.spatPulseCount==0||_this.spatPulseCount>=10){
+                    if(_this.spatPulseCount==0||_this.spatPulseCount>10){
 //                        console.log(_this.spatPulseCount);
                         _this.spatPulseCount=1;
                         if(Object.keys(processData.spatObj).length>0){
@@ -839,7 +841,10 @@
 
                 }
 
-                if(_this.perCacheCount>pulseNum&&_this.perPulseCount==0||_this.perPulseCount>=2){
+//                console.log(_this.perCacheCount,pulseNum)
+//                console.log("...................")
+                //设置40ms
+                if(_this.perCacheCount>pulseNum&&(_this.perPulseCount==0||_this.perPulseCount>2)){
                     _this.perPulseCount=1;
                     if(Object.keys(perceptionCars.devObj).length>0){
                         let perList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
@@ -881,7 +886,7 @@
                 _this.perPulseCount++
 
                 //执行动态告警
-                if(_this.warningCacheCount>pulseNum&&(_this.warningPulseCount==0||_this.warningPulseCount>=10)){
+                if(_this.warningCacheCount>pulseNum&&(_this.warningPulseCount==0||_this.warningPulseCount>10)){
                     _this.warningPulseCount=1;
                     if(Object.keys(processData.dynamicWarning).length>0){
                         for(let warnId in processData.dynamicWarning){
@@ -897,7 +902,7 @@
                 _this.warningPulseCount++;
 
                 //执行静态告警
-                if(_this.staticCacheCount>pulseNum&&(_this.staticPulseCount==0||_this.staticPulseCount>=10)){
+                if(_this.staticCacheCount>pulseNum&&(_this.staticPulseCount==0||_this.staticPulseCount>10)){
                     _this.staticPulseCount=1;
                     //静态事件的处理
                     if(Object.keys(processData.staticWarning).length>0){
@@ -919,6 +924,9 @@
 
 
             },
+            shutDown(){
+                this.perceptionWebsocket&&this.perceptionWebsocket.webSocket.close();
+            }
 
         },
         destroyed(){

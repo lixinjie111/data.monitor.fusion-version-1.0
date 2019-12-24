@@ -93,7 +93,7 @@
         data() {
             return {
 //                center: [parseFloat(this.$route.query.lng), parseFloat(this.$route.query.lat)],
-                center: [121.169471,31.283857],
+                center: [121.176117,31.28040],
                 extend: parseFloat(this.$route.params.extend),
                 currentExtent: [
                     [121.17403069999999,31.2836193],

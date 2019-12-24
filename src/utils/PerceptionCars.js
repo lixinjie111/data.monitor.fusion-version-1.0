@@ -105,7 +105,7 @@ class PerceptionCars {
   processPerTrack(time, delayTime) {
     let devList = [];
       let list = [];
-      // console.log("-----------");
+      console.log("-----------");
     for (let devId in this.cacheAndInterpolateDataByDevId) {
       let devCacheData = this.cacheAndInterpolateDataByDevId[devId];
       if (devCacheData && devCacheData.cacheData.length > 0) {
@@ -199,17 +199,20 @@ class PerceptionCars {
     }
     // console.log("感知车最小索引:",devId,minIndex,minDiff,cacheData.length,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'),DateFormat.formatTime(new Date().getTime(),'hh:mm:ss:ms'));
     // console.log("找到最小值",parseInt(minData.gpsTime),minData.batchId);
-    //   minData.data.forEach(item=>{
-    //     console.log(parseInt(minData.gpsTime),item.vehicleId);
-    //   });
-    // console.log("最小索引:",devId,minIndex,minDiff);
-    // console.log(this.cacheAndInterpolateDataByDevId[devId].isFirst);
     //标尺还没对齐  return;
     if(minDiff && minDiff > this.perMaxValue&&!this.cacheAndInterpolateDataByDevId[devId].isFirst){
       return;
     }
+      console.log("最小索引:",devId,minIndex,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'));
+      console.log(this.cacheAndInterpolateDataByDevId[devId].isFirst);
+      if(minData){
+          minData.data.forEach(item=>{
+              console.log(parseInt(minData.gpsTime),item.vehicleId);
+          });
+      }
     //对其后，找不到符合范围的  最小值保留
     if (minDiff && minDiff > this.perMaxValue&&this.cacheAndInterpolateDataByDevId[devId].isFirst) {
+      console.log(devId,"不在范围内")
       // console.log("per找到最小值无效",this.cacheAndInterpolateDataByDevId[devId].isFirst);
     }else{
         this.cacheAndInterpolateDataByDevId[devId].cacheData = this.cacheAndInterpolateDataByDevId[devId].cacheData.filter((item, index) => {
@@ -243,7 +246,7 @@ class PerceptionCars {
 
     // _this.processPerceptionDataIntervalId = setInterval(() => {
     if (_this.deviceModels == undefined) return;
-    this.clearModel(fusionList);
+    // this.clearModel(fusionList);
     if (fusionList.length <= 0) return;
     for (let i = 0; i < fusionList.length; i++) {
       let d = fusionList[i];
