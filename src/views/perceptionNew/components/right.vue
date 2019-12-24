@@ -58,14 +58,6 @@
     import {getVideoByNum,getCameraByRsId,typeRoadData} from '@/api/fusion'
     import WebSocketObj from '@/assets/js/webSocket.js'
 
-    import GIS3D from '@/utils/GIS3D.js' 
-    import PerceptionCars from '@/utils/PerceptionCars.js'
-    import ProcessCarTrack from '@/utils/ProcessCarTrack.js'
-    import ProcessData from '@/utils/ProcessData.js'
-    let gis3d;
-    let perceptionCars ;
-    let platCars;
-    let processData;
     export default {
         data() {
             return {
