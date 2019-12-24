@@ -210,19 +210,29 @@
                 })
             },
             changeMap(param){
-                this.isActive=param;
-                this.param=param;
                 let _camData = null;
                 if(param==-1){
+                    this.param=-1;
+                    this.isActive=-1;
                     _camData = {
                         type: 'updatePosition'
                     };
                 }else {
                     _camData = {
-                        type: 'updateCam'
+                        type: 'updateCam',
+                        data: null
                     };
+                    if(this.camList.length>0){
+                        let cameraParam = this.camList[param].camParam;
+                        if(cameraParam){
+                            _camData.data = cameraParam;
+                        }
+                    }
                 }
                 document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
+
+                this.isActive=param;
+                this.param=param;
             },
             screenMagnify(item){
                 item.magnify = !item.magnify;
