@@ -292,7 +292,7 @@ let GisData = {
             [ 121.175468343422693, 31.28140713253277 ] ,
             [ 121.175842676513895, 31.281147522119241 ] 
            ] 
-           this.initTree(itemBigTree, viewer, "BigTree",false);
+           this.initTree(itemBigTree, viewer, "bigTree",false);
            
 
         let itemSide2 = [[121.17551589465815, 31.281617738453047, 0.0,250],
