@@ -353,7 +353,8 @@
                 if(param==-1){
                     this.param=-1;
                     this.isActive=-1;
-                    gis3d.updatePosition(this.currentExtent[3][0],this.currentExtent[3][1],this.currentExtent[1][0],this.currentExtent[1][1]);
+                    let currentExtent = this.getExtend(this.x,this.y,0.001);
+                    gis3d.updatePosition(currentExtent[3][0],currentExtent[3][1],currentExtent[1][0],currentExtent[1][1]);
                     // gis3d.updatePosition(this.x,this.y,121.431,31.371);
                     return;
                 }
