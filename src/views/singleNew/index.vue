@@ -14,7 +14,8 @@
     export default {
         data() {
             return {
-                iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/single.html?vehicleId='+this.$route.params.vehicleId+'&delayTime='+this.$route.query.delayTime
+                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/single.html?vehicleId='+this.$route.params.vehicleId+'&delayTime='+this.$route.query.delayTime
+                // iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/single.html?vehicleId='+this.$route.params.vehicleId+'&delayTime='+this.$route.query.delayTime
             }
         },
         components:{ Right },
