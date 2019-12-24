@@ -69,7 +69,8 @@
     export default {
         data() {
             return {
-                iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
+                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
+                // iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
                 center:[],
                 currentExtent:[],
                 x:0,
@@ -138,6 +139,12 @@
             onLoadMap() {
                 // 获取摄像头列表
                 this.getCameraByRsId();
+                
+                let _camData = {
+                    type: 'updateSideList',
+                    data: sessionStorage.getItem("sideList")
+                };
+                document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
             },
             getCameraByRsId(){
                 getCameraByRsId({"rsId":this.rsId}).then(res => {

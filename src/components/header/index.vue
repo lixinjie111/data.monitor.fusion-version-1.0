@@ -13,8 +13,7 @@
     </div>
 </template>
 <script>
- import { getTopHead, getTopWeather } from '@/api/header';
-// import { mapActions } from 'vuex';
+ import { getTopWeather } from '@/api/header';
 export default {
 	name: "Header",
     data() {
