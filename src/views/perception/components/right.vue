@@ -186,7 +186,6 @@
                 _this.x = longitude;
                 _this.y = latitude;
                 _this.currentExtent = _this.getExtend(longitude,latitude,extend);
-                console.log(_this.currentExtent)
                 _this.center=[longitude ,latitude];
             }
             _this.getCameraByRsId();
@@ -231,8 +230,8 @@
                 if(this.camList&&this.camList.length>0&&this.camList[0].camParam){
                     camParam = this.camList[0].camParam;
                         camParam = this.camList[0].camParam;
-                        let {x, y, z, radius, pitch, yaw} = camParam;
-//                         let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+                       let {x, y, z, radius, pitch, yaw} = camParam;
+                         // let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
                         gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
                     this.getData();
                     this.mapShow=true;
@@ -242,8 +241,8 @@
                 this.mapInitTime = setInterval(()=>{
                     if(this.camList&&this.camList.length>0&&this.camList[0].camParam){
                         camParam = this.camList[0].camParam;
-                        let {x, y, z, radius, pitch, yaw} = camParam;
-//                         let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
+                       let {x, y, z, radius, pitch, yaw} = camParam;
+                         // let {x, y, z, radius, pitch, yaw} = window.defaultMapParam;
                         gis3d.updateCameraPosition(x, y, z, radius, pitch, yaw);
                         this.getData();
                         clearInterval(this.mapInitTime);
