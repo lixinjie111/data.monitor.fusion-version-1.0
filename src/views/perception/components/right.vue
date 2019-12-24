@@ -4,7 +4,10 @@
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
-        <div class="c-pulse-time">{{processDataTime|dateFormat}} </div>
+        <div class="c-pulse-time">
+            <i class="el-icon-loading" v-if="!processDataTime"></i>
+            <template v-else>{{processDataTime|dateFormat}}</template>
+        </div>
         <div class="video-style">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">

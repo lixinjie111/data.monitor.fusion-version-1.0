@@ -30,7 +30,10 @@
                 <p class="video-position"  v-if="!inShow">暂无数据</p>
             </div>
         </div>
-        <div class="c-pulse-time" >{{processDataTime|dateFormat}}</div>
+        <div class="c-pulse-time" >
+            <i class="el-icon-loading" v-if="!processDataTime"></i>
+            <template v-else>{{processDataTime|dateFormat}}</template>
+        </div>
         <div class="c-map" id="cesiumContainer">
         </div>
         <img class="single-car" src="@/assets/images/single/car-bottom.png"/>

@@ -275,6 +275,13 @@ img {
   left:50%;
   transform: translate(-50%,0);
   text-align: left;
+  .el-icon-loading{
+    display: block;
+    width: 30px;
+    font-size: 30px;
+    color: #fff;
+    margin: 0 auto;
+  }
 }
 
 .c-iframe {
