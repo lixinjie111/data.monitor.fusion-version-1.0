@@ -37,7 +37,8 @@ let GisUtils = {
         h2 = (3 * r + 1) / 2 / s;
         s = d * (1 + fl * (h1 * sf * (1 - sg) - h2 * (1 - sf) * sg));
         s = s / 1000;
-        s = s.toFixed(2);//指定小数点后的位数。   
+        s = s.toFixed(2);//指定小数点后的位数。
+
         return s;
     }
 }

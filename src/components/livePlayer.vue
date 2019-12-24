@@ -193,9 +193,9 @@ export default {
         },
         onPlayerTimeupdate(player) {
 //             console.log("onPlayerTimeupdate",player);
-            console.log("timeupdate", player, this.videoLoadingDelay.lastTimeupdate);
+//            console.log("timeupdate", player, this.videoLoadingDelay.lastTimeupdate);
             if(this.videoLoadingDelay.lastTimeupdate != player) {
-                console.log("---------更新");
+//                console.log("---------更新");
                 this.videoLoadingDelay.lastTimeupdate = player;
                 this.setVideoOptionClose();
             }

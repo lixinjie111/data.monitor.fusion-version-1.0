@@ -6,29 +6,33 @@
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-pulse-time">{{processDataTime|dateFormat}} </div>
         <div class="video-style">
-            <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
-                <div class="style">
-                    <div class="video-mask" @click="screenMagnify(item)"></div>
-                    <live-player
-                            :requestVideoUrl="requestVideoUrl"
-                            :params="item.params"
-                            type="flvUrl"
-                            :autoplay="false"
-                            :ref="'player'+index"
-                    >
-                        <div class="video-num" @click="changeMap(index)">
-                            <span class="device-num">摄像头编号:{{item.devId}}</span>
-                            <span class="active-circle" :class="{'active-style':isActive==index}"></span>
-                            <span>{{item.rsPtName}}</span>
+            <div class="c-scroll-wrap">
+                <div class="c-scroll-inner">
+                    <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
+                        <div class="style">
+                            <div class="video-mask" @click="screenMagnify(item)"></div>
+                            <live-player
+                                    :requestVideoUrl="requestVideoUrl"
+                                    :params="item.params"
+                                    type="flvUrl"
+                                    :autoplay="false"
+                                    :ref="'player'+index"
+                            >
+                                <div class="video-num" @click="changeMap(index)">
+                                    <span class="device-num">摄像头编号:{{item.devId}}</span>
+                                    <span class="active-circle" :class="{'active-style':isActive==index}"></span>
+                                    <span>{{item.rsPtName}}</span>
+                                </div>
+                                <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
+                            </live-player>
                         </div>
-                        <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
-                    </live-player>
-                </div>
-            </div>
-            <div v-for="item in new Array(2)" class="video-position style" v-if="camList.length==0">
-                <div class="c-video-16-9 ">
-                    <div class="video-tip">
-                        暂无数据
+                    </div>
+                    <div v-for="item in new Array(2)" class="video-position style" v-if="camList.length==0">
+                        <div class="c-video-16-9 ">
+                            <div class="video-tip">
+                                暂无数据
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -998,6 +1002,8 @@
         right: 10px;
         z-index:3;
         width: 400px;
+        bottom: 10px;
+        height: auto;
         .video-tip{
             @include layoutMode(both);
             font-size: 16px;
