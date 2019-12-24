@@ -18,9 +18,6 @@ class PerceptionCars {
     this.cacheAndInterpolateDataByDevId = {};
     this.stepTime = '';
     this.drawnObj = {};
-    this.lastList=[];
-    this.startTime='';
-    this.endTime='';
   }
 
   //接受数据
@@ -107,8 +104,8 @@ class PerceptionCars {
   }
   processPerTrack(time, delayTime) {
     let devList = [];
-    let list = [];
-    console.log("-----------");
+      let list = [];
+      console.log("-----------");
     for (let devId in this.cacheAndInterpolateDataByDevId) {
       let devCacheData = this.cacheAndInterpolateDataByDevId[devId];
       if (devCacheData && devCacheData.cacheData.length > 0) {
@@ -260,56 +257,51 @@ class PerceptionCars {
       }
       if (d.targetType == 0) {//人
         this.addMoveModel(true, d, "person");
+        this.addMoveLable(d, "personlabel");
       }
       else if (d.targetType == 1) //自行车
       {
         this.addMoveModel(true, d, "bicycle");
+        this.addMoveLable(d, "bicyclelabel");
       }
       else if (d.targetType == 2) { //感知车
         // console.log(d.vehicleId)
         /////////////处理感知车数据
         this.addMoveModel(false, d, "carbox");
-        ///////////////////////////end
+        ///////////////////////////end 
         //移动标签
-        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
-        if (carlabel == null || carlabel == undefined) {
-          this.addModeCarLabel(d,3);
-        }
-        else {
-          this.moveModelLabel(carlabel, d,3);
-        }
+        this.addMoveLable(d, "carboxlabel");
       }
       else if (d.targetType == 3) //摩托车
       {
         this.addMoveModel(true, d, "motorbike");
+        this.addMoveLable(d, "motorbikelabel");
       }
       else if (d.targetType == 5) //公交车
       {
         this.addMoveModel(false, d, "bus");
         //移动标签
-        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
-        if (carlabel == null || carlabel == undefined) {
-          this.addModeCarLabel(d,5);
-        }
-        else {
-          this.moveModelLabel(carlabel, d,5);
-        }
+        this.addMoveLable(d, "buslabel");
       }
       else if (d.targetType == 7) //卡车
       {
         this.addMoveModel(false, d, "truck");
         //移动标签
-        var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
-        if (carlabel == null || carlabel == undefined) {
-          this.addModeCarLabel(d,5);
-        }
-        else {
-          this.moveModelLabel(carlabel, d,5);
-        }
+        this.addMoveLable(d, "trucklabel");
       }
 
     }
     // },0); //
+  }
+  //增加和移动标签
+  addMoveLable(d, name) {
+    var carlabel = this.viewer.entities.getById(d.vehicleId + name);
+    if (carlabel == null || carlabel == undefined) {
+      this.addModeCarLabel(d, 5, name);
+    }
+    else {
+      this.moveModelLabel(carlabel, d, 5);
+    }
   }
   //增加移动模型
   addMoveModel(isAnimation, d, name) {
@@ -332,7 +324,8 @@ class PerceptionCars {
     for (var i = 0; i < primitives.length; i++) {
       var primitive = primitives.get(i);
       if (primitive.id) {
-        if (primitive instanceof Cesium.Model && primitive.id.search("carbox") != -1 || primitive.id.search("person") != -1) {
+        if (primitive instanceof Cesium.Model && primitive.id.search("carbox") != -1 || primitive.id.search("person") != -1 || primitive.id.search("bicycle") != -1 ||
+          primitive.id.search("motorbike") != -1 || primitive.id.search("bus") != -1 || primitive.id.search("truck") != -1) {
           this.viewer.scene.primitives.remove(primitive);
         }
       }
@@ -356,7 +349,10 @@ class PerceptionCars {
     this.clearCar(fusionList, "bus");
     this.clearCar(fusionList, "truck");
 
-    this.clearCarLabel(fusionList);
+    // this.clearCarLabel( "labelcarbox");
+    // this.clearCarLabel( "labelperson");
+    // this.clearCarLabel(fusionList,"labelperson");
+    // this.clearCarLabel(fusionList);
   }
   clearCarLabel(fusionList) {
     /////////////////////////
@@ -366,20 +362,25 @@ class PerceptionCars {
       var entitie = entities[i];
       let isTrue = false;
       for (var kk = 0; kk < fusionList.length; kk++) {
-        if (entitie.id != fusionList[kk].vehicleId + "label" && entitie.id.search("label") != -1) {
+        if (entitie.id == fusionList[kk].vehicleId + "labelcarbox") {
           isTrue = true;
-          continue;
+          break;
+        }
+        else {
+          isTrue = false;
         }
       }
-      if (isTrue) {
-        if (entitie.id.search("label") != -1) {
-          entitie.show = false;
+      if (!isTrue) {
+        if (entitie.id) {
+          if (entitie.id.search("label") != -1) {
+            entitie.show = false;
+          }
+          countLable++;
         }
 
-        countLable++;
       }
     }
-    if ((countLable - fusionList.length) >= 100) {
+    if ((countLable - fusionList.length) >= 30) {
       this.removeModelEntities();
     }
     // console.log(fusionList.length + "空闲文字" + countLable)
@@ -389,27 +390,38 @@ class PerceptionCars {
     //复位感知车
     let count = 0;
     var primitives = _this.viewer.scene.primitives;
-    console.log("上次画的",primitives)
-    for (var i = 0; i < primitives.length; i++){
+    for (var i = 0; i < primitives.length; i++) {
       var primitive = primitives.get(i);
-      let isExist = false;
+      let isTrue = false;
       // console.log("---------")
       //   console.log(typeof fusionList);
       for (var kk = 0; kk < fusionList.length; kk++) {
         if (primitive instanceof Cesium.Model && (primitive.id == fusionList[kk].vehicleId + name)) {
-            isExist = true;
+          isTrue = true;
+          break
+        }
+        else {
+          isTrue = false;
         }
       }
-      if(!isExist){
-          primitive.show = false;
-          console.log("隐藏的:",primitive.id)
+      if (!isTrue) {
+        if (primitive.id) {
+          if (primitive.id.indexOf(name) != -1) {
+            primitive.show = false;
+            var carlabel = this.viewer.entities.getById(primitive.id +"label");
+            if (carlabel!= null || carlabel != undefined) {
+              carlabel.show = false;
+            }
+          }
           count++;
-      }
+        }
 
+      }
     }
-    // if (count>0) {
-    //   this.removeModelPrimitives(name);
-    // }
+    if ((count - fusionList.length) >= window.count) {
+      this.removeModelPrimitives(name);
+      this.removeModelEntities(name);
+    }
     // console.log(fusionList.length + "空闲车" + count)
   }
   /**
@@ -457,17 +469,17 @@ class PerceptionCars {
     for (var i = 0; i < primitives.length; i++) {
       var primitive = primitives.get(i);
       if (primitive.id) {
-        if (primitive instanceof Cesium.Model && primitive.id.search(name) != -1) {
+        if (primitive instanceof Cesium.Model && !primitive.show && primitive.id.search(name) != -1) {
           this.viewer.scene.primitives.remove(primitive);
         }
       }
     }
   }
-  removeModelEntities() {
+  removeModelEntities(name) {
     var entities = this.viewer.entities._entities._array;
     for (var i = 0; i < entities.length; i++) {
       if (entities[i].id) {
-        if (!entities[i].show && entities[i].id.search("label") != -1) {
+        if (!entities[i].show && entities[i].id.search(name) != -1) {
           this.viewer.entities.remove(entities[i]);
         }
       }
@@ -513,7 +525,8 @@ class PerceptionCars {
     Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, Cesium.Ellipsoid.WGS84, fixedFrameTransforms, carmodel.modelMatrix)
 
   }
-  addModeCarLabel(d,height) {
+  //增加文字标签
+  addModeCarLabel(d, height, name) {
     var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + height);
     ///////////////增加文字
     let h = d.heading.toFixed(1);
@@ -521,7 +534,7 @@ class PerceptionCars {
     let veh = d.vehicleId.substr(0, 4);
     let text = "[" + h + ", " + s + ", " + veh + "]";
     let entityLabel = this.viewer.entities.add({
-      id: d.vehicleId + "label",
+      id: d.vehicleId + name,
       position: position,
       point: {
         color: Cesium.Color.RED,    //点位颜色
@@ -543,9 +556,9 @@ class PerceptionCars {
   /**
    * 移动文字标签
    */
-  moveModelLabel(carlabel, d,height) {
+  moveModelLabel(carlabel, d, height) {
     //var carlabel = this.viewer.entities.getById( d.vehicleId + "label");
-    carlabel.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ +height);
+    carlabel.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + height);
     let h = d.heading.toFixed(1);
     let s = d.speed.toFixed(1);
     let veh = d.vehicleId.substr(0, 4);
