@@ -1,6 +1,6 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <div style="position: absolute;top: 200px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="shutDown">关闭</div>
+        <!--<div style="position: absolute;top: 200px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="shutDown">关闭</div>-->
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>

@@ -208,9 +208,9 @@
                 platCars.pulseInterval = this.pulseInterval*0.8;//设置阀域范围 脉冲时间的100%
                 platCars.platMaxValue = platCars.pulseInterval*1.5;
 
-                perceptionCars.stepTime = this.pulseInterval;
-                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*0.8;
-                perceptionCars.perMaxValue = perceptionCars.pulseInterval*1.5;
+                perceptionCars.stepTime = this.pulseInterval*2;
+                perceptionCars.pulseInterval = parseInt(this.pulseInterval)*2*0.8;
+                perceptionCars.perMaxValue = perceptionCars.pulseInterval*2*1.5;
 
                 let spatPulse = this.pulseInterval*10;
                 processData.spatPulseInterval = spatPulse*0.8;
@@ -744,7 +744,7 @@
                 }
 
                 //感知车 缓存+80ms调用一次
-                if(this.perCacheCount>pulseNum&&(this.perPulseCount==0||this.perPulseCount>=2)){
+                if(this.perCacheCount>pulseNum&&(this.perPulseCount==0||this.perPulseCount>2)){
                     this.perPulseCount=1;
                     if(Object.keys(perceptionCars.devObj).length>0){
                         let processPerCar = perceptionCars.processPerTrack(result.timestamp,delayTime);

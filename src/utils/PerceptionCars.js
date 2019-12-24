@@ -3,10 +3,10 @@ class PerceptionCars {
   constructor() {
     this.defualtZ = window.defualtZ;
     this.cacheModelNum = 200,//初始化车辆总数
-      this.carColor = 0x80f77a,//感知车颜色
-      this.pitch = 0,
-      this.yaw = 0,
-      this.roll = Math.PI * (10 / 90);
+    this.carColor = 0x80f77a,//感知车颜色
+    this.pitch = 0,
+    this.yaw = 0,
+    this.roll = Math.PI * (10 / 90);
     this.deviceModels = { cars: {}, persons: [], texts: [] };
     this.cachePerceptionQueue = new Array(); //缓存感知数据
     this.lastPerceptionMessage = null;
@@ -105,7 +105,7 @@ class PerceptionCars {
   processPerTrack(time, delayTime) {
     let devList = [];
     let list = [];
-    console.log("-----------");
+    // console.log("-----------");
     for (let devId in this.cacheAndInterpolateDataByDevId) {
       let devCacheData = this.cacheAndInterpolateDataByDevId[devId];
       if (devCacheData && devCacheData.cacheData.length > 0) {
@@ -130,7 +130,7 @@ class PerceptionCars {
       //     this.clearAllModel();
       // }
       this.processPerceptionMesage(list);
-    console.log("**************")
+    // console.log("**************")
     return devList;
   }
   getMinValue(devId, time, delayTime, cacheData) {
