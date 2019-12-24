@@ -46,37 +46,44 @@ export default new VueRouter({
       path: '/single/:vehicleId',
       name: 'Single',
       component: Single,
-      meta: {}
+      meta: {
+        showHeader: true
+      }
   },{
       path: '/singleNew/:vehicleId',
       name: 'SingleNew',
       component: SingleNew,
-      meta: {}
+      meta: {
+        showHeader: true
+      }
   },{
       path: '/perception/:crossId/:delayTime/:extend/:leftShow',
       name: 'Perception',
       component: Perception,
       meta: {
-          // keepAlive:true
+        showHeader: true
       }
   },{
       path: '/perceptionNew/:crossId/:delayTime/:extend/:leftShow',
       name: 'PerceptionNew',
       component: PerceptionNew,
       meta: {
-          // keepAlive:true
+        showHeader: true
       }
   },{
       path: '/PerceptionTest/:crossId/:delayTime/:extend/:leftShow',
       name: 'PerceptionTest',
       component: PerceptionTest,
       meta: {
-          // keepAlive:true
+        showHeader: true
       }
   },{
     path: '/overview',
     name: 'Overview',
-    component: Overview
+    component: Overview,
+    meta: {
+      showHeader: true
+    }
   }],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }

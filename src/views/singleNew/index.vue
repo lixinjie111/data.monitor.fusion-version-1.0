@@ -1,6 +1,11 @@
 <template>
     <div class="c-map">
-        <iframe :src="iframeUrl" class="c-iframe"></iframe>
+        <iframe 
+            @load ="onLoadMap" 
+            :src="iframeUrl" 
+            id="c-iframe" 
+            class="c-iframe">
+        </iframe>
         <right></right>
     </div>
 </template>
@@ -9,10 +14,19 @@
     export default {
         data() {
             return {
-                iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/single.html?vehicleId='+this.$route.params.vehicleId+'&delayTime='+this.$route.query.delayTime
+                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/single.html?vehicleId='+this.$route.params.vehicleId+'&delayTime='+this.$route.query.delayTime
+                // iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/single.html?vehicleId='+this.$route.params.vehicleId+'&delayTime='+this.$route.query.delayTime
             }
         },
         components:{ Right },
-        mounted() {}
+        methods: {
+            onLoadMap() {
+                let _camData = {
+                    type: 'updateSideList',
+                    data: sessionStorage.getItem("sideList")
+                };
+                document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
+            },
+        }
     }
 </script>
