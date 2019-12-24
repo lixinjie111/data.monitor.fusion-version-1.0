@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <!-- 头部 -->
-        <header-bar></header-bar>
+        <header-bar v-if="this.$route.meta.showHeader"></header-bar>
         <div class="app-container">
             <router-view></router-view>
         </div>
@@ -10,7 +10,6 @@
 
 <script>
 import HeaderBar from '@/components/header/index.vue'
-import {getTopWeather} from '@/api/overview/index.js';
 import {mapActions} from 'vuex';
 
 export default {
