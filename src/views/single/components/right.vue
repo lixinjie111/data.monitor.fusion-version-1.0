@@ -967,8 +967,8 @@
         position: absolute;
         transform: translate(-50%,0);
         margin-left:50%;
-        bottom: 260px;
-        font-size: 16px;
+        bottom: 240px;
+        font-size: 20px;
         letter-spacing: 0px;
         z-index:1;
         .detail1{
