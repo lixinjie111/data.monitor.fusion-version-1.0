@@ -42,18 +42,6 @@ class PerceptionCars {
       // }
     });
   }
-    receiveData1(sideList) {
-        sideList.forEach(item => {
-            // if(item.devId=='RCU_2046A10433DB_3100000000132000002801'){
-            if (!this.devObj[item.devId]) {
-                this.devObj[item.devId].data = new Array();
-            }
-            this.devObj[item.devId].data.push(item);
-            this.devObj[item.devId].isFirst=false;
-
-            // }
-        });
-    }
   cacheAndInterpolatePerCar(device) {
     let devId = device.devId;
     let cdata = this.cacheAndInterpolateDataByDevId[devId];
@@ -135,47 +123,18 @@ class PerceptionCars {
         }*/
         this.drawnObj[devId] = devData.batchId;
         let fusionList = devData.data;
-          if(fusionList&&fusionList.length) {
-              list.push.apply(list,fusionList);
-          }
-        // console.log(devData)
-        // console.log("*****"+fusionList)
+      if(fusionList&&fusionList.length) {
+          list.push.apply(list,fusionList);
+      }
         devList.push(devData);
       }
     }
       // if(!Object.keys(this.drawnObj).length) {
       //     this.clearAllModel();
       // }
-    // list.forEach(item=>{
-    //   item.vehicleId =Math.random()*1000+"a" ;
-    // })
-    //   if(list&&list.length<=0){
-    //      return;
-    //   }
       this.processPerceptionMesage(list);
-      // console.log("************")
     return devList;
   }
-  processPerTrack1(time, delayTime) {
-        let devList = [];
-        let list = [];
-        for(let devId in this.devObj){
-            let devCacheData = this.devObj[devId];
-            if (devCacheData && devCacheData.length > 0) {
-                let devData = this.getMinValue(devId, time, delayTime, devCacheData.data);
-                if (!devData){
-                    // console.log("没有找到相应的值")
-                    return;
-                }
-                let fusionList = devData.data;
-                if(fusionList&&fusionList.length){
-                    list.push.apply(list,fusionList);
-                }
-            }
-        }
-        this.processPerceptionMesage(list);
-        return devList;
-    }
   getMinValue(devId, time, delayTime, cacheData) {
     /* let minDiff = Math.abs(time-minData.gpsTime-delayTime);*/
     let rangeData = null;
@@ -274,104 +233,6 @@ class PerceptionCars {
     //返回距离标尺的最小插值的数据
     return minData;
   }
-  getMinValue1(devId, time, delayTime, cacheData) {
-        /* let minDiff = Math.abs(time-minData.gpsTime-delayTime);*/
-        let rangeData = null;
-        let startIndex = -1;
-        let minIndex = -1;
-        let minData = {};
-        let minDiff;
-        // console.log("找到最小值前："+cacheData.length);
-        //找到满足条件的范围
-        for (let i = 0; i < cacheData.length; i++) {
-            let diff = Math.abs(time - cacheData[i].gpsTime - delayTime);
-            // console.log(devId,cacheData.length,time,parseInt(cacheData[i].gpsTime),delayTime,diff,i)
-            if (diff < this.pulseInterval) {
-                if (startIndex != -1 && i != startIndex + 1) {
-                    break;
-                }
-                if (!rangeData || (rangeData && diff < rangeData.delayTime)) {
-                    startIndex = i;
-                    let obj = {
-                        index: i,
-                        delayTime: diff,
-                        data: cacheData[i]
-                    }
-                    minDiff=diff;
-                    rangeData = obj;
-                } else {
-                    break;
-                }
-            } else {
-                if (rangeData) {
-                    break;
-                }
-            }
-        }
-        //如果能找到最小范围
-        // console.log(rangeData)
-        if (rangeData) {
-            minIndex = rangeData.index;
-            minData = rangeData.data;
-            this.devObj[devId].isFirst=true;
-        } else {
-            // console.log("plat***********************");
-            minIndex = 0;
-            minData = cacheData[0];
-            minDiff = Math.abs(time - minData.gpsTime - delayTime);
-            for (let i = 0; i < cacheData.length; i++) {
-                let diff = Math.abs(time - parseInt(cacheData[i].gpsTime) - delayTime);
-                // let diff = time-cacheData[i].gpsTime-insertTime;
-                // console.log(vid,cacheData.length, time, parseInt(cacheData[i].gpsTime) , diff)
-                if (diff < minDiff) {
-                    minData = cacheData[i];
-                    minIndex = i;
-                    minDiff = diff;
-                }
-            }
-        }
-        // console.log("感知车最小索引:",devId,minIndex,minDiff,cacheData.length,DateFormat.formatTime(time,'hh:mm:ss:ms'),DateFormat.formatTime((minData.gpsTime+delayTime),'hh:mm:ss:ms'),DateFormat.formatTime(new Date().getTime(),'hh:mm:ss:ms'));
-        // console.log("找到最小值",parseInt(minData.gpsTime),minData.batchId);
-        //标尺还没对齐  return;
-        if(minDiff && minDiff > this.perMaxValue&&!this.devObj[devId].isFirst){
-            return;
-        }
-        console.log("最小索引:",devId,minIndex,minDiff,DateFormat.formatTime(time,'hh:mm:ss:ms'));
-        console.log(this.devObj[devId].isFirst);
-        if(minData){
-            minData.data.forEach(item=>{
-                console.log(parseInt(minData.gpsTime),item.vehicleId,item);
-            });
-        }
-        //对其后，找不到符合范围的  最小值保留
-        if (minDiff && minDiff > this.perMaxValue&&this.devObj[devId].isFirst) {
-            console.log(devId,"不在范围内")
-            // console.log("per找到最小值无效",this.cacheAndInterpolateDataByDevId[devId].isFirst);
-        }else{
-            this.devObj[devId] = this.devObj[devId].filter((item, index) => {
-                return index > minIndex;
-            });
-        }
-        //打印出被舍弃的点
-        // let lostData = this.cacheAndInterpolateDataByDevId[devId].cacheData.filter((item, index) => {
-        //   return index < minIndex;
-        // })
-        //   if(lostData.length>0){
-        //       console.log("丢失数据长度",lostData.length);
-        //       lostData.forEach(item => {
-        //           let d = Math.abs(time - parseInt(item.gpsTime) - delayTime);
-        //           console.log("丢失的数据：",parseInt(item.gpsTime),d,minDiff,item.batchId);
-        //           console.log("此帧车辆数据的长度："+item.data.length);
-        //           item.data.forEach(data=>{
-        //               console.log("车辆数据：",data);
-        //           });
-        //       })
-        //   }
-        //找到最小值后，将数据之前的数值清除
-        // console.log("找到最小值后"+this.cacheAndInterpolateDataByDevId[devId].cacheData.length);
-        //返回距离标尺的最小插值的数据
-        return minData;
-    }
   //************************************* */ 地图部分******************************
   //绘制感知车
   processPerceptionMesage(fusionList, flag) {
@@ -408,7 +269,7 @@ class PerceptionCars {
         // console.log(d.vehicleId)
         /////////////处理感知车数据
         this.addMoveModel(false, d, "carbox");
-        ///////////////////////////end 
+        ///////////////////////////end
         //移动标签
         var carlabel = this.viewer.entities.getById(d.vehicleId + "label");
         if (carlabel == null || carlabel == undefined) {
@@ -491,7 +352,7 @@ class PerceptionCars {
     this.clearCar(fusionList, "carbox");
     this.clearCar(fusionList, "person");
     this.clearCar(fusionList, "bicycle");
-    this.clearCar(fusionList, "motorbike"); 
+    this.clearCar(fusionList, "motorbike");
     this.clearCar(fusionList, "bus");
     this.clearCar(fusionList, "truck");
 
@@ -525,7 +386,7 @@ class PerceptionCars {
   }
   clearCar(fusionList, name) {
     let _this = this;
-    //复位感知车 
+    //复位感知车
     let count = 0;
     var primitives = _this.viewer.scene.primitives;
     console.log("上次画的",primitives)
@@ -553,7 +414,7 @@ class PerceptionCars {
   }
   /**
    * 增加车辆
-   * @param {数据} d 
+   * @param {数据} d
    */
   addModeCar(isAnimation, d, name, glbName) {
     var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ);
