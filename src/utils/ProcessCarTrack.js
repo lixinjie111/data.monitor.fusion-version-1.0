@@ -73,9 +73,9 @@ class ProcessCarTrack {
             // if(vehicleId=='B21E0002'){
             //     let diff = json.time - data[vehicleId][0].gpsTime;
             //     let diff1 = time - json.time;
-                let diff = new Date().getTime()-data[vehicleId][0].gpsTime;
-                let diff1 = json.time-data[vehicleId][0].gpsTime;
-                let diff2 = new Date().getTime()-json.time
+            let diff = new Date().getTime()-data[vehicleId][0].gpsTime;
+            let diff1 = json.time-data[vehicleId][0].gpsTime;
+            let diff2 = new Date().getTime()-json.time;
             // console.log("vehicleId:"+vehicleId+",send:"+DateFormat.formatTime(json.time,'hh:mm:ss')+",gpsTime:"+DateFormat.formatTime(data[vehicleId][0].gpsTime,'hh:mm:ss')+",pulseTime"+DateFormat.formatTime(time,'hh:mm:ss')+",local："+DateFormat.formatTime(new Date().getTime(),'hh:mm:ss')+",'local-send'"+diff2+",'local-gps:'"+diff+",'send-gps:'"+diff1)
             let vehList = data[vehicleId];
             let cdata = this.platObj[vehicleId];

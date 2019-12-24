@@ -27,7 +27,7 @@ class WebSocketObj {
                 this.$message("此浏览器不支持websocket");
             }
         }catch (e){
-            this.reconnect();
+            // this.reconnect();
         }
 
     }
@@ -36,11 +36,11 @@ class WebSocketObj {
     }
     onClose(){
         console.log("结束连接:"+this.params.action);
-        this.reconnect();
+        // this.reconnect();
     }
     onError(){
         console.log("连接error:"+this.params.action);
-        this.reconnect();
+        // this.reconnect();
     }
     onOpen(){
         let _params = JSON.stringify(this.params);
