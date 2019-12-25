@@ -61,8 +61,8 @@
     export default {
         data() {
             return {
-                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
-                // iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
+                // iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
+                iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
                 center:[],
                 currentExtent:[],
                 x:0,
@@ -278,7 +278,7 @@
         border:1px solid rgba(211, 134, 0, 0.3);
         position: absolute;
         bottom: 10px;
-        background: #000;
+        background: $backgroundRgba;
         right: 10px;
         z-index:100;
     }
@@ -363,7 +363,7 @@
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
         height: 226px;
-        background: #00000082;
+        background: $background;
     }
     .video-mask{
         position: absolute;
