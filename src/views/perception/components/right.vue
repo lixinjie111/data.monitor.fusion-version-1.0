@@ -5,7 +5,7 @@
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-pulse-time">
-            <i class="el-icon-loading" v-if="!processDataTime"></i>
+            <i class="el-icon-loading" v-if="isLoadingShow"></i>
             <template v-else>{{processDataTime|dateFormat}}</template>
         </div>
         <div class="video-style">
@@ -121,7 +121,8 @@
                 dynamicWarning:[],
                 removeWarning:[],
 
-                isShutDown:false
+                isShutDown:false,
+                isLoadingShow:true
             }
         },
         props:{
@@ -193,6 +194,18 @@
             _this.onMapComplete();
             //判断当前标签页是否被隐藏
             document.addEventListener("visibilitychange",this.processTab);
+            let timeout = _this.delayTime+10000;
+            setTimeout(()=>{
+                if(_this.processDataTime==''){
+                    _this.isLoadingShow = false;
+                    _this.$message({
+                        type: 'error',
+                        duration: '1500',
+                        message:  'socket连接失败',
+                        showClose: true
+                    });
+                }
+            },timeout)
         },
         methods: {
             formatTime(value){
@@ -334,19 +347,21 @@
 
                     ]
                 ).then(res=>{
-                    let signs = res.data[0].baseData.signs;
-                    let spats = res.data[0].baseData.spats;
-                    let signCount=0;
-                    let spatCount=0;
-                    if(signs&&signs.length>0){
-                        signs.forEach(item=>{
-                            signCount++;
-                        })
+                    if(res.data&&res.data.length>0){
+                        let signs = res.data[0].baseData.signs;
+                        let spats = res.data[0].baseData.spats;
+                        let signCount=0;
+                        let spatCount=0;
+                        if(signs&&signs.length>0){
+                            signs.forEach(item=>{
+                                signCount++;
+                            })
+                        }
+                        if(spats&&spats.length>0) {
+                            this.$parent.spatCount = spats.length;
+                        }
+                        this.$parent.signCount = signCount;
                     }
-                    if(spats&&spats.length>0) {
-                        this.$parent.spatCount = spats.length;
-                    }
-                    this.$parent.signCount = signCount;
                 })
             },
             changeMap(param){
@@ -808,6 +823,7 @@
 
                     //当平台车开始插值时，调用其他接口
                     _this.processDataTime = result.timestamp-_this.delayTime;
+                    _this.isLoadingShow = false;
 //                    console.log(_this.pulseCount,_this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     //平台车
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
