@@ -77,16 +77,14 @@
                 let latitude=parseFloat(this.$route.query.lat);
                 let currentExtent = this.getExtend(longitude,latitude,0.02);
                 typeRoadData(
-                    [
-                        {
-                            "polygon":currentExtent
-                        }
-
-                    ]
+                    {
+                        "polygon":currentExtent,
+                        "type": 'signs,spats'
+                    }
                 ).then(res=>{
-                    if(res.data&&res.data.length>0){
-                        let signs = res.data[0].baseData.signs;
-                        let spats = res.data[0].baseData.spats;
+                    if(res.data){
+                        let signs = res.data.signs || [];
+                        let spats = res.data.spats || [];
                         let signCount=0;
                         let spatCount=0;
                         if(signs&&signs.length>0){
