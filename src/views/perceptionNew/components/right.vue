@@ -278,7 +278,7 @@
         border:1px solid rgba(211, 134, 0, 0.3);
         position: absolute;
         bottom: 10px;
-        background: #000;
+        background: $backgroundRgba;;
         right: 10px;
         z-index:100;
     }
@@ -363,7 +363,7 @@
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
         height: 226px;
-        background: #00000082;
+        background: $background;
     }
     .video-mask{
         position: absolute;
