@@ -55,7 +55,7 @@
     import TusvnMap from './TusvnMap.vue';
     import DateFormat from '@/utils/date.js'
     import LivePlayer from '@/components/livePlayer'
-    import {getVideoByNum,getCameraByRsId,typeRoadData} from '@/api/fusion'
+    import {getVideoByNum,getCameraByRsId} from '@/api/fusion'
     import WebSocketObj from '@/assets/js/webSocket.js'
 
     export default {
@@ -114,7 +114,6 @@
             this.y = latitude;
             this.currentExtent = this.getExtend(longitude,latitude,extend);
             this.center=[longitude ,latitude];
-            this.typeRoadData();
 
             window.addEventListener('message', this.getMessage);
         },
@@ -184,30 +183,6 @@
                     null, 1, overviewLayerId);
 
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
-            },
-            typeRoadData(){
-                typeRoadData(
-                    [
-                        {
-                            "polygon":this.currentExtent
-                        }
-
-                    ]
-                ).then(res=>{
-                    let signs = res.data[0].baseData.signs;
-                    let spats = res.data[0].baseData.spats;
-                    let signCount=0;
-                    let spatCount=0;
-                    if(signs&&signs.length>0){
-                        signs.forEach(item=>{
-                            signCount++;
-                        })
-                    }
-                    if(spats&&spats.length>0) {
-                        this.$parent.spatCount = spats.length;
-                    }
-                    this.$parent.signCount = signCount;
-                })
             },
             changeMap(param){
                 let _camData = null;
