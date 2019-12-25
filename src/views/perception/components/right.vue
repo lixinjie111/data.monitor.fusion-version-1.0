@@ -5,7 +5,7 @@
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-pulse-time">
-            <div class="three-bounce" v-if="isLoadingShow">
+            <div class="c-three-bounce" v-if="isLoadingShow">
                 <div class="one"></div>
                 <div class="two"></div>
                 <div class="three"></div>
@@ -352,17 +352,14 @@
             },
             typeRoadData(){
                 typeRoadData(
-                    [
-                        {
-                            "polygon":this.platExtent,
-                            "type": "signs,spats" //为空全查
-                        }
-
-                    ]
+                    {
+                        "polygon":this.platExtent,
+                        "type": "signs,spats" //为空全查
+                    }
                 ).then(res=>{
                     if(res.data&&res.data.length>0){
-                        let signs = res.data[0].baseData.signs;
-                        let spats = res.data[0].baseData.spats;
+                        let signs = res.data.signs;
+                        let spats = res.data.spats;
                         let signCount=0;
                         if(signs&&signs.length>0){
                             signs.forEach(item=>{
