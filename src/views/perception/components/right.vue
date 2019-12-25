@@ -357,9 +357,9 @@
                         "type": "signs,spats" //为空全查
                     }
                 ).then(res=>{
-                    if(res.data&&res.data.length>0){
-                        let signs = res.data.signs;
-                        let spats = res.data.spats;
+                    if(res.data){
+                        let signs = res.data.signs || [];
+                        let spats = res.data.spats || [];
                         let signCount=0;
                         if(signs&&signs.length>0){
                             signs.forEach(item=>{

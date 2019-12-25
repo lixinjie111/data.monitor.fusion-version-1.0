@@ -69,7 +69,7 @@ export default {
                     "type": "signs,lampPole"
                 }
             ).then(res=>{
-                if(res.data&&res.data.length>0){
+                if(res.data){
                     let lampPole = res.data;
                     sessionStorage.setItem("lampPole",JSON.stringify(lampPole));
                 }
