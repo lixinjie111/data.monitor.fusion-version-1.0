@@ -884,6 +884,7 @@
             document.addEventListener("visibilitychange",this.processTab);
 
             platCars.sideList = sessionStorage.getItem("sideList");
+            platCars.lampPoleList = sessionStorage.getItem("lampPole");
 
             let timeout = this.delayTime+10000;
             setTimeout(()=>{

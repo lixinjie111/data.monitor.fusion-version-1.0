@@ -185,6 +185,7 @@
             platCars.viewer=gis3d.cesium.viewer;
 
             platCars.sideList = sessionStorage.getItem("sideList");
+            platCars.lampPoleList = sessionStorage.getItem("lampPole");
 
             _this.rsId = _this.$route.params.crossId;
 

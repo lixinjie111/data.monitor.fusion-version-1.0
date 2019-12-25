@@ -537,7 +537,7 @@ class PerceptionCars {
     let s = d.speed.toFixed(1);
     let veh = d.vehicleId.substr(0, 4);
     // let text = "[" + h + ", " + s + ", " + veh + "]";
-    let text = "[" + veh + "]";
+    let text = "[" + veh + ", " + s + "°]";
     let entityLabel = this.viewer.entities.add({
       id: d.vehicleId + name,
       position: position,
@@ -567,7 +567,7 @@ class PerceptionCars {
     let h = d.heading.toFixed(1);
     let s = d.speed.toFixed(1);
     let veh = d.vehicleId.substr(0, 4);
-    let text = "[" + veh + "]";
+    let text = "[" + veh + ", " + s + "°]";
     carlabel.show = true;
     carlabel.label.text = text;
   }
