@@ -978,7 +978,7 @@
     .video-position{
         @include layoutMode(both);
         height:100%;
-        background: #000000;
+        background: $background;
     }
 
     .travel-detail{

@@ -177,7 +177,7 @@
     }
 </script>
 <style lang="scss" scoped>
-    /* @import '@/assets/scss/theme.scss';*/
+     @import '@/assets/scss/theme.scss';
     .left-style{
         padding-top:0px!important;
         padding-bottom:0px!important;
@@ -187,8 +187,9 @@
         line-height: 28px;
         font-size: 14px;
         margin:20px 0px;
-        border: 1px solid rgba(211, 134, 0, 0.5);
-        background: #00000082;
+        border: 1px solid rgba(211, 134, 0, 0.4);
+        /*@borderLine();*/
+        background: $backgroundRgba;
         li{
             letter-spacing: 1px;
             color: #cccccc;
