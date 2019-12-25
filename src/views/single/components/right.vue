@@ -31,7 +31,11 @@
             </div>
         </div>
         <div class="c-pulse-time" >
-            <i class="el-icon-loading" v-if="isLoadingShow"></i>
+            <div class="three-bounce" v-if="isLoadingShow">
+                <div class="one"></div>
+                <div class="two"></div>
+                <div class="three"></div>
+            </div>
             <template v-else>{{processDataTime|dateFormat}}</template>
         </div>
         <div class="c-map" id="cesiumContainer">

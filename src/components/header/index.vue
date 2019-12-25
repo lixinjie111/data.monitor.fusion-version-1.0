@@ -9,6 +9,7 @@
                 <em class="c-middle">{{city.district || '--'}}</em>
                 <img src="@/assets/images/weather/default.png" class="weather-icon" /><em class="c-middle">{{weather.wendu || '--'}}°</em>
             </span>
+            <!--<i class="el-icon-chat-dot-round"></i>-->
         </div>
     </div>
 </template>

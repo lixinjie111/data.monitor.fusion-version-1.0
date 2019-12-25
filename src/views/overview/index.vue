@@ -66,7 +66,8 @@ export default {
             typeRoadData(
                 [
                     {
-                        "polygon":window.currentExtent
+                        "polygon":window.currentExtent,
+                        "type": "lampPole"
                     }
 
                 ]

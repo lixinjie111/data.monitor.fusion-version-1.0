@@ -268,19 +268,91 @@ img {
 }
 .c-pulse-time{
   position: absolute;
-  width: 300px;
-  font-size: 20px;
+  width: 380px;
+  font-size: 28px;
   z-index: 2;
   margin-top: 50px;
   left:50%;
   transform: translate(-50%,0);
   text-align: left;
-  .el-icon-loading{
-    display: block;
-    width: 30px;
-    font-size: 30px;
-    color: #fff;
-    margin: 0 auto;
+  padding-left: 4px;
+  //background: $backgroundRgba;
+  //background: #c8b74a;
+  //.el-icon-loading{
+  //  display: block;
+  //  width: 30px;
+  //  font-size: 30px;
+  //  color: #fff;
+  //  margin: 0 auto;
+  //}
+  //span:nth-child(1){
+  //  position: absolute;
+  //  left: 0px;
+  //  top: 0px;
+  //  padding: 3px;
+  //  border-style: solid;
+  //  border-color: #a3c8b0;
+  //  border-width: 0px;
+  //  box-shadow: -2px -2px 0px 0px #d38600;
+  //}
+  //span:nth-child(2){
+  //  position: absolute;
+  //  right: 0px;
+  //  top: 0px;
+  //  padding: 3px;
+  //  border-style: solid;
+  //  border-color: #a3c8b0;
+  //  border-width: 0px;
+  //  box-shadow: 2px -2px 0px 0px #d38600;
+  //}
+  //span:nth-child(3){
+  //  position: absolute;
+  //  right: 0px;
+  //  bottom: 0px;
+  //  padding: 3px;
+  //  border-style: solid;
+  //  border-color: #a3c8b0;
+  //  border-width: 0px;
+  //  box-shadow: 2px 2px 0px 0px #d38600;
+  //}
+  //span:nth-child(4){
+  //  position: absolute;
+  //  left: 0px;
+  //  bottom: 0px;
+  //  padding: 3px;
+  //  border-style: solid;
+  //  border-color: #a3c8b0;
+  //  border-width:0px;
+  //  box-shadow: -2px 2px 0px 0px #d38600;
+  //}
+}
+.three-bounce{
+  text-align: center;
+  div{
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    //background-color: #29a6ee;
+    background-color: #ffffff;
+    -webkit-animation: bouncedelay 1.4s infinite ease-in-out both;
+    animation: bouncedelay 1.4s infinite ease-in-out both;
+  }
+  .one{
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s;
+  }
+  .two{
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s;
+  }
+  @keyframes bouncedelay {
+    0%, 80%, 100% {
+      transform: scale(0);
+    }
+    40% {
+      transform: scale(1);
+    }
   }
 }
 

@@ -5,7 +5,16 @@
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-pulse-time">
-            <i class="el-icon-loading" v-if="isLoadingShow"></i>
+            <div class="three-bounce" v-if="isLoadingShow">
+                <div class="one"></div>
+                <div class="two"></div>
+                <div class="three"></div>
+            </div>
+            <!--<span></span>
+            <span></span>
+            <span></span>
+            <span></span>-->
+            <!--<i class="el-icon-loading" v-if="isLoadingShow"></i>-->
             <template v-else>{{processDataTime|dateFormat}}</template>
         </div>
         <div class="video-style">
@@ -344,7 +353,8 @@
                 typeRoadData(
                     [
                         {
-                            "polygon":this.platExtent
+                            "polygon":this.platExtent,
+                            "type": "signs,spats" //为空全查
                         }
 
                     ]
@@ -353,7 +363,6 @@
                         let signs = res.data[0].baseData.signs;
                         let spats = res.data[0].baseData.spats;
                         let signCount=0;
-                        let spatCount=0;
                         if(signs&&signs.length>0){
                             signs.forEach(item=>{
                                 signCount++;
