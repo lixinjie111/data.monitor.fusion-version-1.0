@@ -67,7 +67,7 @@ export default {
                 [
                     {
                         "polygon":window.currentExtent,
-                        "type": "lampPole"
+                        "type": "signs,lampPole"
                     }
 
                 ]
