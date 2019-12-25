@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="c-pulse-time" >
-            <i class="el-icon-loading" v-if="!processDataTime"></i>
+            <i class="el-icon-loading" v-if="isLoadingShow"></i>
             <template v-else>{{processDataTime|dateFormat}}</template>
         </div>
         <div class="c-map" id="cesiumContainer">
@@ -129,7 +129,8 @@
                     headingAngle:0,
                     gpsTime:''
                 },
-                removeWarning:[]
+                removeWarning:[],
+                isLoadingShow:true
 
             }
         },
@@ -682,6 +683,7 @@
                 if(this.pulseCount>=pulseNum) {
                     //当平台车开始插值时，调用其他接口
                     this.processDataTime = result.timestamp-delayTime;
+                    this.isLoadingShow = false;
 //                    console.log(this.pulseCount,this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
                         let platCar = platCars.processPlatformCarsTrack(result.timestamp,delayTime);
@@ -878,6 +880,19 @@
             document.addEventListener("visibilitychange",this.processTab);
 
             platCars.sideList = sessionStorage.getItem("sideList");
+
+            let timeout = this.delayTime+10000;
+            setTimeout(()=>{
+                if(this.processDataTime==''){
+                    this.isLoadingShow = false;
+                    this.$message({
+                        type: 'error',
+                        duration: '1500',
+                        message:  'socket连接失败',
+                        showClose: true
+                    });
+                }
+            },timeout)
 
 //            this.initLightWebSocket();
         },
