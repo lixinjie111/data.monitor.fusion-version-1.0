@@ -1,5 +1,7 @@
 @charset "UTF-8";
 $black: #000;
+$background: #5e5970;
+$backgroundRgba: rgba(94, 89, 112, 0.5);
 @mixin lineClampOne() {
   white-space: nowrap;
   overflow: hidden;
@@ -43,4 +45,5 @@ $black: #000;
     justify-content: center;
     justify-content: space-between;
   }
+
 }

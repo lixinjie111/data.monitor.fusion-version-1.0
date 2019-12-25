@@ -226,7 +226,7 @@
         height: 180px;
         position: relative;
         margin-bottom: 40px;
-        background: #00000082;
+        background: $backgroundRgba;
         .pedal-style{
             display: inline-block;
             position: absolute;

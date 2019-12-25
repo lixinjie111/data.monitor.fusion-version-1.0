@@ -31,7 +31,11 @@
             </div>
         </div>
         <div class="c-pulse-time" >
-            <i class="el-icon-loading" v-if="isLoadingShow"></i>
+            <div class="c-three-bounce" v-if="isLoadingShow">
+                <div class="one"></div>
+                <div class="two"></div>
+                <div class="three"></div>
+            </div>
             <template v-else>{{processDataTime|dateFormat}}</template>
         </div>
         <div class="c-map" id="cesiumContainer">
@@ -880,6 +884,7 @@
             document.addEventListener("visibilitychange",this.processTab);
 
             platCars.sideList = sessionStorage.getItem("sideList");
+            platCars.lampPoleList = sessionStorage.getItem("lampPole");
 
             let timeout = this.delayTime+10000;
             setTimeout(()=>{
@@ -978,7 +983,7 @@
     .video-position{
         @include layoutMode(both);
         height:100%;
-        background: #000000;
+        background: $background;
     }
 
     .travel-detail{

@@ -1,11 +1,20 @@
 <template>
     <div class="fusion-right-style" id="fusionRight">
-        <div style="position: absolute;top: 200px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="shutDown">关闭</div>
+        <!--<div style="position: absolute;top: 200px;right: 500px;z-index: 5;color: red;cursor: pointer" @click="shutDown">关闭</div>-->
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-pulse-time">
-            <i class="el-icon-loading" v-if="isLoadingShow"></i>
+            <div class="c-three-bounce" v-if="isLoadingShow">
+                <div class="one"></div>
+                <div class="two"></div>
+                <div class="three"></div>
+            </div>
+            <!--<span></span>
+            <span></span>
+            <span></span>
+            <span></span>-->
+            <!--<i class="el-icon-loading" v-if="isLoadingShow"></i>-->
             <template v-else>{{processDataTime|dateFormat}}</template>
         </div>
         <div class="video-style">
@@ -96,6 +105,7 @@
                 mapShow:false,
                 mapInitTime:'',
                 currentExtent:[],
+                platExtent:[],
                 mapParam:{}, //参数待定
                 camList:[],
                 requestVideoUrl:getVideoByNum,
@@ -175,6 +185,7 @@
             platCars.viewer=gis3d.cesium.viewer;
 
             platCars.sideList = sessionStorage.getItem("sideList");
+            platCars.lampPoleList = sessionStorage.getItem("lampPole");
 
             _this.rsId = _this.$route.params.crossId;
 
@@ -187,6 +198,7 @@
                 _this.x = longitude;
                 _this.y = latitude;
                 _this.currentExtent = _this.getExtend(longitude,latitude,extend);
+                _this.platExtent = _this.getExtend(longitude,latitude,0.02);
                 _this.center=[longitude ,latitude];
             }
             _this.getCameraByRsId();
@@ -340,18 +352,15 @@
             },
             typeRoadData(){
                 typeRoadData(
-                    [
-                        {
-                            "polygon":this.currentExtent
-                        }
-
-                    ]
+                    {
+                        "polygon":this.platExtent,
+                        "type": "signs,spats" //为空全查
+                    }
                 ).then(res=>{
                     if(res.data&&res.data.length>0){
-                        let signs = res.data[0].baseData.signs;
-                        let spats = res.data[0].baseData.spats;
+                        let signs = res.data.signs;
+                        let spats = res.data.spats;
                         let signCount=0;
-                        let spatCount=0;
                         if(signs&&signs.length>0){
                             signs.forEach(item=>{
                                 signCount++;
@@ -400,11 +409,10 @@
 
             //告警
             initWarningWebSocket(){
-                let currentExtent = this.getExtend(this.x,this.y,0.02);
                 let _params = {
                     "action":"cloud_event",
                     "body":{
-                        "region":currentExtent,
+                        "region":this.platExtent,
                     },
                     "type":1
                 };
@@ -529,11 +537,10 @@
 
             //平台车
             initPlatformWebSocket(){
-                let currentExtent = this.getExtend(this.x,this.y,0.02);
                 let _params = {
                     "action": "vehicle",
                     "body": {
-                        "polygon": currentExtent
+                        "polygon": this.platExtent
                     },
                     "type": 3
                 };
@@ -600,11 +607,10 @@
 
             //红绿灯
             initSpatWebSocket(){
-                let currentExtent = this.getExtend(this.x,this.y,0.02);
                 let _params = {
                     "action":"spat",
                     "data":{
-                        "polygon":currentExtent
+                        "polygon":this.platExtent
                     },
                     "type":2
                 };
@@ -975,7 +981,6 @@
         width: 270px;
     }
 
-
     .map-time{
         margin-top:100px!important;
         background: #969090;
@@ -987,7 +992,7 @@
         border:1px solid rgba(211, 134, 0, 0.3);
         position: absolute;
         bottom: 10px;
-        background: #000;
+        background: $backgroundRgba;
         right: 10px;
         z-index:100;
     }
@@ -1074,7 +1079,11 @@
         /*border:1px solid rgba(234, 233, 229, 0.1);*/
         border:1px solid rgba(211, 134, 0, 0.5)!important;
         height: 226px;
-        background: #00000082;
+        background: $background;
+        .c-video-16-9 .c-video-mask{
+            background: rgba(18, 42, 86, 0.71);
+
+        }
     }
     .video-mask{
         position: absolute;

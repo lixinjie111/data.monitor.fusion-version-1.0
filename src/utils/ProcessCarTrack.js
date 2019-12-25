@@ -23,7 +23,8 @@ class ProcessCarTrack {
         this.platObj = {};
         this.singleObj = {};
         this.billboards = {};//存储发射信号
-        this.sideList = [];
+        this.sideList = []; //路侧点列表
+        this.lampPoleList = []; //信号灯列表
     }
 
     //路口视角  平台车

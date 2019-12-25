@@ -77,3 +77,5 @@ window.mapUrl=window.config.dlWmsUrl+"geoserver/gwc/service/wmts?layer=shanghai_
 //地图初始化高度
 window.defualtZ=0.1; 
 window.count=30;//空闲车辆
+//默认的地图全区域
+window.currentExtent = [[121.15611700000001, 31.300408],[121.196117, 31.300408],[121.196117, 31.260408],[121.15611700000001, 31.260408]]
