@@ -131,11 +131,18 @@
                 // 获取摄像头列表
                 this.getCameraByRsId();
                 
-                let _camData = {
+                // 获取路侧点列表
+                let _sideListData = {
                     type: 'updateSideList',
                     data: sessionStorage.getItem("sideList")
                 };
-                document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
+                document.getElementById("c-iframe").contentWindow.postMessage(_sideListData,'*');
+                // 获取标识牌和红绿灯信息
+                let _lampPoleData = {
+                    type: 'updateLampPoleList',
+                    data: sessionStorage.getItem("lampPole")
+                };
+                document.getElementById("c-iframe").contentWindow.postMessage(_lampPoleData,'*');
             },
             getCameraByRsId(){
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
