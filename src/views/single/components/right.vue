@@ -437,7 +437,7 @@
                 let warnId = warningData.warnId;
                 let warningMsg;
                 if(distance){
-                    warningMsg = warningData.warnMsg + ' ' +distance+'米';
+                    warningMsg = warningData.warnMsg + '\n ' +distance+'米';
                 }
 //                console.log(warnId,_this.warningData[warnId])
                 //如果告警第一次画
