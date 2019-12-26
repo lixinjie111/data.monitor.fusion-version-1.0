@@ -278,10 +278,10 @@ class GIS3D {
         if (name && !this.models[name]) {
             let positions = [];
             positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 0));
-            positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 10));
+            positions.push(Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 7.5));
             let lableModel = this.cesium.viewer.entities.add({
                 id: name,
-                position: Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 10),
+                position: Cesium.Cartesian3.fromDegrees(x, y, this.defualtZ + 7.5),
                 polyline: {
                     positions: positions,
                     width: 3,
@@ -294,7 +294,7 @@ class GIS3D {
                     showBackground: true,
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                     pixelOffset: new Cesium.Cartesian2(0.0, 0),
-                   scaleByDistance: new Cesium.NearFarScalar(100, 1.3, 1000, 0)
+                   scaleByDistance: new Cesium.NearFarScalar(100, 1.3, 500, 0)
                 }
             });
 
