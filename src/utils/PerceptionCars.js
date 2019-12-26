@@ -17,7 +17,7 @@ class PerceptionCars {
     this.perMaxValue = '';
     this.cacheAndInterpolateDataByDevId = {};
     this.stepTime = '';
-    this.drawnObj = {};
+    // this.drawnObj = {};
   }
 
   //接受数据
@@ -107,6 +107,7 @@ class PerceptionCars {
   processPerTrack(time, delayTime) {
     let devList = [];
     let list = [];
+    let drawObj = {};
     // console.log("-----------");
     for (let devId in this.cacheAndInterpolateDataByDevId) {
       let devCacheData = this.cacheAndInterpolateDataByDevId[devId];
@@ -120,7 +121,8 @@ class PerceptionCars {
           // console.log("重复绘制的点"+devId+"  ,"+DateFormat.formatTime(devData.batchId,'hh:mm:ss'))
           return;
         }*/
-        this.drawnObj[devId] = devData.batchId;
+        // this.drawnObj[devId] = devData.batchId;
+        drawObj[devId] = devData;
         let fusionList = devData.data;
       if(fusionList&&fusionList.length) {
           list.push.apply(list,fusionList);
@@ -128,9 +130,10 @@ class PerceptionCars {
         devList.push(devData);
       }
     }
-      // if(!Object.keys(this.drawnObj).length) {
-      //     this.clearAllModel();
-      // }
+      //如果本次没找见 则清除所有的模型
+      if(!Object.keys(this.drawObj).length) {
+          this.clearAllModel();
+      }
       this.processPerceptionMesage(list);
     // console.log("**************")
     return devList;

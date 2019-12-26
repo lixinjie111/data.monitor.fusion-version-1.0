@@ -118,6 +118,9 @@ class ProcessCarTrack {
     cacheAndInterpolatePlatformCar(car) {
         let vid = car.vehicleId;
         let cdata = this.cacheAndInterpolateDataByVid[vid];
+        if(car.type==2){
+            car.plateNo = '非注册';
+        }
         let d = {
             vehicleId: vid,
             plateNo: car.plateNo,
@@ -248,9 +251,12 @@ class ProcessCarTrack {
                 }else{
                     //消失机制
                     this.removeObj[vid]++;
-                    //超过3s就让消失
+                    //超过3s没有缓存数就让消失
                     if(this.removeObj>75){
-                        this.removeModelPrimitives();
+                        this.removeModelPrimitives(vid);
+                        delete this.removeObj[vid];
+                        delete this.cacheAndInterpolateDataByVid[vid];
+                        delete this.platObj[vid];
                     }
                 }
             }
@@ -607,22 +613,17 @@ class ProcessCarTrack {
         });
     }
  //删除单车
-    removeModelPrimitives(item) {
-        if(item.length>0)
-        {
-            for(let i=0;i<item.length;i++)
-            {
-                var primitives = this.viewer.scene.primitives;
-                for (var i = 0; i < primitives.length; i++) {
-                  var primitive = primitives.get(i);
-                  if (primitive.id) {
-                    if (primitive instanceof Cesium.Model  && primitive.id.search(item[i]) != -1) {
-                      this.viewer.scene.primitives.remove(primitive);
-                    }
-                  }
-                }
+    removeModelPrimitives(vehicleId) {
+        let carId = vehicleId + "car";
+        var primitives = this.viewer.scene.primitives;
+        for (var i = 0; i < primitives.length; i++) {
+          var primitive = primitives.get(i);
+          if (primitive.id) {
+            if (primitive instanceof Cesium.Model  && primitive.id==carId) {
+              this.viewer.scene.primitives.remove(primitive);
             }
-        } 
+          }
+        }
       }
 }
 export default ProcessCarTrack;
