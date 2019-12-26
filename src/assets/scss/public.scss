@@ -299,10 +299,9 @@ img {
   }
 }
 
-
-.c-six-bounce{
+.c-loading-wrap{
   text-align: center;
-  div{
+  .c-loading-icon{
     display: inline-block;
     width: 10px;
     height: 10px;
@@ -311,21 +310,21 @@ img {
     background-color: #716d6d;
     -webkit-animation: bouncedelay 1.4s infinite ease-in-out both;
     animation: bouncedelay 1.4s infinite ease-in-out both;
-  }
-  .one{
-    animation-delay: -0.32s;
-  }
-  .two{
-    animation-delay: -0.16s;
-  }
-  .three{
-    animation-delay: -0.16s;
-  }
-  .four{
-    animation-delay: -0.16s;
-  }
-  .five{
-    animation-delay: -0.16s;
+    &.one{
+      animation-delay: -0.32s;
+    }
+    &.two{
+      animation-delay: -0.16s;
+    }
+    &.three{
+      animation-delay: -0.16s;
+    }
+    &.four{
+      animation-delay: -0.16s;
+    }
+    &.five{
+      animation-delay: -0.16s;
+    }
   }
   @keyframes bouncedelay {
     0%, 80%, 100% {

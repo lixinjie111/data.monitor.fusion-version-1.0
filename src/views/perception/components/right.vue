@@ -5,13 +5,13 @@
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-pulse-time">
-            <div class="c-six-bounce" v-if="isLoadingShow">
-                <div class="one"></div>
-                <div class="two"></div>
-                <div class="three"></div>
-                <div class="four"></div>
-                <div class="five"></div>
-                <div class="six"></div>
+            <div class="c-loading-wrap" v-if="isLoadingShow">
+                <div class="c-loading-icon one"></div>
+                <div class="c-loading-icon two"></div>
+                <div class="c-loading-icon three"></div>
+                <div class="c-loading-icon four"></div>
+                <div class="c-loading-icon five"></div>
+                <div class="c-loading-icon six"></div>
             </div>
             <!--<span></span>
             <span></span>
