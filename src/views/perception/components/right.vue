@@ -21,7 +21,8 @@
 
             <template v-else>
                 <div class="c-pulse-box"></div>
-                {{processDataTime|dateFormat}}
+                <div class="c-time">{{processDataTime|dateFormat}}</div>
+                <div class="c-pulse-box"></div>
             </template>
         </div>
         <div class="video-style">
@@ -481,7 +482,7 @@
                 if(warnId){
                     //如果告警第一次画
                     if(!_this.warningData[warnId]){
-                        console.log(warnId);
+                        console.log("新增：",warnId);
                         _this.warningCount++;
                         _this.warningData[warnId] = {
                             warnId: warnId,
@@ -945,7 +946,7 @@
                         for(let warnId in processData.staticWarning){
                             let staticData = processData.processStaticData(result.timestamp,_this.delayTime);
                             if(staticData&&staticData.length>0){
-                                console.log("length:"+staticData.length)
+//                                console.log("length:"+staticData.length)
                                 //静态事件
                                 staticData.forEach(item=>{
                                     _this.processWarn(item);

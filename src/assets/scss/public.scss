@@ -268,18 +268,38 @@ img {
 }
 .c-pulse-time{
   position: absolute;
-  width: 380px;
-  font-size: 28px;
+  width: 360px;
+  font-size: 20px;
   z-index: 2;
   margin-top: 50px;
   left:50%;
   transform: translate(-50%,0);
-  text-align: left;
-  padding-left: 4px;
+  text-align: center;
   border:1px solid #808d62;
-  background:#808d62 ;
-  box-shadow:2px 2px 1px #222222;
+  background:#e7e8e3 ;
+  box-sizing: border-box;
+  line-height: 50px;
+  color: #08adac;
+  font-weight: 600;
+  border-radius: 2px;
+  div{
+    display: inline-block;
+  }
+  .c-pulse-box{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #716d6d;
+  }
+  .c-time{
+    vertical-align: middle;
+    padding:0px 4px;
+    width: 300px;
+    text-align: left;
+  }
 }
+
+
 .c-six-bounce{
   text-align: center;
   div{
@@ -288,7 +308,7 @@ img {
     height: 10px;
     border-radius: 100%;
     //background-color: #29a6ee;
-    background-color: #ffffff;
+    background-color: #716d6d;
     -webkit-animation: bouncedelay 1.4s infinite ease-in-out both;
     animation: bouncedelay 1.4s infinite ease-in-out both;
   }
