@@ -12,6 +12,11 @@
 [v-cloak] {
   display: none;
 }
+// icon-font
+[class^="el-icon-mc"],
+[class*=" el-icon-mc"] {
+  font-family: "iconfont" !important;
+}
 
 img {
   object-fit: cover;
@@ -93,12 +98,29 @@ img {
   display: none;
 }
 
+.c-vertical-middle {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .c-relative {
   position: relative;
 }
 .c-absolute {
   position: absolute;
 }
+
+.c-header-dropdown {
+    margin-top: 5px !important;
+    padding: 0 !important;
+    .el-dropdown-menu__item {
+        margin: 0 !important;
+    }
+    .el-dropdown-menu__item--divided:before {
+      height: 0;
+    }
+}
+
 
 .c-dialog-wrapper {
   position: fixed;

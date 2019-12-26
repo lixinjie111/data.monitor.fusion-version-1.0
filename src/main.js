@@ -9,6 +9,7 @@ Vue.prototype.$dateUtil = TDate;
 // 全局静态资源
 import './assets/scss/reset.scss';
 import './assets/scss/public.scss';
+import './assets/icon-font/iconfont.css';
 
 
 //elementui 导入

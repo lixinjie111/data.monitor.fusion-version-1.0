@@ -1,11 +1,15 @@
 <template>
     <el-form ref="searchForm" :inline="true" :model="searchKey" :rules="rules" size="small" class="fusion-select">
         <el-form-item>
-            <el-select v-model.trim="searchKey.field" @change="initChange()">
+            <el-select 
+                v-model.trim="searchKey.field" 
+                @change="initChange()"
+                popper-class="fusion-select-popper">
                 <el-option label="车辆" value="1"></el-option>
                 <el-option label="路侧点" value="2"></el-option>
             </el-select>
             <el-select
+                popper-class="fusion-select-popper"
                 class="select-content"
                 v-model.trim="searchKey.value"
                 filterable
@@ -211,31 +215,31 @@
         }
     }
 }
-.el-select-dropdown__item.selected {
-    color: #f59307!important;
-}
-.el-select-dropdown{
+.fusion-select-popper {
     border: 1px solid #676767!important;
-}
-.el-select-dropdown__wrap{
-    background:#676767!important;
-     color:#fff!important;
-}
-.el-select-dropdown__item{
-    color:#fff!important;
-    border-bottom: 1px solid #6f6f6f!important;
-}
-.el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
-    background:#7f7f7f!important;
-}
-.el-popper[x-placement^=bottom] .popper__arrow::after {
-    border-bottom-color: #676767!important;
-}
-.el-popper[x-placement^=bottom] .popper__arrow {
-    border-bottom-color: #676767!important;
-}
-.el-select-dropdown__empty{
-     background:#676767!important;
-     color:#fff!important;
+    .el-select-dropdown__item.selected {
+        color: #f59307!important;
+    }
+    &.el-popper[x-placement^=bottom] .popper__arrow::after {
+        border-bottom-color: #676767!important;
+    }
+    &.el-popper[x-placement^=bottom] .popper__arrow {
+        border-bottom-color: #676767!important;
+    }
+    .el-select-dropdown__wrap{
+        background:#676767!important;
+         color:#fff!important;
+    }
+    .el-select-dropdown__item{
+        color:#fff!important;
+        border-bottom: 1px solid #6f6f6f!important;
+    }
+    .el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
+        background:#7f7f7f!important;
+    }
+    .el-select-dropdown__empty{
+         background:#676767!important;
+         color:#fff!important;
+    }
 }
 </style>

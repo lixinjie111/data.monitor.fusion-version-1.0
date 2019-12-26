@@ -9,15 +9,29 @@
                 <em class="c-middle">{{city.district || '--'}}</em>
                 <img src="@/assets/images/weather/default.png" class="weather-icon" /><em class="c-middle">{{weather.wendu || '--'}}°</em>
             </span>
+            <el-dropdown trigger="hover">
+                <span class="el-dropdown-link userinfo-inner">
+                    <i class="icon iconfont el-icon-mc-yonghuzhongxin_f c-vertical-middle"></i>
+                    <em class="name c-vertical-middle">{{sysAdminName}}</em>
+                </span>
+                <el-dropdown-menu slot="dropdown" class="c-header-dropdown">
+                    <el-dropdown-item divided>版本V{{version}}</el-dropdown-item>
+                    <el-dropdown-item divided @click.native="logout">登出</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
         </div>
     </div>
 </template>
 <script>
- import { getTopWeather } from '@/api/header';
+import { getTopWeather } from '@/api/header';
+import { mapActions } from 'vuex';
+import { removeAuthInfo } from '@/session/index';
 export default {
 	name: "Header",
     data() {
         return {
+            sysAdminName: this.$store.state.admin.adminName,
+            version: window.config.version,
             city: {
                 province: '',
                 district: ''
@@ -55,6 +69,21 @@ export default {
                 this.weather = res.data;
             });
             // this.weather.wendu = 23;
+        },
+        ...mapActions(['goLogOut']),
+        //退出登录
+        logout() {
+            this.$confirm('确认退出吗?', '提示', {
+            }).then(() => {
+                this.goLogOut().then(res => {
+                    this.$message.success(res.message);
+                    removeAuthInfo();
+                    localStorage.removeItem("yk-token");
+                    this.$router.push({ path: '/' });
+                });
+            }).catch(err => {
+                console.log("取消退出！");
+            });
         }
     },
     computed: {
@@ -132,6 +161,15 @@ export default {
             .num {
                 margin-left: 15px;
                 color: #dc8c00;
+            }
+        }
+        .userinfo-inner {
+            margin-left: 15px;
+            cursor: pointer;
+            color: #fff;
+            .icon {
+                font-size: 28px;
+                line-height: 28px;
             }
         }
     }

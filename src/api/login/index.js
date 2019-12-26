@@ -8,7 +8,7 @@ export const requestLogin = params => { return axios.post(`${OPERATEURL}openApi/
 /**
  * 退出登录
  */
-export const requestLogout = params => { return axios.get(`${OPERATEURL}openApi/user/logout`, {params: params}).then(res => res.data); };
+export const requestLogout = params => { return axios.post(`${OPERATEURL}openApi/user/logout`, params).then(res => res.data); };
 /**
  * 获取滑块位置
  */
