@@ -6,15 +6,16 @@ import store from './store';
 import TDate from '@/utils/date.js'
 Vue.prototype.$dateUtil = TDate;
 
-// 全局静态资源
-import './assets/scss/reset.scss';
-import './assets/scss/public.scss';
-import './assets/icon-font/iconfont.css';
 
 
 //elementui 导入
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+
+// 全局静态资源
+import './assets/scss/reset.scss';
+import './assets/scss/public.scss';
+import './assets/icon-font/iconfont.css';
 
 Vue.use(ElementUI);
 // 进度条
