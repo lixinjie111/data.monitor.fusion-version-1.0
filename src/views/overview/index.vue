@@ -28,7 +28,6 @@ import rightOverview from './components/rightOverview.vue';
 import FusionSelect from './components/fusionSelect.vue';
 import MapContainer from './components/mapContainer.vue';
 import { getBaseStat } from "@/api/overview/index.js";
-import {typeRoadData} from '@/api/fusion'
 export default {
     components: {
         rightOverview,
@@ -44,7 +43,6 @@ export default {
     },
     created() {
         this.getBaseStat();
-        this.typeRoadData();
     },
     computed:{
         filterData() {
@@ -61,20 +59,7 @@ export default {
             getBaseStat().then(res => {
                 this.responseData = res.data;
             });
-        },
-        typeRoadData(){
-            typeRoadData(
-                {
-                    "polygon":window.currentExtent,
-                    "type": "signs,lampPole"
-                }
-            ).then(res=>{
-                if(res.data){
-                    let lampPole = res.data;
-                    sessionStorage.setItem("lampPole",JSON.stringify(lampPole));
-                }
-            })
-        },
+        }
     },
     
     destroyed(){},

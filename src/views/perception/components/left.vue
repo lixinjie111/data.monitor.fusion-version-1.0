@@ -73,9 +73,10 @@
         },
         methods: {
             typeRoadData(){
+                let extend = parseFloat(this.$route.params.extend);
                 let longitude=parseFloat(this.$route.query.lng);
                 let latitude=parseFloat(this.$route.query.lat);
-                let currentExtent = this.getExtend(longitude,latitude,0.02);
+                let currentExtent = this.getExtend(longitude,latitude,extend);
                 typeRoadData(
                     {
                         "polygon":currentExtent,

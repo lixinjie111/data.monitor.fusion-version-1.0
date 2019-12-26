@@ -61,8 +61,8 @@
     export default {
         data() {
             return {
-                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
-                // iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
+                // iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
+                iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/perception.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&delayTime='+this.$route.params.delayTime+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
                 center:[],
                 currentExtent:[],
                 x:0,
@@ -137,12 +137,6 @@
                     data: sessionStorage.getItem("sideList")
                 };
                 document.getElementById("c-iframe").contentWindow.postMessage(_sideListData,'*');
-                // 获取标识牌和红绿灯信息
-                let _lampPoleData = {
-                    type: 'updateLampPoleList',
-                    data: sessionStorage.getItem("lampPole")
-                };
-                document.getElementById("c-iframe").contentWindow.postMessage(_lampPoleData,'*');
             },
             getCameraByRsId(){
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
