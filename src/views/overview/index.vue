@@ -66,7 +66,7 @@ export default {
             typeRoadData(
                 {
                     "polygon":window.currentExtent,
-                    "type": "signs,lampPole"
+                    "type": "lampPole,spats"
                 }
             ).then(res=>{
                 if(res.data){
