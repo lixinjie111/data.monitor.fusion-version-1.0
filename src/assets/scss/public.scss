@@ -276,57 +276,11 @@ img {
   transform: translate(-50%,0);
   text-align: left;
   padding-left: 4px;
-  //background: $backgroundRgba;
-  //background: #c8b74a;
-  //.el-icon-loading{
-  //  display: block;
-  //  width: 30px;
-  //  font-size: 30px;
-  //  color: #fff;
-  //  margin: 0 auto;
-  //}
-  //span:nth-child(1){
-  //  position: absolute;
-  //  left: 0px;
-  //  top: 0px;
-  //  padding: 3px;
-  //  border-style: solid;
-  //  border-color: #a3c8b0;
-  //  border-width: 0px;
-  //  box-shadow: -2px -2px 0px 0px #d38600;
-  //}
-  //span:nth-child(2){
-  //  position: absolute;
-  //  right: 0px;
-  //  top: 0px;
-  //  padding: 3px;
-  //  border-style: solid;
-  //  border-color: #a3c8b0;
-  //  border-width: 0px;
-  //  box-shadow: 2px -2px 0px 0px #d38600;
-  //}
-  //span:nth-child(3){
-  //  position: absolute;
-  //  right: 0px;
-  //  bottom: 0px;
-  //  padding: 3px;
-  //  border-style: solid;
-  //  border-color: #a3c8b0;
-  //  border-width: 0px;
-  //  box-shadow: 2px 2px 0px 0px #d38600;
-  //}
-  //span:nth-child(4){
-  //  position: absolute;
-  //  left: 0px;
-  //  bottom: 0px;
-  //  padding: 3px;
-  //  border-style: solid;
-  //  border-color: #a3c8b0;
-  //  border-width:0px;
-  //  box-shadow: -2px 2px 0px 0px #d38600;
-  //}
+  border:1px solid #808d62;
+  background:#808d62 ;
+  box-shadow:2px 2px 1px #222222;
 }
-.three-bounce{
+.six-bounce{
   text-align: center;
   div{
     display: inline-block;
@@ -339,11 +293,18 @@ img {
     animation: bouncedelay 1.4s infinite ease-in-out both;
   }
   .one{
-    -webkit-animation-delay: -0.32s;
     animation-delay: -0.32s;
   }
   .two{
-    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s;
+  }
+  .three{
+    animation-delay: -0.16s;
+  }
+  .four{
+    animation-delay: -0.16s;
+  }
+  .five{
     animation-delay: -0.16s;
   }
   @keyframes bouncedelay {
