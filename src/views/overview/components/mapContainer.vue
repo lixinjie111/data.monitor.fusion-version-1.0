@@ -33,8 +33,11 @@
             });
 
             this.initWebSocket();
-            let param = ['2'];
-            this.getDevDis(param);
+
+            if(sessionStorage.getItem("sideList")) {
+                let param = ['2'];
+                this.getDevDis(param);
+            }
         },
         methods: {
             initWebSocket(){

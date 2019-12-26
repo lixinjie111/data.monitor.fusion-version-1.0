@@ -27,6 +27,12 @@
                     data: sessionStorage.getItem("sideList")
                 };
                 document.getElementById("c-iframe").contentWindow.postMessage(_sideListData,'*');
+                // 获取标识牌和红绿灯信息
+                let _lampPoleData = {
+                    type: 'updateLampPoleList',
+                    data: sessionStorage.getItem("lampPole")
+                };
+                document.getElementById("c-iframe").contentWindow.postMessage(_lampPoleData,'*');
             },
         }
     }
