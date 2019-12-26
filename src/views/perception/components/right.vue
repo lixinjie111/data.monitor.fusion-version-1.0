@@ -342,20 +342,13 @@
                     "typeList": ["N","S"]
                 }).then(res=>{
                     let data = res.data;
-                    let sensingArea = [];
+                    let sensingArea = "";
                     data.forEach(item=>{
                         if(item.sensingArea!=''){
-                            sensingArea.push(item.sensingArea)
+                            let area = item.sensingArea.replace(";",",");
+                            sensingArea+=area;
                         }
                     });
-                    // let hierarchy = [
-                    //     112.953651652808389, 28.329121301607586, 50,
-                    //     112.953927670284997, 28.328597820186189, 50,
-                    //     112.952570766104373, 28.327743594794072, 50,
-                    //     112.952201968003351, 28.328177801283175, 50,
-                    //     112.953651652808276, 28.329121301607586, 50
-                    // ];
-
                 });
             },
             typeRoadData(){
