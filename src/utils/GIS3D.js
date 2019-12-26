@@ -294,7 +294,7 @@ class GIS3D {
                     showBackground: true,
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                     pixelOffset: new Cesium.Cartesian2(0.0, 0),
-                    scaleByDistance: new Cesium.NearFarScalar(200, 1, 2000, 0)
+                   scaleByDistance: new Cesium.NearFarScalar(100, 1.3, 1000, 0)
                 }
             });
 
