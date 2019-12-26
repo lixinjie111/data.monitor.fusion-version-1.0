@@ -534,10 +534,9 @@ class PerceptionCars {
     var position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + height);
     ///////////////增加文字
     let h = d.heading.toFixed(1);
-    let s = d.speed.toFixed(1);
     let veh = d.vehicleId.substr(0, 4);
     // let text = "[" + h + ", " + s + ", " + veh + "]";
-    let text = "[" + veh + ", " + s + "°]";
+    let text = "[" + veh + ", " + h + "°]";
     let entityLabel = this.viewer.entities.add({
       id: d.vehicleId + name,
       position: position,
@@ -565,9 +564,8 @@ class PerceptionCars {
     //var carlabel = this.viewer.entities.getById( d.vehicleId + "label");
     carlabel.position = Cesium.Cartesian3.fromDegrees(d.longitude, d.latitude, this.defualtZ + height);
     let h = d.heading.toFixed(1);
-    let s = d.speed.toFixed(1);
     let veh = d.vehicleId.substr(0, 4);
-    let text = "[" + veh + ", " + s + "°]";
+    let text = "[" + veh + ", " + h + "°]";
     carlabel.show = true;
     carlabel.label.text = text;
   }

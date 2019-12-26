@@ -5,17 +5,25 @@
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1&&mapShow"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-pulse-time">
-            <div class="c-three-bounce" v-if="isLoadingShow">
-                <div class="one"></div>
-                <div class="two"></div>
-                <div class="three"></div>
+            <div class="c-loading-wrap" v-if="isLoadingShow">
+                <div class="c-loading-icon one"></div>
+                <div class="c-loading-icon two"></div>
+                <div class="c-loading-icon three"></div>
+                <div class="c-loading-icon four"></div>
+                <div class="c-loading-icon five"></div>
+                <div class="c-loading-icon six"></div>
             </div>
             <!--<span></span>
             <span></span>
             <span></span>
             <span></span>-->
             <!--<i class="el-icon-loading" v-if="isLoadingShow"></i>-->
-            <template v-else>{{processDataTime|dateFormat}}</template>
+
+            <template v-else>
+                <div class="c-pulse-box"></div>
+                <div class="c-time">{{processDataTime|dateFormat}}</div>
+                <div class="c-pulse-box"></div>
+            </template>
         </div>
         <div class="video-style">
             <div class="c-scroll-wrap">
@@ -353,13 +361,13 @@
             typeRoadData(){
                 typeRoadData(
                     {
-                        "polygon":this.platExtent,
+                        "polygon":this.currentExtent,
                         "type": "signs,spats" //为空全查
                     }
                 ).then(res=>{
-                    if(res.data&&res.data.length>0){
-                        let signs = res.data.signs;
-                        let spats = res.data.spats;
+                    if(res.data){
+                        let signs = res.data.signs || [];
+                        let spats = res.data.spats || [];
                         let signCount=0;
                         if(signs&&signs.length>0){
                             signs.forEach(item=>{
@@ -474,7 +482,7 @@
                 if(warnId){
                     //如果告警第一次画
                     if(!_this.warningData[warnId]){
-                        console.log(warnId);
+                        console.log("新增：",warnId);
                         _this.warningCount++;
                         _this.warningData[warnId] = {
                             warnId: warnId,
@@ -938,7 +946,7 @@
                         for(let warnId in processData.staticWarning){
                             let staticData = processData.processStaticData(result.timestamp,_this.delayTime);
                             if(staticData&&staticData.length>0){
-                                console.log("length:"+staticData.length)
+//                                console.log("length:"+staticData.length)
                                 //静态事件
                                 staticData.forEach(item=>{
                                     _this.processWarn(item);
