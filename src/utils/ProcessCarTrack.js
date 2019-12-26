@@ -25,6 +25,7 @@ class ProcessCarTrack {
         this.billboards = {};//存储发射信号
         this.sideList = []; //路侧点列表
         this.lampPoleList = []; //信号灯列表
+        this.removeObj={};
     }
 
     //路口视角  平台车
@@ -220,13 +221,12 @@ class ProcessCarTrack {
         for (var vid in _this.cacheAndInterpolateDataByVid) {
             let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
             // console.log(carCacheData.nowReceiveData.gpsTime)
-            if (carCacheData != null) {
-                if (carCacheData.cacheData.length > 0) {
-                    //缓存数据
-                    let cacheData = _this.cacheAndInterpolateDataByVid[vid].cacheData;
-                    // console.log(cacheData.length);
+            if (carCacheData) {
+                //缓存数据
+                let cacheData = carCacheData.cacheData;
+                if (cacheData.length > 0) {
+                    this.removeObj[vid]=0;
                     let cardata = _this.getMinValue(vid, time, delayTime);
-                    // let cardata = cacheData.shift();+
                     if (!cardata) {
                         return;
                     }
@@ -244,6 +244,13 @@ class ProcessCarTrack {
                         platCar['mainCar'] = cardata
                         _this.moveTo(cardata);
                         //主车
+                    }
+                }else{
+                    //消失机制
+                    this.removeObj[vid]++;
+                    //超过3s就让消失
+                    if(this.removeObj>75){
+                        this.removeModelPrimitives();
                     }
                 }
             }

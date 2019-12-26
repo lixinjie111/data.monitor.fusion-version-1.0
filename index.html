@@ -21,12 +21,10 @@
   <script>
     document.write('<script src="./static/config/config.js?v=' + new Date().getTime() + '"><\/script>');
   </script>
-  <script>
-    document.write('<script src="' + window.config.staticUrl + 'frontStatic/vue/vue.min.js"><\/script>');
-    document.write('<script src="' + window.config.staticUrl + 'frontStatic/vue-router/vue-router.min.js"><\/script>');
-    document.write('<script src="' + window.config.staticUrl + 'frontStatic/vuex/vuex.min.js"><\/script>');
-    document.write('<script src="' + window.config.staticUrl + 'frontStatic/axios/axios.min.js"><\/script>');
-  </script>
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <script src="https://unpkg.com/vuex@3.1.2/dist/vuex.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="static/js/liveplayer-lib.min.js"></script>
   <script src="static/map3d/libs/Cesium.js"></script>
 </head>
