@@ -361,7 +361,7 @@
             typeRoadData(){
                 typeRoadData(
                     {
-                        "polygon":this.platExtent,
+                        "polygon":this.currentExtent,
                         "type": "signs,spats" //为空全查
                     }
                 ).then(res=>{
