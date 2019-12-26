@@ -32,7 +32,7 @@
             </el-select>
         </el-form-item>
         <el-form-item>
-            <el-button  @click="showView()" class="enter">进入</el-button>
+            <el-button  @click="showView()">进入</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -194,52 +194,54 @@
 <style lang="scss">
 .fusion-select {
     .el-input__inner,.el-button{
-        background:#676767!important;
-        border: none!important;
-        color:#fff!important;
+        background:#676767 !important;
+        border-color: #676767 !important;
+        color: #fff !important;
         border-radius:0 !important;
+        height: 33px !important;
+        vertical-align: top;
     }
     .el-select .el-input{
-        width: 85px!important;
-        background:#7f7f7f!important;
+        width: 85px !important;
+        background: #7f7f7f !important;
         .el-input__inner{
-             background:#7f7f7f!important;
+             background: #7f7f7f !important;
         }
     }
     .select-content .el-input {
-        margin-left:-12px!important;
-        width: 230px!important;
-        background:#676767;
+        margin-left: -12px !important;
+        width: 230px !important;
+        background: #676767;
         .el-input__inner{
-             background:#676767!important;
+             background: #676767 !important;
         }
     }
 }
 .fusion-select-popper {
-    border: 1px solid #676767!important;
+    border: 1px solid #676767 !important;
     .el-select-dropdown__item.selected {
         color: #f59307!important;
     }
     &.el-popper[x-placement^=bottom] .popper__arrow::after {
-        border-bottom-color: #676767!important;
+        border-bottom-color: #676767 !important;
     }
     &.el-popper[x-placement^=bottom] .popper__arrow {
-        border-bottom-color: #676767!important;
+        border-bottom-color: #676767 !important;
     }
     .el-select-dropdown__wrap{
-        background:#676767!important;
+        background:#676767 !important;
          color:#fff!important;
     }
     .el-select-dropdown__item{
-        color:#fff!important;
-        border-bottom: 1px solid #6f6f6f!important;
+        color:#fff !important;
+        border-bottom: 1px solid #6f6f6f !important;
     }
     .el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
-        background:#7f7f7f!important;
+        background:#7f7f7f !important;
     }
     .el-select-dropdown__empty{
-         background:#676767!important;
-         color:#fff!important;
+         background: #676767 !important;
+         color: #fff !important;
     }
 }
 </style>
