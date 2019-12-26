@@ -6,8 +6,6 @@ import store from './store';
 import TDate from '@/utils/date.js'
 Vue.prototype.$dateUtil = TDate;
 
-
-
 //elementui 导入
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
