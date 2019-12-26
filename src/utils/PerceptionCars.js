@@ -123,10 +123,6 @@ class PerceptionCars {
         }*/
         // this.drawnObj[devId] = devData.batchId;
         drawObj[devId] = devData;
-        let fusionList = devData.data;
-      if(fusionList&&fusionList.length) {
-          list.push.apply(list,fusionList);
-      }
         devList.push(devData);
       }
     }
@@ -134,7 +130,6 @@ class PerceptionCars {
       if(!Object.keys(this.drawObj).length) {
           this.clearAllModel();
       }
-      this.processPerceptionMesage(list);
     // console.log("**************")
     return devList;
   }

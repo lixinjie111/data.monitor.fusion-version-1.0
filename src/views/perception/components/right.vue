@@ -833,6 +833,7 @@
                 }
                 //缓存的时间
                 let pulseNum = _this.delayTime*2/40;
+                let platCar;
                 if(_this.pulseCount>=pulseNum) {
 
                     //当平台车开始插值时，调用其他接口
@@ -841,10 +842,8 @@
 //                    console.log(_this.pulseCount,_this.pulseCount%3,Object.keys(perceptionCars.devObj).length);
                     //平台车
                     if(Object.keys(platCars.cacheAndInterpolateDataByVid).length>0){
-                       let platCar =  platCars.processPlatformCarsTrack(result.timestamp,_this.delayTime);
-                       if(platCar){
-                           this.$parent.vehData = platCar['vehData'];
-                       }
+                       platCar =  platCars.processPlatformCarsTrack(result.timestamp,_this.delayTime);
+                       this.$parent.vehData = platCar['vehData'];
                     }
 
                     //取消告警
@@ -884,19 +883,36 @@
                 if(_this.perCacheCount>pulseNum&&(_this.perPulseCount==0||_this.perPulseCount>2)){
                     _this.perPulseCount=1;
                     if(Object.keys(perceptionCars.devObj).length>0){
-                        let perList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
-                        if(perList){
-                            if(perList.length>0){
-                                _this.processPerData(perList[0]);
+                        let devList = perceptionCars.processPerTrack(result.timestamp,_this.delayTime);
+//                        let fusionList = devData.data;
+//                        if(fusionList&&fusionList.length){
+//                            list.push.apply(list,fusionList);
+//                        }
+                        this.processPerceptionMesage(list);
+                        let list = [];
+                        if(devList){
+                            if(devList.length>0){
+//                                _this.processPerData(devList[0]);
                                 let pernum = 0;
                                 let persons = 0;
                                 let nonNum = 0;
                                 let perData={};
-                                perList.forEach(item=>{
+                                devList.forEach(item=>{
                                     let cars = item.data;
                                     if(cars&&cars.length>0) {
                                         for (let i = 0; i < cars.length; i++) {
                                             let obj = cars[i];
+                                            //将感知车和平台车进行融合
+                                            let carData = platCar['carData'];
+                                            for(let vehicleId in carData){
+                                                let lonDiff = Math.abs(carData[vehicleId].longitude-obj.longitude);
+                                                let latDiff = Math.abs(carData[vehicleId].latitude-obj.latitude);
+
+//                                                if(lonDiff<
+//                                                ){
+//
+//                                                }
+                                            }
                                             if (obj.targetType == 0){
                                                 persons++;
                                             }

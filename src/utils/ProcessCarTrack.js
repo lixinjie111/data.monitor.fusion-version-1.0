@@ -219,7 +219,8 @@ class ProcessCarTrack {
 
         let platCar = {
             'mainCar':{},
-            'vehData':new Object()
+            'vehData':new Object(),
+            'carData':new Object()
         };
         for (var vid in _this.cacheAndInterpolateDataByVid) {
             let carCacheData = _this.cacheAndInterpolateDataByVid[vid];
@@ -233,6 +234,7 @@ class ProcessCarTrack {
                     if (!cardata) {
                         return;
                     }
+                    platCar.carData[vid]=cardata;
                     // console.log(cardata)
                     if(cardata.devType==1){
                         platVeh++;
