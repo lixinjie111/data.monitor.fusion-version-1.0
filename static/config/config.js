@@ -11,22 +11,22 @@ window.config = {
     //http://172.17.1.16:9092/icvShadowApp/ws.html  不要给我删掉了！！！
 
     //望京 外网
-    // staticUrl: "http://120.133.21.14:9090/", //静态文件路径
+    staticUrl: "http://120.133.21.14:9090/", //静态文件路径
     // url: 'http://120.133.21.14:9093/monPlatApp/', //监控平台
-    // operateUrl: 'http://120.133.21.14:9090/operateApp/',	//运营平台
+    operateUrl: 'http://120.133.21.14:9090/operateApp/',	//运营平台
     // websocketUrl:'ws://120.133.21.14:49982/mon',  //监控
     // socketUrl:'ws://172.17.1.16:9999/ws',  //影子系统
-    // dlUrl: 'http://117.114.144.227:8085/', //迪路
-    // dlWmsUrl: 'http://117.114.144.227:8080/', //迪路
+    dlUrl: 'http://117.114.144.227:8085/', //迪路
+    dlWmsUrl: 'http://117.114.144.227:8080/', //迪路
 
     //上海正式环境  外网
-    staticUrl: "http://116.236.72.204:49090/", //静态文件路径
+    // staticUrl: "http://116.236.72.204:49090/", //静态文件路径
     url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
-    operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
+    // operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
     websocketUrl:'ws://116.236.72.206:49982/mon',  //监控
     socketUrl:'ws://116.236.72.205:49999/ws',  //影子系统
-    dlUrl: 'http://116.236.72.204:48085/', //迪路
-    dlWmsUrl: 'http://116.236.72.204:48080/', //迪路
+    // dlUrl: 'http://116.236.72.204:48085/', //迪路
+    // dlWmsUrl: 'http://116.236.72.204:48080/', //迪路
 
     version: 1.2,       // 版本号
 }
@@ -78,4 +78,4 @@ window.mapUrl=window.config.dlWmsUrl+"geoserver/gwc/service/wmts?layer=shanghai_
 window.defualtZ=0.1; 
 window.count=30;//空闲车辆
 //默认的地图全区域
-window.currentExtent = [[121.15611700000001, 31.300408],[121.196117, 31.300408],[121.196117, 31.260408],[121.15611700000001, 31.260408]]
+window.currentExtent = [[121.158117,31.298408000000002],[121.194117,31.298408000000002],[121.194117,31.262408],[121.158117,31.262408]];

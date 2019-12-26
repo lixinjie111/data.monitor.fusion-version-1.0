@@ -44,7 +44,7 @@ export default {
     },
     created() {
         this.getBaseStat();
-        if(sessionStorage.getItem("lampPole")) {
+        if(!sessionStorage.getItem("lampPole")) {
             this.typeRoadData();
         }
     },

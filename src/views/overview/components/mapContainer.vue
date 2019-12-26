@@ -34,9 +34,13 @@
 
             this.initWebSocket();
 
-            if(sessionStorage.getItem("sideList")) {
+            let _sideList = sessionStorage.getItem("sideList");
+            if(!_sideList) {
                 let param = ['2'];
                 this.getDevDis(param);
+            }else {
+                _sideList = JSON.parse(_sideList);
+                this.deviceMap(_sideList);
             }
         },
         methods: {
