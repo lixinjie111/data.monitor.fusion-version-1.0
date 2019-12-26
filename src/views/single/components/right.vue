@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="c-pulse-time" >
-            <div class="three-bounce" v-if="isLoadingShow">
+            <div class="c-three-bounce" v-if="isLoadingShow">
                 <div class="one"></div>
                 <div class="two"></div>
                 <div class="three"></div>
