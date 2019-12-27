@@ -57,6 +57,7 @@
                 for(let vehicleId in data){
                     if(data[vehicleId]&&data[vehicleId].length>0){
                         _result[vehicleId] = data[vehicleId][data[vehicleId].length-1];
+                        //过滤过路车
                         if (_result[vehicleId].type == 2) {
                             return;
                         }
