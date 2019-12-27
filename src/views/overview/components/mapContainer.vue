@@ -57,6 +57,9 @@
                 for(let vehicleId in data){
                     if(data[vehicleId]&&data[vehicleId].length>0){
                         _result[vehicleId] = data[vehicleId][data[vehicleId].length-1];
+                        if (_result[vehicleId].type == 2) {
+                            return;
+                        }
                         _filterData[vehicleId] = {
                             vehicleId: _result[vehicleId].vehicleId,
                             plateNo: _result[vehicleId].plateNo,
