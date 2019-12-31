@@ -66,6 +66,7 @@
                 iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
                 center:[],
                 currentExtent:[],
+                perExtent:[],
                 x:0,
                 y:0,
                 param:1, //平面 俯视
@@ -114,6 +115,7 @@
             this.x = longitude;
             this.y = latitude;
             this.currentExtent = GetExtend.getExtend(longitude,latitude,extend);
+            this.perExtent = GetExtend.getExtend(longitude,latitude,window.extend);
             this.center=[longitude ,latitude];
 
             window.addEventListener('message', this.getMessage);
@@ -179,17 +181,33 @@
             getMap(){
                 let overviewMap = this.$refs.tusvnMap;
                 let overviewLayerId = "overviewLayer";
+                let overviewLayerIdPre = "overviewLayerPre";
                 let overviewLayer = overviewMap.getLayerById(overviewLayerId);
+                let overviewLayerPre = overviewMap.getLayerById(overviewLayerIdPre);
+                
                 if(overviewLayer!=null){
                     overviewMap.removeAllFeature(overviewLayerId);
                 }else{
                     overviewMap.addVectorLayer(overviewLayerId);
                 }
+
+                if(overviewLayerPre!=null){
+                    overviewMap.removeAllFeature(overviewLayerIdPre);
+                }else{
+                    overviewMap.addVectorLayer(overviewLayerIdPre);
+                }
+
                 let currentExtend = this.currentExtent;
+
                 overviewMap.addMultiPolygon([[currentExtend]], "rectangle",
                     [255,0,0,0.4],[255,0,0,1], "round",
                     "round", [5,0], null,
                     null, 1, overviewLayerId);
+
+                overviewMap.addMultiPolygon([[this.perExtent]], "rectangle",
+                    [255,255,255,0.1],[255,255,255,1], "round",
+                    "round", [5,0], null,
+                    null, 1, overviewLayerIdPre);
 
                 overviewMap.centerAt((currentExtend[0][0]+currentExtend[2][0])/2,(currentExtend[0][1]+currentExtend[2][1])/2);
             },
