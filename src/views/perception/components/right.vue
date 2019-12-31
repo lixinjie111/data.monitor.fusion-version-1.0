@@ -162,6 +162,7 @@
 
                         let _camData = {
                             type: 'updateCam',
+                            animationZ: 0,
                             data: this.camList[0].camParam
                         };
                         document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
@@ -202,6 +203,7 @@
                 }else {
                     _camData = {
                         type: 'updateCam',
+                        animationZ: 5,
                         data: null
                     };
                     if(this.camList.length>0){
