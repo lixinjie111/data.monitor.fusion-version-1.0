@@ -73,13 +73,13 @@
         },
         methods: {
             typeRoadData(){
-                let extend = parseFloat(this.$route.params.extend);
-                let longitude=parseFloat(this.$route.query.lng);
-                let latitude=parseFloat(this.$route.query.lat);
-                let currentExtent = this.getExtend(longitude,latitude,extend);
+//                let extend = parseFloat(this.$route.params.extend);
+//                let longitude=parseFloat(this.$route.query.lng);
+//                let latitude=parseFloat(this.$route.query.lat);
+//                let currentExtent = this.getExtend(longitude,latitude,extend);
                 typeRoadData(
                     {
-                        "polygon":currentExtent,
+                        "polygon":window.currentExtent,
                         "type": 'signs,spats'
                     }
                 ).then(res=>{
@@ -100,18 +100,18 @@
                     }
                 })
             },
-            getExtend(x,y,r){
-                let currentExtent=[];
-                let x0=x+r;
-                let y0=y+r;
-                let x1=x-r;
-                let y1=y-r;
-                currentExtent.push([x1, y0]);
-                currentExtent.push([x0, y0]);
-                currentExtent.push([x0, y1]);
-                currentExtent.push([x1, y1]);
-                return currentExtent;
-            }
+//            getExtend(x,y,r){
+//                let currentExtent=[];
+//                let x0=x+r;
+//                let y0=y+r;
+//                let x1=x-r;
+//                let y1=y-r;
+//                currentExtent.push([x1, y0]);
+//                currentExtent.push([x0, y0]);
+//                currentExtent.push([x0, y1]);
+//                currentExtent.push([x1, y1]);
+//                return currentExtent;
+//            }
         },
         mounted(){
             this.typeRoadData();
