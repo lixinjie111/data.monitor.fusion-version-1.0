@@ -28,6 +28,7 @@
 			font-size: 80pt;
 		}
 		.text {
+			margin-top: 40px;
 			font-size: 18pt;
 		}
 	}

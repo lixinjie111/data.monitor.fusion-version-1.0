@@ -115,7 +115,7 @@
     @import '@/assets/scss/theme.scss';
     .single-right {
         width: 270px;
-        padding-top: 20px !important;
+        padding-top: 68px !important;
     }
     .fusion-video{
         border:1px solid rgba(211, 134, 0, 0.5);
