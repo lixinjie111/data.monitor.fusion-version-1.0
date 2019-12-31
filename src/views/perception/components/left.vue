@@ -40,6 +40,7 @@
     </div>
 </template>
 <script>
+    import GetExtend from '@/assets/js/getExtend'
     import {typeRoadData} from '@/api/fusion'
     export default {
         data() {
@@ -73,13 +74,12 @@
         },
         methods: {
             typeRoadData(){
-//                let extend = parseFloat(this.$route.params.extend);
-//                let longitude=parseFloat(this.$route.query.lng);
-//                let latitude=parseFloat(this.$route.query.lat);
-//                let currentExtent = this.getExtend(longitude,latitude,extend);
+               let longitude=parseFloat(this.$route.query.lng);
+               let latitude=parseFloat(this.$route.query.lat);
+               let currentExtent = GetExtend.getExtend(longitude,latitude,window.extend);
                 typeRoadData(
                     {
-                        "polygon":window.currentExtent,
+                        "polygon": currentExtent,
                         "type": 'signs,spats'
                     }
                 ).then(res=>{
@@ -99,19 +99,7 @@
                         this.signCount = signCount;
                     }
                 })
-            },
-//            getExtend(x,y,r){
-//                let currentExtent=[];
-//                let x0=x+r;
-//                let y0=y+r;
-//                let x1=x-r;
-//                let y1=y-r;
-//                currentExtent.push([x1, y0]);
-//                currentExtent.push([x0, y0]);
-//                currentExtent.push([x0, y1]);
-//                currentExtent.push([x1, y1]);
-//                return currentExtent;
-//            }
+            }
         },
         mounted(){
             this.typeRoadData();

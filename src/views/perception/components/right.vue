@@ -57,12 +57,13 @@
     import LivePlayer from '@/components/livePlayer'
     import {getVideoByNum,getCameraByRsId} from '@/api/fusion'
     import WebSocketObj from '@/assets/js/webSocket.js'
+    import GetExtend from '@/assets/js/getExtend'
 
     export default {
         data() {
             return {
-                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
-                // iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
+                // iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
+                iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
                 center:[],
                 currentExtent:[],
                 x:0,
@@ -112,7 +113,7 @@
             //设置地图的中心点
             this.x = longitude;
             this.y = latitude;
-            this.currentExtent = this.getExtend(longitude,latitude,extend);
+            this.currentExtent = GetExtend.getExtend(longitude,latitude,extend);
             this.center=[longitude ,latitude];
 
             window.addEventListener('message', this.getMessage);
@@ -224,19 +225,7 @@
 //                if(videoUrl!=''){
 //                    this.camList[param].videoShow=true;
 //                }
-            },
-            getExtend(x,y,r){
-                let currentExtent=[];
-                let x0=x+r;
-                let y0=y+r;
-                let x1=x-r;
-                let y1=y-r;
-                currentExtent.push([x1, y0]);
-                currentExtent.push([x0, y0]);
-                currentExtent.push([x0, y1]);
-                currentExtent.push([x1, y1]);
-                return currentExtent;
-            },
+            }
         },
         destroyed(){
             window.removeEventListener("message", this.getMessage);
