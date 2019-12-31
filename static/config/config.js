@@ -20,7 +20,7 @@ window.config = {
     // dlWmsUrl: 'http://117.114.144.227:8080/', //迪路
 
     //上海正式环境  外网
-    staticUrl: "http://116.236.72.204:49090/", //静态文件路径
+    staticUrl: "http://116.236.72.204:48080/", //静态文件路径
     url: 'http://116.236.72.206:49093/monPlatApp/', //监控平台
     operateUrl: 'http://116.236.72.204:49090/operateApp/', //运营平台
     websocketUrl:'ws://116.236.72.206:49982/mon',  //监控
