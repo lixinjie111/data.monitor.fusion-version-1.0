@@ -11,6 +11,7 @@ const Refresh = resolve => require(['@/views/refresh'], resolve)
 
 const Single = resolve => require(['@/views/single'], resolve)
 const Perception = resolve => require(['@/views/perception'], resolve)
+const PerceptionTest = resolve => require(['@/views/perception'], resolve)
 const Overview = resolve => require(['@/views/overview'], resolve)
 
 
@@ -36,26 +37,33 @@ export default new VueRouter({
     redirect: '/login'
   },{ 
     path: '/refresh', 
-    name: 'Refresh', 
+    name: 'refresh', 
     component: Refresh,
     meta: {}
   },{
       path: '/single/:vehicleId',
-      name: 'Single',
+      name: 'single',
       component: Single,
       meta: {
         showHeader: true
       }
   },{
       path: '/perception/:crossId/:delayTime/:extend/:leftShow',
-      name: 'Perception',
+      name: 'perception',
       component: Perception,
       meta: {
         showHeader: true
       }
   },{
+      path: '/perceptionTest/:crossId/:delayTime/:extend/:leftShow',
+      name: 'perceptionTest',
+      component: PerceptionTest,
+      meta: {
+        showHeader: true
+      }
+  },{
     path: '/overview',
-    name: 'Overview',
+    name: 'overview',
     component: Overview,
     meta: {
       showHeader: true
