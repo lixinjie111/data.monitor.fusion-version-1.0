@@ -2,6 +2,9 @@
 $black: #000;
 $background: #5e5970;
 $backgroundRgba: rgba(94, 89, 112, 0.5);
+
+$borderColor: #d38600;
+$borderColorLight: rgba(211, 134, 0, .5);
 @mixin lineClampOne() {
   white-space: nowrap;
   overflow: hidden;
