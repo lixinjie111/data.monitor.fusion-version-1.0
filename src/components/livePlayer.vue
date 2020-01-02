@@ -1,7 +1,7 @@
 <template> 
     <div :class="[isBig?'c-video-16-9':'c-video-4-3']">
         <div class="c-video">
-            <div class="c-video-title">
+            <div class="c-video-title" v-if="showTitle">
                 <!-- <span class="title">路侧点：16:9</span> -->
                 <slot></slot>
                 <i class="el-icon-refresh" v-if="refreshFlag" @click="refreshVideo"></i>
@@ -56,6 +56,10 @@ export default {
         refName:{
             default:'',
             type:String
+        },
+        showTitle:{
+            default: true,
+            type: Boolean
         }
     },
     components: {
