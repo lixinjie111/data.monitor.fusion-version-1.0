@@ -59,7 +59,7 @@
                             this.$message({
                                 type: 'error',
                                 duration: '1500',
-                                message: '没有设置典型数据',
+                                message: '未设置典型摄像头',
                                 showClose: true
                             });
                             sessionStorage.removeItem("sTypeRoadCamLst");
