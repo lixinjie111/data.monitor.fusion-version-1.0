@@ -79,24 +79,21 @@
                let currentExtent = GetExtend.getExtend(longitude,latitude,window.extend);
                 typeRoadData(
                     {
-                        "polygon": currentExtent,
-                        "type": 'signs,spats'
+                        "polygon":currentExtent,
+                        "type": 'signs,lampPole'
                     }
                 ).then(res=>{
                     if(res.data){
                         let signs = res.data.signs || [];
-                        let spats = res.data.spats || [];
-                        let signCount=0;
+                        let lampPole = res.data.lampPole || [];
                         let spatCount=0;
-                        if(signs&&signs.length>0){
-                            signs.forEach(item=>{
-                                signCount++;
-                            })
-                        }
-                        if(spats&&spats.length>0) {
-                            this.spatCount = spats.length;
-                        }
-                        this.signCount = signCount;
+                        lampPole.forEach(item=>{
+                            let spats = item.spats || [];
+                            spatCount+=spats.length;
+
+                        });
+                        this.spatCount = spatCount;
+                        this.signCount = signs.length;
                     }
                 })
             }
