@@ -58,8 +58,9 @@
     export default {
         data() {
             return {
-                // iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
-                iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
+                //+"&v="+new Date().getTime()
+                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
+                // iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat,
                 center:[],
                 currentExtent:[],
                 perExtent:[],
@@ -131,8 +132,8 @@
                 if(!sessionStorage.getItem("sTypeRoadCamLst")) {
                     this.getCameraByRsId();
                 }else {
-                    this.camList = JSON.parse(sessionStorage.getItem("sTypeRoadCamLst"));
-                    this.postCamListMessage();
+                    let _data = sessionStorage.getItem("sTypeRoadCamLst");
+                    this.postCamListMessage(_data);
                 }
                 
                 // 获取路侧点列表
@@ -142,7 +143,25 @@
                 };
                 document.getElementById("c-iframe").contentWindow.postMessage(_sideListData,'*');
             },
-            postCamListMessage() {
+            postCamListMessage(data) {
+                let _option;
+                if (typeof data == 'string') {
+                    _option = JSON.parse(data);
+                } else {
+                    _option = data;
+                }
+                this.camList = _option.camLst;
+                this.camList.forEach(item=>{
+                    let params={
+                        "serialNum": item.sn,
+                        "protocal": item.protocal
+                    }
+                    item.params = params;
+                    item.rsPtName=_option.rsName;
+                    this.$set(item,"magnify",false);
+                })
+                this.mapShow=true;
+                console.log(this.camList);
                 let _camData = {
                     type: 'updateCam',
                     animationZ: 0,
@@ -154,19 +173,7 @@
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
                     let data = res.data;
                     if(data.camLst && data.camLst.length>0){
-                        this.camList = data.camLst;
-                        this.camList.forEach(item=>{
-                            let params={
-                                "serialNum": item.sn,
-                                "protocal": item.protocal
-                            }
-                            item.params = params;
-                            item.rsPtName=data.rsName;
-                            this.$set(item,"magnify",false);
-                        })
-                        this.mapShow=true;
-
-                        this.postCamListMessage();
+                        this.postCamListMessage(data);
                     }
                 });
             },

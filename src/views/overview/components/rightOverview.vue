@@ -43,7 +43,7 @@
                     if(res.status == 200) {
                         let data = res.data;
                         if(data.camLst && data.camLst.length>0){
-                            sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data.camLst));
+                            sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data));
                             let centPos = item.centPos.split(",");
                             this.$router.push({
                                 path: '/perception/'+item.rsId+ "/"+window.delayTime+ "/"+window.miniExtend+"/"+true,
