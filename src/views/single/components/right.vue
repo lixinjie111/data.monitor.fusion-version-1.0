@@ -1,7 +1,7 @@
 <template>
     <div class="c-fusion-right single-right">
         <p class="c-title">前向摄像头</p>
-        <div class="fusion-video">
+        <div class="c-fusion-box single-fusion-video">
             <live-player
                     :requestVideoUrl="requestVideoUrl"
                     :params="forwardParam"
@@ -12,10 +12,10 @@
                     v-if="forwardShow"
             >
             </live-player>
-            <p class="video-position" v-if="!forwardShow">暂无数据</p>
+            <p class="c-video-tip" v-if="!forwardShow">暂无数据</p>
         </div>
         <p class="c-title">车内摄像头</p>
-        <div class="fusion-video">
+        <div class="c-fusion-box single-fusion-video">
             <live-player
                     :requestVideoUrl="requestVideoUrl"
                     :params="inParam"
@@ -26,7 +26,7 @@
                     v-if="inShow"
             >
             </live-player>
-            <p class="video-position"  v-if="!inShow">暂无数据</p>
+            <p class="c-video-tip"  v-if="!inShow">暂无数据</p>
         </div>
     </div>
 </template>
@@ -117,34 +117,25 @@
         width: 270px;
         padding-top: 68px !important;
     }
-    .fusion-video{
-        border:1px solid rgba(211, 134, 0, 0.5);
-        margin: 20px 0px;
+    .single-fusion-video{
         height: 184px;
-        box-sizing: border-box;
-        /* padding-top: 10px;*/
-    }
-    .video-position{
-        @include layoutMode(both);
-        height:100%;
-        background: $background;
     }
 </style>
 <style lang="scss">
 .single-right {
-    .fusion-video .vjs-error .vjs-error-display:before{
+    .single-fusion-video .vjs-error .vjs-error-display:before{
         font-size: 3em;
         color: #ccc;
         top:60%;
         display: none;
     }
-    .fusion-video .vjs-modal-dialog-content{
+    .single-fusion-video .vjs-modal-dialog-content{
         padding-top:50px!important;
     }
-    .fusion-video .vjs-custom-skin > .video-js .vjs-big-play-button{
+    .single-fusion-video .vjs-custom-skin > .video-js .vjs-big-play-button{
         font-size: 0.5em!important;
     }
-    .fusion-video .video-js{
+    .single-fusion-video .video-js{
         height: 180px!important;
     }
 }

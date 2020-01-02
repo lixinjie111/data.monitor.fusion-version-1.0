@@ -222,7 +222,7 @@ img {
   margin-top: 20px;
   font-size: 16px;
   padding: 5px 0;
-  border-bottom: 1px solid rgba(211, 134, 0 , 0.4);
+  border-bottom: 1px solid $borderColorLight;
   font-weight: normal;
   line-height: 30px;
   &:after {
@@ -232,8 +232,26 @@ img {
     bottom: -1px;
     width: 22px;
     height: 2px;
-    background-color: #d38600;
+    background-color: $borderColor;
   }
+}
+.c-fusion-box {
+  position: relative;
+  border: 1px solid $borderColorLight;
+  background: $backgroundRgba;
+  box-sizing: border-box;
+  margin: 20px 0px;
+}
+.c-video-tip {
+  @include layoutMode(both);
+  font-size: 16px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0px;
+  color: #fff;
+  background: $background;
 }
 .c-fusion-left {
   position: absolute;

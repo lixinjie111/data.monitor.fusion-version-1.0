@@ -6,36 +6,30 @@
         <div class="c-fusion-right video-style">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
-                    <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'video-position']">
-                        <div class="style">
-                            <div class="video-mask" @click="screenMagnify(item)"></div>
-                            <live-player
-                                    :requestVideoUrl="requestVideoUrl"
-                                    :params="item.params"
-                                    type="flvUrl"
-                                    :autoplay="false"
-                                    :ref="'player'+index"
-                            >
-                                <div class="video-num" @click="changeMap(index)">
-                                    <span class="device-num">摄像头编号:{{item.devId}}</span>
-                                    <span class="active-circle" :class="{'active-style':isActive==index}"></span>
-                                    <span>{{item.rsPtName}}</span>
-                                </div>
-                                <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
-                            </live-player>
-                        </div>
-                    </div>
-                    <div v-for="item in new Array(2)" class="video-position style" v-if="camList.length==0">
-                        <div class="c-video-16-9 ">
-                            <div class="video-tip">
-                                暂无数据
+                    <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'c-fusion-box']">
+                        <div class="video-screen-btn" @click="screenMagnify(item)"></div>
+                        <live-player
+                                :requestVideoUrl="requestVideoUrl"
+                                :params="item.params"
+                                type="flvUrl"
+                                :autoplay="false"
+                                :ref="'player'+index"
+                        >
+                            <div class="video-num" @click="changeMap(index)">
+                                <span class="device-num">摄像头编号:{{item.devId}}</span>
+                                <span class="active-circle" :class="{'active-style':isActive==index}"></span>
+                                <span>{{item.rsPtName}}</span>
                             </div>
-                        </div>
+                            <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
+                        </live-player>
+                    </div>
+                    <div v-for="item in new Array(2)" class="c-fusion-box c-video-16-9" v-if="camList.length==0">
+                        <div class="c-video-tip">暂无数据</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="perception-road" id="mapRoad">
+        <div class="c-fusion-box perception-road" id="mapRoad">
             <tusvn-map
                     ref="tusvnMap"
                     targetId="tusvnMap"
@@ -241,10 +235,6 @@
             },
             screenMagnify(item){
                 item.magnify = !item.magnify;
-//                let videoUrl = this.camList[param].videoUrl;
-//                if(videoUrl!=''){
-//                    this.camList[param].videoShow=true;
-//                }
             }
         },
         destroyed(){
@@ -263,15 +253,11 @@
     .perception-road{
         height: 130px;
         width: 220px;
-        border:1px solid rgba(211, 134, 0, 0.3);
         position: absolute;
         bottom: 10px;
-        background: $backgroundRgba;
         right: 10px;
-        z-index:100;
-    }
-    .style{
-        position: relative;
+        margin: 0;
+        z-index: 4;
     }
     .video-num{
         position: absolute;
@@ -297,19 +283,10 @@
     .video-style{
         width: 400px;
         padding: 86px 10px 0;
+        z-index: 4;
         .c-scroll-wrap {
             height: calc(100% - 152px);
         }
-        .video-tip{
-            @include layoutMode(both);
-            font-size: 16px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0px;
-        }
-
         /*  transition: all 2s ease-in-out;*/
         .active-circle{
             display: inline-block;
@@ -335,32 +312,29 @@
                opacity: 1;
             }*/
         }
-    }
-    .magnify-style{
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        z-index:6;
-        width: 900px;
-        border:1px solid rgba(211, 134, 0, 0.5);
-        background: #000;
-    }
-    .video-position{
-        margin-bottom: 16px;
-        box-sizing: border-box;
-        /*border:1px solid rgba(234, 233, 229, 0.1);*/
-        border:1px solid rgba(211, 134, 0, 0.5)!important;
-        height: 226px;
-        background: $background;
-    }
-    .video-mask{
-        position: absolute;
-        right: 50px;
-        bottom: 0;
-        width: 80px;
-        height: 46px;
-        z-index: 3;
-        cursor: pointer;
+        .magnify-style{
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            z-index:6;
+            width: 900px;
+            border:1px solid rgba(211, 134, 0, 0.5);
+            background: #000;
+        }
+        .c-fusion-box{
+            margin: 0 0 16px;
+            height: 226px;
+            background: $background;
+        }
+        .video-screen-btn{
+            position: absolute;
+            right: 50px;
+            bottom: 0;
+            width: 80px;
+            height: 46px;
+            z-index: 3;
+            cursor: pointer;
+        }
     }
 
 </style>
