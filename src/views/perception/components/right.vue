@@ -128,7 +128,12 @@
             },
             onLoadMap() {
                 // 获取摄像头列表
-                this.getCameraByRsId();
+                if(!sessionStorage.getItem("sTypeRoadCamLst")) {
+                    this.getCameraByRsId();
+                }else {
+                    this.camList = JSON.parse(sessionStorage.getItem("sTypeRoadCamLst"));
+                    this.postCamListMessage();
+                }
                 
                 // 获取路侧点列表
                 let _sideListData = {
@@ -142,6 +147,14 @@
                     data: sessionStorage.getItem("lampPole")
                 };
                 document.getElementById("c-iframe").contentWindow.postMessage(_lampPoleData,'*');
+            },
+            postCamListMessage() {
+                let _camData = {
+                    type: 'updateCam',
+                    animationZ: 0,
+                    data: this.camList[0].camParam
+                };
+                document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
             },
             getCameraByRsId(){
                 getCameraByRsId({"rsId":this.rsId}).then(res => {
@@ -159,12 +172,7 @@
                         })
                         this.mapShow=true;
 
-                        let _camData = {
-                            type: 'updateCam',
-                            animationZ: 0,
-                            data: this.camList[0].camParam
-                        };
-                        document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
+                        this.postCamListMessage();
                     }
                 });
             },

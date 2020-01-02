@@ -5,6 +5,7 @@
     import { getRoadCenterIds, getRoadCenterPoints,getDevDis} from '@/api/overview/index.js';
     import ConvertCoord from '@/assets/js/coordConvert.js'
     import WebSocketObj from '@/assets/js/webSocket.js'
+    import {getCameraByRsId} from '@/api/fusion'
     export default {
         name: "MapContainer",
         data () {
@@ -44,6 +45,32 @@
             }
         },
         methods: {
+            getCameraByRsId(item){
+                getCameraByRsId({"rsId":item.deviceId}).then(res => {
+                    if(res.status == 200) {
+                        let data = res.data;
+                        if(data.camLst && data.camLst.length>0){
+                            sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data.camLst));
+                            this.$router.push({
+                                path: '/perception/'+item.deviceId+ "/"+4+ "/"+0.005+"/"+true,
+                                query:{lng:item.longitude,lat:item.latitude,isShow:false}
+                            }); 
+                        }else {
+                            this.$message({
+                                type: 'error',
+                                duration: '1500',
+                                message: '没有设置典型数据',
+                                showClose: true
+                            });
+                            sessionStorage.removeItem("sTypeRoadCamLst");
+                        }
+                    }else {
+                        sessionStorage.removeItem("sTypeRoadCamLst");
+                    }
+                }).catch(err => {
+                    sessionStorage.removeItem("sTypeRoadCamLst");
+                });
+            },
             initWebSocket(){
                 this.webSocket = new WebSocketObj(this, window.config.socketUrl, this.webSocketData, this.onmessage);
             },
@@ -170,13 +197,6 @@
                 this.prevData[id].plateNoMarker.on('click', this.showView);
             },
             showView(e) {
-                /*const { href } = this.$router.resolve({
-                    name: 'Single',
-                    params: {
-                        vehicleId: e.target.get("vehicleId")
-                    }
-                })
-                window.open(href, '_blank')*/
                 this.$router.push({
                     path: "/single/" + e.target.get("vehicleId"),
                     query:{delayTime:4}
@@ -205,10 +225,7 @@
                                     path:item.path,
                                     longitude:item.longitude,
                                     latitude:item.latitude,
-                                    title:item.devName,
-//                                id:item.deviceId,
-//                                name:item.devName,
-//                                lnglat:ConvertCoord.wgs84togcj02(item.longitude, item.latitude)
+                                    title:item.devName
                                 }
                                 resultData.push(option);
                             }
@@ -236,58 +253,17 @@
                                             target:'map'
                                         }
                                         marker.on('click', function(e) {
-                                            _this.$router.push({
-                                                path: '/perception/'+subItem.deviceId+ "/"+4+ "/"+0.005+"/"+true,
-                                                query:{lng:subItem.longitude,lat:subItem.latitude,isShow:false}
-                                            });
+                                            _this.getCameraByRsId(subItem);
                                         });
                                     }
                                     //绘制完后，重新设置
                                     if(subIndex==resultData.length-1){
                                         _this.AMap.setFitView();
-//                                    _this.AMap.setZoom(_this.AMap.getZoom()-2);
                                         _this.count=0;
                                     }
                                 })
                             }
-                            /*}
-                          });*/
                         })
-                        /* let style = {
-                             url: 'static/images/road/side.png',
-                             anchor: new AMap.Pixel(15, 15),
-                             size: new AMap.Size(30, 30)
-                         }
-                          let mass = new AMap.MassMarks(resultData, {
-                              opacity: 0.8,
-                              zIndex: 111,
-                              cursor: 'pointer',
-                              style: style
-                          });
-                         mass.setMap(_this.AMap);
-
-
-                          let marker = new AMap.Marker({content: ' ', map: _this.AMap, offset: new AMap.Pixel(10, 0)});
-                          marker.hide();
-                          mass.on('mouseover', function (e) {
-                              marker.setPosition(e.data.lnglat);
-                              marker.setLabel({content: e.data.name,direction:'bottom', offset: new AMap.Pixel(10, -15)});
-                              marker.show();
-
-                          });
-
-                          mass.on('mouseout', function (e) {
-                              marker.hide();
-      //                        marker.setPosition(e.data.lnglat);
-      //                        marker.setLabel({content: e.data.name});
-
-                          });
-                          mass.on('click', function (e) {
-                              _this.$router.push({
-                                  path: '/perception/' +e.data.lnglat.lng + "/" +e.data.lnglat.lat+"/"+e.data.id+ "/"+1+ "/"+false+ "/"+0.002+"/"+true,
-                              });
-                          });
-      */
                     }
                 }
             },

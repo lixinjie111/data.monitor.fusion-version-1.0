@@ -26,6 +26,7 @@
 </template>
 <script>
     import {getTypicalRoadData} from '@/api/overview/index.js';
+    import {getCameraByRsId} from '@/api/fusion'
     export default {
         props:['filterData'],
         data(){
@@ -37,13 +38,36 @@
             this.fetchTypicalRoad();
         },
         methods: {
-            showRoadDetail(item) {
-//            sessionStorage.setItem(item.rsId,JSON.stringify(item));
-                let centPos = item.centPos.split(",");
-                this.$router.push({
-                    path: '/perception/'+item.rsId+ "/"+4+"/"+0.005+"/"+true,
-                    query:{lng:centPos[0],lat:centPos[1],isShow:false}
+            getCameraByRsId(item){
+                getCameraByRsId({"rsId":item.rsId}).then(res => {
+                    if(res.status == 200) {
+                        let data = res.data;
+                        if(data.camLst && data.camLst.length>0){
+                            sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data.camLst));
+                            let centPos = item.centPos.split(",");
+                            this.$router.push({
+                                path: '/perception/'+item.rsId+ "/"+4+ "/"+0.005+"/"+true,
+                                query:{lng:centPos[0],lat:centPos[1],isShow:false}
+                            }); 
+                        }else {
+                            this.$message({
+                                type: 'error',
+                                duration: '1500',
+                                message: '没有设置典型数据',
+                                showClose: true
+                            });
+                            sessionStorage.removeItem("sTypeRoadCamLst");
+                        }
+                    }else {
+                        sessionStorage.removeItem("sTypeRoadCamLst");
+                    }
+                }).catch(err => {
+                    sessionStorage.removeItem("sTypeRoadCamLst");
                 });
+            },
+            showRoadDetail(item) {
+                console.log(item);
+                this.getCameraByRsId(item);
             },
             // 路段中心点位置
             fetchTypicalRoad() {
