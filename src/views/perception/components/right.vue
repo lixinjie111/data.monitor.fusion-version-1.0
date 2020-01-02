@@ -24,7 +24,7 @@
                         </live-player>
                     </div>
                     <div v-for="item in new Array(2)" class="c-fusion-box c-video-16-9" v-if="camList.length==0">
-                        <div class="c-video-tip">暂无数据</div>
+                        <div class="c-video-empty">暂无数据</div>
                     </div>
                 </div>
             </div>

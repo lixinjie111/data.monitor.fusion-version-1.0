@@ -12,7 +12,7 @@
                     v-if="forwardShow"
             >
             </live-player>
-            <p class="c-video-tip" v-if="!forwardShow">暂无数据</p>
+            <p class="c-video-empty" v-if="!forwardShow">暂无数据</p>
         </div>
         <p class="c-title">车内摄像头</p>
         <div class="c-fusion-box single-fusion-video">
@@ -26,7 +26,7 @@
                     v-if="inShow"
             >
             </live-player>
-            <p class="c-video-tip"  v-if="!inShow">暂无数据</p>
+            <p class="c-video-empty" v-if="!inShow">暂无数据</p>
         </div>
     </div>
 </template>
@@ -119,6 +119,9 @@
     }
     .single-fusion-video{
         height: 184px;
+    }
+    .c-video-empty {
+        font-size: 14px;
     }
 </style>
 <style lang="scss">
