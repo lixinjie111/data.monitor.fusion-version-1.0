@@ -6,7 +6,7 @@
         <div class="c-fusion-right video-style">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
-                    <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'magnify-style':'c-fusion-box']">
+                    <div v-for="(item,index) in camList"  v-if="camList.length>0" :class="[item.magnify?'m-magnify-style':'c-fusion-box']">
                         <div class="video-screen-btn" @click="screenMagnify(item)"></div>
                         <live-player
                                 :requestVideoUrl="requestVideoUrl"
@@ -312,7 +312,7 @@
                opacity: 1;
             }*/
         }
-        .magnify-style{
+        .m-magnify-style{
             position: absolute;
             top: 0px;
             right: 0px;
