@@ -1,7 +1,7 @@
 <template>
-    <div class="c-fusion-right single-right">
+    <div class="c-fusion-right m-single-right">
         <p class="c-title">前向摄像头</p>
-        <div class="c-fusion-box single-fusion-video">
+        <div class="c-fusion-box m-single-video">
             <live-player
                     :requestVideoUrl="requestVideoUrl"
                     :params="forwardParam"
@@ -15,7 +15,7 @@
             <p class="c-video-empty" v-if="!forwardShow">暂无数据</p>
         </div>
         <p class="c-title">车内摄像头</p>
-        <div class="c-fusion-box single-fusion-video">
+        <div class="c-fusion-box m-single-video">
             <live-player
                     :requestVideoUrl="requestVideoUrl"
                     :params="inParam"
@@ -113,11 +113,11 @@
 </script>
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
-    .single-right {
+    .m-single-right {
         width: 270px;
         padding-top: 68px !important;
     }
-    .single-fusion-video{
+    .m-single-video{
         height: 184px;
     }
     .c-video-empty {
@@ -125,20 +125,20 @@
     }
 </style>
 <style lang="scss">
-.single-right {
-    .single-fusion-video .vjs-error .vjs-error-display:before{
+.m-single-right {
+    .vjs-error .vjs-error-display:before{
         font-size: 3em;
         color: #ccc;
         top:60%;
         display: none;
     }
-    .single-fusion-video .vjs-modal-dialog-content{
+    .vjs-modal-dialog-content{
         padding-top:50px!important;
     }
-    .single-fusion-video .vjs-custom-skin > .video-js .vjs-big-play-button{
+    .vjs-custom-skin > .video-js .vjs-big-play-button{
         font-size: 0.5em!important;
     }
-    .single-fusion-video .video-js{
+    .video-js{
         height: 180px!important;
     }
 }

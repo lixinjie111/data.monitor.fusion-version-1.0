@@ -2,7 +2,7 @@
     <div class="fusion-left-style">
         <div class="fusion-left-main left-style">
             <p class="c-title">感知数据</p>
-            <ul  class="perception-style">
+            <ul  class="c-fusion-box">
                 <li>
                     <span class="overview-sign perception-sign"></span>
                     <span>平台直连：车辆 {{vehData.platVeh || 0}}</span>
@@ -22,7 +22,7 @@
                 </li>
             </ul>
             <p class="c-title">交通数据</p>
-            <ul class="perception-style">
+            <ul class="c-fusion-box">
                 <li>
                     <span class="overview-sign traffic-sign"></span>
                     <span>下发预警信息：{{warningCount|| 0}}</span>
@@ -40,6 +40,7 @@
     </div>
 </template>
 <script>
+    import GetExtend from '@/assets/js/getExtend'
     import {typeRoadData} from '@/api/fusion'
     export default {
         data() {
@@ -73,9 +74,9 @@
         },
         methods: {
             typeRoadData(){
-                let longitude=parseFloat(this.$route.query.lng);
-                let latitude=parseFloat(this.$route.query.lat);
-                let currentExtent = this.getExtend(longitude,latitude,window.extend);
+               let longitude=parseFloat(this.$route.query.lng);
+               let latitude=parseFloat(this.$route.query.lat);
+               let currentExtent = GetExtend.getExtend(longitude,latitude,window.extend);
                 typeRoadData(
                     {
                         "polygon":currentExtent,
@@ -95,18 +96,6 @@
                         this.signCount = signs.length;
                     }
                 })
-            },
-            getExtend(x,y,r){
-                let currentExtent=[];
-                let x0=x+r;
-                let y0=y+r;
-                let x1=x-r;
-                let y1=y-r;
-                currentExtent.push([x1, y0]);
-                currentExtent.push([x0, y0]);
-                currentExtent.push([x0, y1]);
-                currentExtent.push([x1, y1]);
-                return currentExtent;
             }
         },
         mounted(){
@@ -120,14 +109,10 @@
         padding-top:0px!important;
         padding-bottom:0px!important;
     }
-    .perception-style{
+    .c-fusion-box{
         padding: 20px 10px;
         line-height: 28px;
         font-size: 14px;
-        margin:20px 0px;
-        border: 1px solid rgba(211, 134, 0, 0.4);
-        /*@borderLine();*/
-        background: $backgroundRgba;
         li{
             letter-spacing: 1px;
             color: #cccccc;
