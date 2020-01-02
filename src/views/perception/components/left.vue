@@ -73,45 +73,41 @@
         },
         methods: {
             typeRoadData(){
-//                let extend = parseFloat(this.$route.params.extend);
-//                let longitude=parseFloat(this.$route.query.lng);
-//                let latitude=parseFloat(this.$route.query.lat);
-//                let currentExtent = this.getExtend(longitude,latitude,extend);
+                let longitude=parseFloat(this.$route.query.lng);
+                let latitude=parseFloat(this.$route.query.lat);
+                let currentExtent = this.getExtend(longitude,latitude,window.extend);
                 typeRoadData(
                     {
-                        "polygon":window.currentExtent,
-                        "type": 'signs,spats'
+                        "polygon":currentExtent,
+                        "type": 'signs,lampPole'
                     }
                 ).then(res=>{
                     if(res.data){
                         let signs = res.data.signs || [];
-                        let spats = res.data.spats || [];
-                        let signCount=0;
+                        let lampPole = res.data.lampPole || [];
                         let spatCount=0;
-                        if(signs&&signs.length>0){
-                            signs.forEach(item=>{
-                                signCount++;
-                            })
-                        }
-                        if(spats&&spats.length>0) {
-                            this.spatCount = spats.length;
-                        }
-                        this.signCount = signCount;
+                        lampPole.forEach(item=>{
+                            let spats = item.spats || [];
+                            spatCount+=spats.length;
+
+                        });
+                        this.spatCount = spatCount;
+                        this.signCount = signs.length;
                     }
                 })
             },
-//            getExtend(x,y,r){
-//                let currentExtent=[];
-//                let x0=x+r;
-//                let y0=y+r;
-//                let x1=x-r;
-//                let y1=y-r;
-//                currentExtent.push([x1, y0]);
-//                currentExtent.push([x0, y0]);
-//                currentExtent.push([x0, y1]);
-//                currentExtent.push([x1, y1]);
-//                return currentExtent;
-//            }
+            getExtend(x,y,r){
+                let currentExtent=[];
+                let x0=x+r;
+                let y0=y+r;
+                let x1=x-r;
+                let y1=y-r;
+                currentExtent.push([x1, y0]);
+                currentExtent.push([x0, y0]);
+                currentExtent.push([x0, y1]);
+                currentExtent.push([x1, y1]);
+                return currentExtent;
+            }
         },
         mounted(){
             this.typeRoadData();
