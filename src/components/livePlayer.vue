@@ -178,10 +178,12 @@ export default {
         },
         setVideoOptionClose() {
             this.initVideoTimer();
-            this.videoOption.videoMaskFlag = false;
-            this.videoOption.playFlag = false;
-            this.videoOption.loadingFlag = false;
-            this.videoOption.playError = false;
+            if(this.videoOption.videoMaskFlag) {
+                this.videoOption.videoMaskFlag = false;
+                this.videoOption.playFlag = false;
+                this.videoOption.loadingFlag = false;
+                this.videoOption.playError = false;
+            }
         },
         onPlayerMessage(player) {
             // console.log("onPlayerMessage");
@@ -215,8 +217,8 @@ export default {
         },
         // listen event
         onPlayerPlay(player) {
-            // console.log('player play!');
-            this.setVideoOptionPause();
+            // console.log('play!', player);
+            this.setVideoOptionClose();
         },
         requestVideo() {
             this.setVideoOptionLoading();
