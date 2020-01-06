@@ -58,8 +58,8 @@
     export default {
         data() {
             return {
-                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
-                // iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
+//                iframeUrl: window.config.staticUrl+'cesium-map/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
+                 iframeUrl: 'http://127.0.0.1:8080/modules/fusionMonitor/'+this.$route.name+'.html?crossId='+this.$route.params.crossId+'&delayTime='+this.$route.params.delayTime+'&extend='+this.$route.params.extend+'&lng='+this.$route.query.lng+'&lat='+this.$route.query.lat+"&v="+new Date().getTime(),
                 center:[],
                 currentExtent:[],
                 perExtent:[],
@@ -158,7 +158,11 @@
                             this.$set(item,"magnify",false);
                         })
                         this.mapShow=true;
-
+                        let camParam = this.camList[0].camParam;
+                        if(Object.keys(camParam).length<1){
+                            this.$message.error("典型摄像头还未设置地图参数");
+                            return;
+                        }
                         let _camData = {
                             type: 'updateCam',
                             animationZ: 0,
@@ -226,6 +230,10 @@
                         if(cameraParam){
                             _camData.data = cameraParam;
                         }
+                    }
+                    if(!_camData.data){
+                        this.$message.error("典型摄像头还未设置地图参数，无法进行切换!");
+                        return;
                     }
                 }
                 document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');

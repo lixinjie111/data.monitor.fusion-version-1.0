@@ -130,7 +130,7 @@
             showView(carId) {
                 this.$router.push({
                     path: "/single/" + carId,
-                    query:{delayTime:4}
+                    query:{delayTime:2}
                 });
             }
         },
