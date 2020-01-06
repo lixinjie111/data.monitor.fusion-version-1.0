@@ -161,15 +161,10 @@
                 })
                 this.mapShow=true;
 //                console.log(this.camList);
-                let camParam = this.camList[0].camParam;
-                if(Object.keys(camParam).length<1){
-                    this.$message.error("典型摄像头还未设置地图参数");
-                    return;
-                }
                 let _camData = {
                     type: 'updateCam',
                     animationZ: 0,
-                    data: camParam
+                    data: this.camList[0].camParam
                 };
                 document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
             },
@@ -239,10 +234,6 @@
                         if(cameraParam){
                             _camData.data = cameraParam;
                         }
-                    }
-                    if(!_camData.data){
-                        this.$message.error("典型摄像头还未设置地图参数，无法进行切换!");
-                        return;
                     }
                 }
                 document.getElementById("c-iframe").contentWindow.postMessage(_camData,'*');
