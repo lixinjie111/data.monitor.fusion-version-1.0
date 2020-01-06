@@ -7,6 +7,7 @@
                     :params="forwardParam"
                     type="rtmp"
                     :autoplay="false"
+                    :showTitle="false"
                     @videoLoadCompleted="videoLoadCompleted"
                     :isBig="false"
                     v-if="forwardShow"
@@ -21,6 +22,7 @@
                     :params="inParam"
                     type="rtmp"
                     :autoplay="false"
+                    :showTitle="false"
                     @videoLoadCompleted="videoLoadCompleted"
                     :isBig="false"
                     v-if="inShow"
@@ -137,9 +139,6 @@
     }
     .vjs-custom-skin > .video-js .vjs-big-play-button{
         font-size: 0.5em!important;
-    }
-    .video-js{
-        height: 180px!important;
     }
 }
 </style>

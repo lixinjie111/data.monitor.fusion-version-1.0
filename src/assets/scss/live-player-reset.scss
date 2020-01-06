@@ -3,7 +3,11 @@
 // 视频样式
 
 .c-live-player {
-	background-color:red;
+	position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translate(0, -50%);
 	.video-js {
 		.vjs-big-play-button {
 			width: 50px;

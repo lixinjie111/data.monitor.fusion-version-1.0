@@ -1,7 +1,7 @@
 <template> 
     <div :class="[isBig?'c-video-16-9':'c-video-4-3']">
         <div class="c-video">
-            <div class="c-video-title">
+            <div class="c-video-title" v-if="showTitle">
                 <!-- <span class="title">路侧点：16:9</span> -->
                 <slot></slot>
                 <i class="el-icon-refresh" v-if="refreshFlag" @click="refreshVideo"></i>
@@ -56,6 +56,10 @@ export default {
         refName:{
             default:'',
             type:String
+        },
+        showTitle:{
+            default: true,
+            type: Boolean
         }
     },
     components: {
@@ -132,24 +136,24 @@ export default {
                 }
             }, 1000);
         },
-        videoTimerReload() {
-            clearInterval(this.videoLoadingDelay.timer);
-            this.videoLoadingDelay.timer = setInterval(() => {
-                this.videoLoadingDelay.count ++;
-                this.videoLoadingDelay.reloadCount ++;
-                console.log("视频卡顿"+this.videoLoadingDelay.reloadTime,this.videoLoadingDelay.count,"连续加载次数", this.videoLoadingDelay.reloadCount);
-                if(this.videoLoadingDelay.count >= this.videoLoadingDelay.reloadTime) {
-                    if(this.videoLoadingDelay.reloadCount >= this.videoLoadingDelay.reloadCountLimit) {
-                        console.log("连续加载已达上限，关闭加载");
-                        this.setVideoOptionError("此视频暂无法播放，请稍后再试");
-                    }else {
-                        console.log("视频卡顿重新加载");
-                        this.requestVideo();
-                    }
-                }
-            }, 2000);
-//            console.log("第一个定时器："+this.videoLoadingDelay.timer );
-        },
+//         videoTimerReload() {
+//             clearInterval(this.videoLoadingDelay.timer);
+//             this.videoLoadingDelay.timer = setInterval(() => {
+//                 this.videoLoadingDelay.count ++;
+//                 this.videoLoadingDelay.reloadCount ++;
+//                 console.log("视频卡顿"+this.videoLoadingDelay.reloadTime,this.videoLoadingDelay.count,"连续加载次数", this.videoLoadingDelay.reloadCount);
+//                 if(this.videoLoadingDelay.count >= this.videoLoadingDelay.reloadTime) {
+//                     if(this.videoLoadingDelay.reloadCount >= this.videoLoadingDelay.reloadCountLimit) {
+//                         console.log("连续加载已达上限，关闭加载");
+//                         this.setVideoOptionError("此视频暂无法播放，请稍后再试");
+//                     }else {
+//                         console.log("视频卡顿重新加载");
+//                         this.requestVideo();
+//                     }
+//                 }
+//             }, 2000);
+// //            console.log("第一个定时器："+this.videoLoadingDelay.timer );
+//         },
         setVideoOptionPause() {
             this.initVideoTimer();
             this.videoOption.videoMaskFlag = true;
@@ -174,10 +178,12 @@ export default {
         },
         setVideoOptionClose() {
             this.initVideoTimer();
-            this.videoOption.videoMaskFlag = false;
-            this.videoOption.playFlag = false;
-            this.videoOption.loadingFlag = false;
-            this.videoOption.playError = false;
+            if(this.videoOption.videoMaskFlag) {
+                this.videoOption.videoMaskFlag = false;
+                this.videoOption.playFlag = false;
+                this.videoOption.loadingFlag = false;
+                this.videoOption.playError = false;
+            }
         },
         onPlayerMessage(player) {
             // console.log("onPlayerMessage");
@@ -199,9 +205,9 @@ export default {
                 this.videoLoadingDelay.lastTimeupdate = player;
                 this.setVideoOptionClose();
             }
-            setTimeout(() => {
-                this.videoTimerReload();
-            }, 0);
+            // setTimeout(() => {
+            //     this.videoTimerReload();
+            // }, 0);
             this.$emit("videoTimeupdate",player);
         },
         onPlayerPause() {
@@ -211,8 +217,8 @@ export default {
         },
         // listen event
         onPlayerPlay(player) {
-            // console.log('player play!');
-            this.setVideoOptionPause();
+            // console.log('play!', player);
+            this.setVideoOptionClose();
         },
         requestVideo() {
             this.setVideoOptionLoading();
