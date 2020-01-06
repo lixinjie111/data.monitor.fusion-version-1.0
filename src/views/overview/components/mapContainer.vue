@@ -49,7 +49,7 @@
                 getCameraByRsId({"rsId":item.deviceId}).then(res => {
                     if(res.status == 200) {
                         let data = res.data;
-                        if(data.camLst && data.camLst.length>0){
+                        if(data.camLst && data.camLst.length>0 && data.camLst[0].camParam){
                             sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data));
                             this.$router.push({
                                 path: '/perception/'+item.deviceId+ "/"+window.delayTime+ "/"+window.miniExtend+"/"+true,
@@ -59,7 +59,7 @@
                             this.$message({
                                 type: 'error',
                                 duration: '1500',
-                                message: '未设置典型摄像头',
+                                message: '未设置典型摄像头或摄像头参数',
                                 showClose: true
                             });
                             sessionStorage.removeItem("sTypeRoadCamLst");
