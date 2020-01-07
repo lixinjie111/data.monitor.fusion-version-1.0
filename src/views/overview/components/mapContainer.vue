@@ -199,7 +199,7 @@
             showView(e) {
                 this.$router.push({
                     path: "/single/" + e.target.get("vehicleId"),
-                    query:{delayTime:2}
+                    query:{delayTime: window.delayTime}
                 });
             },
             getDevDis(disParams){
