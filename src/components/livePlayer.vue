@@ -129,7 +129,7 @@ export default {
         videoTimer() {
             this.videoLoadingDelay.timer = setInterval(() => {
                 if(this.videoLoadingDelay.count >= this.videoLoadingDelay.countTime) {
-                    this.setVideoOptionError("此视频暂无法播放，请稍后再试");
+                    this.setVideoOptionError("受网络环境影响暂无法播放，请稍后再试");
                     this.videoUrl = "";
                 }else {
                     this.videoLoadingDelay.count ++;
@@ -145,7 +145,7 @@ export default {
 //                 if(this.videoLoadingDelay.count >= this.videoLoadingDelay.reloadTime) {
 //                     if(this.videoLoadingDelay.reloadCount >= this.videoLoadingDelay.reloadCountLimit) {
 //                         console.log("连续加载已达上限，关闭加载");
-//                         this.setVideoOptionError("此视频暂无法播放，请稍后再试");
+//                         this.setVideoOptionError("受网络环境影响暂无法播放，请稍后再试");
 //                     }else {
 //                         console.log("视频卡顿重新加载");
 //                         this.requestVideo();
