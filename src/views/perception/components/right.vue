@@ -1,5 +1,5 @@
 <template>
-    <div class="fusion-right-style" id="fusionRight">
+    <div class="c-position-trbl">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1"/>
         <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
@@ -23,21 +23,25 @@
                             <!--<a class="title" href="javascript:;" @click="jumpLink">路测点：{{params.serialNum}}</a>-->
                         </live-player>
                     </div>
-                    <div v-for="item in new Array(2)" class="c-fusion-box c-video-16-9" v-if="camList.length==0">
-                        <div class="c-video-empty">暂无数据</div>
+                    <div v-for="item in new Array(2)" class="c-fusion-box" v-if="camList.length==0">
+                        <div class="c-video-16-9">
+                            <div class="c-video-empty">暂无数据</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="c-fusion-box perception-road" id="mapRoad">
-            <tusvn-map
+
+            <div class="perception-road clearfix" id="mapRoad">
+                <tusvn-map
+                    class="c-fusion-box m-tusvn-map"
                     ref="tusvnMap"
                     targetId="tusvnMap"
                     overlayContainerId="overlay"
                     :isMasker='false'
                     :isCircle='false'
                     @MapInitComplete='mapInitComplete'>
-            </tusvn-map>
+                </tusvn-map>
+            </div>
         </div>
         <iframe 
             @load ="onLoadMap" 
@@ -253,19 +257,20 @@
 
 <style lang="scss" scoped>
     @import '@/assets/scss/theme.scss';
+    @import '@/assets/scss/live-player-reset.scss';
     .map-time{
         margin-top:100px!important;
         background: #969090;
         font-size: 14px;
     }
     .perception-road{
-        height: 130px;
-        width: 220px;
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        margin: 0;
-        z-index: 4;
+        margin-top: 16px;
+        height: 132px;
+        .m-tusvn-map {
+            float: right;
+            width: 222px;
+            margin: 0;
+        }
     }
     .video-num{
         position: absolute;
@@ -293,7 +298,15 @@
         padding: 86px 10px 0;
         z-index: 4;
         .c-scroll-wrap {
-            height: calc(100% - 152px);
+            height: auto !important;
+            max-height: 470px !important;
+            .c-fusion-box {
+                margin: 0 0 16px;
+                background: $background;
+                &:last-child {
+                    margin: 0;
+                }  
+            }
         }
         /*  transition: all 2s ease-in-out;*/
         .active-circle{
@@ -328,11 +341,6 @@
             width: 900px;
             border:1px solid rgba(211, 134, 0, 0.5);
             background: #000;
-        }
-        .c-fusion-box{
-            margin: 0 0 16px;
-            height: 226px;
-            background: $background;
         }
         .video-screen-btn{
             position: absolute;

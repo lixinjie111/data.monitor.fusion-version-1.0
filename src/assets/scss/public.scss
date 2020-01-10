@@ -109,7 +109,17 @@ img {
 .c-absolute {
   position: absolute;
 }
-
+.c-box {
+  width: 100%;
+  height: 100%;
+}
+.c-position-trbl {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
 .c-header-dropdown {
     text-align: center;
     margin-top: 5px !important;
@@ -121,8 +131,6 @@ img {
       height: 0;
     }
 }
-
-
 .c-dialog-wrapper {
   position: fixed;
   left: 0;
@@ -296,16 +304,6 @@ img {
   padding: 0px 30px;*/
   background:linear-gradient(to right, rgb(0,0,0) 0%, transparent 100%);
   z-index:1;
-}
-.c-map{
-  height: 100%;
-}
-.fusion-right-style{
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right:0;
 }
 .c-pulse-time{
   position: absolute;

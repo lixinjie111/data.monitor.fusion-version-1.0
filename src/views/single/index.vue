@@ -1,5 +1,5 @@
 <template>
-    <div class="c-map">
+    <div class="c-box">
         <iframe 
             @load ="onLoadMap" 
             :src="iframeUrl" 

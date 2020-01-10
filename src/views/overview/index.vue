@@ -1,5 +1,5 @@
 <template>
-    <div class="fusion-style">
+    <div class="c-box">
         <!-- 左侧 -->
         <div class="c-fusion-left">
             <div class="c-scroll-wrap">
@@ -69,12 +69,5 @@ export default {
 <style lang="scss" scoped>
 .c-fusion-left, .c-fusion-right {
     padding:100px 30px 0;
-}
-.fusion-style{
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
 }
 </style>

@@ -1,15 +1,13 @@
 <template>
-    <div class="fusion-style">
-        <div class="fusion-layout">
-            <div class="c-fusion-left fusion-left">
-                <div class="c-scroll-wrap">
-                    <div class="c-scroll-inner">
-                        <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount" :vehData="vehData" v-show="leftShow"></left>
-                    </div>
+    <div class="c-box">
+        <div class="c-fusion-left">
+            <div class="c-scroll-wrap">
+                <div class="c-scroll-inner">
+                    <left :currentExtent="currentExtent" :spatCount="spatCount" :signCount="signCount" :perceptionData="perceptionData" :warningCount="warningCount" :vehData="vehData" v-show="leftShow"></left>
                 </div>
             </div>
-            <right></right>
         </div>
+        <right></right>
     </div>
 </template>
 <script>
@@ -50,12 +48,7 @@
     }
 </script>
 <style lang="scss" scoped>
-
-    .fusion-style{
-        width: 100%;
-        height: 100%;
-        .fusion-left{
-            width: 310px;
-        }
-    }
+.c-fusion-left{
+    width: 310px;
+}
 </style>
