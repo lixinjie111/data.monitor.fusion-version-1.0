@@ -1,13 +1,6 @@
 <template>
-    <div class="m-wrapper">
-        <div class="m-select-wrap">
-            
-        </div>
-        <div class="c-scroll-wrap">
-            <div class="c-scroll-inner">
-                
-            </div>
-        </div>
+    <div class="fusion-left-style">
+        
     </div>
 </template>
 <script>

@@ -190,6 +190,9 @@
     right: 0;
    @include layoutMode(pack)
 }
+.el-form-item {
+    margin-bottom: 0;
+}
 </style>
 <style lang="scss">
 .fusion-select {

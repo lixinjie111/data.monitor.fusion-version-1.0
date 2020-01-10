@@ -1,5 +1,5 @@
 <template>
-    <div class="road-view-map" :id="id"></div>
+    <div class="c-box road-view-map" :id="id"></div>
 </template>
 <script>
     import { getRoadCenterIds, getRoadCenterPoints,getDevDis} from '@/api/overview/index.js';
@@ -288,11 +288,3 @@
         text-align: center;
     }
 </style>
-<style scoped lang="scss">
-    .road-view-map{
-        height: 100%;
-        width: 100%;
-        z-index: -2;
-    }
-</style>
-
