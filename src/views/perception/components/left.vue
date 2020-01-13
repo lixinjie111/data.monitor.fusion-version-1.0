@@ -1,15 +1,15 @@
 <template>
     <div class="m-wrapper">
         <div class="m-select-wrap clearfix">
-            <el-collapse class="c-left">
-                <el-collapse-item :title="'图层数量：'+levelOptionShowNum">
+            <el-collapse class="c-left" v-model="levelActiveName" @click.stop.prevent>
+                <el-collapse-item :title="'图层数量：'+levelOptionShowNum" name="1">
                     <ul class="m-ul">
                         <li class="m-li clearfix" v-for="(item, index) in levelOption">
                             <span class="m-text">{{item.name}}</span>
                             <span 
                                 class="m-switch" 
-                                :class="{'active': item.flag, 'disabled': item.disabled}" 
-                                @click="switchHandle(item, index, levelOption)">
+                                :class="{'active': item.flag, 'disabled': item.disabled}"
+                                @click="switchHandle(item, index, levelOption, true)">
                             </span>
                         </li>
                     </ul>
@@ -82,6 +82,7 @@ export default {
                     name: '基础路网',
                 }
             ],
+            levelActiveName: [],
             levelOptionShowNum: 0,
             dataOption: [
                 {
@@ -97,6 +98,7 @@ export default {
                     name: '统计数据', 
                 }
             ],
+            dataActiveName: ['1'],
             drawObj: {
                 "title1": [1-1,1-2,1-3]
             }
@@ -113,11 +115,20 @@ export default {
     },
     mounted(){
         this.levelOptionShowNum = this.levelOption.length;
+
+
     },
     methods: {
-        switchHandle(item, index, obj) {
+        switchHandle(item, index, obj, status) {
             if(!item.disabled) {
                 obj[index].flag = !obj[index].flag;
+            }
+            if(status) {
+                let _camData = {
+                    type: item.type,
+                    flag: item.flag
+                }
+                document.getElementById("c-iframe").contentWindow.postMessage(_camData, '*');
             }
         }
     }
