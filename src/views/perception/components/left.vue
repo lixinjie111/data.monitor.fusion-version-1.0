@@ -18,7 +18,7 @@
         </div>
         <div class="c-scroll-wrap">
             <div class="c-scroll-inner">
-                
+                <div style="height: 2000px;width: 50px; background-color: red;margin-bottom: 50px;"></div>
             </div>
         </div>
     </div>
@@ -81,55 +81,66 @@ export default {
 <style lang="scss" scoped>
 @import '@/assets/scss/theme.scss';
 .m-wrapper {
-    position: absolute;
-    left: 10px;
-    top: 100px;
-    z-index: 2;
-    .el-collapse {
-        border: 1px solid $borderColorLight;
-    }
-    .m-ul {
-        color: #fff;
-        .m-li {
-            padding: 0 20px;
-            height: 30px;
-            line-height: 30px;
-            .m-text {
-                float: left
-            }
-            .m-switch {
-                float: right;
-                margin-top: 7px;
-                position: relative;
-                width: 36px;
-                height: 16px;
-                border-radius: 8px;
-                overflow: hidden;
-                background-color: rgb(48, 48, 48);
-                cursor: pointer;
-                &:after {
-                    content: '';
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 16px;
+    height: 100%;
+    .m-select-wrap {
+        position: absolute;
+        left: 10px;
+        top: 100px;
+        z-index: 2;
+        .el-collapse {
+            border: 1px solid $borderColorLight;
+        }
+        .m-ul {
+            color: #fff;
+            .m-li {
+                padding: 0 20px;
+                height: 30px;
+                line-height: 30px;
+                .m-text {
+                    float: left
+                }
+                .m-switch {
+                    float: right;
+                    margin-top: 7px;
+                    position: relative;
+                    width: 36px;
                     height: 16px;
-                    border-radius: 100%;
-                    background-color: #fff;
-                }
-                &.active {
-                    background-color: rgb(220, 140, 0);
+                    border-radius: 8px;
+                    overflow: hidden;
+                    background-color: rgb(48, 48, 48);
+                    cursor: pointer;
                     &:after {
-                        left: auto;
-                        right: 0;
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 100%;
+                        background-color: #fff;
                     }
-                }
-                &.disabled {
-                    background-color: rgba(220, 140, 0, 0.7) !important;
-                    cursor: default !important;
+                    &.active {
+                        background-color: rgb(220, 140, 0);
+                        &:after {
+                            left: auto;
+                            right: 0;
+                        }
+                    }
+                    &.disabled {
+                        background-color: rgba(220, 140, 0, 0.7) !important;
+                        cursor: default !important;
+                    }
                 }
             }
         }
+    }
+    .c-scroll-wrap {
+        height: auto;
+        position: absolute;                                                          
+        left: 10px;
+        top: 150px;
+        z-index: 1;
+        max-height: calc(100% - 170px);                             
     }
 }
 </style>
