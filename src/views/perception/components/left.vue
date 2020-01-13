@@ -1,15 +1,29 @@
 <template>
     <div class="m-wrapper">
-        <div class="m-select-wrap">
-            <el-collapse>
-              <el-collapse-item title="图层数量：6">
+        <div class="m-select-wrap clearfix">
+            <el-collapse class="c-left">
+                <el-collapse-item :title="'图层数量：'+levelOptionShowNum">
+                    <ul class="m-ul">
+                        <li class="m-li clearfix" v-for="(item, index) in levelOption">
+                            <span class="m-text">{{item.name}}</span>
+                            <span 
+                                class="m-switch" 
+                                :class="{'active': item.flag, 'disabled': item.disabled}" 
+                                @click="switchHandle(item, index, levelOption)">
+                            </span>
+                        </li>
+                    </ul>
+                </el-collapse-item>
+            </el-collapse>
+            <el-collapse class="c-left">
+              <el-collapse-item title="数据展示开关">
                 <ul class="m-ul">
-                    <li class="m-li clearfix" v-for="(item, index) in levelOption">
+                    <li class="m-li clearfix" v-for="(item, index) in dataOption">
                         <span class="m-text">{{item.name}}</span>
                         <span 
                             class="m-switch" 
                             :class="{'active': item.flag, 'disabled': item.disabled}" 
-                            @click="switchHandle(item, index)">
+                            @click="switchHandle(item, index, dataOption)">
                         </span>
                     </li>
                 </ul>
@@ -17,9 +31,17 @@
             </el-collapse>
         </div>
         <div class="c-scroll-wrap">
-            <div class="c-scroll-inner">
-                <div style="height: 2000px;width: 50px; background-color: red;margin-bottom: 50px;"></div>
-            </div>
+            <ul class="c-scroll-inner m-ul">
+                <li class="m-li" v-for="(item, key) in drawObj">
+                    <p class="c-title">{{key}}</p>
+                    <ul class="c-fusion-box m-sub-ul">
+                        <li class="m-sub-li" v-for="items in item">
+                            <span class="overview-sign perception-sign"></span>
+                            <span>{{items}}</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </div>
 </template>
@@ -29,50 +51,73 @@ export default {
         return {
             levelOption: [
                 {
-                    type: '1',
+                    type: 'platform',
                     flag: true,
                     disabled: false,
                     name: '联网数据',
                 }, {
-                    type: '2',
+                    type: 'perception',
                     flag: true,
                     disabled: false,
                     name: '感知数据',
                 }, {
-                    type: '3',
+                    type: 'warning',
                     flag: true,
                     disabled: false,
                     name: '预警信息',
                 }, {
-                    type: '4',
+                    type: 'roadsidePoints',
                     flag: true,
                     disabled: false,
                     name: '路侧点',
                 }, {
-                    type: '5',
+                    type: 'spat',
                     flag: true,
                     disabled: false,
                     name: '信号灯',
                 }, {
-                    type: '6',
+                    type: 'baseRoadNetwork',
                     flag: true,
                     disabled: true,
                     name: '基础路网',
                 }
             ],
+            levelOptionShowNum: 0,
+            dataOption: [
+                {
+                    type: 'preData',
+                    flag: true,
+                    disabled: false,
+                    name: '感知数据', 
+                },
+                {
+                    type: 'echartsData',
+                    flag: true,
+                    disabled: false,
+                    name: '统计数据', 
+                }
+            ],
+            drawObj: {
+                "title1": [1-1,1-2,1-3]
+            }
         }
     },
     watch: {
         levelOption: {
-
+            handler(newVal, oldVal) {
+                let _option = newVal.filter(item => item.flag);
+                this.levelOptionShowNum = _option.length;
+            },
+            deep: true
         }
     },
     mounted(){
+        this.levelOptionShowNum = this.levelOption.length;
     },
     methods: {
-        switchHandle(item, index) {
+        switchHandle(item, index, obj) {
             if(!item.disabled) {
-                this.levelOption[index].flag = !this.levelOption[index].flag;
+                obj[index].flag = !obj[index].flag;
             }
         }
     }
@@ -127,8 +172,11 @@ export default {
                         }
                     }
                     &.disabled {
-                        background-color: rgba(220, 140, 0, 0.7) !important;
+                        background-color: rgba(48, 48, 48, 0.5) !important;
                         cursor: default !important;
+                        &.active {
+                            background-color: rgba(220, 140, 0, 0.5) !important;
+                        }
                     }
                 }
             }
@@ -136,11 +184,43 @@ export default {
     }
     .c-scroll-wrap {
         height: auto;
-        position: absolute;                                                          
+        position: absolute;
         left: 10px;
-        top: 150px;
+        top: 140px;
         z-index: 1;
-        max-height: calc(100% - 170px);                             
+        max-height: calc(100% - 170px);
+        .c-title {
+            margin: 0;
+            font-size: 14px;
+        }                             
+    }
+    .m-sub-ul {
+        margin: 10px 0 0;
+        min-width: 150px;
+        padding: 10px; 
+        // line-height: 28px; 
+        // font-size: 14px;
+        line-height: 20px; 
+        font-size: 12px;
+        .m-sub-li {
+            position: relative;
+            padding-left: 22px;
+            &:before {
+                content: ''; 
+                position: absolute; 
+                left: 0; 
+                top: 50%; 
+                // margin-top: -7px; 
+                // width: 14px; 
+                // height: 14px; 
+                margin-top: -5px; 
+                width: 10px; 
+                height: 10px; 
+                border-radius: 50%; 
+                overflow: hidden; 
+                background-color: #4eaf6b;
+            }
+        }
     }
 }
 </style>
@@ -148,7 +228,7 @@ export default {
 @import '@/assets/scss/theme.scss';
 .m-select-wrap {
     .el-collapse-item__header {
-        background-color: $backgroundRgba;
+        background-color: $background;
         border-color: $borderColorLight;
         color: #fff;
         height: 30px;
@@ -159,7 +239,7 @@ export default {
         }
     }
     .el-collapse-item__wrap {
-        background-color: $backgroundRgba;
+        background-color: $background;
         border-color: $borderColorLight;
         padding: 10px 0;
         .el-collapse-item__content {
