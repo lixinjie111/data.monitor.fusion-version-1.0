@@ -6,7 +6,7 @@
     </div>
 </template>
 <script>
-    import leftleft from './components/left'
+    import left from './components/left'
     import Right from './components/right'
     import bottom from './components/bottom'
     export default {
