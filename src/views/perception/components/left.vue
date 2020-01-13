@@ -1,15 +1,15 @@
 <template>
     <div class="m-wrapper">
         <div class="m-select-wrap clearfix">
-            <el-collapse class="c-left" v-model="levelActiveName" @click.stop.prevent>
-                <el-collapse-item :title="'图层数量：'+levelOptionShowNum" name="1">
+            <el-collapse class="c-left">
+                <el-collapse-item :title="'图层数量：'+levelOptionShowNum">
                     <ul class="m-ul">
                         <li class="m-li clearfix" v-for="(item, index) in levelOption">
                             <span class="m-text">{{item.name}}</span>
                             <span 
                                 class="m-switch" 
                                 :class="{'active': item.flag, 'disabled': item.disabled}"
-                                @click="switchHandle(item, index, levelOption, true)">
+                                @click="switchHandle(item, index, levelOption, 1)">
                             </span>
                         </li>
                     </ul>
@@ -23,7 +23,7 @@
                         <span 
                             class="m-switch" 
                             :class="{'active': item.flag, 'disabled': item.disabled}" 
-                            @click="switchHandle(item, index, dataOption)">
+                            @click="switchHandle(item, index, dataOption, 2)">
                         </span>
                     </li>
                 </ul>
@@ -43,10 +43,55 @@
                 </li>
             </ul>
         </div>
+        <ul class="m-data-wrapper">
+            <li class="c-fusion-box">
+                <p class="m-data-title">BSM/TCP时延</p>
+                <div class="m-echarts-box">
+                    <echarts-one class="m-echarts" id="platform-receive" :color="echartsOption.orange"></echarts-one>
+                    <echarts-one class="m-echarts" id="platform-send" :color="echartsOption.green"></echarts-one>
+                </div>
+            </li>
+            <li class="c-fusion-box">
+                <p class="m-data-title">感知数据时延</p>
+                <div class="m-echarts-box">
+                    <echarts-one class="m-echarts" id="perception-receive" :color="echartsOption.orange"></echarts-one>
+                    <echarts-one class="m-echarts" id="perception-send" :color="echartsOption.green"></echarts-one>
+                </div>
+            </li>
+            <li class="c-fusion-box">
+                <p class="m-data-title">SPAT时延</p>
+                <div class="m-echarts-box">
+                    <echarts-one class="m-echarts" id="spat-receive" :color="echartsOption.orange"></echarts-one>
+                    <echarts-one class="m-echarts" id="spat-send" :color="echartsOption.green"></echarts-one>
+                </div>
+            </li>
+            <li class="c-fusion-box">
+                <p class="m-data-title">融合车辆数量</p>
+                <echarts-two class="m-echarts-box m-echarts" id="fusion-count"></echarts-two>
+            </li>
+            <li class="c-fusion-box">
+                <p class="m-data-title">感知数量统计</p>
+                <echarts-three class="m-echarts-box m-echarts" id="perception-count"></echarts-three>
+            </li>
+            <li class="c-fusion-box">
+                <p class="m-data-title">RSI事件统计</p>
+                <echarts-four class="m-echarts-box m-echarts" id="rsi-count"></echarts-four>
+            </li>
+        </ul>
     </div>
 </template>
 <script>
+import echartsOne from './components/echartsOne'
+import echartsTwo from './components/echartsTwo'
+import echartsThree from './components/echartsThree'
+import echartsFour from './components/echartsFour'
 export default {
+    components: {
+        echartsOne,
+        echartsTwo,
+        echartsThree,
+        echartsFour
+    },
     data() {
         return {
             levelOption: [
@@ -82,7 +127,6 @@ export default {
                     name: '基础路网',
                 }
             ],
-            levelActiveName: [],
             levelOptionShowNum: 0,
             dataOption: [
                 {
@@ -98,9 +142,15 @@ export default {
                     name: '统计数据', 
                 }
             ],
-            dataActiveName: ['1'],
             drawObj: {
                 "title1": [1-1,1-2,1-3]
+            },
+            echartsOption: {
+                orange: "#ec9524",
+                green: "#95f204",
+                red: "#d9001b",
+                blue: "#02a7f0",
+                yellow: "#ffff80"
             }
         }
     },
@@ -115,20 +165,24 @@ export default {
     },
     mounted(){
         this.levelOptionShowNum = this.levelOption.length;
-
-
+        document.addEventListener('click', this.collapseClose);
     },
     methods: {
         switchHandle(item, index, obj, status) {
             if(!item.disabled) {
                 obj[index].flag = !obj[index].flag;
             }
-            if(status) {
+            if(status == 1) {
                 let _camData = {
                     type: item.type,
                     flag: item.flag
                 }
                 document.getElementById("c-iframe").contentWindow.postMessage(_camData, '*');
+            }
+            if(status == 2) {
+                if(item.type) {
+
+                }
             }
         }
     }
@@ -230,6 +284,46 @@ export default {
                 border-radius: 50%; 
                 overflow: hidden; 
                 background-color: #4eaf6b;
+            }
+        }
+    }
+    .m-data-wrapper {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 5;
+        height: 180px;
+        padding: 20px 5px;
+        background: linear-gradient(to top, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
+        @include layoutMode(all);
+        .c-fusion-box {
+            flex: 1;
+            height: 100%;
+            margin: 0 5px;
+            padding: 10px;
+        }
+        .m-data-title {
+            color: #fff;
+            font-size: 14px;
+            line-height: 20px;
+        }
+        .m-echarts-box {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            top: 40px;
+            bottom: 10px;
+            &.m-echarts {
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+            .m-echarts {
+                height: 48%;
+                background-color: rgba(0, 0, 0, 0.3);
+                margin-bottom: 2%;
+                &:last-child {
+                    margin-bottom: 0;
+                }
             }
         }
     }

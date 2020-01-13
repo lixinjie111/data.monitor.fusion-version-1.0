@@ -1,5 +1,5 @@
 <template>
-    <div class="fusion-left-style">
+    <div class="c-box">
         
     </div>
 </template>
@@ -15,6 +15,3 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
-@import '@/assets/scss/theme.scss';
-</style>
