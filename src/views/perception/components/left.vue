@@ -47,22 +47,22 @@
             <li class="c-fusion-box">
                 <p class="m-data-title">BSM/TCP时延</p>
                 <div class="m-echarts-box">
-                    <echarts-one class="m-echarts" id="platform-receive" :color="echartsOption.orange"></echarts-one>
-                    <echarts-one class="m-echarts" id="platform-send" :color="echartsOption.green"></echarts-one>
+                    <echarts-one class="m-echarts" id="platform-receive"></echarts-one>
+                    <echarts-one class="m-echarts" id="platform-send"></echarts-one>
                 </div>
             </li>
             <li class="c-fusion-box">
                 <p class="m-data-title">感知数据时延</p>
                 <div class="m-echarts-box">
-                    <echarts-one class="m-echarts" id="perception-receive" :color="echartsOption.orange"></echarts-one>
-                    <echarts-one class="m-echarts" id="perception-send" :color="echartsOption.green"></echarts-one>
+                    <echarts-one class="m-echarts" id="perception-receive"></echarts-one>
+                    <echarts-one class="m-echarts" id="perception-send"></echarts-one>
                 </div>
             </li>
             <li class="c-fusion-box">
                 <p class="m-data-title">SPAT时延</p>
                 <div class="m-echarts-box">
-                    <echarts-one class="m-echarts" id="spat-receive" :color="echartsOption.orange"></echarts-one>
-                    <echarts-one class="m-echarts" id="spat-send" :color="echartsOption.green"></echarts-one>
+                    <echarts-one class="m-echarts" id="spat-receive"></echarts-one>
+                    <echarts-one class="m-echarts" id="spat-send"></echarts-one>
                 </div>
             </li>
             <li class="c-fusion-box">
