@@ -43,12 +43,12 @@
                 </tusvn-map>
             </div>
         </div>
-        <!-- <iframe 
+        <iframe 
             @load ="onLoadMap" 
             :src="iframeUrl" 
             class="c-iframe" 
             id="c-iframe">
-        </iframe> -->
+        </iframe>
     </div>
 </template>
 <script>
