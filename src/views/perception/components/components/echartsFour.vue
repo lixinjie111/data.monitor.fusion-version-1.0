@@ -1,17 +1,115 @@
 <template>
-    <div class="c-position-trbl">
-        
-    </div>
+    <div class="c-position-trbl" :id="id"></div>
 </template>
 <script>
+import $echarts from 'echarts'
 export default {
+    props:{
+        id: {
+            type: String
+        },
+        lineColor: {
+            type: Object
+        }
+    },
     data() {
         return {
+            echarts: null
         }
     },
     mounted(){
+        this.echarts = $echarts.init(document.getElementById(this.id));
+        this.echarts.setOption(this.defaultOption());
     },
     methods: {
+        defaultOption() {
+            let option = {
+                silent: true,
+                series: {
+                    radius: ['15%', '100%'],
+                    type: 'sunburst',
+                    sort: null,
+                    highlightPolicy: 'ancestor',
+                    data: [{
+                        value: 8,
+                        children: [{
+                            value: 4,
+                            children: [{
+                                value: 2
+                            }, {
+                                value: 1
+                            }]
+                        }, {
+                            value: 2
+                        }]
+                    }, {
+                        value: 4,
+                        children: [{
+                            children: [{
+                                value: 2
+                            }]
+                        }]
+                    }, {
+                        value: 4,
+                        children: [{
+                            children: [{
+                                value: 2
+                            }]
+                        }]
+                    }, {
+                        value: 3,
+                        children: [{
+                            children: [{
+                                value: 1
+                            }]
+                        }]
+                    }],
+                    // label: {
+                    //     color: '#fff',
+                    //     textBorderColor: '#666',
+                    //     textBorderWidth: 2,
+                    //     borderColor: '#999',
+                    //     borderWidth: 1,
+                    //     formatter: function (param) {
+                    //         var depth = param.treePathInfo.length;
+                    //         if (depth === 2) {
+                    //             return 'radial';
+                    //         }
+                    //         else if (depth === 3) {
+                    //             return 'tangential';
+                    //         }
+                    //         else if (depth === 4) {
+                    //             return '0';
+                    //         }
+                    //     }
+                    // },
+                    levels: [{}, {
+                        itemStyle: {
+                            color: 'red'
+                        },
+                        label: {
+                            rotate: 'radial'
+                        }
+                    }, {
+                        itemStyle: {
+                            color: 'orange'
+                        },
+                        label: {
+                            rotate: 'tangential'
+                        }
+                    }, {
+                        itemStyle: {
+                            color: 'yellow'
+                        },
+                        label: {
+                            rotate: 0
+                        }
+                    }]
+                }
+            };
+            return option;
+        }
+
     }
 }
 </script>

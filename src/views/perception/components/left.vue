@@ -45,37 +45,106 @@
         </div>
         <ul class="m-data-wrapper">
             <li class="c-fusion-box">
-                <p class="m-data-title">BSM/TCP时延</p>
+                <p class="m-data-title">
+                    BSM/TCP时延(s)
+                    <span class="m-data-legend">
+                        <i class="orange">接受</i>
+                        <i class="green">发送</i>
+                    </span>
+                </p>
                 <div class="m-echarts-box">
-                    <echarts-one class="m-echarts" id="platform-receive"></echarts-one>
-                    <echarts-one class="m-echarts" id="platform-send"></echarts-one>
+                    <echarts-one class="m-echarts" 
+                        id="platform-receive" 
+                        :yData="[0, 1, 2]" 
+                        :lineColor="echartsOption.orange">
+                    </echarts-one>
+                    <echarts-one class="m-echarts" 
+                        id="platform-send" 
+                        :yData="[0, 1, 2]" 
+                        :lineColor="echartsOption.green">
+                    </echarts-one>
                 </div>
             </li>
             <li class="c-fusion-box">
-                <p class="m-data-title">感知数据时延</p>
+                <p class="m-data-title">
+                    感知数据时延(ms)
+                    <span class="m-data-legend">
+                        <i class="orange">接受</i>
+                        <i class="green">发送</i>
+                    </span>
+                </p>
                 <div class="m-echarts-box">
-                    <echarts-one class="m-echarts" id="perception-receive"></echarts-one>
-                    <echarts-one class="m-echarts" id="perception-send"></echarts-one>
+                    <echarts-one class="m-echarts" 
+                        id="perception-receive" 
+                        :yData="[0, 100, 200]" 
+                        :lineColor="echartsOption.orange">
+                    </echarts-one>
+                    <echarts-one class="m-echarts" 
+                        id="perception-send" 
+                        :yData="[0, 100, 200]" 
+                        :lineColor="echartsOption.green">
+                    </echarts-one>
                 </div>
             </li>
             <li class="c-fusion-box">
-                <p class="m-data-title">SPAT时延</p>
+                <p class="m-data-title">
+                    SPAT时延(ms)
+                    <span class="m-data-legend">
+                        <i class="orange">接受</i>
+                        <i class="green">发送</i>
+                    </span>
+                </p>
                 <div class="m-echarts-box">
-                    <echarts-one class="m-echarts" id="spat-receive"></echarts-one>
-                    <echarts-one class="m-echarts" id="spat-send"></echarts-one>
+                    <echarts-one class="m-echarts" 
+                        id="spat-receive" 
+                        :yData="[0, 100, 200]" 
+                        :lineColor="echartsOption.orange">
+                    </echarts-one>
+                    <echarts-one class="m-echarts" 
+                        id="spat-send" 
+                        :yData="[0, 100, 200]" 
+                        :lineColor="echartsOption.green">
+                    </echarts-one>
                 </div>
             </li>
             <li class="c-fusion-box">
-                <p class="m-data-title">融合车辆数量</p>
-                <echarts-two class="m-echarts-box m-echarts" id="fusion-count"></echarts-two>
+                <p class="m-data-title">
+                    融合车辆数量
+                    <span class="m-data-legend">
+                        <i class="orange">联网车</i>
+                        <i class="green">非注册车</i>
+                    </span>
+                </p>
+                <echarts-two 
+                    class="m-echarts-box m-echarts" 
+                    id="fusion-count"
+                    :lineColor="echartsOption">
+                </echarts-two>
             </li>
             <li class="c-fusion-box">
-                <p class="m-data-title">感知数量统计</p>
-                <echarts-three class="m-echarts-box m-echarts" id="perception-count"></echarts-three>
+                <p class="m-data-title">
+                    感知数量统计
+                    <span class="m-data-legend">
+                        <i class="orange">轿车</i>
+                        <i class="green">货车</i>
+                        <i class="red">公交车</i>
+                        <i class="blue">非机动车</i>
+                        <i class="yellow">行人</i>
+                    </span>
+                </p>
+                <echarts-three 
+                    class="m-echarts-box m-echarts" 
+                    id="perception-count"
+                    :lineColor="echartsOption">
+                </echarts-three>
             </li>
             <li class="c-fusion-box">
                 <p class="m-data-title">RSI事件统计</p>
-                <echarts-four class="m-echarts-box m-echarts" id="rsi-count"></echarts-four>
+                <echarts-four 
+                    class="m-echarts-box m-echarts" 
+                    id="rsi-count"
+                    :lineColor="echartsOption">
+                </echarts-four>
             </li>
         </ul>
     </div>
@@ -148,8 +217,8 @@ export default {
                 "title1": [1-1,1-2,1-3]
             },
             echartsOption: {
-                orange: "#ec9524",
-                green: "#95f204",
+                orange: "#d38600",
+                green: "#4eaf6b",
                 red: "#d9001b",
                 blue: "#02a7f0",
                 yellow: "#ffff80"
@@ -310,7 +379,7 @@ export default {
         bottom: 0;
         z-index: 5;
         height: 180px;
-        padding: 20px 5px;
+        padding: 10px 5px;
         background: linear-gradient(to top, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
         @include layoutMode(all);
         .c-fusion-box {
@@ -320,9 +389,66 @@ export default {
             padding: 10px;
         }
         .m-data-title {
+            position: relative;
             color: #fff;
             font-size: 14px;
             line-height: 20px;
+            .m-data-legend {
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translate(0, -50%);
+                max-width: 60%;
+                font-size: 12px;
+                line-height: 18px;
+                text-align: right;
+                i {
+                    display: inline-block;
+                    position: relative;
+                    margin-left: 2px;
+                    padding-left: 12px;
+                    &:before {
+                        content: '';
+                        position: absolute;
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        left: 0;
+                        top: 50%;
+                        transform: translate(0, -50%);
+                    }
+                    &.orange {
+                        color: #d38600;
+                        &:before {
+                            background-color: #d38600;
+                        }
+                    }
+                    &.green {
+                        color: #4eaf6b;
+                        &:before {
+                            background-color: #4eaf6b;
+                        }
+                    }
+                    &.red {
+                        color: #d9001b;
+                        &:before {
+                            background-color: #d9001b;
+                        }
+                    }
+                    &.blue {
+                        color: #02a7f0;
+                        &:before {
+                            background-color: #02a7f0;
+                        }
+                    }
+                    &.yellow {
+                        color: #ffff80;
+                        &:before {
+                            background-color: #ffff80;
+                        }
+                    }
+                }
+            }
         }
         .m-echarts-box {
             position: absolute;
@@ -331,11 +457,11 @@ export default {
             top: 40px;
             bottom: 10px;
             &.m-echarts {
-                background-color: rgba(0, 0, 0, 0.3);
+                // background-color: rgba(0, 0, 0, 0.3);
             }
             .m-echarts {
                 height: 48%;
-                background-color: rgba(0, 0, 0, 0.3);
+                // background-color: rgba(0, 0, 0, 0.3);
                 margin-bottom: 2%;
                 &:last-child {
                     margin-bottom: 0;
