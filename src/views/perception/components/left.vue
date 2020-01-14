@@ -1,7 +1,7 @@
 <template>
     <div class="m-wrapper">
         <div class="m-select-wrap clearfix">
-            <el-collapse class="c-left">
+            <el-collapse ref="optionShowNum" v-model="optionShowNum" class="c-left">
                 <el-collapse-item :title="'图层数量：'+levelOptionShowNum">
                     <ul class="m-ul">
                         <li class="m-li clearfix" v-for="(item, index) in levelOption">
@@ -15,7 +15,7 @@
                     </ul>
                 </el-collapse-item>
             </el-collapse>
-            <el-collapse class="c-left">
+            <el-collapse ref="dataOptionEnable" v-model="dataOptionEnable" class="c-left">
               <el-collapse-item title="数据展示开关">
                 <ul class="m-ul">
                     <li class="m-li clearfix" v-for="(item, index) in dataOption">
@@ -85,6 +85,8 @@ import echartsOne from './components/echartsOne'
 import echartsTwo from './components/echartsTwo'
 import echartsThree from './components/echartsThree'
 import echartsFour from './components/echartsFour'
+import { bind,unbind } from '@/utils/focus-outside.js'
+
 export default {
     components: {
         echartsOne,
@@ -151,7 +153,9 @@ export default {
                 red: "#d9001b",
                 blue: "#02a7f0",
                 yellow: "#ffff80"
-            }
+            },
+            optionShowNum:[],
+            dataOptionEnable:[],
         }
     },
     watch: {
@@ -164,10 +168,17 @@ export default {
         }
     },
     mounted(){
-        this.levelOptionShowNum = this.levelOption.length;
-        document.addEventListener('click', this.collapseClose);
+        this.levelOptionShowNum = this.levelOption.length;  
+        bind(this.$refs.optionShowNum.$el, this.collapseClose);
+        bind(this.$refs.dataOptionEnable.$el, this.collapseClose);     
     },
     methods: {
+        collapseClose(){
+            this.optionShowNum = []
+            this.dataOptionEnable = []
+        },
+      
+     
         switchHandle(item, index, obj, status) {
             if(!item.disabled) {
                 obj[index].flag = !obj[index].flag;
@@ -185,7 +196,12 @@ export default {
                 }
             }
         }
+    },
+    destoryed () {
+        unbind(this.$refs.dropdown.$el, this.collapseClose);
+        unbind(this.$refs.dropdown1.$el, this.collapseClose1);
     }
+    
 }
 </script>
 <style lang="scss" scoped>
