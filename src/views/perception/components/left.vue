@@ -238,8 +238,8 @@ export default {
     },
     mounted(){
         this.levelOptionShowNum = this.levelOption.length;  
-        bind(this.$refs.optionShowNum.$el, this.collapseClose);
-        bind(this.$refs.dataOptionEnable.$el, this.collapseClose);     
+        this.bindMapClick();
+       
     },
     methods: {
         collapseClose(){
@@ -262,6 +262,18 @@ export default {
 
                 }
             }
+        },
+
+        bindMapClick(){
+            bind(this.$refs.optionShowNum.$el, this.collapseClose);
+            bind(this.$refs.dataOptionEnable.$el, this.collapseClose);     
+            window.addEventListener('message', e => {
+                // e.data为父页面发送的数据
+                let eventData = e.data;
+                if(eventData.type == 'mapClick') {
+                    this.collapseClose();
+                }   
+            });
         }
     },
     destoryed () {
