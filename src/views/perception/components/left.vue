@@ -246,8 +246,6 @@ export default {
             this.optionShowNum = []
             this.dataOptionEnable = []
         },
-      
-     
         switchHandle(item, index, obj, status) {
             if(!item.disabled) {
                 obj[index].flag = !obj[index].flag;

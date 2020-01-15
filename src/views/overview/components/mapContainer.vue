@@ -52,8 +52,8 @@
                         if(data.camLst && data.camLst.length>0 && data.camLst[0].camParam){
                             sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data));
                             this.$router.push({
-                                path: '/perception/'+item.deviceId+ "/"+window.delayTime+ "/"+window.miniExtend+"/"+true,
-                                query:{lng:item.longitude,lat:item.latitude,isShow:false}
+                                path: '/perception/'+item.deviceId+ "/"+window.delayTime+ "/"+window.miniExtend,
+                                query:{lng:item.longitude,lat:item.latitude}
                             });
                         }else {
                             this.$message({

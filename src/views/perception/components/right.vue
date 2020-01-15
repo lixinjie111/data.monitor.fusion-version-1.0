@@ -2,7 +2,6 @@
     <div class="c-position-trbl">
         <img class="img-style" src="@/assets/images/perception/3d1.png" @click="changeMap(0)" v-show="param==-1"/>
         <img class="img-style" src="@/assets/images/perception/2d1.png" @click="changeMap(-1)" v-show="param!=-1"/>
-        <div class="c-pulse-time map-time" v-show="isShow=='true'">{{statisticData}}</div>
         <div class="c-fusion-right video-style">
             <div class="c-scroll-wrap">
                 <div class="c-scroll-inner">
@@ -72,8 +71,6 @@
                 param:1, //平面 俯视
                 camList:[],
                 mapShow:false,
-
-                statisticData:'',
                 isActive:0,
                 requestVideoUrl:getVideoByNum
             }
@@ -97,15 +94,6 @@
             },
         },
         components: {TusvnMap,LivePlayer},
-        watch: {
-            '$route':{
-                handler(newValue, oldValue) {
-                    this.isShow = newValue.query.isShow;
-                },
-                immediate: true,
-//                deep: true
-            }
-        },
         mounted() {
             this.rsId=this.$route.params.crossId;
             let extend = parseFloat(this.$route.params.extend);

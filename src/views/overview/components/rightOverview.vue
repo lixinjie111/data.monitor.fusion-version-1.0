@@ -46,8 +46,8 @@
                             sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data));
                             let centPos = item.centPos.split(",");
                             this.$router.push({
-                                path: '/perception/'+item.rsId+ "/"+window.delayTime+ "/"+window.miniExtend+"/"+true,
-                                query:{lng:centPos[0],lat:centPos[1],isShow:false}
+                                path: '/perception/'+item.rsId+ "/"+window.delayTime+ "/"+window.miniExtend,
+                                query:{lng:centPos[0],lat:centPos[1]}
                             });
                         }else {
                             this.$message({

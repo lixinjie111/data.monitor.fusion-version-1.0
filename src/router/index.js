@@ -47,7 +47,7 @@ export default new VueRouter({
         showHeader: true
       }
   },{
-      path: '/perception/:crossId/:delayTime/:extend/:leftShow',
+      path: '/perception/:crossId/:delayTime/:extend',
       name: 'perception',
       component: Perception,
       meta: {
