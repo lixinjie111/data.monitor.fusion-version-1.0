@@ -15,12 +15,31 @@ export default {
     data() {
         return {
             echarts: null,
-            sourceData: {}
+            sourceData: {},
+            filterData: {
+                car: new Array(10).fill(0), 
+                truck: new Array(10).fill(0),
+                bus: new Array(10).fill(0),
+                noMotor: new Array(10).fill(0),
+                person: new Array(10).fill(0)
+            }
+        }
+    },
+    watch: {
+        sourceData: {
+            handler(newVal, oldVal) {
+                for(let key in this.filterData) {
+                    // console.log(key, this.sourceData[key]);
+                    this.filterData[key].shift();
+                    this.filterData[key].push(newVal[key]);
+                }
+                this.echarts.setOption(this.defaultOption());
+            }
         }
     },
     mounted(){
         this.echarts = $echarts.init(document.getElementById(this.id));
-        this.echarts.setOption(this.defaultOption());
+        // this.echarts.setOption(this.defaultOption());
 
         window.addEventListener('message', this.getMessage);
     },
@@ -30,6 +49,7 @@ export default {
             let eventData = e.data;
             if(eventData.type == 'perceptionData') {
                 this.sourceData = eventData.data;
+                // console.log(this.sourceData);
             }
         },
         defaultOption() {
@@ -64,7 +84,8 @@ export default {
                         color:'#fff'
                     },
                     max(value) {
-                        return value.max * 5;
+                        // return value.max * 2.5;
+                        return 30;
                     }
                 },
                 series: [{
@@ -72,31 +93,31 @@ export default {
                     name: '轿车',
                     stack: 'one',
                     barWidth: '50%',
-                    data: [1,2,3,4,5,6,7,8,9,10]
+                    data: this.filterData.car
                 },{
                     type: 'bar',
                     name: '货车',
                     stack: 'one',
                     barWidth: '50%',
-                    data: [11,12,13,14,15,16,17,18,19,20]
+                    data: this.filterData.truck
                 },{
                     type: 'bar',
                     name: '公交车',
                     stack: 'one',
                     barWidth: '50%',
-                    data: [5,6,7,8,9,10,11,12,13,14]
+                    data: this.filterData.bus
                 },{
                     type: 'bar',
                     name: '非机动车',
                     stack: 'one',
                     barWidth: '50%',
-                    data: [5,6,7,8,9,10,11,12,13,14]
+                    data: this.filterData.noMotor
                 },{
                     type: 'bar',
                     name: '行人',
                     stack: 'one',
                     barWidth: '50%',
-                    data: [5,6,7,8,9,10,11,12,13,14]
+                    data: this.filterData.person
                 }]
             };
             return option;

@@ -112,11 +112,7 @@
             getMessage(e) {
                 // e.data为父页面发送的数据
                 let eventData = e.data;
-                if(eventData.isParent) {
-                    this.$parent[eventData.type] = eventData.data;
-                }else {
-                    this[eventData.type] = eventData.data
-                }
+                this[eventData.type] = eventData.data;
             },
             onLoadMap() {
                 // 获取摄像头列表

@@ -15,15 +15,50 @@ export default {
     data() {
         return {
             echarts: null,
-            data: [1,0,1,0,2,0,2,0,2,0,2,0,2],
-            data2: [10,30,10,40,20,10,20,30,20,10,20,10,12]
+            sourceData: {},
+            filterData: {
+                networkCar: new Array(10).fill(null), 
+                unregisteredCar: new Array(10).fill(null)
+            }
+        }
+    },
+    watch: {
+        sourceData: {
+            handler(newVal, oldVal) {
+                for(let key in this.filterData) {
+                    this.filterData[key].shift();
+                }
+                let _networkCar = 0;
+                let _unregisteredCar = 0;
+                newVal.forEach(item => {
+                    if(item.type == 1) { //联网车
+                        _networkCar++;
+                    }
+                    if(item.type == 2) { //非注册车
+                        _unregisteredCar++;
+                    }
+                });
+                this.filterData.networkCar.push(_networkCar);
+                this.filterData.unregisteredCar.push(_unregisteredCar);
+                // console.log(this.filterData);
+                this.echarts.setOption(this.defaultOption());
+            }
         }
     },
     mounted(){
         this.echarts = $echarts.init(document.getElementById(this.id));
-        this.echarts.setOption(this.defaultOption());
+        // this.echarts.setOption(this.defaultOption());
+
+        window.addEventListener('message', this.getMessage);
     },
     methods: {
+        getMessage(e) {
+            // e.data为父页面发送的数据
+            let eventData = e.data;
+            if(eventData.type == 'perceptionData') {
+                this.sourceData = eventData.data.platFusionList;
+            }
+        },
         defaultOption() {
             let option = {
                 animation: false,
@@ -54,7 +89,8 @@ export default {
                     },
                     axisLabel:{
                         color:'#fff'
-                    }
+                    },
+                    max: 10
                 },
                 series: [{
                     type:'line',
@@ -68,7 +104,7 @@ export default {
                     lineStyle: {
                         color: this.lineColor.orange
                     },
-                    data: this.data
+                    data: this.filterData.networkCar
                 },{
                     type:'line',
                     symbol: 'none',
@@ -81,12 +117,14 @@ export default {
                     lineStyle: {
                         color: this.lineColor.green
                     },
-                    data: this.data2
+                    data: this.filterData.unregisteredCar
                 }]
             };
             return option;
         }
-
+    },
+    destroyed(){
+        window.removeEventListener("message", this.getMessage);
     }
 }
 </script>

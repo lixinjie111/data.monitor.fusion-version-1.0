@@ -17,31 +17,7 @@ export default {
         return {
             echarts: null,
             trafficClassify: [],
-            sourceData: [],
-            // data: [],
-            data: [{
-                value: 8,
-                children: [{
-                    value: 4
-                }, {
-                    value: 2
-                }]
-            }, {
-                value: 4,
-                children: [{
-                        value: 2
-                }]
-            }, {
-                value: 4,
-                children: [{
-                    value: 2
-                }]
-            }, {
-                value: 3,
-                children: [{
-                    value: 1
-                }]
-            }],
+            sourceData: []
         }
     },
     watch: {
@@ -75,7 +51,7 @@ export default {
                         }
                     });
                 }
-                console.log(this.trafficClassify);
+                // console.log(this.trafficClassify);
                 this.echarts.setOption(this.defaultOption());
             }
         }
@@ -85,7 +61,7 @@ export default {
     },
     mounted(){
         this.echarts = $echarts.init(document.getElementById(this.id));
-        this.echarts.setOption(this.defaultOption());
+        // this.echarts.setOption(this.defaultOption());
 
         window.addEventListener('message', this.getMessage);
     },

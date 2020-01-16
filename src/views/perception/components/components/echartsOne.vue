@@ -24,6 +24,10 @@ export default {
     mounted(){
         this.echarts = $echarts.init(document.getElementById(this.id));
         this.echarts.setOption(this.defaultOption());
+
+        window.onresize = function(){ // 定义窗口大小变更通知事件
+            this.echarts.setOption(this.defaultOption());
+        };
     },
     methods: {
         defaultOption() {

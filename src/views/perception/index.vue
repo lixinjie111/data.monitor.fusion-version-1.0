@@ -10,9 +10,6 @@
     export default {
         data() {
             return {
-                perceptionData:{},
-                vehData:{},
-                warningCount:0
             }
         },
         components:{

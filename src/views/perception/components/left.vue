@@ -306,7 +306,6 @@ export default {
                 document.getElementById("c-iframe").contentWindow.postMessage(_camData, '*');
             }
         },
-
         bindMapClick(){
             bind(this.$refs.optionShowNum.$el, this.collapseClose);
             bind(this.$refs.dataOptionEnable.$el, this.collapseClose);     
