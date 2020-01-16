@@ -16,7 +16,7 @@
                 </el-collapse-item>
             </el-collapse>
             <el-collapse ref="dataOptionEnable" v-model="dataOptionEnable" class="c-left">
-              <el-collapse-item title="数据展示开关">
+              <el-collapse-item :title="'数据统计：'+dataOptionShowNum">
                 <ul class="m-ul">
                     <li class="m-li clearfix" v-for="(item, index) in dataOption">
                         <span class="m-text">{{item.name}}</span>
@@ -32,12 +32,18 @@
         </div>
         <div class="c-scroll-wrap">
             <ul class="c-scroll-inner m-ul">
-                <li class="m-li" v-for="(item, key) in drawObj">
+                <li class="m-li" v-for="(item, key) in filterPerCarData">
                     <p class="c-title">{{key}}</p>
                     <ul class="c-fusion-box m-sub-ul">
                         <li class="m-sub-li" v-for="items in item">
                             <span class="overview-sign perception-sign"></span>
-                            <span>{{items}}</span>
+                            <span>
+                                {{items.vehicleId}},
+                                {{items.longitude.toFixed(9)}},
+                                {{items.latitude.toFixed(9)}},
+                                {{items.speed.toFixed(1)+'km/h'}},
+                                {{items.heading.toFixed(1)+'°'}}
+                            </span>
                         </li>
                     </ul>
                 </li>
@@ -213,9 +219,9 @@ export default {
                     name: '统计数据', 
                 }
             ],
-            drawObj: {
-                "title1": [1-1,1-2,1-3]
-            },
+            dataOptionShowNum: 0,
+            perCarList: [],
+            filterPerCarData: {},
             echartsOption: {
                 orange: "#d38600",
                 green: "#4eaf6b",
@@ -234,14 +240,56 @@ export default {
                 this.levelOptionShowNum = _option.length;
             },
             deep: true
+        },
+        dataOption: {
+            handler(newVal, oldVal) {
+                let _option = newVal.filter(item => item.flag);
+                this.dataOptionShowNum = _option.length;
+            },
+            deep: true
+        },
+        perCarList: {
+            handler(newVal, oldVal) {
+                let _obj = {};
+                newVal.forEach(item => {
+                    if(!_obj[item.devId]) {
+                        _obj[item.devId] = [];
+                    }
+                    _obj[item.devId].push(item);
+                });
+                this.filterPerCarData = _obj;
+            },
+            deep: true
+        }
+    },
+    computed: {
+        filterPerCarData() {
+            let _obj = {};
+            this.perCarList.forEach(item => {
+                if(!_obj[item.devId]) {
+                    _obj[item.devId] = [];
+                }
+                _obj[item.devId].push(item);
+            });
+            return _obj;
         }
     },
     mounted(){
         this.levelOptionShowNum = this.levelOption.length;  
+        this.dataOptionShowNum = this.dataOption.length;  
         this.bindMapClick();
-       
+
+        window.addEventListener('message', this.getMessage);
     },
     methods: {
+        getMessage(e) {
+            // e.data为父页面发送的数据
+            let eventData = e.data;
+            if(eventData.type == 'perCarList') {
+                this.perCarList = eventData.data;
+                console.log(this.perCarList);
+            }
+        },
         collapseClose(){
             this.optionShowNum = []
             this.dataOptionEnable = []
@@ -279,6 +327,7 @@ export default {
     destoryed () {
         unbind(this.$refs.dropdown.$el, this.collapseClose);
         unbind(this.$refs.dropdown1.$el, this.collapseClose1);
+        window.removeEventListener("message", this.getMessage);
     }
     
 }
@@ -348,7 +397,7 @@ export default {
         left: 10px;
         top: 140px;
         z-index: 1;
-        max-height: calc(100% - 170px);
+        max-height: calc(100% - 340px);
         .c-title {
             margin: 0;
             font-size: 14px;
