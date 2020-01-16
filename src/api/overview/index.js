@@ -1,6 +1,5 @@
 //import axios from 'axios';
-import {HTTPURL} from '../requestUrl';
-import {OPERATEURL} from '../requestUrl';
+import {HTTPURL, OPERATEURL} from '../requestUrl';
 /**
  * 获取概览左侧的车辆数据
  */

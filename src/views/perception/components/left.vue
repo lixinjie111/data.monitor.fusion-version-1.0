@@ -30,7 +30,7 @@
               </el-collapse-item>
             </el-collapse>
         </div>
-        <div class="c-scroll-wrap">
+        <div class="c-scroll-wrap" :class="dataOption[0].flag ? 'active' : ''">
             <ul class="c-scroll-inner m-ul">
                 <li class="m-li" v-for="(item, key) in filterPerCarData">
                     <p class="c-title">{{key}}</p>
@@ -38,7 +38,7 @@
                         <li class="m-sub-li" v-for="items in item">
                             <span class="overview-sign perception-sign"></span>
                             <span>
-                                {{items.vehicleId}},
+                                {{items.vehicleId.substr(0,4)+"_"+items.vehicleId.substring(items.vehicleId.length-4)}},
                                 {{items.longitude.toFixed(9)}},
                                 {{items.latitude.toFixed(9)}},
                                 {{items.speed.toFixed(1)+'km/h'}},
@@ -49,7 +49,7 @@
                 </li>
             </ul>
         </div>
-        <ul class="m-data-wrapper">
+        <ul class="m-data-wrapper" :class="dataOption[1].flag ? 'active' : ''">
             <li class="c-fusion-box">
                 <p class="m-data-title">
                     BSM/TCP时延(s)
@@ -170,6 +170,7 @@ export default {
         echartsFour
     },
     data() {
+        let _this = this;
         return {
             levelOption: [
                 {
@@ -208,7 +209,7 @@ export default {
             dataOption: [
                 {
                     type: 'preData',
-                    flag: true,
+                    flag: false,
                     disabled: false,
                     name: '感知数据', 
                 },
@@ -234,20 +235,20 @@ export default {
         }
     },
     watch: {
-        levelOption: {
-            handler(newVal, oldVal) {
-                let _option = newVal.filter(item => item.flag);
-                this.levelOptionShowNum = _option.length;
-            },
-            deep: true
-        },
-        dataOption: {
-            handler(newVal, oldVal) {
-                let _option = newVal.filter(item => item.flag);
-                this.dataOptionShowNum = _option.length;
-            },
-            deep: true
-        },
+        // levelOption: {
+        //     handler(newVal, oldVal) {
+        //         let _option = newVal.filter(item => item.flag);
+        //         this.levelOptionShowNum = _option.length;
+        //     },
+        //     deep: true
+        // },
+        // dataOption: {
+        //     handler(newVal, oldVal) {
+        //         let _option = newVal.filter(item => item.flag);
+        //         this.dataOptionShowNum = _option.length;
+        //     },
+        //     deep: true
+        // },
         perCarList: {
             handler(newVal, oldVal) {
                 let _obj = {};
@@ -287,7 +288,6 @@ export default {
             let eventData = e.data;
             if(eventData.type == 'perCarList') {
                 this.perCarList = eventData.data;
-                console.log(this.perCarList);
             }
         },
         collapseClose(){
@@ -304,11 +304,6 @@ export default {
                     flag: item.flag
                 }
                 document.getElementById("c-iframe").contentWindow.postMessage(_camData, '*');
-            }
-            if(status == 2) {
-                if(item.type) {
-
-                }
             }
         },
 
@@ -394,10 +389,14 @@ export default {
     .c-scroll-wrap {
         height: auto;
         position: absolute;
-        left: 10px;
+        left: -600px;
         top: 140px;
         z-index: 1;
         max-height: calc(100% - 340px);
+        transition: left .5s ease;
+        &.active {
+            left: 10px;
+        }
         .c-title {
             margin: 0;
             font-size: 14px;
@@ -435,12 +434,16 @@ export default {
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 0;
+        bottom: -220px;
         z-index: 5;
         height: 180px;
         padding: 10px 5px;
         background: linear-gradient(to top, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
         @include layoutMode(all);
+        transition: bottom .5s ease;
+        &.active {
+            bottom: 0;
+        }
         .c-fusion-box {
             flex: 1;
             height: 100%;

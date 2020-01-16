@@ -1,7 +1,6 @@
 
 //import axios from 'axios';
-import {HTTPURL} from '../requestUrl';
-import {OPERATEURL} from '../requestUrl';
+import {HTTPURL, OPERATEURL, TRAFFICURL} from '../requestUrl';
 /**
  * 获取单车基本数据
  */
@@ -27,3 +26,9 @@ export const getCameraByRsId = params => {return axios.post(`${HTTPURL}ehb/road/
  * 根据路侧点查询设备
  */
 export const getAreaByRsId = params => {return axios.post(`${OPERATEURL}openApi/v2x/device/findRSBindDevList`, params).then(res => res.data); };
+
+
+/**
+ * 获取交通事件信息类型
+ */
+export const getTrafficClassify = params => {return axios.post(`${TRAFFICURL}collaProcApp/common/queryDictionary`, params).then(res => res.data); };

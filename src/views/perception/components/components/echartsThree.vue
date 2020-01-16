@@ -14,14 +14,24 @@ export default {
     },
     data() {
         return {
-            echarts: null
+            echarts: null,
+            sourceData: {}
         }
     },
     mounted(){
         this.echarts = $echarts.init(document.getElementById(this.id));
         this.echarts.setOption(this.defaultOption());
+
+        window.addEventListener('message', this.getMessage);
     },
     methods: {
+        getMessage(e) {
+            // e.data为父页面发送的数据
+            let eventData = e.data;
+            if(eventData.type == 'perceptionData') {
+                this.sourceData = eventData.data;
+            }
+        },
         defaultOption() {
             let option = {
                 animation: false,
@@ -91,7 +101,9 @@ export default {
             };
             return option;
         }
-
+    },
+    destroyed(){
+        window.removeEventListener("message", this.getMessage);
     }
 }
 </script>
