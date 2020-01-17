@@ -149,7 +149,7 @@
                     if(this.searchKey.plateNo!=""){
                         this.$router.push({
                             path: "/single/" + this.searchKey.value,
-                            query:{delayTime:4}
+                            query:{delayTime: window.delayTime, isShowMapElement:window.isShowMapElement}
                         });
                     }else{
                         this.$message({
@@ -164,7 +164,7 @@
                         let centPos = [this.searchKey.value.ptLon,this.searchKey.value.ptLat];
                         this.$router.push({
                             path: '/perception/'+this.searchKey.value.rsPtId+ "/"+4+"/"+0.004+"/"+true,
-                            query:{lng:centPos[0],lat:centPos[1],isShow:false}
+                            query:{lng:centPos[0],lat:centPos[1],isShow:false, isShowMapElement:window.isShowMapElement}
                         });
                     }else{
                         this.$message({
