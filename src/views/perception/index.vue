@@ -32,12 +32,6 @@
         components:{
             HeaderTop,Left,Right
         },
-       /* watch:{
-            '$route':function (newValue,oldValue) {
-//                console.log(newValue.lon,newValue.lat);
-                this.$router.replace("/refresh");
-            },
-        },*/
         methods: {
 
         },
@@ -51,8 +45,6 @@
             }
         },
         destroyed(){
-            //销毁Socket
-//            this.socket.close();
             clearInterval(this.time);
         }
     }

@@ -25,7 +25,6 @@
                 <li>
                     <span class="overview-sign perception-sign"></span>
                     <span class="fusion-font">路侧识别：车辆 {{perceptionData.veh || 0}}，行人 {{perceptionData.person || 0}}，<br/>&nbsp;&nbsp;&nbsp;&nbsp;非机动车 {{perceptionData.noMotor || 0}}</span>
-                    <!--<span class="fusion-font">路侧识别：车辆 </span>-->
                 </li>
                 <li>
                     <span class="overview-sign perception-sign"></span>
