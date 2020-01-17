@@ -53,7 +53,7 @@
                             sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data));
                             this.$router.push({
                                 path: '/perception/'+item.deviceId+ "/"+window.delayTime+ "/"+window.miniExtend,
-                                query:{lng:item.longitude,lat:item.latitude}
+                                query:{lng:item.longitude,lat:item.latitude,isShowMapElement:window.isShowMapElement}
                             });
                         }else {
                             this.$message({
@@ -199,7 +199,7 @@
             showView(e) {
                 this.$router.push({
                     path: "/single/" + e.target.get("vehicleId"),
-                    query:{delayTime: window.delayTime}
+                    query:{delayTime: window.delayTime, isShowMapElement:window.isShowMapElement}
                 });
             },
             getDevDis(disParams){

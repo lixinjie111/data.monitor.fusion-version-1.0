@@ -47,7 +47,7 @@
                             let centPos = item.centPos.split(",");
                             this.$router.push({
                                 path: '/perception/'+item.rsId+ "/"+window.delayTime+ "/"+window.miniExtend,
-                                query:{lng:centPos[0],lat:centPos[1]}
+                                query:{lng:centPos[0],lat:centPos[1],isShowMapElement:window.isShowMapElement}
                             });
                         }else {
                             this.$message({

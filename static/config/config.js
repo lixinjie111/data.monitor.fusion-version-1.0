@@ -94,4 +94,4 @@ window.count=30;//空闲车辆
 window.delayTime = 2;
 window.miniExtend = 0.005;
 window.extend = 0.02;
-window.currentExtent = [[121.158117,31.298408000000002],[121.194117,31.298408000000002],[121.194117,31.262408],[121.158117,31.262408]];
+window.isShowMapElement = false;
