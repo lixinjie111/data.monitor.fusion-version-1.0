@@ -1,6 +1,21 @@
 <template>
     <div class="fusion-left-style">
         <div class="fusion-left-main left-style">
+            <p class="c-title">融合结果</p>
+            <ul class="c-fusion-box">
+                <li>
+                    <span class="overview-sign fusion-sign"></span>
+                    <span>融合后感知车辆：{{perceptionData.fusionVeh || 0}}</span>
+                </li>
+                <li>
+                    <span class="overview-sign fusion-sign"></span>
+                    <span>融合非机动车：{{perceptionData.fusionNoMotor || 0}}</span>
+                </li>
+                <li>
+                    <span class="overview-sign fusion-sign"></span>
+                    <span>融合后行人：{{perceptionData.fusionPerson || 0}}</span>
+                </li>
+            </ul>
             <p class="c-title">感知数据</p>
             <ul  class="c-fusion-box">
                 <li>
