@@ -67,7 +67,7 @@ export default {
                 _count += parseFloat(item[this.type]);
             });
             this.nowTime = _count/_length;
-            console.log(this.lastTime, this.nowTime, (this.nowTime - this.lastTime)/1000);
+            console.log(this.lastTime, this.nowTime,'&&&&&&&&&&&&& '+(this.nowTime - this.lastTime)/1000);
             if(!this.flag) {
                 this.flag = true;
             }else {
