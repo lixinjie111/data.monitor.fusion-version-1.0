@@ -42,7 +42,8 @@ export default {
                 this.filterData.unregisteredCar.push(_unregisteredCar);
                 // console.log(this.filterData);
                 this.echarts.setOption(this.defaultOption());
-            }
+            },
+            deep: true
         }
     },
     mounted(){

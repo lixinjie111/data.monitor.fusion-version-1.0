@@ -61,19 +61,19 @@
                 <div class="m-echarts-box">
                     <echarts-one class="m-echarts" 
                         id="platform-receive" 
-                        :yData="[0, 1, 2]" 
+                        :yData="[0, 2]" 
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="platform-send" 
-                        :yData="[0, 1, 2]" 
+                        :yData="[0, 2]" 
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
             </li>
             <li class="c-fusion-box">
                 <p class="m-data-title">
-                    感知数据时延(ms)
+                    感知数据时延(s)
                     <span class="m-data-legend">
                         <i class="orange">接受</i>
                         <i class="green">发送</i>
@@ -82,19 +82,19 @@
                 <div class="m-echarts-box">
                     <echarts-one class="m-echarts" 
                         id="perception-receive" 
-                        :yData="[0, 100, 200]" 
+                        :yData="[0, 2]" 
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="perception-send" 
-                        :yData="[0, 100, 200]" 
+                        :yData="[0, 2]" 
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
             </li>
             <li class="c-fusion-box">
                 <p class="m-data-title">
-                    SPAT时延(ms)
+                    SPAT时延(s)
                     <span class="m-data-legend">
                         <i class="orange">接受</i>
                         <i class="green">发送</i>
@@ -103,12 +103,12 @@
                 <div class="m-echarts-box">
                     <echarts-one class="m-echarts" 
                         id="spat-receive" 
-                        :yData="[0, 100, 200]" 
+                        :yData="[0, 2]" 
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="spat-send" 
-                        :yData="[0, 100, 200]" 
+                        :yData="[0, 2]" 
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
@@ -261,18 +261,6 @@ export default {
                 this.filterPerCarData = _obj;
             },
             deep: true
-        }
-    },
-    computed: {
-        filterPerCarData() {
-            let _obj = {};
-            this.perCarList.forEach(item => {
-                if(!_obj[item.devId]) {
-                    _obj[item.devId] = [];
-                }
-                _obj[item.devId].push(item);
-            });
-            return _obj;
         }
     },
     mounted(){

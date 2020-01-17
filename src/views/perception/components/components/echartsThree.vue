@@ -34,7 +34,8 @@ export default {
                     this.filterData[key].push(newVal[key]);
                 }
                 this.echarts.setOption(this.defaultOption());
-            }
+            },
+            deep: true
         }
     },
     mounted(){

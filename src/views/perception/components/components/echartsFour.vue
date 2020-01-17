@@ -53,7 +53,8 @@ export default {
                 }
                 // console.log(this.trafficClassify);
                 this.echarts.setOption(this.defaultOption());
-            }
+            },
+            deep: true
         }
     },
     created() {
