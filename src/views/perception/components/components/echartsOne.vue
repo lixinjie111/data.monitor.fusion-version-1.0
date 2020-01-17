@@ -107,7 +107,7 @@ export default {
                 animation: false,
                 grid:{
                     left: 40,
-                    right: 0,
+                    right: 2,
                     top: 8,
                     bottom: 5
                 },
@@ -154,7 +154,8 @@ export default {
                 },
                 series: {
                     type:'line',
-                    symbol: 'none',
+                    symbol: 'emptyCircle',
+                    symbolSize: 2,
                     itemStyle: {
                         normal: {
                             color: "#fff"

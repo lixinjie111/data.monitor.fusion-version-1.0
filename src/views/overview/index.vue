@@ -50,7 +50,7 @@ export default {
             for (let attr in this.responseData) {
                 _filterData[attr] = parseFloat(this.responseData[attr].toLocaleString()) || '--';
             }
-            console.log(_filterData);
+            // console.log(_filterData);
             return _filterData;
         }
     },

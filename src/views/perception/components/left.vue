@@ -211,13 +211,13 @@ export default {
                     type: 'preData',
                     flag: false,
                     disabled: false,
-                    name: '感知数据', 
+                    name: '数据调试', 
                 },
                 {
                     type: 'echartsData',
                     flag: false,
                     disabled: false,
-                    name: '统计数据', 
+                    name: '数据统计', 
                 }
             ],
             dataOptionShowNum: 0,

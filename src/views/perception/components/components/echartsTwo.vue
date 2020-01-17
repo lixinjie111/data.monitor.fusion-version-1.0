@@ -30,6 +30,9 @@ export default {
                 }
                 let _networkCar = 0;
                 let _unregisteredCar = 0;
+                if(!newVal) {
+                    return
+                }
                 newVal.forEach(item => {
                     if(item.type == 1) { //联网车
                         _networkCar++;
@@ -57,7 +60,9 @@ export default {
             // e.data为父页面发送的数据
             let eventData = e.data;
             if(eventData.type == 'perceptionData') {
-                this.sourceData = eventData.data.platFusionList;
+                // console.log("perceptionData-------**************%%%%%%%%%%%%%%");
+                // console.log(eventData.data);
+                this.sourceData = eventData.data&&eventData.data.platFusionList ? eventData.data.platFusionList : [];
             }
         },
         defaultOption() {
