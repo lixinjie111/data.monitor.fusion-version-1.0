@@ -215,7 +215,7 @@ export default {
                 },
                 {
                     type: 'echartsData',
-                    flag: true,
+                    flag: false,
                     disabled: false,
                     name: '统计数据', 
                 }
