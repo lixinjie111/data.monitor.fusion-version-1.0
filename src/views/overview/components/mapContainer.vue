@@ -24,7 +24,7 @@
                 count: 0,
                 flag: true,
                 prevData: [],
-                timeOut:3000
+                timeOut:5000
             }
         },
         mounted() {
