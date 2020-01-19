@@ -51,9 +51,9 @@
                             });
                         }else {
                             this.$message({
-                                type: 'error',
+                                type: 'warning',
                                 duration: '1500',
-                                message: '未设置典型摄像头或摄像头参数',
+                                message: '请设置典型摄像头及其相关参数',
                                 showClose: true
                             });
                             sessionStorage.removeItem("sTypeRoadCamLst");
