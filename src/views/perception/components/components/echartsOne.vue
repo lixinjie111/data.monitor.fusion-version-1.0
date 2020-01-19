@@ -13,6 +13,10 @@ export default {
         },
         lineColor: {
             type: String
+        },
+        resizeFlag: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -36,10 +40,7 @@ export default {
             deep: true
         },
         resizeFlag(newVal, oldVal) {
-            if(newVal) {
-                this.echarts.setOption(this.defaultOption());
-                this.$emit('resizeCallback');
-            }
+            this.echarts.resize();
         }
     },
     mounted(){
@@ -67,7 +68,10 @@ export default {
                 _count += parseFloat(item[this.type]);
             });
             this.nowTime = _count/_length;
-            console.log(this.lastTime, this.nowTime,'&&&&&&&&&&&&& '+(this.nowTime - this.lastTime)/1000);
+
+            // if(this.type == 'gpsTime') {
+            //     console.log(this.lastTime, this.nowTime,'&&&&&&&&&&&&& '+(this.nowTime - this.lastTime)/1000);
+            // }
             if(!this.flag) {
                 this.flag = true;
             }else {
@@ -83,22 +87,28 @@ export default {
             if(eventData.type == 'platCarsList') {  // 平台车
                 if(this.id.indexOf("platform-") != -1) {
                     this.sourceData = eventData.data&&eventData.data.platCars ? eventData.data.platCars : [];
-                    console.log("平台车-----------", this.type);
-                    console.log(this.sourceData);
+                    // if(this.type == 'gpsTime') {
+                    //     console.log("平台车-----------", this.type);
+                    //     // console.log(this.sourceData); 
+                    // }
                 }
             }
             if(eventData.type == 'perceptionCarsList') {  // 感知车
                 if(this.id.indexOf("perception-") != -1) {
                     this.sourceData = eventData.data || [];
-                    console.log("感知车-----------", this.type);
-                    console.log(this.sourceData);
+                    // if(this.type == 'gpsTime') {
+                    //     console.log("感知车-----------", this.type);
+                    //     // console.log(this.sourceData); 
+                    // }
                 }
             }
-            if(eventData.type == 'spatList') {  // 感知车
+            if(eventData.type == 'spatList') {  // 信号灯
                 if(this.id.indexOf("spat-") != -1) {
                     this.sourceData = eventData.data || [];
-                    console.log("红绿灯-----------", this.type);
-                    console.log(this.sourceData);
+                    // if(this.type == 'spatTime') {
+                    //     console.log("信号灯-----------", this.type);
+                    //     // console.log(this.sourceData); 
+                    // }
                 }
             }
         },
@@ -106,7 +116,7 @@ export default {
             let option = {
                 animation: false,
                 grid:{
-                    left: 40,
+                    left: 20,
                     right: 2,
                     top: 8,
                     bottom: 5
@@ -118,22 +128,21 @@ export default {
                 },
                 yAxis: {
                     type: 'value',
-                    // boundaryGap: false,
-                    // boundaryGap: [0, 0],
+                    minInterval: 1,
                     splitLine: {
-                        // interval(index, val) {
-                        //     if(index == 1){
-                        //         return true;
-                        //     }else{
-                        //         return false;
-                        //     }
-                        // },
-                        // lineStyle:{
-                        //     color: '#fff',
-                        //     lineStyle: {
-                        //         width: 1
-                        //     }
-                        // },
+                        interval(index, val) {
+                            if(index == 1){
+                                return true;
+                            }else{
+                                return false;
+                            }
+                        },
+                        lineStyle:{
+                            color: '#fff',
+                            lineStyle: {
+                                width: 1
+                            }
+                        },
                         show: false
                     },
                     axisLine:{
@@ -143,12 +152,15 @@ export default {
                         }
                     },
                     axisTick:{
-                        show: false
+                        show: true,
+                        lineStyle: {
+                            color: "#fff",
+                            width: 2
+                        }
                     },
                     axisLabel:{
                         color:'#fff'
                     },
-                    // data: this.yData,
                     min: this.yData[0],
                     max: this.yData[this.yData.length],
                 },

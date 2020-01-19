@@ -1,7 +1,11 @@
 <template>
     <div class="m-wrapper">
-        <div class="m-select-wrap clearfix">
-            <el-collapse ref="optionShowNum" v-model="optionShowNum" class="c-left">
+        <a href="javascript:;" class="m-hover-box" @click="handlerShow = !handlerShow">
+            <template v-if="handlerShow">关</template>
+            <template v-else>开</template>
+        </a>
+        <div class="m-select-wrap clearfix" :class="handlerShow ? 'active' : ''">
+            <el-collapse ref="levelOptionEnable" v-model="levelOptionEnable" class="c-left">
                 <el-collapse-item :title="'图层数量：'+levelOptionShowNum">
                     <ul class="m-ul">
                         <li class="m-li clearfix" v-for="(item, index) in levelOption">
@@ -62,11 +66,13 @@
                     <echarts-one class="m-echarts" 
                         id="platform-receive" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="platform-send" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
@@ -83,11 +89,13 @@
                     <echarts-one class="m-echarts" 
                         id="perception-receive" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="perception-send" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
@@ -104,11 +112,13 @@
                     <echarts-one class="m-echarts" 
                         id="spat-receive" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="spat-send" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
@@ -124,6 +134,7 @@
                 <echarts-two 
                     class="m-echarts-box m-echarts" 
                     id="fusion-count"
+                    :resizeFlag="resizeFlag"
                     :lineColor="echartsOption">
                 </echarts-two>
             </li>
@@ -141,6 +152,7 @@
                 <echarts-three 
                     class="m-echarts-box m-echarts" 
                     id="perception-count"
+                    :resizeFlag="resizeFlag"
                     :lineColor="echartsOption">
                 </echarts-three>
             </li>
@@ -149,6 +161,7 @@
                 <echarts-four 
                     class="m-echarts-box m-echarts" 
                     id="rsi-count"
+                    :resizeFlag="resizeFlag"
                     :lineColor="echartsOption">
                 </echarts-four>
             </li>
@@ -172,6 +185,8 @@ export default {
     data() {
         let _this = this;
         return {
+            handlerShow: false,
+            resizeFlag: false,
             levelOption: [
                 {
                     type: 'platform',
@@ -206,6 +221,7 @@ export default {
                 }
             ],
             levelOptionShowNum: 0,
+            levelOptionEnable:[],
             dataOption: [
                 {
                     type: 'preData',
@@ -221,6 +237,7 @@ export default {
                 }
             ],
             dataOptionShowNum: 0,
+            dataOptionEnable:[],
             perCarList: [],
             filterPerCarData: {},
             echartsOption: {
@@ -230,8 +247,6 @@ export default {
                 blue: "#02a7f0",
                 yellow: "#ffff80"
             },
-            optionShowNum:[],
-            dataOptionEnable:[],
         }
     },
     watch: {
@@ -269,18 +284,23 @@ export default {
         this.bindMapClick();
 
         window.addEventListener('message', this.getMessage);
+
+        window.addEventListener('resize',this.listenResize); 
     },
     methods: {
+        listenResize() {
+            this.resizeFlag = !this.resizeFlag;
+        },
         getMessage(e) {
             // e.data为父页面发送的数据
             let eventData = e.data;
-            if(eventData.type == 'perCarList') {
-                this.perCarList = eventData.data;
+            if(eventData.type == 'perceptionData') {
+                this.perCarList = eventData.data.perList || [];
             }
         },
         collapseClose(){
-            this.optionShowNum = []
-            this.dataOptionEnable = []
+            this.levelOptionEnable = [];
+            this.dataOptionEnable = [];
         },
         switchHandle(item, index, obj, status) {
             if(!item.disabled) {
@@ -295,7 +315,7 @@ export default {
             }
         },
         bindMapClick(){
-            bind(this.$refs.optionShowNum.$el, this.collapseClose);
+            bind(this.$refs.levelOptionEnable.$el, this.collapseClose);
             bind(this.$refs.dataOptionEnable.$el, this.collapseClose);     
             window.addEventListener('message', e => {
                 // e.data为父页面发送的数据
@@ -307,9 +327,10 @@ export default {
         }
     },
     destoryed () {
-        unbind(this.$refs.dropdown.$el, this.collapseClose);
-        unbind(this.$refs.dropdown1.$el, this.collapseClose1);
+        unbind(this.$refs.levelOptionEnable.$el, this.collapseClose);
+        unbind(this.$refs.dataOptionEnable.$el, this.collapseClose);
         window.removeEventListener("message", this.getMessage);
+        window.removeEventListener("resize",this.listenResize);
     }
     
 }
@@ -318,11 +339,38 @@ export default {
 @import '@/assets/scss/theme.scss';
 .m-wrapper {
     height: 100%;
+    .m-hover-box {
+        position: absolute;
+        left: 0;
+        top: 100px;
+        z-index: 3;
+        width: 32px;
+        height: 32px;
+        margin-left: 10px;
+        border-radius: 50%;
+        overflow: hidden;
+        @include layoutMode();
+        color: #fff;
+        font-size: 12px;
+        border: 1px solid $borderColorLight;
+        background: $background;
+        box-shadow: 0 0 10px $borderColorLight;
+        animation: scale 1s infinite;
+    }
+    @keyframes scale{
+        0% {transform: scale(0.99);}
+        50% {transform: scale(0.9);}
+        100% {transform: scale(0.99);}
+    }
     .m-select-wrap {
         position: absolute;
-        left: 10px;
+        left: -320px;
         top: 100px;
         z-index: 2;
+        transition: left .5s ease;
+        &.active {
+            left: 52px;
+        }
         .el-collapse {
             border: 1px solid $borderColorLight;
         }
@@ -506,11 +554,11 @@ export default {
             top: 40px;
             bottom: 10px;
             &.m-echarts {
-                // background-color: rgba(0, 0, 0, 0.3);
+                background-color: rgba(0, 0, 0, 0.3);
             }
             .m-echarts {
                 height: 48%;
-                // background-color: rgba(0, 0, 0, 0.3);
+                background-color: rgba(0, 0, 0, 0.3);
                 margin-bottom: 2%;
                 &:last-child {
                     margin-bottom: 0;

@@ -15,6 +15,8 @@
         components:{
             left,Right
         },
+        mounted() {
+        },
         methods: {
 
         },

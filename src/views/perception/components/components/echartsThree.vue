@@ -10,6 +10,10 @@ export default {
         },
         lineColor: {
             type: Object
+        },
+        resizeFlag: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -36,6 +40,9 @@ export default {
                 this.echarts.setOption(this.defaultOption());
             },
             deep: true
+        },
+        resizeFlag(newVal, oldVal) {
+            this.echarts.resize();
         }
     },
     mounted(){
@@ -57,7 +64,7 @@ export default {
             let option = {
                 animation: false,
                 grid:{
-                    left: 40,
+                    left: 32,
                     right: 0,
                     top: 8,
                     bottom: 5
@@ -79,7 +86,11 @@ export default {
                         }
                     },
                     axisTick:{
-                        show: false
+                        show: true,
+                        lineStyle: {
+                            color: "#fff",
+                            width: 2
+                        }
                     },
                     axisLabel:{
                         color:'#fff'
