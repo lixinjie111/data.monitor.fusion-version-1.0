@@ -2,7 +2,6 @@
     <div class="c-position-trbl" :id="id"></div>
 </template>
 <script>
-import {getTrafficClassify} from '@/api/fusion'
 import $echarts from 'echarts'
 export default {
     props:{
@@ -34,7 +33,8 @@ export default {
                 for(let warnId in newVal) {
                     let _classity = warnId.split('_')[0];              // 事件分类key
                     let _category = newVal[warnId].eventType.split('_')[1];      // 事件告警key
-                    let _msg = newVal[warnId].msg;      // 事件名称
+                    let _msg = newVal[warnId].msg || '其他';      // 事件名称
+                    // console.log(warnId, _classity, _category, _msg);
 
                     let _isFirst = -1;
                     this.trafficClassify.forEach((item, index) => {
@@ -56,6 +56,18 @@ export default {
                             }
                         }
                     });
+                    if(_isFirst < 0) {
+                        this.trafficClassify.push({
+                            key: _classity,
+                            name: _classity,
+                            children: [{
+                                key: _category,
+                                name: _msg,
+                                warnId: warnId,
+                                value: 1
+                            }]
+                        });
+                    }
                 }
                 // console.log(this.trafficClassify);
                 this.echarts.setOption(this.defaultOption());
@@ -66,9 +78,6 @@ export default {
             this.echarts.resize();
         }
     },
-    created() {
-        this.getTrafficClassify();
-    },
     mounted(){
         this.echarts = $echarts.init(document.getElementById(this.id));
         // this.echarts.setOption(this.defaultOption());
@@ -76,23 +85,6 @@ export default {
         window.addEventListener('message', this.getMessage);
     },
     methods: {
-        getTrafficClassify() {
-            getTrafficClassify({
-                parentCode: "trafficType"
-            }).then(res => {
-                if(res.status == 200) {
-                    res.data.forEach((item, index) => {
-                        if(!this.trafficClassify[index]) {
-                            this.trafficClassify[index] = {
-                                key: item.key,
-                                name: item.name,
-                                children: []
-                            }
-                        }
-                    });
-                }
-            });
-        },
         getMessage(e) {
             // e.data为父页面发送的数据
             let eventData = e.data;
@@ -110,7 +102,17 @@ export default {
                     highlightPolicy: 'ancestor',
                     data: this.trafficClassify,
                     label: {
-                        show: false
+                        rotate: 'tangential',
+                        verticalAlign: 'middle',
+                        align: 'center',
+                        color: '#fff',
+                        textBorderColor: '#fff',
+                        textBorderWidth: 1,
+                        fontSize: 8,
+                        border: 'none',
+                        // formatter: function () {
+                        //     return 'tangential';
+                        // }
                     },
                     levels: [{}, {
                         itemStyle: {
