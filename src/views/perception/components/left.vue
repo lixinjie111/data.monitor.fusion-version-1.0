@@ -62,11 +62,13 @@
                     <echarts-one class="m-echarts" 
                         id="platform-receive" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="platform-send" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
@@ -83,11 +85,13 @@
                     <echarts-one class="m-echarts" 
                         id="perception-receive" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="perception-send" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
@@ -104,11 +108,13 @@
                     <echarts-one class="m-echarts" 
                         id="spat-receive" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="spat-send" 
                         :yData="[0, 2]" 
+                        :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
                 </div>
@@ -124,6 +130,7 @@
                 <echarts-two 
                     class="m-echarts-box m-echarts" 
                     id="fusion-count"
+                    :resizeFlag="resizeFlag"
                     :lineColor="echartsOption">
                 </echarts-two>
             </li>
@@ -141,6 +148,7 @@
                 <echarts-three 
                     class="m-echarts-box m-echarts" 
                     id="perception-count"
+                    :resizeFlag="resizeFlag"
                     :lineColor="echartsOption">
                 </echarts-three>
             </li>
@@ -149,6 +157,7 @@
                 <echarts-four 
                     class="m-echarts-box m-echarts" 
                     id="rsi-count"
+                    :resizeFlag="resizeFlag"
                     :lineColor="echartsOption">
                 </echarts-four>
             </li>
@@ -172,6 +181,7 @@ export default {
     data() {
         let _this = this;
         return {
+            resizeFlag: false,
             levelOption: [
                 {
                     type: 'platform',
@@ -269,13 +279,18 @@ export default {
         this.bindMapClick();
 
         window.addEventListener('message', this.getMessage);
+
+        window.addEventListener('resize',this.listenResize); 
     },
     methods: {
+        listenResize() {
+            this.resizeFlag = !this.resizeFlag;
+        },
         getMessage(e) {
             // e.data为父页面发送的数据
             let eventData = e.data;
-            if(eventData.type == 'perCarList') {
-                this.perCarList = eventData.data;
+            if(eventData.type == 'perceptionData') {
+                this.perCarList = eventData.data.perList || [];
             }
         },
         collapseClose(){
@@ -310,6 +325,7 @@ export default {
         unbind(this.$refs.dropdown.$el, this.collapseClose);
         unbind(this.$refs.dropdown1.$el, this.collapseClose1);
         window.removeEventListener("message", this.getMessage);
+        window.removeEventListener("resize",this.listenResize);
     }
     
 }
@@ -506,11 +522,11 @@ export default {
             top: 40px;
             bottom: 10px;
             &.m-echarts {
-                // background-color: rgba(0, 0, 0, 0.3);
+                background-color: rgba(0, 0, 0, 0.3);
             }
             .m-echarts {
                 height: 48%;
-                // background-color: rgba(0, 0, 0, 0.3);
+                background-color: rgba(0, 0, 0, 0.3);
                 margin-bottom: 2%;
                 &:last-child {
                     margin-bottom: 0;

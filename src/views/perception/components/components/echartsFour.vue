@@ -11,6 +11,10 @@ export default {
         },
         lineColor: {
             type: Object
+        },
+        resizeFlag: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -23,12 +27,14 @@ export default {
     watch: {
         sourceData: {
             handler(newVal, oldVal) {
+                // console.log(newVal);
                 this.trafficClassify.forEach(item => {
                     item.children = [];
                 });
                 for(let warnId in newVal) {
                     let _classity = warnId.split('_')[0];              // 事件分类key
                     let _category = newVal[warnId].eventType.split('_')[1];      // 事件告警key
+                    let _msg = newVal[warnId].msg;      // 事件名称
 
                     let _isFirst = -1;
                     this.trafficClassify.forEach((item, index) => {
@@ -44,7 +50,7 @@ export default {
                             if(_isSecond < 0) {
                                 this.trafficClassify[_isFirst].children.push({
                                     key: _category,
-                                    name: item.msg,
+                                    name: _msg,
                                     value: 1
                                 });
                             }
@@ -55,6 +61,9 @@ export default {
                 this.echarts.setOption(this.defaultOption());
             },
             deep: true
+        },
+        resizeFlag(newVal, oldVal) {
+            this.echarts.resize();
         }
     },
     created() {
