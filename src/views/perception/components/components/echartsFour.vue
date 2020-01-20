@@ -106,10 +106,9 @@ export default {
                         verticalAlign: 'middle',
                         align: 'center',
                         color: '#fff',
-                        textBorderColor: '#fff',
-                        textBorderWidth: 1,
-                        fontWeight: 0,
-                        fontFamily: 'serif',
+                        textBorderWidth: 0,
+                        fontWeight: 'lighter',
+                        fontFamily: 'Microsoft YaHei',
                         fontSize: 10,
                         border: 'none',
                         // formatter: function () {

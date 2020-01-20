@@ -1,11 +1,10 @@
 <template>
     <div class="m-wrapper">
-        <a href="javascript:;" class="m-hover-box" @click="handlerShow = !handlerShow">
-            <template v-if="handlerShow">关</template>
-            <template v-else>开</template>
-        </a>
-        <div class="m-select-wrap clearfix" :class="handlerShow ? 'active' : ''">
-            <el-collapse ref="levelOptionEnable" v-model="levelOptionEnable" class="c-left">
+        <div class="m-select-wrap clearfix m-select-wrap-1">
+            <a href="javascript:;" class="m-hover-box" @click="hoverHandler('levelHandlerShow')">
+                <i class="el-icon-coin"></i>
+            </a>
+            <el-collapse ref="levelOptionEnable" v-model="levelOptionEnable" :class="levelHandlerShow ? 'active' : ''">
                 <el-collapse-item :title="'图层：'+levelOptionShowNum">
                     <ul class="m-ul">
                         <li class="m-li clearfix" v-for="(item, index) in levelOption">
@@ -19,7 +18,12 @@
                     </ul>
                 </el-collapse-item>
             </el-collapse>
-            <el-collapse ref="dataOptionEnable" v-model="dataOptionEnable" class="c-left">
+        </div>
+        <div class="m-select-wrap clearfix m-select-wrap-2">
+            <a href="javascript:;" class="m-hover-box" @click="hoverHandler('dataHandlerShow')">
+                <i class="el-icon-s-data"></i>
+            </a>
+            <el-collapse ref="dataOptionEnable" v-model="dataOptionEnable" :class="dataHandlerShow ? 'active' : ''">
               <el-collapse-item :title="'数据概览：'+dataOptionShowNum">
                 <ul class="m-ul">
                     <li class="m-li clearfix" v-for="(item, index) in dataOption">
@@ -185,7 +189,6 @@ export default {
     data() {
         let _this = this;
         return {
-            handlerShow: false,
             resizeFlag: false,
             levelOption: [
                 {
@@ -222,6 +225,7 @@ export default {
             ],
             levelOptionShowNum: 0,
             levelOptionEnable:[],
+            levelHandlerShow: false,
             dataOption: [
                 {
                     type: 'preData',
@@ -231,13 +235,15 @@ export default {
                 },
                 {
                     type: 'echartsData',
-                    flag: false,
+                    flag: true,
                     disabled: false,
                     name: '数据统计', 
                 }
             ],
             dataOptionShowNum: 0,
             dataOptionEnable:[],
+            dataHandlerShow: false,
+
             perCarList: [],
             filterPerCarData: {},
             echartsOption: {
@@ -267,7 +273,6 @@ export default {
             if(newVal.length) {
                 this.dataOptionEnable = [];
             }
-            console.log("图层：", newVal);
         },
         dataOptionEnable(newVal, oldVal) {
             if(newVal.length) {
@@ -285,6 +290,17 @@ export default {
         window.addEventListener('resize',this.listenResize); 
     },
     methods: {
+        hoverHandler(flag) {
+            this[flag] = !this[flag];
+            if(this[flag]) {
+                if(flag == 'levelHandlerShow') {
+                    this.dataHandlerShow = false;
+                }
+                if(flag == 'dataHandlerShow') {
+                    this.levelHandlerShow = false;
+                }
+            }
+        },
         listenResize() {
             this.resizeFlag = !this.resizeFlag;
         },
@@ -338,17 +354,16 @@ export default {
     height: 100%;
     .m-hover-box {
         position: absolute;
-        left: 0;
-        top: 100px;
-        z-index: 3;
+        left: 10px;
+        top: 0;
         width: 32px;
         height: 32px;
-        margin-left: 10px;
         border-radius: 50%;
         overflow: hidden;
+        z-index: 3;
         @include layoutMode();
         color: #fff;
-        font-size: 12px;
+        font-size: 18px;
         border: 1px solid $borderColorLight;
         background: $background;
         box-shadow: 0 0 10px $borderColorLight;
@@ -361,16 +376,25 @@ export default {
     }
     .m-select-wrap {
         position: absolute;
-        left: -320px;
-        top: 100px;
+        left: 0;
         z-index: 2;
-        transition: left .5s ease;
-        &.active {
-            left: 52px;
+        &.m-select-wrap-1 {
+            top: 88px;
+        }
+        &.m-select-wrap-2 {
+            top: 128px;
         }
         .el-collapse {
+            position: absolute;
+            left: -200px;
+            top: 0;
             border: 1px solid $borderColorLight;
             min-width: 150px;
+            border-radius: 4px;
+            transition: left .2s ease;
+            &.active {
+                left: 52px;
+            }
         }
         .m-ul {
             color: #fff;
@@ -423,9 +447,9 @@ export default {
         height: auto;
         position: absolute;
         left: -600px;
-        top: 140px;
+        top: 168px;
         z-index: 1;
-        max-height: calc(100% - 360px);
+        max-height: calc(100% - 388px);
         transition: left .5s ease;
         &.active {
             left: 10px;
@@ -576,6 +600,7 @@ export default {
         height: 30px;
         line-height: 30px;
         padding: 0 20px;
+        border-radius: 4px;
         .el-collapse-item__arrow {
             margin: 0 0 0 8px;
         }
