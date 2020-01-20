@@ -116,7 +116,7 @@ export default {
             let option = {
                 animation: false,
                 grid:{
-                    left: 20,
+                    left: 30,
                     right: 2,
                     top: 8,
                     bottom: 5

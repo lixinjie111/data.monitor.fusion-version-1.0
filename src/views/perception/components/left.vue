@@ -427,7 +427,7 @@ export default {
         left: -600px;
         top: 140px;
         z-index: 1;
-        max-height: calc(100% - 340px);
+        max-height: calc(100% - 360px);
         transition: left .5s ease;
         &.active {
             left: 10px;
@@ -471,7 +471,7 @@ export default {
         right: 0;
         bottom: -220px;
         z-index: 5;
-        height: 180px;
+        height: 200px;
         padding: 10px 5px;
         background: linear-gradient(to top, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
         @include layoutMode(all);

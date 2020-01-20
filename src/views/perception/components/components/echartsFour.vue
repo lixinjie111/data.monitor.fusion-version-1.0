@@ -50,7 +50,7 @@ export default {
                             if(_isSecond < 0) {
                                 this.trafficClassify[_isFirst].children.push({
                                     key: _category,
-                                    name: _msg,
+                                    name: _msg.substr(0,4),
                                     value: 1
                                 });
                             }
@@ -108,7 +108,9 @@ export default {
                         color: '#fff',
                         textBorderColor: '#fff',
                         textBorderWidth: 1,
-                        fontSize: 8,
+                        fontWeight: 0,
+                        fontFamily: 'serif',
+                        fontSize: 10,
                         border: 'none',
                         // formatter: function () {
                         //     return 'tangential';
