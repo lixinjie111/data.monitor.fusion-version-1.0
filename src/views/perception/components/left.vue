@@ -6,7 +6,7 @@
         </a>
         <div class="m-select-wrap clearfix" :class="handlerShow ? 'active' : ''">
             <el-collapse ref="levelOptionEnable" v-model="levelOptionEnable" class="c-left">
-                <el-collapse-item :title="'图层数量：'+levelOptionShowNum">
+                <el-collapse-item :title="'图层：'+levelOptionShowNum">
                     <ul class="m-ul">
                         <li class="m-li clearfix" v-for="(item, index) in levelOption">
                             <span class="m-text">{{item.name}}</span>
@@ -20,7 +20,7 @@
                 </el-collapse-item>
             </el-collapse>
             <el-collapse ref="dataOptionEnable" v-model="dataOptionEnable" class="c-left">
-              <el-collapse-item :title="'数据统计：'+dataOptionShowNum">
+              <el-collapse-item :title="'数据概览：'+dataOptionShowNum">
                 <ul class="m-ul">
                     <li class="m-li clearfix" v-for="(item, index) in dataOption">
                         <span class="m-text">{{item.name}}</span>
@@ -227,7 +227,7 @@ export default {
                     type: 'preData',
                     flag: false,
                     disabled: false,
-                    name: '数据调试', 
+                    name: '数据信息', 
                 },
                 {
                     type: 'echartsData',
@@ -250,20 +250,6 @@ export default {
         }
     },
     watch: {
-        // levelOption: {
-        //     handler(newVal, oldVal) {
-        //         let _option = newVal.filter(item => item.flag);
-        //         this.levelOptionShowNum = _option.length;
-        //     },
-        //     deep: true
-        // },
-        // dataOption: {
-        //     handler(newVal, oldVal) {
-        //         let _option = newVal.filter(item => item.flag);
-        //         this.dataOptionShowNum = _option.length;
-        //     },
-        //     deep: true
-        // },
         perCarList: {
             handler(newVal, oldVal) {
                 let _obj = {};
@@ -276,6 +262,17 @@ export default {
                 this.filterPerCarData = _obj;
             },
             deep: true
+        },
+        levelOptionEnable(newVal, oldVal) {
+            if(newVal.length) {
+                this.dataOptionEnable = [];
+            }
+            console.log("图层：", newVal);
+        },
+        dataOptionEnable(newVal, oldVal) {
+            if(newVal.length) {
+                this.levelOptionEnable = [];
+            }
         }
     },
     mounted(){
@@ -373,6 +370,7 @@ export default {
         }
         .el-collapse {
             border: 1px solid $borderColorLight;
+            min-width: 150px;
         }
         .m-ul {
             color: #fff;
