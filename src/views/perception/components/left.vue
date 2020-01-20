@@ -5,14 +5,14 @@
                 <i class="el-icon-coin"></i>
             </a>
             <el-collapse ref="levelOptionEnable" v-model="levelOptionEnable" :class="levelHandlerShow ? 'active' : ''">
-                <el-collapse-item :title="'图层：'+levelOptionShowNum">
+                <el-collapse-item :title="'图层：'+levelOptionShowNum" name="1">
                     <ul class="m-ul">
                         <li class="m-li clearfix" v-for="(item, index) in levelOption">
                             <span class="m-text">{{item.name}}</span>
                             <span 
                                 class="m-switch" 
                                 :class="{'active': item.flag, 'disabled': item.disabled}"
-                                @click="switchHandle(item, index, levelOption, 1)">
+                                @click="switchHandle(item, index, levelOption)">
                             </span>
                         </li>
                     </ul>
@@ -24,14 +24,14 @@
                 <i class="el-icon-s-data"></i>
             </a>
             <el-collapse ref="dataOptionEnable" v-model="dataOptionEnable" :class="dataHandlerShow ? 'active' : ''">
-              <el-collapse-item :title="'数据概览：'+dataOptionShowNum">
+              <el-collapse-item :title="'数据概览：'+dataOptionShowNum" name="1">
                 <ul class="m-ul">
                     <li class="m-li clearfix" v-for="(item, index) in dataOption">
                         <span class="m-text">{{item.name}}</span>
                         <span 
                             class="m-switch" 
                             :class="{'active': item.flag, 'disabled': item.disabled}" 
-                            @click="switchHandle(item, index, dataOption, 2)">
+                            @click="switchHandle(item, index, dataOption)">
                         </span>
                     </li>
                 </ul>
@@ -195,31 +195,37 @@ export default {
                     type: 'platform',
                     flag: true,
                     disabled: false,
+                    isPost: true,
                     name: '联网数据',
                 }, {
                     type: 'perception',
                     flag: true,
                     disabled: false,
+                    isPost: true,
                     name: '感知数据',
                 }, {
                     type: 'warning',
                     flag: true,
                     disabled: false,
+                    isPost: true,
                     name: '预警信息',
                 }, {
                     type: 'roadsidePoints',
                     flag: true,
                     disabled: false,
+                    isPost: true,
                     name: '路侧点',
                 }, {
                     type: 'spat',
                     flag: true,
                     disabled: false,
+                    isPost: true,
                     name: '信号灯',
                 }, {
                     type: 'baseRoadNetwork',
                     flag: true,
                     disabled: true,
+                    isPost: true,
                     name: '基础路网',
                 }
             ],
@@ -228,14 +234,15 @@ export default {
             levelHandlerShow: false,
             dataOption: [
                 {
-                    type: 'preData',
+                    type: 'perceptionLable',
                     flag: false,
                     disabled: false,
+                    isPost: true,
                     name: '数据信息', 
                 },
                 {
                     type: 'echartsData',
-                    flag: true,
+                    flag: false,
                     disabled: false,
                     name: '数据统计', 
                 }
@@ -249,7 +256,7 @@ export default {
             echartsOption: {
                 orange: "#d38600",
                 green: "#4eaf6b",
-                red: "#d9001b",
+                red: "#e0635d",
                 blue: "#02a7f0",
                 yellow: "#ffff80"
             },
@@ -288,15 +295,25 @@ export default {
         window.addEventListener('message', this.getMessage);
 
         window.addEventListener('resize',this.listenResize); 
+
+        this.levelOption.forEach(item => {
+            this.publicPostMessage(item);
+        });
+        this.dataOption.forEach(item => {
+            this.publicPostMessage(item);
+        });
     },
     methods: {
         hoverHandler(flag) {
             this[flag] = !this[flag];
             if(this[flag]) {
+                console.log(flag);
                 if(flag == 'levelHandlerShow') {
+                    this.levelOptionEnable = ["1"];
                     this.dataHandlerShow = false;
                 }
                 if(flag == 'dataHandlerShow') {
+                    this.dataOptionEnable = ["1"];
                     this.levelHandlerShow = false;
                 }
             }
@@ -319,7 +336,10 @@ export default {
             if(!item.disabled) {
                 obj[index].flag = !obj[index].flag;
             }
-            if(status == 1) {
+            this.publicPostMessage(item);
+        },
+        publicPostMessage(item) {
+            if(item.isPost) {
                 let _camData = {
                     type: item.type,
                     flag: item.flag
@@ -506,6 +526,7 @@ export default {
             height: 100%;
             margin: 0 5px;
             padding: 10px;
+            background: $background;
         }
         .m-data-title {
             position: relative;
@@ -549,9 +570,9 @@ export default {
                         }
                     }
                     &.red {
-                        color: #d9001b;
+                        color: #e0635d;
                         &:before {
-                            background-color: #d9001b;
+                            background-color: #e0635d;
                         }
                     }
                     &.blue {
@@ -576,11 +597,11 @@ export default {
             top: 40px;
             bottom: 10px;
             &.m-echarts {
-                background-color: rgba(0, 0, 0, 0.3);
+                background-color: rgba(0, 0, 0, 0.1);
             }
             .m-echarts {
                 height: 48%;
-                background-color: rgba(0, 0, 0, 0.3);
+                background-color: rgba(0, 0, 0, 0.1);
                 margin-bottom: 2%;
                 &:last-child {
                     margin-bottom: 0;
