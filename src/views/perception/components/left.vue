@@ -511,7 +511,7 @@ export default {
         position: absolute;
         left: 0;
         right: 0;
-        bottom: -220px;
+        bottom: -240px;
         z-index: 5;
         height: 200px;
         padding: 10px 5px;
