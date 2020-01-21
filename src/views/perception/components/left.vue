@@ -614,21 +614,27 @@ export default {
 <style lang="scss">
 @import '@/assets/scss/theme.scss';
 .m-select-wrap {
+    .el-collapse-item {
+        border-color: $borderColorLight;
+        border-radius: 4px;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
     .el-collapse-item__header {
         background-color: $background;
-        border-color: $borderColorLight;
+        border: none;
         color: #fff;
         height: 30px;
         line-height: 30px;
         padding: 0 20px;
-        border-radius: 4px;
         .el-collapse-item__arrow {
             margin: 0 0 0 8px;
         }
     }
     .el-collapse-item__wrap {
         background-color: $background;
-        border-color: $borderColorLight;
+        border: none;
+        border-top: 1px solid $borderColorLight;
         padding: 10px 0;
         .el-collapse-item__content {
             padding-bottom: 0;
