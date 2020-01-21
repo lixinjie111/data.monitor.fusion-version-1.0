@@ -8,9 +8,6 @@ export default {
         id: {
             type: String
         },
-        yData: {
-            type: Array
-        },
         lineColor: {
             type: String
         },
@@ -96,9 +93,8 @@ export default {
             if(eventData.type == 'perceptionCarsList') {  // 感知车
                 if(this.id.indexOf("perception-") != -1) {
                     this.sourceData = eventData.data || [];
-                    // if(this.type == 'gpsTime') {
-                    //     console.log("感知车-----------", this.type);
-                    //     // console.log(this.sourceData); 
+                    // if(this.type == 'updateTime') {
+                    //     console.log(new Date().getTime());
                     // }
                 }
             }
@@ -129,20 +125,21 @@ export default {
                 yAxis: {
                     type: 'value',
                     minInterval: 1,
+                    // minInterval: 1,
                     splitLine: {
-                        interval(index, val) {
-                            if(index == 1){
-                                return true;
-                            }else{
-                                return false;
-                            }
-                        },
-                        lineStyle:{
-                            color: '#fff',
-                            lineStyle: {
-                                width: 1
-                            }
-                        },
+                        // interval(index, val) {
+                        //     if(index == 1){
+                        //         return true;
+                        //     }else{
+                        //         return false;
+                        //     }
+                        // },
+                        // lineStyle:{
+                        //     color: '#fff',
+                        //     lineStyle: {
+                        //         width: 1
+                        //     }
+                        // },
                         show: false
                     },
                     axisLine:{
@@ -161,8 +158,8 @@ export default {
                     axisLabel:{
                         color:'#fff'
                     },
-                    min: this.yData[0],
-                    max: this.yData[this.yData.length],
+                    min: 0,
+                    max: 2,
                 },
                 series: {
                     type:'line',

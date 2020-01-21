@@ -62,20 +62,18 @@
                 <p class="m-data-title">
                     BSM/TCP时延(s)
                     <span class="m-data-legend">
-                        <i class="orange">接受</i>
+                        <i class="orange">接收</i>
                         <i class="green">发送</i>
                     </span>
                 </p>
                 <div class="m-echarts-box">
                     <echarts-one class="m-echarts" 
                         id="platform-receive" 
-                        :yData="[0, 2]" 
                         :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="platform-send" 
-                        :yData="[0, 2]" 
                         :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
@@ -85,20 +83,18 @@
                 <p class="m-data-title">
                     感知数据时延(s)
                     <span class="m-data-legend">
-                        <i class="orange">接受</i>
+                        <i class="orange">接收</i>
                         <i class="green">发送</i>
                     </span>
                 </p>
                 <div class="m-echarts-box">
                     <echarts-one class="m-echarts" 
                         id="perception-receive" 
-                        :yData="[0, 2]" 
                         :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="perception-send" 
-                        :yData="[0, 2]" 
                         :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
@@ -108,20 +104,18 @@
                 <p class="m-data-title">
                     SPAT时延(s)
                     <span class="m-data-legend">
-                        <i class="orange">接受</i>
+                        <i class="orange">接收</i>
                         <i class="green">发送</i>
                     </span>
                 </p>
                 <div class="m-echarts-box">
                     <echarts-one class="m-echarts" 
                         id="spat-receive" 
-                        :yData="[0, 2]" 
                         :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.orange">
                     </echarts-one>
                     <echarts-one class="m-echarts" 
                         id="spat-send" 
-                        :yData="[0, 2]" 
                         :resizeFlag="resizeFlag"
                         :lineColor="echartsOption.green">
                     </echarts-one>
@@ -307,7 +301,7 @@ export default {
         hoverHandler(flag) {
             this[flag] = !this[flag];
             if(this[flag]) {
-                console.log(flag);
+                // console.log(flag);
                 if(flag == 'levelHandlerShow') {
                     this.levelOptionEnable = ["1"];
                     this.dataHandlerShow = false;
