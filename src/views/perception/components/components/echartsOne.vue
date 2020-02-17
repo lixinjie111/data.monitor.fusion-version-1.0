@@ -125,7 +125,6 @@ export default {
                 yAxis: {
                     type: 'value',
                     minInterval: 1,
-                    // minInterval: 1,
                     splitLine: {
                         // interval(index, val) {
                         //     if(index == 1){
@@ -158,8 +157,8 @@ export default {
                     axisLabel:{
                         color:'#fff'
                     },
-                    min: 0,
-                    max: 2,
+                    // min: 0,
+                    // max: 2,
                 },
                 series: {
                     type:'line',

@@ -107,7 +107,8 @@ export default {
                     axisLabel:{
                         color:'#fff'
                     },
-                    max: 10
+                    // max: 10,
+                    min: 10
                 },
                 series: [{
                     type:'line',

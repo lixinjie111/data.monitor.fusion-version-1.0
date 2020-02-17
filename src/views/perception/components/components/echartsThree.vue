@@ -95,10 +95,11 @@ export default {
                     axisLabel:{
                         color:'#fff'
                     },
-                    max(value) {
-                        // return value.max * 2.5;
-                        return 30;
-                    }
+                    // max(value) {
+                    //     // return value.max * 2.5;
+                    //     return 30;
+                    // },
+                    min: 30
                 },
                 series: [{
                     type: 'bar',
