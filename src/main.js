@@ -6,16 +6,13 @@ import store from './store';
 import TDate from '@/utils/date.js'
 Vue.prototype.$dateUtil = TDate;
 
-//elementui 导入
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
-
 // 全局静态资源
 import './assets/scss/reset.scss';
 import './assets/scss/public.scss';
 import './assets/icon-font/iconfont.css';
 
-Vue.use(ElementUI);
+import AddScriptJs from '@/assets/js/utils/addScriptJs';
+
 // 进度条
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
@@ -55,11 +52,15 @@ router.beforeEach((to, from, next) => {
     if(ADMINID) {
         // 回填用户信息
         store.dispatch('setAuthInfo', getAuthInfo());
-        if(to.path === '/login') {
-            next({path: '/overview'});
-        }else {
-            next();
-        }
+        AddScriptJs.add("gaodeMap", window.scriptJs.gaodeMapUrl, function() {
+            AddScriptJs.add("livePlayer", window.scriptJs.livePlayerUrl, function() {
+                if(to.path === '/login') {
+                    next({path: '/overview'});
+                }else {
+                    next();
+                }
+            });
+        });
     }else {
         if (whiteList.indexOf(to.path) !== -1) { // 在免登录白名单，直接进入
             next()

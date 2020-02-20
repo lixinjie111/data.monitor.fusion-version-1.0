@@ -127,11 +127,11 @@
             },
             loginFunc(params) {
                 this.goLogin(params).then(res => {
-                    this.loading = false;
                     if(res.status == 200) {
                         this.$router.push({ path: '/overview' });
                         localStorage.setItem("yk-token",JSON.stringify({data:JSON.parse(res.data).token,"time":new Date().getTime()}));
                     }else {
+                        this.loading = false;
                         if(res.status == -200){
                             if(res.data.errorCount) {
                                 if(res.data.errorCount>=5){

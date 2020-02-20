@@ -79,11 +79,11 @@ module.exports = {
     ]
   },
   externals:{
-    'AMap': 'AMap',
     'vue':'Vue',
+    'vue-router':'VueRouter',
     'vuex':'Vuex',
     'axios':'axios',
-    'vue-router':'VueRouter',
+    'element-ui':'ELEMENT'
   },
   node: {
     // prevent webpack from injecting useless setImmediate polyfill because Vue
