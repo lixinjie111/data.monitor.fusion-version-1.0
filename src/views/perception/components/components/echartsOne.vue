@@ -112,7 +112,7 @@ export default {
             let option = {
                 animation: false,
                 grid:{
-                    left: 30,
+                    left: 36,
                     right: 2,
                     top: 8,
                     bottom: 5
@@ -157,7 +157,7 @@ export default {
                     axisLabel:{
                         color:'#fff'
                     },
-                    // min: 0,
+                    min: 0,
                     // max: 2,
                 },
                 series: {

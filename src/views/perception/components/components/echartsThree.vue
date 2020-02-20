@@ -64,7 +64,7 @@ export default {
             let option = {
                 animation: false,
                 grid:{
-                    left: 30,
+                    left: 36,
                     right: 0,
                     top: 8,
                     bottom: 5
@@ -99,7 +99,7 @@ export default {
                     //     // return value.max * 2.5;
                     //     return 30;
                     // },
-                    min: 30
+                    min: 0
                 },
                 series: [{
                     type: 'bar',

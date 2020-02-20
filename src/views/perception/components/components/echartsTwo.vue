@@ -76,7 +76,7 @@ export default {
             let option = {
                 animation: false,
                 grid:{
-                    left: 30,
+                    left: 36,
                     right: 0,
                     top: 8,
                     bottom: 5
@@ -108,7 +108,7 @@ export default {
                         color:'#fff'
                     },
                     // max: 10,
-                    min: 10
+                    min: 0
                 },
                 series: [{
                     type:'line',

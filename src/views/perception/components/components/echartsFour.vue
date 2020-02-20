@@ -21,7 +21,7 @@ export default {
         return {
             echarts: null,
             trafficClassify: [],
-            rsiList: [],
+            rsiList: {},
             sourceData: []
         }
     },
@@ -33,20 +33,11 @@ export default {
                     item.children = [];
                 });
                 for(let warnId in newVal) {
-                    // let _classity = warnId.split('_')[0];              // 事件分类key
-                    // let _alertType = newVal[warnId].eventType.split('_')[1];      // 事件告警key
-                    let _alertType = newVal[warnId].alertType;      // 事件告警key,alertType(-1：表示公司私有协议，非RSI)
-                    if(alertType == -1) {
+                    let _alertType = newVal[warnId].eventType.split('_')[1];      // 事件告警key
+                    if(_alertType == -1) {
                         continue;
                     }
-                    let _filterData = this.rsiList.filter(function(val,index,arr){
-                        return (val._alertType == _alertType)
-                    });
-                    let _classity = warnId.split('_')[0];
-                    if(_filterData.length) {
-                        _classity = _filterData[0].statType;
-                    }
-
+                    let _classity = this.rsiList[_alertType] || warnId.split('_')[0];
                     let _msg = newVal[warnId].msg || '其他';      // 事件名称
                     console.log(warnId, _classity, _alertType, _msg);
 
@@ -104,7 +95,7 @@ export default {
             // console.log('获取rsi事件列表');
             findRByAST().then(res => {
                 this.rsiList = res.data;
-                console.log(this.rsiList);
+                // console.log(this.rsiList);
             });
         },
         getMessage(e) {
