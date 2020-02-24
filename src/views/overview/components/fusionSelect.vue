@@ -163,12 +163,6 @@
                     }
                 }else{//路侧点
                     if(this.searchKey.rsPtName!=""){
-                        // console.log(this.searchKey);
-                        // let centPos = [this.searchKey.value.ptLon,this.searchKey.value.ptLat];
-                        // this.$router.push({
-                        //     path: '/perception/'+this.searchKey.value.rsPtId+ "/"+4+"/"+0.004+"/"+true,
-                        //     query:{lng:centPos[0],lat:centPos[1],isShow:false, isShowMapElement:window.isShowMapElement}
-                        // });
                         this.getCameraByRsId(this.searchKey.value);
                     }else{
                         this.$message({
@@ -188,7 +182,7 @@
                         if(data.camLst && data.camLst.length>0 && data.camLst[0].camParam){
                             sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data));
                             this.$router.push({
-                                path: '/perception/'+item.rsPtId+ "/"+window.delayTime+ "/"+window.miniExtend+"/"+true,
+                                path: '/perception/'+item.rsPtId+ "/"+window.delayTime+ "/"+window.miniExtend,
                                 query:{lng:item.ptLon,lat:item.ptLat,isShowMapElement:window.isShowMapElement}
                             });
                         }else {
