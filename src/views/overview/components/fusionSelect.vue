@@ -189,7 +189,7 @@
                             sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data));
                             this.$router.push({
                                 path: '/perception/'+item.rsPtId+ "/"+window.delayTime+ "/"+window.miniExtend+"/"+true,
-                                query:{lng:item.ptLon,lat:item.ptLat,isShow:false,isShowMapElement:window.isShowMapElement}
+                                query:{lng:item.ptLon,lat:item.ptLat,isShowMapElement:window.isShowMapElement}
                             });
                         }else {
                             this.$message({
