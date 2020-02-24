@@ -252,7 +252,7 @@
     .video-style{
         width: 400px;
         padding: 86px 10px 0;
-        z-index: 99;
+        z-index: 5;
         .c-scroll-wrap {
             height: auto !important;
             max-height: 470px !important;
@@ -293,7 +293,7 @@
             position: absolute;
             top: 0px;
             right: 0px;
-            z-index:6;
+            z-index:8;
             width: 900px;
             border:1px solid rgba(211, 134, 0, 0.5);
             background: #000;

@@ -506,7 +506,7 @@ export default {
         left: 0;
         right: 0;
         bottom: -240px;
-        z-index: 100;
+        z-index: 7;
         height: 200px;
         padding: 10px 5px;
         background: linear-gradient(to top, rgba(0, 0 ,0 , .6) 30%, rgba(0, 0 ,0 , 0));
