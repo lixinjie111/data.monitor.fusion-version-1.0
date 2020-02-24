@@ -32,12 +32,13 @@
             </el-select>
         </el-form-item>
         <el-form-item>
-            <el-button  @click="showView()">进入</el-button>
+            <el-button  @click="showView()" :loading="enterloading">进入</el-button>
         </el-form-item>
     </el-form>
 </template>
 <script>
-  import { requestVehicle,requestRoadSide } from "@/api/overview/index.js";
+    import { requestVehicle,requestRoadSide } from "@/api/overview/index.js";
+    import {getCameraByRsId} from '@/api/fusion'
     export default {
         directives:{
             loadmore:{
@@ -54,6 +55,7 @@
         },
         data() {
             return {
+                enterloading: false,
                 scrollDom:'',
                 query:'',
                 searchKey:{
@@ -161,11 +163,13 @@
                     }
                 }else{//路侧点
                     if(this.searchKey.rsPtName!=""){
-                        let centPos = [this.searchKey.value.ptLon,this.searchKey.value.ptLat];
-                        this.$router.push({
-                            path: '/perception/'+this.searchKey.value.rsPtId+ "/"+4+"/"+0.004+"/"+true,
-                            query:{lng:centPos[0],lat:centPos[1],isShow:false, isShowMapElement:window.isShowMapElement}
-                        });
+                        // console.log(this.searchKey);
+                        // let centPos = [this.searchKey.value.ptLon,this.searchKey.value.ptLat];
+                        // this.$router.push({
+                        //     path: '/perception/'+this.searchKey.value.rsPtId+ "/"+4+"/"+0.004+"/"+true,
+                        //     query:{lng:centPos[0],lat:centPos[1],isShow:false, isShowMapElement:window.isShowMapElement}
+                        // });
+                        this.getCameraByRsId(this.searchKey.value);
                     }else{
                         this.$message({
                             type: 'error',
@@ -175,7 +179,35 @@
                         });
                     }
                 }
-                
+            },
+            getCameraByRsId(item){
+                this.enterloading = true;
+                getCameraByRsId({"rsId":item.rsPtId}).then(res => {
+                    if(res.status == 200) {
+                        let data = res.data;
+                        if(data.camLst && data.camLst.length>0 && data.camLst[0].camParam){
+                            sessionStorage.setItem("sTypeRoadCamLst",JSON.stringify(data));
+                            this.$router.push({
+                                path: '/perception/'+item.rsPtId+ "/"+window.delayTime+ "/"+window.miniExtend+"/"+true,
+                                query:{lng:item.ptLon,lat:item.ptLat,isShow:false,isShowMapElement:window.isShowMapElement}
+                            });
+                        }else {
+                            this.$message({
+                                type: 'warning',
+                                duration: '1500',
+                                message: '请设置典型摄像头及其相关参数',
+                                showClose: true
+                            });
+                            sessionStorage.removeItem("sTypeRoadCamLst");
+                        }
+                    }else {
+                        sessionStorage.removeItem("sTypeRoadCamLst");
+                    }
+                    this.enterloading = false;
+                }).catch(err => {
+                    sessionStorage.removeItem("sTypeRoadCamLst");
+                    this.enterloading = false;
+                });
             }
         }
     }
