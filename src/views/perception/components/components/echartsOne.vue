@@ -125,6 +125,7 @@ export default {
                 yAxis: {
                     type: 'value',
                     minInterval: 1,
+                    splitNumber: 2,
                     splitLine: {
                         // interval(index, val) {
                         //     if(index == 1){
