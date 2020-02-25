@@ -108,7 +108,10 @@ export default {
                         color:'#fff'
                     },
                     // max: 10,
-                    min: 0
+                    min: 0,
+                    max(value) {
+                        return value.max > 10 ? value.max : 10
+                    }
                 },
                 series: [{
                     type:'line',

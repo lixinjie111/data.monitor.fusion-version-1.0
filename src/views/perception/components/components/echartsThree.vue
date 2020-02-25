@@ -99,7 +99,10 @@ export default {
                     //     // return value.max * 2.5;
                     //     return 30;
                     // },
-                    min: 0
+                    min: 0,
+                    max(value) {
+                        return value.max > 30 ? value.max : 30
+                    }
                 },
                 series: [{
                     type: 'bar',
