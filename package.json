@@ -15,7 +15,7 @@
     "echarts": "^4.2.1",
     "element-ui": "^2.4.8",
     "js-md5": "^0.7.3",
-    "jquery": "^2.2.3",
+    "jquery": "^3.4.0",
     "js-cookie": "^2.2.0",
     "nprogress": "^0.2.0",
     "ol": "^5.3.3",
